@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Minetest
+GenericName=Minetest
+Comment=Block-based multiplayer game platform
+Comment[de]=Blockbasierte Mehrspieler-Spieleplattform
+Comment[fr]=Plate-forme de jeu multijoueurs à base de blocs
+Exec=minetest
+Icon=minetest
+Terminal=false
+PrefersNonDefaultGPU=true
+Type=Application
+Categories=Game;Simulation;
+StartupNotify=false
+Keywords=sandbox;world;mining;crafting;blocks;nodes;multiplayer;roleplaying;
