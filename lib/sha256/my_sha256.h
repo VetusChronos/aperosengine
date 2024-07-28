@@ -57,6 +57,7 @@
  */
 
 #include <stddef.h>
+#include <stdint.h>
 
 #ifndef HEADER_SHA_H
 #define HEADER_SHA_H
@@ -84,10 +85,11 @@ extern "C" {
 #define SHA256_DIGEST_LENGTH	32
 
 typedef struct SHA256state_st {
-	SHA_LONG h[8];
-	SHA_LONG Nl, Nh;
-	SHA_LONG data[SHA_LBLOCK];
-	unsigned int num, md_len;
+    uint32_t h[8];
+    uint32_t data[16];
+    size_t num;
+    uint32_t Nl, Nh;
+    size_t md_len;
 } SHA256_CTX;
 
 int SHA256_Init(SHA256_CTX *c);

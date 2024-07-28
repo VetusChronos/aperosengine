@@ -1,127 +1,21 @@
-/* libcrypto/sha/sha256.c */
-/* ====================================================================
- * Copyright (c) 1998-2011 The OpenSSL Project.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. All advertising materials mentioning features or use of this
- *    software must display the following acknowledgment:
- *    "This product includes software developed by the OpenSSL Project
- *    for use in the OpenSSL Toolkit. (http://www.openssl.org/)"
- *
- * 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to
- *    endorse or promote products derived from this software without
- *    prior written permission. For written permission, please contact
- *    openssl-core@openssl.org.
- *
- * 5. Products derived from this software may not be called "OpenSSL"
- *    nor may "OpenSSL" appear in their names without prior written
- *    permission of the OpenSSL Project.
- *
- * 6. Redistributions of any form whatsoever must retain the following
- *    acknowledgment:
- *    "This product includes software developed by the OpenSSL Project
- *    for use in the OpenSSL Toolkit (http://www.openssl.org/)"
- *
- * THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY
- * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
- * ====================================================================
- *
- * This product includes cryptographic software written by Eric Young
- * (eay@cryptsoft.com).  This product includes software written by Tim
- * Hudson (tjh@cryptsoft.com).
- */
+/* 
+* sha256.c modified by Yuna Sato (YunaSatoy)
+* based on libcrypto/sha/sha256.c (see LICENSE.md) 
+*/
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "my_sha256.h"
 
+// Ensure compatibility with different endian systems
 #if defined(_MSC_VER) && !defined(__clang__) && !defined(__attribute__)
 #define __attribute__(a)
 #endif
 
-#include "cmake_config.h" /* HAVE_ENDIAN_H */
-
-/** endian.h **/
-/*
- * Public domain
- * endian.h compatibility shim
- */
+#include "cmake_config.h" // For HAVE_ENDIAN_H
 
 #if defined(_WIN32)
-
-#define LITTLE_ENDIAN 1234
-#define BIG_ENDIAN 4321
-#define PDP_ENDIAN 3412
-
-/*
- * Use GCC and Visual Studio compiler defines to determine endian.
- */
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define BYTE_ORDER LITTLE_ENDIAN
-#else
-#define BYTE_ORDER BIG_ENDIAN
-#endif
-
-#elif defined(HAVE_ENDIAN_H)
-#include <endian.h>
-
-#elif defined(__MACH__) && defined(__APPLE__)
-#include <machine/endian.h>
-
-#elif defined(__sun) || defined(_AIX) || defined(__hpux)
-#include <arpa/nameser_compat.h>
-#include <sys/types.h>
-
-#elif defined(__sgi)
-#include <standards.h>
-#include <sys/endian.h>
-
-#endif
-
-#ifndef __STRICT_ALIGNMENT
-#define __STRICT_ALIGNMENT
-#if defined(__i386) || defined(__i386__) || defined(__x86_64) ||               \
-    defined(__x86_64__) || defined(__s390__) || defined(__s390x__) ||          \
-    defined(__aarch64__) ||                                                    \
-    ((defined(__arm__) || defined(__arm)) && __ARM_ARCH >= 6)
-#undef __STRICT_ALIGNMENT
-#endif
-#endif
-
-#if defined(__APPLE__) && !defined(HAVE_ENDIAN_H)
-#include <libkern/OSByteOrder.h>
-#define be16toh(x) OSSwapBigToHostInt16((x))
-#define htobe16(x) OSSwapHostToBigInt16((x))
-#define le32toh(x) OSSwapLittleToHostInt32((x))
-#define be32toh(x) OSSwapBigToHostInt32((x))
-#define htole32(x) OSSwapHostToLittleInt32(x)
-#define htobe32(x) OSSwapHostToBigInt32(x)
-#endif /* __APPLE__ && !HAVE_ENDIAN_H */
-
-#if defined(_WIN32) && !defined(HAVE_ENDIAN_H)
 #include <winsock2.h>
 
 #define be16toh(x) ntohs((x))
@@ -130,39 +24,20 @@
 #define be32toh(x) ntohl((x))
 #define htole32(x) (x)
 #define htobe32(x) ntohl((x))
-#endif /* _WIN32 && !HAVE_ENDIAN_H */
 
-#ifdef __linux__
-#if !defined(betoh16)
-#define betoh16(x) be16toh(x)
-#endif
-#if !defined(betoh32)
-#define betoh32(x) be32toh(x)
-#endif
-#endif /* __linux__ */
+#elif defined(HAVE_ENDIAN_H)
+#include <endian.h>
 
-#if defined(__FreeBSD__)
-#if !defined(HAVE_ENDIAN_H)
+#elif defined(__APPLE__)
+#include <machine/endian.h>
+
+#elif defined(__linux__)
+#include <endian.h>
+
+#elif defined(__FreeBSD__)
 #include <sys/endian.h>
-#endif
-#if !defined(betoh16)
-#define betoh16(x) be16toh(x)
-#endif
-#if !defined(betoh32)
-#define betoh32(x) be32toh(x)
-#endif
-#endif
 
-#if defined(__NetBSD__)
-#if !defined(betoh16)
-#define betoh16(x) be16toh(x)
-#endif
-#if !defined(betoh32)
-#define betoh32(x) be32toh(x)
-#endif
-#endif
-
-#if defined(__sun)
+#elif defined(__sun)
 #include <sys/byteorder.h>
 #define be16toh(x) BE_16(x)
 #define htobe16(x) BE_16(x)
@@ -170,43 +45,44 @@
 #define be32toh(x) BE_32(x)
 #define htole32(x) LE_32(x)
 #define htobe32(x) BE_32(x)
+
+#else
+#error "Unsupported platform"
 #endif
-/** **/
+
+// Ensure alignment for various architectures
+#ifndef __STRICT_ALIGNMENT
+#define __STRICT_ALIGNMENT
+#if defined(__i386) || defined(__x86_64) || defined(__aarch64__) || \
+    ((defined(__arm__) || defined(__arm)) && __ARM_ARCH >= 6)
+#undef __STRICT_ALIGNMENT
+#endif
+#endif
 
 /** libcrypto/crypto_internal.h **/
 #define CTASSERT(x) \
     extern char _ctassert[(x) ? 1 : -1] __attribute__((__unused__))
 
-static inline uint32_t
-crypto_load_be32toh(const uint8_t *src)
-{
-	uint32_t v;
-
-	memcpy(&v, src, sizeof(v));
-
-	return be32toh(v);
+static inline uint32_t crypto_load_be32toh(const uint8_t *src) {
+    uint32_t v;
+    memcpy(&v, src, sizeof(v));
+    return be32toh(v);
 }
 
-static inline void
-crypto_store_htobe32(uint8_t *dst, uint32_t v)
-{
-	v = htobe32(v);
-	memcpy(dst, &v, sizeof(v));
+static inline void crypto_store_htobe32(uint8_t *dst, uint32_t v) {
+    v = htobe32(v);
+    memcpy(dst, &v, sizeof(v));
 }
 
-static inline uint32_t
-crypto_ror_u32(uint32_t v, size_t shift)
-{
+static inline uint32_t crypto_ror_u32(uint32_t v, size_t shift) {
 	return (v << (32 - shift)) | (v >> shift);
 }
-/** **/
 
 /** libcrypto/hidden/crypto_namespace.h **/
 # define LCRYPTO_UNUSED(x)
 # define LCRYPTO_USED(x)
 # define LCRYPTO_ALIAS1(pre,x)
 # define LCRYPTO_ALIAS(x)
-/** **/
 
 /* Ensure that SHA_LONG and uint32_t are equivalent. */
 CTASSERT(sizeof(SHA_LONG) == sizeof(uint32_t));
@@ -232,338 +108,201 @@ static const SHA_LONG K256[64] = {
 	0x90befffaUL, 0xa4506cebUL, 0xbef9a3f7UL, 0xc67178f2UL,
 };
 
-static inline SHA_LONG
-Sigma0(SHA_LONG x)
-{
-	return crypto_ror_u32(x, 2) ^ crypto_ror_u32(x, 13) ^
-	    crypto_ror_u32(x, 22);
+static inline SHA_LONG Sigma0(SHA_LONG x) {
+    return crypto_ror_u32(x, 2) ^ crypto_ror_u32(x, 13) ^ crypto_ror_u32(x, 22);
 }
 
-static inline SHA_LONG
-Sigma1(SHA_LONG x)
-{
-	return crypto_ror_u32(x, 6) ^ crypto_ror_u32(x, 11) ^
-	    crypto_ror_u32(x, 25);
+static inline SHA_LONG Sigma1(SHA_LONG x) {
+    return crypto_ror_u32(x, 6) ^ crypto_ror_u32(x, 11) ^ crypto_ror_u32(x, 25);
 }
 
-static inline SHA_LONG
-sigma0(SHA_LONG x)
-{
-	return crypto_ror_u32(x, 7) ^ crypto_ror_u32(x, 18) ^ (x >> 3);
+static inline SHA_LONG sigma0(SHA_LONG x) {
+    return crypto_ror_u32(x, 7) ^ crypto_ror_u32(x, 18) ^ (x >> 3);
 }
 
-static inline SHA_LONG
-sigma1(SHA_LONG x)
-{
-	return crypto_ror_u32(x, 17) ^ crypto_ror_u32(x, 19) ^ (x >> 10);
+static inline SHA_LONG sigma1(SHA_LONG x) {
+    return crypto_ror_u32(x, 17) ^ crypto_ror_u32(x, 19) ^ (x >> 10);
 }
 
-static inline SHA_LONG
-Ch(SHA_LONG x, SHA_LONG y, SHA_LONG z)
-{
-	return (x & y) ^ (~x & z);
+static inline SHA_LONG Ch(SHA_LONG x, SHA_LONG y, SHA_LONG z) {
+    return (x & y) ^ (~x & z);
 }
 
-static inline SHA_LONG
-Maj(SHA_LONG x, SHA_LONG y, SHA_LONG z)
-{
-	return (x & y) ^ (x & z) ^ (y & z);
+static inline SHA_LONG Maj(SHA_LONG x, SHA_LONG y, SHA_LONG z) {
+    return (x & y) ^ (x & z) ^ (y & z);
 }
 
-static inline void
-sha256_msg_schedule_update(SHA_LONG *W0, SHA_LONG W1,
-    SHA_LONG W9, SHA_LONG W14)
-{
-	*W0 = sigma1(W14) + W9 + sigma0(W1) + *W0;
+static inline void sha256_msg_schedule_update(SHA_LONG *W0, SHA_LONG W1, SHA_LONG W9, SHA_LONG W14) {
+    *W0 += sigma1(W14) + W9 + sigma0(W1);
 }
 
-static inline void
-sha256_round(SHA_LONG *a, SHA_LONG *b, SHA_LONG *c, SHA_LONG *d,
-    SHA_LONG *e, SHA_LONG *f, SHA_LONG *g, SHA_LONG *h,
-    SHA_LONG Kt, SHA_LONG Wt)
-{
-	SHA_LONG T1, T2;
+static inline void sha256_round(SHA_LONG *a, SHA_LONG *b, SHA_LONG *c, SHA_LONG *d,
+                                 SHA_LONG *e, SHA_LONG *f, SHA_LONG *g, SHA_LONG *h,
+                                 SHA_LONG Kt, SHA_LONG Wt) {
+    SHA_LONG T1 = *h + Sigma1(*e) + Ch(*e, *f, *g) + Kt + Wt;
+    SHA_LONG T2 = Sigma0(*a) + Maj(*a, *b, *c);
 
-	T1 = *h + Sigma1(*e) + Ch(*e, *f, *g) + Kt + Wt;
-	T2 = Sigma0(*a) + Maj(*a, *b, *c);
-
-	*h = *g;
-	*g = *f;
-	*f = *e;
-	*e = *d + T1;
-	*d = *c;
-	*c = *b;
-	*b = *a;
-	*a = T1 + T2;
+    *h = *g;
+    *g = *f;
+    *f = *e;
+    *e = *d + T1;
+    *d = *c;
+    *c = *b;
+    *b = *a;
+    *a = T1 + T2;
 }
 
-static void
-sha256_block_data_order(SHA256_CTX *ctx, const void *_in, size_t num)
-{
-	const uint8_t *in = _in;
-	const SHA_LONG *in32;
-	SHA_LONG a, b, c, d, e, f, g, h;
-	SHA_LONG X[16];
-	int i;
+static void sha256_block_data_order(SHA256_CTX *ctx, const void *_in, size_t num) {
+    const uint8_t *in = _in;
+    SHA_LONG a, b, c, d, e, f, g, h;
+    SHA_LONG X[16];
+    int i;
 
-	while (num--) {
-		a = ctx->h[0];
-		b = ctx->h[1];
-		c = ctx->h[2];
-		d = ctx->h[3];
-		e = ctx->h[4];
-		f = ctx->h[5];
-		g = ctx->h[6];
-		h = ctx->h[7];
+    while (num--) {
+        a = ctx->h[0];
+        b = ctx->h[1];
+        c = ctx->h[2];
+        d = ctx->h[3];
+        e = ctx->h[4];
+        f = ctx->h[5];
+        g = ctx->h[6];
+        h = ctx->h[7];
 
-		if ((size_t)in % 4 == 0) {
-			/* Input is 32 bit aligned. */
-			in32 = (const SHA_LONG *)in;
-			X[0] = be32toh(in32[0]);
-			X[1] = be32toh(in32[1]);
-			X[2] = be32toh(in32[2]);
-			X[3] = be32toh(in32[3]);
-			X[4] = be32toh(in32[4]);
-			X[5] = be32toh(in32[5]);
-			X[6] = be32toh(in32[6]);
-			X[7] = be32toh(in32[7]);
-			X[8] = be32toh(in32[8]);
-			X[9] = be32toh(in32[9]);
-			X[10] = be32toh(in32[10]);
-			X[11] = be32toh(in32[11]);
-			X[12] = be32toh(in32[12]);
-			X[13] = be32toh(in32[13]);
-			X[14] = be32toh(in32[14]);
-			X[15] = be32toh(in32[15]);
-		} else {
-			/* Input is not 32 bit aligned. */
-			X[0] = crypto_load_be32toh(&in[0 * 4]);
-			X[1] = crypto_load_be32toh(&in[1 * 4]);
-			X[2] = crypto_load_be32toh(&in[2 * 4]);
-			X[3] = crypto_load_be32toh(&in[3 * 4]);
-			X[4] = crypto_load_be32toh(&in[4 * 4]);
-			X[5] = crypto_load_be32toh(&in[5 * 4]);
-			X[6] = crypto_load_be32toh(&in[6 * 4]);
-			X[7] = crypto_load_be32toh(&in[7 * 4]);
-			X[8] = crypto_load_be32toh(&in[8 * 4]);
-			X[9] = crypto_load_be32toh(&in[9 * 4]);
-			X[10] = crypto_load_be32toh(&in[10 * 4]);
-			X[11] = crypto_load_be32toh(&in[11 * 4]);
-			X[12] = crypto_load_be32toh(&in[12 * 4]);
-			X[13] = crypto_load_be32toh(&in[13 * 4]);
-			X[14] = crypto_load_be32toh(&in[14 * 4]);
-			X[15] = crypto_load_be32toh(&in[15 * 4]);
-		}
-		in += SHA256_CBLOCK;
+        // Load message schedule
+        if ((size_t)in % 4 == 0) {
+            const SHA_LONG *in32 = (const SHA_LONG *)in;
+            for (i = 0; i < 16; i++) {
+                X[i] = be32toh(in32[i]);
+            }
+        } else {
+            for (i = 0; i < 16; i++) {
+                X[i] = crypto_load_be32toh(&in[i * 4]);
+            }
+        }
+        in += SHA256_CBLOCK;
 
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[0], X[0]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[1], X[1]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[2], X[2]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[3], X[3]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[4], X[4]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[5], X[5]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[6], X[6]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[7], X[7]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[8], X[8]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[9], X[9]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[10], X[10]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[11], X[11]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[12], X[12]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[13], X[13]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[14], X[14]);
-		sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[15], X[15]);
+        // Process the first 16 words
+        for (i = 0; i < 16; i++) {
+            sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i], X[i]);
+        }
 
-		for (i = 16; i < 64; i += 16) {
-			sha256_msg_schedule_update(&X[0], X[1], X[9], X[14]);
-			sha256_msg_schedule_update(&X[1], X[2], X[10], X[15]);
-			sha256_msg_schedule_update(&X[2], X[3], X[11], X[0]);
-			sha256_msg_schedule_update(&X[3], X[4], X[12], X[1]);
-			sha256_msg_schedule_update(&X[4], X[5], X[13], X[2]);
-			sha256_msg_schedule_update(&X[5], X[6], X[14], X[3]);
-			sha256_msg_schedule_update(&X[6], X[7], X[15], X[4]);
-			sha256_msg_schedule_update(&X[7], X[8], X[0], X[5]);
-			sha256_msg_schedule_update(&X[8], X[9], X[1], X[6]);
-			sha256_msg_schedule_update(&X[9], X[10], X[2], X[7]);
-			sha256_msg_schedule_update(&X[10], X[11], X[3], X[8]);
-			sha256_msg_schedule_update(&X[11], X[12], X[4], X[9]);
-			sha256_msg_schedule_update(&X[12], X[13], X[5], X[10]);
-			sha256_msg_schedule_update(&X[13], X[14], X[6], X[11]);
-			sha256_msg_schedule_update(&X[14], X[15], X[7], X[12]);
-			sha256_msg_schedule_update(&X[15], X[0], X[8], X[13]);
+        // Process the remaining words
+        for (i = 16; i < 64; i++) {
+            sha256_msg_schedule_update(&X[i % 16], X[(i + 1) % 16], X[(i + 9) % 16], X[(i + 14) % 16]);
+            sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i], X[i % 16]);
+        }
 
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 0], X[0]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 1], X[1]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 2], X[2]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 3], X[3]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 4], X[4]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 5], X[5]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 6], X[6]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 7], X[7]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 8], X[8]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 9], X[9]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 10], X[10]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 11], X[11]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 12], X[12]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 13], X[13]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 14], X[14]);
-			sha256_round(&a, &b, &c, &d, &e, &f, &g, &h, K256[i + 15], X[15]);
-		}
-
-		ctx->h[0] += a;
-		ctx->h[1] += b;
-		ctx->h[2] += c;
-		ctx->h[3] += d;
-		ctx->h[4] += e;
-		ctx->h[5] += f;
-		ctx->h[6] += g;
-		ctx->h[7] += h;
-	}
+        ctx->h[0] += a;
+        ctx->h[1] += b;
+        ctx->h[2] += c;
+        ctx->h[3] += d;
+        ctx->h[4] += e;
+        ctx->h[5] += f;
+        ctx->h[6] += g;
+        ctx->h[7] += h;
+    }
 }
 
-int
-SHA256_Init(SHA256_CTX *c)
-{
-	memset(c, 0, sizeof(*c));
+int SHA256_Init(SHA256_CTX *c) {
+    memset(c, 0, sizeof(*c));
 
-	c->h[0] = 0x6a09e667UL;
-	c->h[1] = 0xbb67ae85UL;
-	c->h[2] = 0x3c6ef372UL;
-	c->h[3] = 0xa54ff53aUL;
-	c->h[4] = 0x510e527fUL;
-	c->h[5] = 0x9b05688cUL;
-	c->h[6] = 0x1f83d9abUL;
-	c->h[7] = 0x5be0cd19UL;
+    c->h[0] = 0x6a09e667UL;
+    c->h[1] = 0xbb67ae85UL;
+    c->h[2] = 0x3c6ef372UL;
+    c->h[3] = 0xa54ff53aUL;
+    c->h[4] = 0x510e527fUL;
+    c->h[5] = 0x9b05688cUL;
+    c->h[6] = 0x1f83d9abUL;
+    c->h[7] = 0x5be0cd19UL;
 
-	c->md_len = SHA256_DIGEST_LENGTH;
+    c->md_len = SHA256_DIGEST_LENGTH;
+    c->num = 0;
 
-	return 1;
+    return 1;
 }
 LCRYPTO_ALIAS(SHA256_Init);
 
-int
-SHA256_Update(SHA256_CTX *c, const void *data_, size_t len)
-{
-	const unsigned char *data = data_;
-	unsigned char *p;
-	SHA_LONG l;
-	size_t n;
+int SHA256_Update(SHA256_CTX *c, const void *data, size_t len) {
+    const uint8_t *data_ptr = (const uint8_t *)data;
+    size_t fill;
+    uint32_t left;
 
-	if (len == 0)
-		return 1;
+    if (len == 0) {
+        return 1;
+    }
 
-	l = (c->Nl + (((SHA_LONG)len) << 3)) & 0xffffffffUL;
-	/* 95-05-24 eay Fixed a bug with the overflow handling, thanks to
-	 * Wei Dai <weidai@eskimo.com> for pointing it out. */
-	if (l < c->Nl) /* overflow */
-		c->Nh++;
-	c->Nh += (SHA_LONG)(len >> 29);	/* might cause compiler warning on 16-bit */
-	c->Nl = l;
+    left = c->num & 0x3F; // Number of bytes already processed in the buffer
+    fill = 64 - left;    // Number of bytes remaining in the current buffer
 
-	n = c->num;
-	if (n != 0) {
-		p = (unsigned char *)c->data;
+    if (left && len >= fill) {
+        // Fill the buffer and process the entire block
+        memcpy((uint8_t *)c->data + left, data_ptr, fill);
+        c->num += fill;
+        sha256_block_data_order(c, (uint8_t *)c->data, 1);
+        data_ptr += fill;
+        len -= fill;
+        left = 0;
+    }
 
-		if (len >= SHA_CBLOCK || len + n >= SHA_CBLOCK) {
-			memcpy(p + n, data, SHA_CBLOCK - n);
-			sha256_block_data_order(c, p, 1);
-			n = SHA_CBLOCK - n;
-			data += n;
-			len -= n;
-			c->num = 0;
-			memset(p, 0, SHA_CBLOCK);	/* keep it zeroed */
-		} else {
-			memcpy(p + n, data, len);
-			c->num += (unsigned int)len;
-			return 1;
-		}
-	}
+    // Process 64 byte blocks
+    if (len >= 64) {
+        size_t blocks = len / 64;
+        sha256_block_data_order(c, data_ptr, blocks);
+        data_ptr += blocks * 64;
+        len -= blocks * 64;
+    }
 
-	n = len/SHA_CBLOCK;
-	if (n > 0) {
-		sha256_block_data_order(c, data, n);
-		n *= SHA_CBLOCK;
-		data += n;
-		len -= n;
-	}
+    // Copy any remaining data to the buffer
+    if (len) {
+        memcpy(c->data, data_ptr, len);
+        c->num += len;
+    }
 
-	if (len != 0) {
-		p = (unsigned char *)c->data;
-		c->num = (unsigned int)len;
-		memcpy(p, data, len);
-	}
-	return 1;
+    return 1;
 }
+
 LCRYPTO_ALIAS(SHA256_Update);
 
-void
-SHA256_Transform(SHA256_CTX *c, const unsigned char *data)
-{
+void SHA256_Transform(SHA256_CTX *c, const unsigned char *data) {
 	sha256_block_data_order(c, data, 1);
 }
 LCRYPTO_ALIAS(SHA256_Transform);
 
-int
-SHA256_Final(unsigned char *md, SHA256_CTX *c)
-{
-	unsigned char *p = (unsigned char *)c->data;
-	size_t n = c->num;
-	unsigned int nn;
+int SHA256_Final(unsigned char *md, SHA256_CTX *c) {
+    uint8_t *p = (uint8_t *)c->data;
+    size_t n = c->num & 0x3F;
 
-	p[n] = 0x80; /* there is always room for one */
-	n++;
+    p[n++] = 0x80;
 
-	if (n > (SHA_CBLOCK - 8)) {
-		memset(p + n, 0, SHA_CBLOCK - n);
-		n = 0;
-		sha256_block_data_order(c, p, 1);
-	}
+    if (n > 56) {
+        memset(p + n, 0, 64 - n);
+        sha256_block_data_order(c, p, 1);
+        n = 0;
+    }
 
-	memset(p + n, 0, SHA_CBLOCK - 8 - n);
-	c->data[SHA_LBLOCK - 2] = htobe32(c->Nh);
-	c->data[SHA_LBLOCK - 1] = htobe32(c->Nl);
+    memset(p + n, 0, 56 - n);
 
-	sha256_block_data_order(c, p, 1);
-	c->num = 0;
-	memset(p, 0, SHA_CBLOCK);
+    SHA_LONG bits[2];
+    bits[0] = htobe32((c->num >> 29) & 0xFFFFFFFF);
+    bits[1] = htobe32(c->num << 3);
 
-	/*
-	 * Note that FIPS180-2 discusses "Truncation of the Hash Function Output."
-	 * default: case below covers for it. It's not clear however if it's
-	 * permitted to truncate to amount of bytes not divisible by 4. I bet not,
-	 * but if it is, then default: case shall be extended. For reference.
-	 * Idea behind separate cases for pre-defined lengths is to let the
-	 * compiler decide if it's appropriate to unroll small loops.
-	 */
-	switch (c->md_len) {
-	case SHA256_DIGEST_LENGTH:
-		for (nn = 0; nn < SHA256_DIGEST_LENGTH / 4; nn++) {
-			crypto_store_htobe32(md, c->h[nn]);
-			md += 4;
-		}
-		break;
+    memcpy(p + 56, bits, sizeof(bits));
 
-	default:
-		if (c->md_len > SHA256_DIGEST_LENGTH)
-			return 0;
-		for (nn = 0; nn < c->md_len / 4; nn++) {
-			crypto_store_htobe32(md, c->h[nn]);
-			md += 4;
-		}
-		break;
-	}
+    sha256_block_data_order(c, p, 1);
 
-	return 1;
+    for (size_t i = 0; i < SHA256_DIGEST_LENGTH / 4; i++) {
+        ((SHA_LONG *)md)[i] = htobe32(c->h[i]);
+    }
+
+    return 1;
 }
 LCRYPTO_ALIAS(SHA256_Final);
 
-unsigned char *
-SHA256(const unsigned char *d, size_t n, unsigned char *md)
-{
+unsigned char * SHA256(const unsigned char *d, size_t n, unsigned char *md) {
 	SHA256_CTX c;
 	static unsigned char m[SHA256_DIGEST_LENGTH];
 
-	if (md == NULL)
-		md = m;
+	if (md == NULL) { md = m; }
 
 	SHA256_Init(&c);
 	SHA256_Update(&c, d, n);

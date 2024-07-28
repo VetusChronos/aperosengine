@@ -130,5 +130,7 @@ compile_commands.json
 # Old irrlichtmt. Still ignored to make bisecting easier.
 lib/irrlichtmt
 
+lib/sha256/test_sha256
+
 # Generated mod storage database
 client/mod_storage.sqlite
