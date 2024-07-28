@@ -5,10 +5,10 @@ AperosVoxel Engine
 
 AperosVoxel is a free open-source voxel game engine with easy modding and game creation.
 
-AperosVoxel is based on [AperosEngine Engine](https://aperosengine.net):
+AperosVoxel is based on [Minetest](https://minetest.net):
 
 > Copyright (C) 2010-2024 Perttu Ahola <celeron55@gmail.com>
-and contributors of the AperosEngine (see source file comments). 
+and contributors of the Minetest (see source file comments). 
 Thanks you all!
 
 Locales
@@ -67,13 +67,13 @@ Some can be changed in the key config dialog in the settings tab.
 | V                             | Cycle through minimap modes                                    |
 | Shift + V                     | Change minimap orientation                                     |
 | F1                            | Hide/show HUD                                                  |
-| F2                            | Hide/show chat                                                 |
-| F3                            | Disable/enable fog                                             |
+| F12                           | Hide/show chat                                                 |
+| F7                            | Disable/enable fog                                             |
 | F4                            | Disable/enable camera update (Mapblocks are not updated anymore when disabled, disabled in release builds)  |
-| F5                            | Cycle through debug information screens                        |
+| F3                            | Cycle through debug information screens                        |
 | F6                            | Cycle through profiler info screens                            |
 | F10                           | Show/hide console                                              |
-| F12                           | Take screenshot                                                |
+| F2                           | Take screenshot                                                |
 
 Paths
 -----
