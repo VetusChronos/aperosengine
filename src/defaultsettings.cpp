@@ -171,17 +171,17 @@ void set_default_settings()
 	settings->setDefault("keymap_cinematic", "");
 	settings->setDefault("keymap_toggle_block_bounds", "");
 	settings->setDefault("keymap_toggle_hud", "KEY_F1");
-	settings->setDefault("keymap_toggle_chat", "KEY_F2");
-	settings->setDefault("keymap_toggle_fog", "KEY_F3");
+	settings->setDefault("keymap_toggle_chat", "KEY_F12");
+	settings->setDefault("keymap_toggle_fog", "KEY_F7");
 #ifndef NDEBUG
 	settings->setDefault("keymap_toggle_update_camera", "KEY_F4");
 #else
 	settings->setDefault("keymap_toggle_update_camera", "");
 #endif
-	settings->setDefault("keymap_toggle_debug", "KEY_F5");
+	settings->setDefault("keymap_toggle_debug", "KEY_F3");
 	settings->setDefault("keymap_toggle_profiler", "KEY_F6");
 	settings->setDefault("keymap_camera_mode", "KEY_KEY_C");
-	settings->setDefault("keymap_screenshot", "KEY_F12");
+	settings->setDefault("keymap_screenshot", "KEY_F2");
 	settings->setDefault("keymap_fullscreen", "KEY_F11");
 	settings->setDefault("keymap_increase_viewing_range_min", "+");
 	settings->setDefault("keymap_decrease_viewing_range_min", "-");

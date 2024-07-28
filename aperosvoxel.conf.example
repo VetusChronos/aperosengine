@@ -3455,7 +3455,7 @@
 #    Key for taking screenshots.
 #    See https://github.com/yunasatoy/aperosengine/blob/main/irr/include/Keycodes.h
 #    type: key
-# keymap_screenshot = KEY_F12
+# keymap_screenshot = KEY_F2
 
 #    Key for toggling fullscreen mode.
 #    See https://github.com/yunasatoy/aperosengine/blob/main/irr/include/Keycodes.h
@@ -3640,7 +3640,7 @@
 #    Key for toggling the display of chat.
 #    See https://github.com/yunasatoy/aperosengine/blob/main/irr/include/Keycodes.h
 #    type: key
-# keymap_toggle_chat = KEY_F2
+# keymap_toggle_chat = KEY_F12
 
 #    Key for toggling the display of the large chat console.
 #    See https://github.com/yunasatoy/aperosengine/blob/main/irr/include/Keycodes.h
@@ -3650,7 +3650,7 @@
 #    Key for toggling the display of fog.
 #    See https://github.com/yunasatoy/aperosengine/blob/main/irr/include/Keycodes.h
 #    type: key
-# keymap_toggle_fog = KEY_F3
+# keymap_toggle_fog = KEY_F7
 
 #    Key for toggling the camera update. Only usable with 'debug' privilege.
 #    See https://github.com/yunasatoy/aperosengine/blob/main/irr/include/Keycodes.h
@@ -3660,7 +3660,7 @@
 #    Key for toggling the display of debug info.
 #    See https://github.com/yunasatoy/aperosengine/blob/main/irr/include/Keycodes.h
 #    type: key
-# keymap_toggle_debug = KEY_F5
+# keymap_toggle_debug = KEY_F3
 
 #    Key for toggling the display of the profiler. Used for development.
 #    See https://github.com/yunasatoy/aperosengine/blob/main/irr/include/Keycodes.h

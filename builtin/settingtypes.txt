@@ -2398,7 +2398,7 @@ keymap_cinematic (Cinematic mode key) key
 keymap_minimap (Minimap key) key KEY_KEY_V
 
 #    Key for taking screenshots.
-keymap_screenshot (Screenshot) key KEY_F12
+keymap_screenshot (Screenshot) key KEY_F2
 
 #    Key for toggling fullscreen mode.
 keymap_fullscreen (Fullscreen key) key KEY_F11
@@ -2509,19 +2509,19 @@ keymap_slot32 (Hotbar slot 32 key) key
 keymap_toggle_hud (HUD toggle key) key KEY_F1
 
 #    Key for toggling the display of chat.
-keymap_toggle_chat (Chat toggle key) key KEY_F2
+keymap_toggle_chat (Chat toggle key) key KEY_F12
 
 #    Key for toggling the display of the large chat console.
 keymap_console (Large chat console key) key KEY_F10
 
 #    Key for toggling the display of fog.
-keymap_toggle_fog (Fog toggle key) key KEY_F3
+keymap_toggle_fog (Fog toggle key) key KEY_F7
 
 #    Key for toggling the camera update. Only usable with 'debug' privilege.
 keymap_toggle_update_camera (Camera update toggle key) key
 
 #    Key for toggling the display of debug info.
-keymap_toggle_debug (Debug info toggle key) key KEY_F5
+keymap_toggle_debug (Debug info toggle key) key KEY_F3
 
 #    Key for toggling the display of the profiler. Used for development.
 keymap_toggle_profiler (Profiler toggle key) key KEY_F6
