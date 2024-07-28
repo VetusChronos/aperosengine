@@ -21,6 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <ostream>
 #include <cstring>
+
 #include "address.h"
 #include "irrlichttypes.h"
 #include "networkexceptions.h"
@@ -30,25 +31,21 @@ extern bool socket_enable_debug_output;
 void sockets_init();
 void sockets_cleanup();
 
-class UDPSocket
-{
+class UDPSocket {
 public:
 	UDPSocket() = default;
-	UDPSocket(bool ipv6); // calls init()
+	explicit UDPSocket(bool ipv6);
 	~UDPSocket();
 	bool init(bool ipv6, bool noExceptions = false);
 
 	void Bind(Address addr);
 
 	void Send(const Address &destination, const void *data, int size);
-	// Returns -1 if there is no data
-	int Receive(Address &sender, void *data, int size);
+	int Receive(Address &sender, void *data, int size); // Returns -1 if there is no data
 	void setTimeoutMs(int timeout_ms);
-	// Returns true if there is data, false if timeout occurred
-	bool WaitData(int timeout_ms);
+	bool WaitData(int timeout_ms); // Returns true if there is data, false if timeout occurred
 
-	// Debugging purposes only
-	int GetHandle() const { return m_handle; };
+	int GetHandle() const { return m_handle; }; // Debugging purposes only
 
 private:
 	int m_handle = -1;
