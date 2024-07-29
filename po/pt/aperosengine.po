@@ -1259,7 +1259,7 @@ msgstr "Ocorreu um erro:"
 #: src/client/game.cpp
 #, c-format
 msgid "Access denied. Reason: %s"
-msgstr "Acesso negado. Razão:%s"
+msgstr "Acesso negado. Razão: %s"
 
 #: src/client/game.cpp
 msgid "Automatic forward disabled"
