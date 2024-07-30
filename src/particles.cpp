@@ -234,7 +234,7 @@ inline bool streamEndsBeforeParam(T& val, std::istream& is) {
      // Check if the next character is EOF before reading
     if (is.peek() == EOF) { return true; }
     // Read the value using the provided reader
-    val = reader(s);
+    val = reader(is);
 
     return false;
 }
