@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <sstream>
 #include <vector>
 #include <type_traits>
+
 #include "irrlicht_changes/printing.h"
 #include "irrlichttypes_bloated.h"
 #include "tileanimation.h"
@@ -33,8 +34,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // This file defines the particle-related structures that both the server and
 // client need. The ParticleManager and rendering is in client/particles.h
 
-namespace ParticleParamTypes
-{
+namespace ParticleParamTypes {
 	template <bool cond, typename T>
 	using enableIf = typename std::enable_if<cond, T>::type;
 	// std::enable_if_t does not appear to be present in GCC????
@@ -86,8 +86,7 @@ namespace ParticleParamTypes
 
 	// Describes a single value
 	template <typename T, size_t PN>
-	struct Parameter
-	{
+	struct Parameter {
 		using ValType = T;
 		using pickFactors = float[PN];
 
@@ -129,14 +128,12 @@ namespace ParticleParamTypes
 	};
 
 	template <typename T, size_t PN>
-	inline std::string dump(const Parameter<T,PN>& p)
-	{
+	inline std::string dump(const Parameter<T,PN>& p) {
 		return std::to_string(p.val);
 	}
 
 	template <typename T, size_t N>
-	inline std::string dump(const VectorParameter<T,N>& v)
-	{
+	inline std::string dump(const VectorParameter<T,N>& v) {
 		std::ostringstream oss;
 		oss << v.val;
 		return oss.str();
@@ -149,8 +146,7 @@ namespace ParticleParamTypes
 
 	// Bound limits information based on "Parameter" types
 	template <typename T>
-	struct RangedParameter
-	{
+	struct RangedParameter {
 		using ValType = T;
 		using This = RangedParameter<T>;
 
@@ -162,13 +158,11 @@ namespace ParticleParamTypes
 		template <typename M> RangedParameter(M b) : min(b),     max(b)     {}
 
 		// Binary format must not be changed. Function is to be deprecated.
-		void legacySerialize(std::ostream &os) const
-		{
+		void legacySerialize(std::ostream &os) const {
 			min.serialize(os);
 			max.serialize(os);
 		}
-		void legacyDeSerialize(std::istream &is)
-		{
+		void legacyDeSerialize(std::istream &is) {
 			min.deSerialize(is);
 			max.deSerialize(is);
 		}
@@ -176,8 +170,7 @@ namespace ParticleParamTypes
 		void serialize(std::ostream &os) const;
 		void deSerialize(std::istream &is);
 
-		This interpolate(float fac, const This against) const
-		{
+		This interpolate(float fac, const This against) const {
 			This r;
 			r.min = min.interpolate(fac, against.min);
 			r.max = max.interpolate(fac, against.max);
@@ -190,12 +183,12 @@ namespace ParticleParamTypes
 	};
 
 	template <typename T>
-	inline std::string dump(const RangedParameter<T>& r)
-	{
+	inline std::string dump(const RangedParameter<T>& r) {
 		std::ostringstream s;
 		s << "range<" << dump(r.min) << " ~ " << dump(r.max);
-		if (r.bias != 0)
+		if (r.bias != 0) {
 			s << " :: " << r.bias;
+		}
 		s << ">";
 		return s.str();
 	}
@@ -206,8 +199,7 @@ namespace ParticleParamTypes
 
 	// "Tweened" pretty much means "animated" in this context
 	template <typename T>
-	struct TweenedParameter
-	{
+	struct TweenedParameter {
 		using ValType = T;
 		using This = TweenedParameter<T>;
 
@@ -230,8 +222,7 @@ namespace ParticleParamTypes
 	};
 
 	template <typename T>
-	inline std::string dump(const TweenedParameter<T>& t)
-	{
+	inline std::string dump(const TweenedParameter<T>& t) {
 		std::ostringstream s;
 		const char* icon;
 		switch (t.style) {
@@ -240,9 +231,12 @@ namespace ParticleParamTypes
 			case TweenStyle::pulse: icon = "↔"; break;
 			case TweenStyle::flicker: icon = "↯"; break;
 		}
+
 		s << "tween<";
-		if (t.reps != 1)
+		if (t.reps != 1) {
 			s << t.reps << "x ";
+		}
+
 		s << dump(t.start) << " "<<icon<<" " << dump(t.end) << ">";
 		return s.str();
 	}
@@ -264,8 +258,7 @@ namespace ParticleParamTypes
 	#undef DECL_PARAM_OVERLOADS
 }
 
-struct ParticleTexture
-{
+struct ParticleTexture {
 	bool animated = false;
 	ParticleParamTypes::BlendMode blendmode = ParticleParamTypes::BlendMode::alpha;
 	TileAnimationParams animation;
@@ -273,8 +266,7 @@ struct ParticleTexture
 	ParticleParamTypes::v2fTween scale{v2f(1.0f)};
 };
 
-struct ServerParticleTexture : public ParticleTexture
-{
+struct ServerParticleTexture : public ParticleTexture {
 	std::string string;
 	void serialize(std::ostream &os, u16 protocol_ver, bool newPropertiesOnly = false,
 			bool skipAnimation = false) const;
@@ -282,8 +274,7 @@ struct ServerParticleTexture : public ParticleTexture
 			bool skipAnimation = false);
 };
 
-struct CommonParticleParams
-{
+struct CommonParticleParams {
 	bool collisiondetection = false;
 	bool collision_removal = false;
 	bool object_collision = false;
@@ -314,8 +305,7 @@ struct CommonParticleParams
 	}
 };
 
-struct ParticleParameters : CommonParticleParams
-{
+struct ParticleParameters : CommonParticleParams {
 	v3f pos, vel, acc, drag;
 	f32 size = 1, expirationtime = 1;
 	ParticleParamTypes::f32Range bounce;
@@ -325,8 +315,7 @@ struct ParticleParameters : CommonParticleParams
 	void deSerialize(std::istream &is, u16 protocol_ver);
 };
 
-struct ParticleSpawnerParameters : CommonParticleParams
-{
+struct ParticleSpawnerParameters : CommonParticleParams {
 	u16 amount = 1;
 	f32 time = 1;
 
@@ -346,10 +335,10 @@ struct ParticleSpawnerParameters : CommonParticleParams
 	bool attractor_kill = true;
 
 	ParticleParamTypes::f32RangeTween
-		exptime{1.0f},
-		size   {1.0f},
-		attract{0.0f},
-		bounce {0.0f};
+		exptime {1.0f},
+		size    {1.0f},
+		attract {0.0f},
+		bounce  {0.0f};
 
 	// For historical reasons no (de-)serialization methods here
 };
