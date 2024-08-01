@@ -1966,7 +1966,7 @@ msgstr "%s falta:"
 msgid ""
 "Install and enable the required mods, or disable the mods causing errors."
 msgstr ""
-"Instala e habilita os Mods necessários, ou desativa os Mods que causam erros."
+"Instale e habilite os mods necessários, ou desative os mods que causam os erros."
 
 #: src/content/mod_configuration.cpp
 msgid ""
@@ -1978,7 +1978,7 @@ msgstr ""
 
 #: src/content/mod_configuration.cpp
 msgid "Some mods have unsatisfied dependencies:"
-msgstr "Alguns Mods têm dependências insatisfeitas:"
+msgstr "Alguns mods têm dependências insatisfeitas:"
 
 #: src/gui/guiChatConsole.cpp
 msgid "Failed to open webpage"
