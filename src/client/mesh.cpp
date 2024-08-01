@@ -26,77 +26,70 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <SAnimatedMesh.h>
 #include <IAnimatedMeshSceneNode.h>
 
-inline static void applyShadeFactor(video::SColor& color, float factor)
-{
-	color.setRed(core::clamp(core::round32(color.getRed()*factor), 0, 255));
-	color.setGreen(core::clamp(core::round32(color.getGreen()*factor), 0, 255));
-	color.setBlue(core::clamp(core::round32(color.getBlue()*factor), 0, 255));
+inline static void applyShadeFactor(video::SColor& color, float factor) {
+	color.setRed(core::clamp(static_cast<int>(color.getRed() * factor), 0, 255));
+	color.setGreen(core::clamp(static_cast<int>(color.getGreen() * factor), 0, 255));
+	color.setBlue(core::clamp(static_cast<int>(color.getBlue() * factor), 0, 255));
 }
 
-void applyFacesShading(video::SColor &color, const v3f &normal)
-{
-	/*
-		Some drawtypes have normals set to (0, 0, 0), this must result in
-		maximum brightness: shade factor 1.0.
-		Shade factors for aligned cube faces are:
-		+Y 1.000000 sqrt(1.0)
-		-Y 0.447213 sqrt(0.2)
-		+-X 0.670820 sqrt(0.45)
-		+-Z 0.836660 sqrt(0.7)
-	*/
+void applyFacesShading(video::SColor &color, const v3f &normal) {
+	constexpr float sqrt1_0 = 1.0f;
+	constexpr float sqrt0_2 = 0.447213f;
+	constexpr float sqrt0_45 = 0.670820f;
+	constexpr float sqrt0_7 = 0.836660f;
+
 	float x2 = normal.X * normal.X;
 	float y2 = normal.Y * normal.Y;
 	float z2 = normal.Z * normal.Z;
-	if (normal.Y < 0)
-		applyShadeFactor(color, 0.670820f * x2 + 0.447213f * y2 + 0.836660f * z2);
-	else if ((x2 > 1e-3) || (z2 > 1e-3))
-		applyShadeFactor(color, 0.670820f * x2 + 1.000000f * y2 + 0.836660f * z2);
+
+	if (normal.Y < 0) {
+		applyShadeFactor(color, sqrt0_45 * x2 + sqrt0_2 * y2 + sqrt0_7 * z2);
+	} else if ((x2 > 1e-3) || (z2 > 1e-3)) {
+		applyShadeFactor(color, sqrt0_45 * x2 + sqrt1_0 * y2 + sqrt0_7 * z2);
+	}
 }
 
-scene::IAnimatedMesh* createCubeMesh(v3f scale)
-{
-	video::SColor c(255,255,255,255);
-	video::S3DVertex vertices[24] =
-	{
+scene::IAnimatedMesh* createCubeMesh(const v3f &scale) {
+	video::SColor c(255, 255, 255, 255);
+	video::S3DVertex vertices[24] = {
 		// Up
-		video::S3DVertex(-0.5,+0.5,-0.5, 0,1,0, c, 0,1),
-		video::S3DVertex(-0.5,+0.5,+0.5, 0,1,0, c, 0,0),
-		video::S3DVertex(+0.5,+0.5,+0.5, 0,1,0, c, 1,0),
-		video::S3DVertex(+0.5,+0.5,-0.5, 0,1,0, c, 1,1),
+		{{-0.5f, +0.5f, -0.5f}, {0, 1, 0}, c, {0, 1}},
+		{{-0.5f, +0.5f, +0.5f}, {0, 1, 0}, c, {0, 0}},
+		{{+0.5f, +0.5f, +0.5f}, {0, 1, 0}, c, {1, 0}},
+		{{+0.5f, +0.5f, -0.5f}, {0, 1, 0}, c, {1, 1}},
 		// Down
-		video::S3DVertex(-0.5,-0.5,-0.5, 0,-1,0, c, 0,0),
-		video::S3DVertex(+0.5,-0.5,-0.5, 0,-1,0, c, 1,0),
-		video::S3DVertex(+0.5,-0.5,+0.5, 0,-1,0, c, 1,1),
-		video::S3DVertex(-0.5,-0.5,+0.5, 0,-1,0, c, 0,1),
+		{{-0.5f, -0.5f, -0.5f}, {0, -1, 0}, c, {0, 0}},
+		{{+0.5f, -0.5f, -0.5f}, {0, -1, 0}, c, {1, 0}},
+		{{+0.5f, -0.5f, +0.5f}, {0, -1, 0}, c, {1, 1}},
+		{{-0.5f, -0.5f, +0.5f}, {0, -1, 0}, c, {0, 1}},
 		// Right
-		video::S3DVertex(+0.5,-0.5,-0.5, 1,0,0, c, 0,1),
-		video::S3DVertex(+0.5,+0.5,-0.5, 1,0,0, c, 0,0),
-		video::S3DVertex(+0.5,+0.5,+0.5, 1,0,0, c, 1,0),
-		video::S3DVertex(+0.5,-0.5,+0.5, 1,0,0, c, 1,1),
+		{{+0.5f, -0.5f, -0.5f}, {1, 0, 0}, c, {0, 1}},
+		{{+0.5f, +0.5f, -0.5f}, {1, 0, 0}, c, {0, 0}},
+		{{+0.5f, +0.5f, +0.5f}, {1, 0, 0}, c, {1, 0}},
+		{{+0.5f, -0.5f, +0.5f}, {1, 0, 0}, c, {1, 1}},
 		// Left
-		video::S3DVertex(-0.5,-0.5,-0.5, -1,0,0, c, 1,1),
-		video::S3DVertex(-0.5,-0.5,+0.5, -1,0,0, c, 0,1),
-		video::S3DVertex(-0.5,+0.5,+0.5, -1,0,0, c, 0,0),
-		video::S3DVertex(-0.5,+0.5,-0.5, -1,0,0, c, 1,0),
+		{{-0.5f, -0.5f, -0.5f}, {-1, 0, 0}, c, {1, 1}},
+		{{-0.5f, -0.5f, +0.5f}, {-1, 0, 0}, c, {0, 1}},
+		{{-0.5f, +0.5f, +0.5f}, {-1, 0, 0}, c, {0, 0}},
+		{{-0.5f, +0.5f, -0.5f}, {-1, 0, 0}, c, {1, 0}},
 		// Back
-		video::S3DVertex(-0.5,-0.5,+0.5, 0,0,1, c, 1,1),
-		video::S3DVertex(+0.5,-0.5,+0.5, 0,0,1, c, 0,1),
-		video::S3DVertex(+0.5,+0.5,+0.5, 0,0,1, c, 0,0),
-		video::S3DVertex(-0.5,+0.5,+0.5, 0,0,1, c, 1,0),
+		{{-0.5f, -0.5f, +0.5f}, {0, 0, 1}, c, {1, 1}},
+		{{+0.5f, -0.5f, +0.5f}, {0, 0, 1}, c, {0, 1}},
+		{{+0.5f, +0.5f, +0.5f}, {0, 0, 1}, c, {0, 0}},
+		{{-0.5f, +0.5f, +0.5f}, {0, 0, 1}, c, {1, 0}},
 		// Front
-		video::S3DVertex(-0.5,-0.5,-0.5, 0,0,-1, c, 0,1),
-		video::S3DVertex(-0.5,+0.5,-0.5, 0,0,-1, c, 0,0),
-		video::S3DVertex(+0.5,+0.5,-0.5, 0,0,-1, c, 1,0),
-		video::S3DVertex(+0.5,-0.5,-0.5, 0,0,-1, c, 1,1),
+		{{-0.5f, -0.5f, -0.5f}, {0, 0, -1}, c, {0, 1}},
+		{{-0.5f, +0.5f, -0.5f}, {0, 0, -1}, c, {0, 0}},
+		{{+0.5f, +0.5f, -0.5f}, {0, 0, -1}, c, {1, 0}},
+		{{+0.5f, -0.5f, -0.5f}, {0, 0, -1}, c, {1, 1}},
 	};
 
-	u16 indices[6] = {0,1,2,2,3,0};
+	constexpr std::array<u16, 6> indices = {0, 1, 2, 2, 3, 0};
 
-	scene::SMesh *mesh = new scene::SMesh();
-	for (u32 i=0; i<6; ++i)
-	{
-		scene::IMeshBuffer *buf = new scene::SMeshBuffer();
-		buf->append(vertices + 4 * i, 4, indices, 6);
+	auto mesh = std::make_unique<scene::SMesh>();
+	for (u32 i = 0; i < 6; ++i) {
+		auto buf = std::make_unique<scene::SMeshBuffer>();
+		buf->append(vertices + 4 * i, 4, indices.data(), indices.size());
 		// Set default material
 		buf->getMaterial().Lighting = false;
 		buf->getMaterial().MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
@@ -105,20 +98,16 @@ scene::IAnimatedMesh* createCubeMesh(v3f scale)
 			tex.MagFilter = video::ETMAGF_NEAREST;
 		});
 		// Add mesh buffer to mesh
-		mesh->addMeshBuffer(buf);
-		buf->drop();
+		mesh->addMeshBuffer(buf.release());
 	}
 
-	scene::SAnimatedMesh *anim_mesh = new scene::SAnimatedMesh(mesh);
-	mesh->drop();
-	scaleMesh(anim_mesh, scale);  // also recalculates bounding box
-	return anim_mesh;
+	auto anim_mesh = std::make_unique<scene::SAnimatedMesh>(mesh.release());
+	scaleMesh(anim_mesh.get(), scale);  // also recalculates bounding box
+	return anim_mesh.release();
 }
 
-void scaleMesh(scene::IMesh *mesh, v3f scale)
-{
-	if (mesh == NULL)
-		return;
+void scaleMesh(scene::IMesh *mesh, const v3f &scale) {
+	if (!mesh) { return; }
 
 	aabb3f bbox;
 	bbox.reset(0, 0, 0);
@@ -128,25 +117,25 @@ void scaleMesh(scene::IMesh *mesh, v3f scale)
 		scene::IMeshBuffer *buf = mesh->getMeshBuffer(j);
 		const u32 stride = getVertexPitchFromType(buf->getVertexType());
 		u32 vertex_count = buf->getVertexCount();
-		u8 *vertices = (u8 *)buf->getVertices();
-		for (u32 i = 0; i < vertex_count; i++)
-			((video::S3DVertex *)(vertices + i * stride))->Pos *= scale;
+		auto vertices = reinterpret_cast<video::S3DVertex *>(buf->getVertices());
+		std::for_each(vertices, vertices + vertex_count, [scale](auto &vertex) {
+			vertex.Pos *= scale;
+		});
 
 		buf->recalculateBoundingBox();
 
-		// calculate total bounding box
-		if (j == 0)
+		// Calculate total bounding box
+		if (j == 0) {
 			bbox = buf->getBoundingBox();
-		else
+		} else {
 			bbox.addInternalBox(buf->getBoundingBox());
+		}
 	}
 	mesh->setBoundingBox(bbox);
 }
 
-void translateMesh(scene::IMesh *mesh, v3f vec)
-{
-	if (mesh == NULL)
-		return;
+void translateMesh(scene::IMesh *mesh, const v3f &vec) {
+	if (!mesh) { return; }
 
 	aabb3f bbox;
 	bbox.reset(0, 0, 0);
@@ -156,45 +145,45 @@ void translateMesh(scene::IMesh *mesh, v3f vec)
 		scene::IMeshBuffer *buf = mesh->getMeshBuffer(j);
 		const u32 stride = getVertexPitchFromType(buf->getVertexType());
 		u32 vertex_count = buf->getVertexCount();
-		u8 *vertices = (u8 *)buf->getVertices();
-		for (u32 i = 0; i < vertex_count; i++)
-			((video::S3DVertex *)(vertices + i * stride))->Pos += vec;
+		auto vertices = reinterpret_cast<video::S3DVertex *>(buf->getVertices());
+		std::for_each(vertices, vertices + vertex_count, [vec](auto &vertex) {
+			vertex.Pos += vec;
+		});
 
 		buf->recalculateBoundingBox();
 
 		// calculate total bounding box
-		if (j == 0)
+		if (j == 0) {
 			bbox = buf->getBoundingBox();
-		else
+		} else {
 			bbox.addInternalBox(buf->getBoundingBox());
+		}
 	}
 	mesh->setBoundingBox(bbox);
 }
 
-void setMeshBufferColor(scene::IMeshBuffer *buf, const video::SColor &color)
-{
+void setMeshBufferColor(scene::IMeshBuffer *buf, const video::SColor &color) {
 	const u32 stride = getVertexPitchFromType(buf->getVertexType());
 	u32 vertex_count = buf->getVertexCount();
 	u8 *vertices = (u8 *) buf->getVertices();
-	for (u32 i = 0; i < vertex_count; i++)
+	for (u32 i = 0; i < vertex_count; i++) {
 		((video::S3DVertex *) (vertices + i * stride))->Color = color;
+	}
 }
 
-void setAnimatedMeshColor(scene::IAnimatedMeshSceneNode *node, const video::SColor &color)
-{
+void setAnimatedMeshColor(scene::IAnimatedMeshSceneNode *node, const video::SColor &color) {
 	for (u32 i = 0; i < node->getMaterialCount(); ++i) {
 		node->getMaterial(i).EmissiveColor = color;
 	}
 }
 
-void setMeshColor(scene::IMesh *mesh, const video::SColor &color)
-{
-	if (mesh == NULL)
-		return;
+void setMeshColor(scene::IMesh *mesh, const video::SColor &color) {
+	if (!mesh) { return; }
 
 	u32 mc = mesh->getMeshBufferCount();
-	for (u32 j = 0; j < mc; j++)
+	for (u32 j = 0; j < mc; j++) {
 		setMeshBufferColor(mesh->getMeshBuffer(j), color);
+	}
 }
 
 void setMeshBufferTextureCoords(scene::IMeshBuffer *buf, const v2f *uv, u32 count)
@@ -202,26 +191,26 @@ void setMeshBufferTextureCoords(scene::IMeshBuffer *buf, const v2f *uv, u32 coun
 	const u32 stride = getVertexPitchFromType(buf->getVertexType());
 	assert(buf->getVertexCount() >= count);
 	u8 *vertices = (u8 *) buf->getVertices();
-	for (u32 i = 0; i < count; i++)
+	for (u32 i = 0; i < count; i++) {
 		((video::S3DVertex*) (vertices + i * stride))->TCoords = uv[i];
+	}
 }
 
 template <typename F>
-static void applyToMesh(scene::IMesh *mesh, const F &fn)
-{
+static void applyToMesh(scene::IMesh *mesh, const F &fn) {
 	u16 mc = mesh->getMeshBufferCount();
 	for (u16 j = 0; j < mc; j++) {
 		scene::IMeshBuffer *buf = mesh->getMeshBuffer(j);
 		const u32 stride = getVertexPitchFromType(buf->getVertexType());
 		u32 vertex_count = buf->getVertexCount();
 		char *vertices = reinterpret_cast<char *>(buf->getVertices());
-		for (u32 i = 0; i < vertex_count; i++)
+		for (u32 i = 0; i < vertex_count; i++) {
 			fn(reinterpret_cast<video::S3DVertex *>(vertices + i * stride));
+		}
 	}
 }
 
-void colorizeMeshBuffer(scene::IMeshBuffer *buf, const video::SColor *buffercolor)
-{
+void colorizeMeshBuffer(scene::IMeshBuffer *buf, const video::SColor *buffercolor) {
 	const u32 stride = getVertexPitchFromType(buf->getVertexType());
 	u32 vertex_count = buf->getVertexCount();
 	u8 *vertices = (u8 *) buf->getVertices();
@@ -235,42 +224,38 @@ void colorizeMeshBuffer(scene::IMeshBuffer *buf, const video::SColor *buffercolo
 	}
 }
 
-void setMeshColorByNormalXYZ(scene::IMesh *mesh,
-		const video::SColor &colorX,
+void setMeshColorByNormalXYZ(scene::IMesh *mesh, const video::SColor &colorX,
 		const video::SColor &colorY,
-		const video::SColor &colorZ)
-{
-	if (!mesh)
-		return;
+		const video::SColor &colorZ) {
+	if (!mesh) { return; }
 	auto colorizator = [=] (video::S3DVertex *vertex) {
 		f32 x = fabs(vertex->Normal.X);
 		f32 y = fabs(vertex->Normal.Y);
 		f32 z = fabs(vertex->Normal.Z);
-		if (x >= y && x >= z)
+		if (x >= y && x >= z) {
 			vertex->Color = colorX;
-		else if (y >= z)
+		} else if (y >= z) {
 			vertex->Color = colorY;
-		else
+		} else {
 			vertex->Color = colorZ;
+		}
 	};
 	applyToMesh(mesh, colorizator);
 }
 
 void setMeshColorByNormal(scene::IMesh *mesh, const v3f &normal,
-		const video::SColor &color)
-{
-	if (!mesh)
-		return;
+		const video::SColor &color) {
+	if (!mesh) { return; }
 	auto colorizator = [normal, color] (video::S3DVertex *vertex) {
-		if (vertex->Normal == normal)
+		if (vertex->Normal == normal) {
 			vertex->Color = color;
+		}
 	};
 	applyToMesh(mesh, colorizator);
 }
 
 template <float v3f::*U, float v3f::*V>
-static void rotateMesh(scene::IMesh *mesh, float degrees)
-{
+static void rotateMesh(scene::IMesh *mesh, float degrees) {
 	degrees *= M_PI / 180.0f;
 	float c = std::cos(degrees);
 	float s = std::sin(degrees);
@@ -283,23 +268,19 @@ static void rotateMesh(scene::IMesh *mesh, float degrees)
 	applyToMesh(mesh, rotator);
 }
 
-void rotateMeshXYby(scene::IMesh *mesh, f64 degrees)
-{
+void rotateMeshXYby(scene::IMesh *mesh, f64 degrees) {
 	rotateMesh<&v3f::X, &v3f::Y>(mesh, degrees);
 }
 
-void rotateMeshXZby(scene::IMesh *mesh, f64 degrees)
-{
+void rotateMeshXZby(scene::IMesh *mesh, f64 degrees) {
 	rotateMesh<&v3f::X, &v3f::Z>(mesh, degrees);
 }
 
-void rotateMeshYZby(scene::IMesh *mesh, f64 degrees)
-{
+void rotateMeshYZby(scene::IMesh *mesh, f64 degrees) {
 	rotateMesh<&v3f::Y, &v3f::Z>(mesh, degrees);
 }
 
-void rotateMeshBy6dFacedir(scene::IMesh *mesh, int facedir)
-{
+void rotateMeshBy6dFacedir(scene::IMesh *mesh, int facedir) 
 	int axisdir = facedir >> 2;
 	facedir &= 0x03;
 	switch (facedir) {
@@ -316,29 +297,27 @@ void rotateMeshBy6dFacedir(scene::IMesh *mesh, int facedir)
 	}
 }
 
-void recalculateBoundingBox(scene::IMesh *src_mesh)
-{
+void recalculateBoundingBox(scene::IMesh *src_mesh) {
 	aabb3f bbox;
 	bbox.reset(0,0,0);
 	for (u16 j = 0; j < src_mesh->getMeshBufferCount(); j++) {
 		scene::IMeshBuffer *buf = src_mesh->getMeshBuffer(j);
 		buf->recalculateBoundingBox();
-		if (j == 0)
+		if (j == 0) {
 			bbox = buf->getBoundingBox();
-		else
+		} else {
 			bbox.addInternalBox(buf->getBoundingBox());
+		}
 	}
 	src_mesh->setBoundingBox(bbox);
 }
 
-bool checkMeshNormals(scene::IMesh *mesh)
-{
+bool checkMeshNormals(scene::IMesh *mesh) {
 	u32 buffer_count = mesh->getMeshBufferCount();
 
 	for (u32 i = 0; i < buffer_count; i++) {
 		scene::IMeshBuffer *buffer = mesh->getMeshBuffer(i);
-		if (!buffer->getVertexCount())
-			continue;
+		if (!buffer->getVertexCount()) { continue; }
 
 		// Here we intentionally check only first normal, assuming that if buffer
 		// has it valid, then most likely all other ones are fine too. We can
@@ -346,15 +325,13 @@ bool checkMeshNormals(scene::IMesh *mesh)
 		// hurting the performance and covering only really weird broken models.
 		f32 length = buffer->getNormal(0).getLength();
 
-		if (!std::isfinite(length) || length < 1e-10f)
-			return false;
+		if (!std::isfinite(length) || length < 1e-10f) { return false; }
 	}
 
 	return true;
 }
 
-scene::IMeshBuffer* cloneMeshBuffer(scene::IMeshBuffer *mesh_buffer)
-{
+scene::IMeshBuffer* cloneMeshBuffer(scene::IMeshBuffer *mesh_buffer) {
 	switch (mesh_buffer->getVertexType()) {
 	case video::EVT_STANDARD: {
 		video::S3DVertex *v = (video::S3DVertex *) mesh_buffer->getVertices();
@@ -390,26 +367,28 @@ scene::IMeshBuffer* cloneMeshBuffer(scene::IMeshBuffer *mesh_buffer)
 	return NULL;
 }
 
-scene::SMesh* cloneMesh(scene::IMesh *src_mesh)
-{
-	scene::SMesh* dst_mesh = new scene::SMesh();
-	for (u16 j = 0; j < src_mesh->getMeshBufferCount(); j++) {
-		scene::IMeshBuffer *temp_buf = cloneMeshBuffer(
-			src_mesh->getMeshBuffer(j));
-		dst_mesh->addMeshBuffer(temp_buf);
-		temp_buf->drop();
+scene::SMesh* cloneMesh(scene::IMesh *srcMesh) {
+	if (!srcMesh) { return nullptr; }
 
+	auto mesh = std::make_unique<scene::SMesh>();
+	u32 mc = srcMesh->getMeshBufferCount();
+	for (u32 j = 0; j < mc; j++) {
+		scene::IMeshBuffer *srcBuf = srcMesh->getMeshBuffer(j);
+		auto buf = std::make_unique<scene::SMeshBuffer>();
+		buf->append(srcBuf->getVertices(), srcBuf->getVertexCount(), srcBuf->getIndices(), srcBuf->getIndexCount());
+		buf->BoundingBox = srcBuf->getBoundingBox();
+		mesh->addMeshBuffer(buf.release());
 	}
-	return dst_mesh;
+
+	mesh->recalculateBoundingBox();
+	return mesh.release();
 }
 
 scene::IMesh* convertNodeboxesToMesh(const std::vector<aabb3f> &boxes,
-		const f32 *uv_coords, float expand)
-{
+		const f32 *uv_coords, float expand) {
 	scene::SMesh* dst_mesh = new scene::SMesh();
 
-	for (u16 j = 0; j < 6; j++)
-	{
+	for (u16 j = 0; j < 6; j++) {
 		scene::IMeshBuffer *buf = new scene::SMeshBuffer();
 		buf->getMaterial().Lighting = false;
 		buf->getMaterial().forEachTexture([] (auto &tex) {
@@ -461,8 +440,7 @@ scene::IMesh* convertNodeboxesToMesh(const std::vector<aabb3f> &boxes,
 		v3f min = box.MinEdge;
 		v3f max = box.MaxEdge;
 
-		video::S3DVertex vertices[24] =
-		{
+		video::S3DVertex vertices[24] = {
 			// up
 			video::S3DVertex(min.X,max.Y,max.Z, 0,1,0, c, txc[0],txc[1]),
 			video::S3DVertex(max.X,max.Y,max.Z, 0,1,0, c, txc[2],txc[1]),
@@ -497,8 +475,7 @@ scene::IMesh* convertNodeboxesToMesh(const std::vector<aabb3f> &boxes,
 
 		u16 indices[] = {0,1,2,2,3,0};
 
-		for(u16 j = 0; j < 24; j += 4)
-		{
+		for(u16 j = 0; j < 24; j += 4) {
 			scene::IMeshBuffer *buf = dst_mesh->getMeshBuffer(j / 4);
 			buf->append(vertices + j, 4, indices, 6);
 		}
@@ -506,14 +483,14 @@ scene::IMesh* convertNodeboxesToMesh(const std::vector<aabb3f> &boxes,
 	return dst_mesh;
 }
 
-void setMaterialFilters(video::SMaterialLayer &tex, bool bilinear, bool trilinear, bool anisotropic)
-{
-	if (trilinear)
+void setMaterialFilters(video::SMaterialLayer &tex, bool bilinear, bool trilinear, bool anisotropic) {
+	if (trilinear) {
 		tex.MinFilter = video::ETMINF_LINEAR_MIPMAP_LINEAR;
-	else if (bilinear)
+	} else if (bilinear) {
 		tex.MinFilter = video::ETMINF_LINEAR_MIPMAP_NEAREST;
-	else
+	} else {
 		tex.MinFilter = video::ETMINF_NEAREST_MIPMAP_NEAREST;
+	}
 
 	tex.MagFilter = (trilinear || bilinear) ? video::ETMAGF_LINEAR : video::ETMAGF_NEAREST;
 
