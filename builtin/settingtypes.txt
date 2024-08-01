@@ -283,7 +283,7 @@ smooth_lighting (Smooth lighting) bool true
 
 #    Enables tradeoffs that reduce CPU load or increase rendering performance
 #    at the expense of minor visual glitches that do not impact game playability.
-performance_tradeoffs (Tradeoffs for performance) bool false
+performance_tradeoffs (Tradeoffs for performance) bool true
 
 #    Adds particles when digging a node.
 enable_particles (Digging particles) bool true

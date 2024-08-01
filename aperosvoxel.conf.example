@@ -215,7 +215,7 @@
 #    Enables tradeoffs that reduce CPU load or increase rendering performance
 #    at the expense of minor visual glitches that do not impact game playability.
 #    type: bool
-# performance_tradeoffs = false
+# performance_tradeoffs = true
 
 #    Adds particles when digging a node.
 #    type: bool
