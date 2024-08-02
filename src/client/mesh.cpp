@@ -280,7 +280,7 @@ void rotateMeshYZby(scene::IMesh *mesh, f64 degrees) {
 	rotateMesh<&v3f::Y, &v3f::Z>(mesh, degrees);
 }
 
-void rotateMeshBy6dFacedir(scene::IMesh *mesh, int facedir) 
+void rotateMeshBy6dFacedir(scene::IMesh *mesh, int facedir) {
 	int axisdir = facedir >> 2;
 	facedir &= 0x03;
 	switch (facedir) {
