@@ -20,10 +20,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include "irrlichttypes.h"
+
 #include <cassert>
 #include <string>
 #include <map>
 #include <ostream>
+#include <optional>
 
 #include "threading/mutex_auto_lock.h"
 #include "util/timetaker.h"
@@ -33,12 +35,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class Profiler;
 extern Profiler *g_profiler;
 
-/*
-	Time profiler
-*/
+/* Time profiler */
 
-class Profiler
-{
+class Profiler {
 public:
 	Profiler();
 
@@ -51,37 +50,32 @@ public:
 	int getAvgCount(const std::string &name) const;
 	u64 getElapsedMs() const;
 
-	typedef std::map<std::string, float> GraphValues;
+	using GraphValues = std::map<std::string, float>;
 
 	// Returns the line count
 	int print(std::ostream &o, u32 page = 1, u32 pagecount = 1);
 	void getPage(GraphValues &o, u32 page, u32 pagecount);
 
 
-	void graphSet(const std::string &id, float value)
-	{
-		MutexAutoLock lock(m_mutex);
+	void graphSet(const std::string &id, float value) {
+		std::scoped_lock lock(m_mutex);
 		m_graphvalues[id] = value;
 	}
-	void graphAdd(const std::string &id, float value)
-	{
-		MutexAutoLock lock(m_mutex);
-		auto it = m_graphvalues.find(id);
-		if (it == m_graphvalues.end())
-			m_graphvalues.emplace(id, value);
-		else
+	void graphAdd(const std::string &id, float value) {
+		std::scoped_lock lock(m_mutex);
+		auto[it, inserted] = m_graphvalues.try_emplace(id, value);
+		if (!inserted) {
 			it->second += value;
+		}
 	}
-	void graphPop(GraphValues &result)
-	{
-		MutexAutoLock lock(m_mutex);
+	void graphPop(GraphValues &result) {
+		std::scoped_lock lock(m_mutex);
 		assert(result.empty());
 		std::swap(result, m_graphvalues);
 	}
 
-	void remove(const std::string& name)
-	{
-		MutexAutoLock lock(m_mutex);
+	void remove(const std::string& name) {
+		std::scoped_lock lock(m_mutex);
 		m_data.erase(name);
 	}
 
@@ -90,25 +84,26 @@ private:
 		float value = 0;
 		int avgcount = 0;
 
-		inline void reset() {
+		void reset() {
 			value = 0;
-			// negative values are used for type checking, so leave them alone
-			if (avgcount >= 1)
+			// Negative values are used for type checking, so leave them alone
+			if (avgcount >= 1) {
 				avgcount = 0;
+			}
 		}
-		inline float getValue() const {
+
+		float getValue() const {
 			return avgcount >= 1 ? (value / avgcount) : value;
 		}
 	};
 
-	std::mutex m_mutex;
+	mutable std::mutex m_mutex;
 	std::map<std::string, DataPair> m_data;
 	std::map<std::string, float> m_graphvalues;
 	u64 m_start_time;
 };
 
-enum ScopeProfilerType : u8
-{
+enum ScopeProfilerType : u8 {
 	SPT_ADD = 1,
 	SPT_AVG,
 	SPT_GRAPH_ADD,
@@ -117,8 +112,7 @@ enum ScopeProfilerType : u8
 
 // Note: this class should be kept lightweight.
 
-class ScopeProfiler
-{
+class ScopeProfiler {
 public:
 	ScopeProfiler(Profiler *profiler, const std::string &name,
 			ScopeProfilerType type = SPT_ADD,
@@ -131,4 +125,7 @@ private:
 	u64 m_time1;
 	ScopeProfilerType m_type;
 	TimePrecision m_precision;
+
+	// Declaration of the helper function for calculating duration
+	static float calculateDuration(u64 start_time, TimePrecision precision);
 };

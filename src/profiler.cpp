@@ -26,18 +26,15 @@ Profiler *g_profiler = &main_profiler;
 ScopeProfiler::ScopeProfiler(Profiler *profiler, const std::string &name,
 		ScopeProfilerType type, TimePrecision prec) :
 	m_profiler(profiler),
-	m_name(name), m_type(type), m_precision(prec)
-{
+	m_name(name), m_type(type), m_precision(prec) {
 	m_name.append(" [").append(TimePrecision_units[prec]).append("]");
-	m_time1 = porting::getTime(prec);
+	m_time1 = porting::getTime(m_precision);
 }
 
-ScopeProfiler::~ScopeProfiler()
-{
-	if (!m_profiler)
-		return;
+ScopeProfiler::~ScopeProfiler() {
+	if (!m_profiler) return;
 
-	float duration = porting::getTime(m_precision) - m_time1;
+	float duration = calculateDuration(m_time1, m_precision);
 
 	switch (m_type) {
 	case SPT_ADD:
@@ -55,85 +52,75 @@ ScopeProfiler::~ScopeProfiler()
 	}
 }
 
-Profiler::Profiler()
-{
+float ScopeProfiler::calculateDuration(u64 start_time, TimePrecision precision) {
+	return porting::getTime(precision) - start_time;
+}
+
+Profiler::Profiler() {
 	m_start_time = porting::getTimeMs();
 }
 
-void Profiler::add(const std::string &name, float value)
-{
-	MutexAutoLock lock(m_mutex);
+void Profiler::add(const std::string &name, float value) {
+	std::scoped_lock lock(m_mutex);
 
-	auto it = m_data.find(name);
-	if (it == m_data.end()) {
-		// mark with special value for checking
-		m_data.emplace(name, DataPair{value, -SPT_ADD});
-	} else {
+	auto[it, inserted] = m_data.try_emplace(name, DataPair{value, -SPT_ADD});
+	if (!inserted) {
 		assert(it->second.avgcount == -SPT_ADD);
 		it->second.value += value;
 	}
 }
 
-void Profiler::max(const std::string &name, float value)
-{
-	MutexAutoLock lock(m_mutex);
+void Profiler::max(const std::string &name, float value) {
+	std::scoped_lock lock(m_mutex);
 
-	auto it = m_data.find(name);
-	if (it == m_data.end()) {
-		// mark with special value for checking
-		m_data.emplace(name, DataPair{value, -SPT_MAX});
-	} else {
+	auto[it, inserted] = m_data.try_emplace(name, DataPair{value, -SPT_MAX});
+	if (!inserted) {
 		assert(it->second.avgcount == -SPT_MAX);
 		it->second.value = std::max(value, it->second.value);
 	}
 }
 
-void Profiler::avg(const std::string &name, float value)
-{
-	MutexAutoLock lock(m_mutex);
+void Profiler::avg(const std::string &name, float value) {
+	std::scoped_lock lock(m_mutex);
 
-	auto it = m_data.find(name);
-	if (it == m_data.end()) {
-		m_data.emplace(name, DataPair{value, 1});
-	} else {
+	auto[it, inserted] = m_data.try_emplace(name, DataPair{value, 1});
+	if (!inserted) {
 		assert(it->second.avgcount >= 0);
 		it->second.value += value;
 		it->second.avgcount++;
 	}
 }
 
-void Profiler::clear()
-{
-	MutexAutoLock lock(m_mutex);
-	for (auto &it : m_data)
+void Profiler::clear() {
+	std::scoped_lock lock(m_mutex);
+	for (auto &it : m_data) {
 		it.second.reset();
+	}
 	m_start_time = porting::getTimeMs();
 }
 
-float Profiler::getValue(const std::string &name) const
-{
-	auto it = m_data.find(name);
-	if (it == m_data.end())
-		return 0;
-	return it->second.getValue();
+float Profiler::getValue(const std::string &name) const {
+	if (auto it = m_data.find(name); it != m_data.end()) {
+		return it->second.getValue();
+	}
+
+	return 0;
 }
 
-int Profiler::getAvgCount(const std::string &name) const
-{
-	auto it = m_data.find(name);
-	if (it == m_data.end())
-		return 1;
-	int denominator = it->second.avgcount;
-	return denominator >= 1 ? denominator : 1;
+int Profiler::getAvgCount(const std::string &name) const {
+	if (auto it = m_data.find(name); it != m_data.end()) {
+		int denominator = it->second.avgcount;
+		return denominator >= 1 ? denominator : 1;
+	}
+
+	return 1;
 }
 
-u64 Profiler::getElapsedMs() const
-{
+u64 Profiler::getElapsedMs() const {
 	return porting::getTimeMs() - m_start_time;
 }
 
-int Profiler::print(std::ostream &o, u32 page, u32 pagecount)
-{
+int Profiler::print(std::ostream &o, u32 page, u32 pagecount) {
 	GraphValues values;
 	getPage(values, page, pagecount);
 	char buffer[50];
@@ -147,7 +134,7 @@ int Profiler::print(std::ostream &o, u32 page, u32 pagecount)
 
 		{
 			// Padding
-			s32 space = std::max(0, 44 - (s32)i.first.size());
+			s32 space = std::max(0, 44 - static_cast<s32>(i.first.size()));
 			memset(buffer, '_', space);
 			buffer[space] = '\0';
 			o << buffer;
@@ -157,19 +144,18 @@ int Profiler::print(std::ostream &o, u32 page, u32 pagecount)
 				getAvgCount(i.first), floor(i.second * 1000.0) / 1000.0);
 		o << buffer << '\n';
 	}
+
 	return values.size();
 }
 
-void Profiler::getPage(GraphValues &o, u32 page, u32 pagecount)
-{
-	MutexAutoLock lock(m_mutex);
+void Profiler::getPage(GraphValues &o, u32 page, u32 pagecount) {
+	std::scoped_lock lock(m_mutex);
 
 	u32 minindex, maxindex;
 	paging(m_data.size(), page, pagecount, minindex, maxindex);
 
 	for (const auto &i : m_data) {
-		if (maxindex == 0)
-			break;
+		if (maxindex == 0) break;
 		maxindex--;
 
 		if (minindex != 0) {
