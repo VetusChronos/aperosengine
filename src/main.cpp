@@ -692,8 +692,6 @@ static bool init_common(const Settings &cmd_args, int argc, char *argv[])
 	if (!read_config_file(cmd_args))
 		return false;
 
-	migrate_settings();
-
 	init_log_streams(cmd_args);
 
 	// Initialize random seed
