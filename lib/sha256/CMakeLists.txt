@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(sha256 C)
 
+option(RUN_TEST "Compile the test_sha256 executable" OFF)
+
 add_library(sha256 STATIC sha256.c)
 
 target_include_directories(sha256 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
@@ -15,9 +17,11 @@ configure_file(
 )
 target_include_directories(sha256 PRIVATE "${PROJECT_BINARY_DIR}")
 
-add_executable(test_sha256 test_sha256.c)
+if(RUN_TEST)
+    add_executable(test_sha256 test_sha256.c)
 
-target_link_libraries(test_sha256 PRIVATE sha256)
+    target_link_libraries(test_sha256 PRIVATE sha256)
 
-find_package(OpenSSL REQUIRED)
-target_link_libraries(test_sha256 PRIVATE OpenSSL::Crypto)
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(test_sha256 PRIVATE OpenSSL::Crypto)
+endif()

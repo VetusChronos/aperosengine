@@ -3,3 +3,4 @@
 #pragma once
 
 #cmakedefine HAVE_ENDIAN_H
+#cmakedefine RUN_TEST
