@@ -1117,21 +1117,6 @@ Table used to specify how a sound is played:
     -- Attach the sound to an object.
     -- Can't be used together with `pos`.
 
-    -- For backward compatibility, sounds continue playing at the last location
-    -- of the object if an object is removed (for example if an entity dies).
-    -- It is not recommended to rely on this.
-    -- For death sounds, prefer playing a positional sound instead.
-
-    -- If you want to stop a sound when an entity dies or is deactivated,
-    -- store the handle and call `minetest.sound_stop` in `on_die` / `on_deactivate`.
-
-    -- Ephemeral sounds are entirely unaffected by the object being removed
-    -- or leaving the active object range.
-
-    -- Non-ephemeral sounds stop playing on clients if objects leave
-    -- the active object range; they should start playing again if objects
-    --- come back into range (but due to a known bug, they don't yet).
-
     to_player = name,
     -- Only play for this player.
     -- Can't be used together with `exclude_player`.
@@ -5458,7 +5443,7 @@ Utilities
       node_interaction_actor = true,
       -- "new_pos" field in entity moveresult (5.9.0)
       moveresult_new_pos = true,
-      -- Allow removing definition fields in `minetest.override_item`
+      -- Allow removing definition fields in `minetest.override_item` (5.9.0)
       override_item_remove_fields = true,
   }
   ```
@@ -6731,7 +6716,7 @@ This allows you easy interoperability for delegating work to jobs.
     * Register a path to a Lua file to be imported when an async environment
       is initialized. You can use this to preload code which you can then call
       later using `minetest.handle_async()`.
-* `minetest.register_async_metatable(name, mt)`:
+* `minetest.register_portable_metatable(name, mt)`:
     * Register a metatable that should be preserved when data is transferred
     between the main thread and the async environment.
     * `name` is a string that identifies the metatable. It is recommended to
@@ -6771,7 +6756,7 @@ Functions:
 
 * Standalone helpers such as logging, filesystem, encoding,
   hashing or compression APIs
-* `minetest.register_async_metatable` (see above)
+* `minetest.register_portable_metatable` (see above)
 
 Variables:
 
