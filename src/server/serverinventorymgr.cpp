@@ -25,90 +25,86 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "server.h"
 #include "serverenvironment.h"
 
-ServerInventoryManager::ServerInventoryManager() : InventoryManager()
-{
+ServerInventoryManager::ServerInventoryManager() :
+		InventoryManager() {
 }
 
-Inventory *ServerInventoryManager::getInventory(const InventoryLocation &loc)
-{
+Inventory *ServerInventoryManager::getInventory(const InventoryLocation &loc) {
 	// No m_env check here: allow creation and modification of detached inventories
 
 	switch (loc.type) {
-	case InventoryLocation::UNDEFINED:
-	case InventoryLocation::CURRENT_PLAYER:
-		break;
-	case InventoryLocation::PLAYER: {
-		if (!m_env)
-			return nullptr;
+		case InventoryLocation::UNDEFINED:
+		case InventoryLocation::CURRENT_PLAYER:
+			break;
+		case InventoryLocation::PLAYER: {
+			if (!m_env)
+				return nullptr;
 
-		RemotePlayer *player = m_env->getPlayer(loc.name.c_str());
-		if (!player)
-			return nullptr;
+			RemotePlayer *player = m_env->getPlayer(loc.name.c_str());
+			if (!player)
+				return nullptr;
 
-		PlayerSAO *playersao = player->getPlayerSAO();
-		return playersao ? playersao->getInventory() : nullptr;
-	} break;
-	case InventoryLocation::NODEMETA: {
-		if (!m_env)
-			return nullptr;
+			PlayerSAO *playersao = player->getPlayerSAO();
+			return playersao ? playersao->getInventory() : nullptr;
+		} break;
+		case InventoryLocation::NODEMETA: {
+			if (!m_env)
+				return nullptr;
 
-		NodeMetadata *meta = m_env->getMap().getNodeMetadata(loc.p);
-		return meta ? meta->getInventory() : nullptr;
-	} break;
-	case InventoryLocation::DETACHED: {
-		auto it = m_detached_inventories.find(loc.name);
-		if (it == m_detached_inventories.end())
-			return nullptr;
-		return it->second.inventory.get();
-	} break;
-	default:
-		sanity_check(false); // abort
-		break;
+			NodeMetadata *meta = m_env->getMap().getNodeMetadata(loc.p);
+			return meta ? meta->getInventory() : nullptr;
+		} break;
+		case InventoryLocation::DETACHED: {
+			auto it = m_detached_inventories.find(loc.name);
+			if (it == m_detached_inventories.end())
+				return nullptr;
+			return it->second.inventory.get();
+		} break;
+		default:
+			sanity_check(false); // abort
+			break;
 	}
 	return nullptr;
 }
 
-void ServerInventoryManager::setInventoryModified(const InventoryLocation &loc)
-{
+void ServerInventoryManager::setInventoryModified(const InventoryLocation &loc) {
 	switch (loc.type) {
-	case InventoryLocation::UNDEFINED:
-		break;
-	case InventoryLocation::PLAYER: {
+		case InventoryLocation::UNDEFINED:
+			break;
+		case InventoryLocation::PLAYER: {
+			RemotePlayer *player = m_env->getPlayer(loc.name.c_str());
 
-		RemotePlayer *player = m_env->getPlayer(loc.name.c_str());
+			if (!player)
+				return;
 
-		if (!player)
-			return;
-
-		player->setModified(true);
-		player->inventory.setModified(true);
-		// Updates are sent in ServerEnvironment::step()
-	} break;
-	case InventoryLocation::NODEMETA: {
-		MapEditEvent event;
-		event.type = MEET_BLOCK_NODE_METADATA_CHANGED;
-		event.setPositionModified(loc.p);
-		m_env->getMap().dispatchEvent(event);
-	} break;
-	case InventoryLocation::DETACHED: {
-		// Updates are sent in ServerEnvironment::step()
-	} break;
-	default:
-		sanity_check(false); // abort
-		break;
+			player->setModified(true);
+			player->inventory.setModified(true);
+			// Updates are sent in ServerEnvironment::step()
+		} break;
+		case InventoryLocation::NODEMETA: {
+			MapEditEvent event;
+			event.type = MEET_BLOCK_NODE_METADATA_CHANGED;
+			event.setPositionModified(loc.p);
+			m_env->getMap().dispatchEvent(event);
+		} break;
+		case InventoryLocation::DETACHED: {
+			// Updates are sent in ServerEnvironment::step()
+		} break;
+		default:
+			sanity_check(false); // abort
+			break;
 	}
 }
 
 Inventory *ServerInventoryManager::createDetachedInventory(
-		const std::string &name, IItemDefManager *idef, const std::string &player)
-{
+		const std::string &name, IItemDefManager *idef, const std::string &player) {
 	if (m_detached_inventories.count(name) > 0) {
 		infostream << "Server clearing detached inventory \"" << name << "\""
-			   << '\n';
+				   << '\n';
 		m_detached_inventories[name].inventory.reset();
 	} else {
 		infostream << "Server creating detached inventory \"" << name << "\""
-			   << '\n';
+				   << '\n';
 	}
 
 	auto inv_u = std::make_unique<Inventory>(idef);
@@ -139,8 +135,7 @@ Inventory *ServerInventoryManager::createDetachedInventory(
 	return inv;
 }
 
-bool ServerInventoryManager::removeDetachedInventory(const std::string &name)
-{
+bool ServerInventoryManager::removeDetachedInventory(const std::string &name) {
 	const auto &inv_it = m_detached_inventories.find(name);
 	if (inv_it == m_detached_inventories.end())
 		return false;
@@ -168,8 +163,7 @@ bool ServerInventoryManager::removeDetachedInventory(const std::string &name)
 }
 
 bool ServerInventoryManager::checkDetachedInventoryAccess(
-		const InventoryLocation &loc, const std::string &player) const
-{
+		const InventoryLocation &loc, const std::string &player) const {
 	SANITY_CHECK(loc.type == InventoryLocation::DETACHED);
 
 	const auto &inv_it = m_detached_inventories.find(loc.name);
@@ -181,8 +175,7 @@ bool ServerInventoryManager::checkDetachedInventoryAccess(
 
 void ServerInventoryManager::sendDetachedInventories(const std::string &peer_name,
 		bool incremental,
-		std::function<void(const std::string &, Inventory *)> apply_cb)
-{
+		std::function<void(const std::string &, Inventory *)> apply_cb) {
 	for (const auto &detached_inventory : m_detached_inventories) {
 		const DetachedInventory &dinv = detached_inventory.second;
 		if (incremental) {

@@ -21,8 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "util/container.h"
 
-class TestDataStructures : public TestBase
-{
+class TestDataStructures : public TestBase {
 public:
 	TestDataStructures() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestDataStructures"; }
@@ -38,8 +37,7 @@ public:
 
 static TestDataStructures g_test_instance;
 
-void TestDataStructures::runTests(IGameDef *gamedef)
-{
+void TestDataStructures::runTests(IGameDef *gamedef) {
 	rawstream << "-------- ModifySafeMap" << '\n';
 	TEST(testMap1);
 	TEST(testMap2);
@@ -62,7 +60,8 @@ class Tracker {
 
 public:
 	Tracker() {}
-	Tracker(TrackerState &res) : res(&res) {}
+	Tracker(TrackerState &res) :
+			res(&res) {}
 
 	operator bool() const { return !!res; }
 
@@ -84,10 +83,9 @@ public:
 	~Tracker() { trackDeletion(); }
 };
 
-}
+} //namespace
 
-void TestDataStructures::testMap1()
-{
+void TestDataStructures::testMap1() {
 	ModifySafeMap<int, Tracker> map;
 	TrackerState t0, t1;
 
@@ -112,8 +110,7 @@ void TestDataStructures::testMap1()
 	map.clear(); // ASan complains about stack-use-after-scope otherwise
 }
 
-void TestDataStructures::testMap2()
-{
+void TestDataStructures::testMap2() {
 	ModifySafeMap<int, Tracker> map;
 	TrackerState t0, t1;
 
@@ -127,8 +124,7 @@ void TestDataStructures::testMap2()
 	map.clear();
 }
 
-void TestDataStructures::testMap3()
-{
+void TestDataStructures::testMap3() {
 	ModifySafeMap<int, Tracker> map;
 	TrackerState t0, t1;
 
@@ -151,8 +147,7 @@ void TestDataStructures::testMap3()
 	}
 }
 
-void TestDataStructures::testMap4()
-{
+void TestDataStructures::testMap4() {
 	ModifySafeMap<int, u32> map;
 
 	// overwrite + take during iter
@@ -169,8 +164,7 @@ void TestDataStructures::testMap4()
 	UASSERTEQ(size_t, map.size(), 0);
 }
 
-void TestDataStructures::testMap5()
-{
+void TestDataStructures::testMap5() {
 	ModifySafeMap<int, u32> map;
 
 	// overwrite 2x during iter

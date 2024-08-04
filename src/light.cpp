@@ -40,7 +40,8 @@ struct LightingParams {
 static LightingParams params;
 
 float decode_light_f(float x) {
-	if (x >= 1.0f) return 1.0f;
+	if (x >= 1.0f)
+		return 1.0f;
 	x = std::max(x, 0.0f);
 	float brightness = ((params.a * x + params.b) * x + params.c) * x;
 	brightness += params.boost * std::exp(-0.5f * sqr((x - params.center) / params.sigma));
@@ -53,7 +54,7 @@ float decode_light_f(float x) {
 void set_light_table(float gamma) {
 	// Lighting curve bounding gradients
 	const float alpha = std::clamp(g_settings->getFloat("lighting_alpha"), 0.0f, 3.0f);
-	const float beta  = std::clamp(g_settings->getFloat("lighting_beta"), 0.0f, 3.0f);
+	const float beta = std::clamp(g_settings->getFloat("lighting_beta"), 0.0f, 3.0f);
 	// Lighting curve polynomial coefficients
 	params.a = alpha + beta - 2.0f;
 	params.b = 3.0f - 2.0f * alpha - beta;

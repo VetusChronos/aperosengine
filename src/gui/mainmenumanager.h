@@ -26,8 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <cassert>
 #include <list>
 
-class IGameCallback
-{
+class IGameCallback {
 public:
 	virtual void exitToOS() = 0;
 	virtual void keyConfig() = 0;
@@ -43,52 +42,46 @@ extern gui::IGUIStaticText *guiroot;
 
 // Handler for the modal menus
 
-class MainMenuManager : public IMenuManager
-{
+class MainMenuManager : public IMenuManager {
 public:
-	virtual void createdMenu(gui::IGUIElement *menu)
-	{
+	virtual void createdMenu(gui::IGUIElement *menu) {
 		for (gui::IGUIElement *e : m_stack) {
 			if (e == menu)
 				return;
 		}
 
-		if(!m_stack.empty())
+		if (!m_stack.empty())
 			m_stack.back()->setVisible(false);
 
 		m_stack.push_back(menu);
 		guienv->setFocus(m_stack.back());
 	}
 
-	virtual void deletingMenu(gui::IGUIElement *menu)
-	{
+	virtual void deletingMenu(gui::IGUIElement *menu) {
 		// Remove all entries if there are duplicates
 		m_stack.remove(menu);
 
-		if(!m_stack.empty()) {
+		if (!m_stack.empty()) {
 			m_stack.back()->setVisible(true);
 			guienv->setFocus(m_stack.back());
 		}
 	}
 
 	// Returns true to prevent further processing
-	virtual bool preprocessEvent(const SEvent& event)
-	{
+	virtual bool preprocessEvent(const SEvent &event) {
 		if (m_stack.empty())
 			return false;
-		GUIModalMenu *mm = dynamic_cast<GUIModalMenu*>(m_stack.back());
+		GUIModalMenu *mm = dynamic_cast<GUIModalMenu *>(m_stack.back());
 		return mm && mm->preprocessEvent(event);
 	}
 
-	size_t menuCount() const
-	{
+	size_t menuCount() const {
 		return m_stack.size();
 	}
 
-	bool pausesGame()
-	{
+	bool pausesGame() {
 		for (gui::IGUIElement *i : m_stack) {
-			GUIModalMenu *mm = dynamic_cast<GUIModalMenu*>(i);
+			GUIModalMenu *mm = dynamic_cast<GUIModalMenu *>(i);
 			if (mm && mm->pausesGame())
 				return true;
 		}
@@ -96,54 +89,45 @@ public:
 	}
 
 	// FIXME: why isn't this private?
-	std::list<gui::IGUIElement*> m_stack;
+	std::list<gui::IGUIElement *> m_stack;
 };
 
 extern MainMenuManager g_menumgr;
 
-static inline bool isMenuActive()
-{
+static inline bool isMenuActive() {
 	return g_menumgr.menuCount() != 0;
 }
 
-class MainGameCallback : public IGameCallback
-{
+class MainGameCallback : public IGameCallback {
 public:
 	MainGameCallback() = default;
 	virtual ~MainGameCallback() = default;
 
-	void exitToOS() override
-	{
+	void exitToOS() override {
 		shutdown_requested = true;
 	}
 
-	void disconnect() override
-	{
+	void disconnect() override {
 		disconnect_requested = true;
 	}
 
-	void changePassword() override
-	{
+	void changePassword() override {
 		changepassword_requested = true;
 	}
 
-	void changeVolume() override
-	{
+	void changeVolume() override {
 		changevolume_requested = true;
 	}
 
-	void keyConfig() override
-	{
+	void keyConfig() override {
 		keyconfig_requested = true;
 	}
 
-	void signalKeyConfigChange() override
-	{
+	void signalKeyConfigChange() override {
 		keyconfig_changed = true;
 	}
 
-	void showOpenURLDialog(const std::string &url) override
-	{
+	void showOpenURLDialog(const std::string &url) override {
 		show_open_url_dialog = url;
 	}
 

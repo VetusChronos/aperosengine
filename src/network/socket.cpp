@@ -99,8 +99,8 @@ bool UDPSocket::init(bool ipv6, bool noExceptions) {
 
 	if (socket_enable_debug_output) {
 		tracestream << "UDPSocket(" << m_handle
-			<< ")::UDPSocket(): ipv6 = " << (ipv6 ? "true" : "false")
-			<< '\n';
+					<< ")::UDPSocket(): ipv6 = " << (ipv6 ? "true" : "false")
+					<< '\n';
 	}
 
 	if (m_handle < 0) {
@@ -108,7 +108,7 @@ bool UDPSocket::init(bool ipv6, bool noExceptions) {
 			return false;
 		}
 		throw SocketException("Failed to create socket: error " +
-				      std::string(SOCKET_ERR_STR(LAST_SOCKET_ERR())));
+				std::string(SOCKET_ERR_STR(LAST_SOCKET_ERR())));
 	}
 
 	setTimeoutMs(0);
@@ -141,8 +141,8 @@ UDPSocket::~UDPSocket() {
 void UDPSocket::Bind(Address addr) {
 	if (socket_enable_debug_output) {
 		tracestream << "UDPSocket(" << m_handle
-			<< ")::Bind(): " << addr.serializeString() << ":"
-			<< addr.getPort() << '\n';
+					<< ")::Bind(): " << addr.serializeString() << ":"
+					<< addr.getPort() << '\n';
 	}
 
 	if (addr.getFamily() != m_addr_family) {
@@ -168,12 +168,12 @@ void UDPSocket::Bind(Address addr) {
 		address.sin_port = htons(addr.getPort());
 
 		ret = bind(m_handle, reinterpret_cast<const struct sockaddr *>(&address),
-			sizeof(address));
+				sizeof(address));
 	}
 
 	if (ret < 0) {
 		tracestream << m_handle << ": Bind failed: "
-			<< SOCKET_ERR_STR(LAST_SOCKET_ERR()) << '\n';
+					<< SOCKET_ERR_STR(LAST_SOCKET_ERR()) << '\n';
 		throw SocketException("Failed to bind socket");
 	}
 }
@@ -215,7 +215,9 @@ void UDPSocket::Send(const Address &destination, const void *data, int size) {
 // Receive data from sender address
 int UDPSocket::Receive(Address &sender, void *data, int size) {
 	assert(m_timeout_ms >= 0);
-	if (!WaitData(m_timeout_ms)) { return -1; }
+	if (!WaitData(m_timeout_ms)) {
+		return -1;
+	}
 
 	size = std::max(size, 0);
 
@@ -227,10 +229,12 @@ int UDPSocket::Receive(Address &sender, void *data, int size) {
 		received = recvfrom(m_handle, reinterpret_cast<char *>(data), size, 0,
 				reinterpret_cast<struct sockaddr *>(&address), &address_len);
 
-		if (received < 0) { return -1; }
+		if (received < 0) {
+			return -1;
+		}
 
 		u16 address_port = ntohs(address.sin6_port);
-		const auto *bytes = reinterpret_cast<IPv6AddressBytes*>(address.sin6_addr.s6_addr);
+		const auto *bytes = reinterpret_cast<IPv6AddressBytes *>(address.sin6_addr.s6_addr);
 		sender = Address(bytes, address_port);
 	} else {
 		struct sockaddr_in address = {};
@@ -239,7 +243,9 @@ int UDPSocket::Receive(Address &sender, void *data, int size) {
 		received = recvfrom(m_handle, reinterpret_cast<char *>(data), size, 0,
 				reinterpret_cast<struct sockaddr *>(&address), &address_len);
 
-		if (received < 0) { return -1; }
+		if (received < 0) {
+			return -1;
+		}
 
 		u32 address_ip = ntohl(address.sin_addr.s_addr);
 		u16 address_port = ntohs(address.sin_port);
@@ -255,8 +261,8 @@ int UDPSocket::Receive(Address &sender, void *data, int size) {
 		for (int i = 0; i < std::min(received, 20); i++) {
 			if (i % 2 == 0)
 				tracestream << " ";
-			tracestream << std::hex << std::setw(2) << std::setfill('0') 
-			            << static_cast<unsigned int>(reinterpret_cast<unsigned char*>(data)[i]);
+			tracestream << std::hex << std::setw(2) << std::setfill('0')
+						<< static_cast<unsigned int>(reinterpret_cast<unsigned char *>(data)[i]);
 		}
 		if (received > 20) {
 			tracestream << "...";

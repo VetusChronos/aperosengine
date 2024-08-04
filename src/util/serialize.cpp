@@ -29,13 +29,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 FloatType g_serialize_f32_type = FLOATTYPE_UNKNOWN;
 
-
 ////
 //// String
 ////
 
-std::string serializeString16(std::string_view plain)
-{
+std::string serializeString16(std::string_view plain) {
 	std::string s;
 	char buf[2];
 
@@ -50,8 +48,7 @@ std::string serializeString16(std::string_view plain)
 	return s;
 }
 
-std::string deSerializeString16(std::istream &is)
-{
+std::string deSerializeString16(std::istream &is) {
 	std::string s;
 	char buf[2];
 
@@ -71,13 +68,11 @@ std::string deSerializeString16(std::istream &is)
 	return s;
 }
 
-
 ////
 //// Long String
 ////
 
-std::string serializeString32(std::string_view plain)
-{
+std::string serializeString32(std::string_view plain) {
 	std::string s;
 	char buf[4];
 
@@ -85,14 +80,13 @@ std::string serializeString32(std::string_view plain)
 		throw SerializationError("String too long for serializeLongString");
 	s.reserve(4 + plain.size());
 
-	writeU32((u8*)&buf[0], plain.size());
+	writeU32((u8 *)&buf[0], plain.size());
 	s.append(buf, 4);
 	s.append(plain);
 	return s;
 }
 
-std::string deSerializeString32(std::istream &is)
-{
+std::string deSerializeString32(std::istream &is) {
 	std::string s;
 	char buf[4];
 
@@ -107,7 +101,8 @@ std::string deSerializeString32(std::istream &is)
 	// We don't really want a remote attacker to force us to allocate 4GB...
 	if (s_size > LONG_STRING_MAX_LEN) {
 		throw SerializationError("deSerializeLongString: "
-			"string too long: " + itos(s_size) + " bytes");
+								 "string too long: " +
+				itos(s_size) + " bytes");
 	}
 
 	s.resize(s_size);
@@ -122,8 +117,7 @@ std::string deSerializeString32(std::istream &is)
 //// JSON-like strings
 ////
 
-std::string serializeJsonString(std::string_view plain)
-{
+std::string serializeJsonString(std::string_view plain) {
 	std::string tmp;
 
 	tmp.reserve(plain.size() + 2);
@@ -171,8 +165,7 @@ std::string serializeJsonString(std::string_view plain)
 	return tmp;
 }
 
-static void deSerializeJsonString(std::string &s)
-{
+static void deSerializeJsonString(std::string &s) {
 	assert(s.size() >= 2);
 	assert(s.front() == '"' && s.back() == '"');
 
@@ -213,12 +206,12 @@ static void deSerializeJsonString(std::string &s)
 					throw SerializationError("JSON string ended prematurely");
 				unsigned char v[4] = {};
 				for (int j = 0; j < 4; j++)
-					hex_digit_decode(s[i+j], v[j]);
+					hex_digit_decode(s[i + j], v[j]);
 				i += 4;
 				u32 hexnumber = (v[0] << 12) | (v[1] << 8) | (v[2] << 4) | v[3];
 				// Note that this does not work for anything other than ASCII
 				// but these functions do not actually interact with real JSON input.
-				s[w++] = (int) hexnumber;
+				s[w++] = (int)hexnumber;
 				break;
 			}
 			default:
@@ -232,8 +225,7 @@ static void deSerializeJsonString(std::string &s)
 	s.resize(w);
 }
 
-std::string deSerializeJsonString(std::istream &is)
-{
+std::string deSerializeJsonString(std::istream &is) {
 	std::string tmp;
 	char c;
 	bool was_backslash = false;
@@ -263,8 +255,7 @@ std::string deSerializeJsonString(std::istream &is)
 	return tmp;
 }
 
-std::string serializeJsonStringIfNeeded(std::string_view s)
-{
+std::string serializeJsonStringIfNeeded(std::string_view s) {
 	for (size_t i = 0; i < s.size(); ++i) {
 		if (s[i] <= 0x1f || s[i] >= 0x7f || s[i] == ' ' || s[i] == '\"')
 			return serializeJsonString(s);
@@ -272,8 +263,7 @@ std::string serializeJsonStringIfNeeded(std::string_view s)
 	return std::string(s);
 }
 
-std::string deSerializeJsonStringIfNeeded(std::istream &is)
-{
+std::string deSerializeJsonStringIfNeeded(std::istream &is) {
 	// Check for initial quote
 	char c = is.peek();
 	if (is.eof())
@@ -291,4 +281,3 @@ std::string deSerializeJsonStringIfNeeded(std::istream &is)
 		is.unget(); // we hit a space, put it back
 	return tmp;
 }
-

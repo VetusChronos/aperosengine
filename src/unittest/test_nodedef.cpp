@@ -25,8 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "nodedef.h"
 #include "network/networkprotocol.h"
 
-class TestNodeDef : public TestBase
-{
+class TestNodeDef : public TestBase {
 public:
 	TestNodeDef() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestNodeDef"; }
@@ -38,15 +37,13 @@ public:
 
 static TestNodeDef g_test_instance;
 
-void TestNodeDef::runTests(IGameDef *gamedef)
-{
+void TestNodeDef::runTests(IGameDef *gamedef) {
 	TEST(testContentFeaturesSerialization);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestNodeDef::testContentFeaturesSerialization()
-{
+void TestNodeDef::testContentFeaturesSerialization() {
 	ContentFeatures f;
 
 	f.name = "default:stone";

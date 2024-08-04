@@ -30,15 +30,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
  *
  * `SimpleSoundSpec`, as used by modding, is a `SoundSpec` with only name, fain,
  * pitch and fade.
-*/
-struct SoundSpec
-{
+ */
+struct SoundSpec {
 	SoundSpec(std::string_view name = "", float gain = 1.0f,
 			bool loop = false, float fade = 0.0f, float pitch = 1.0f,
 			float start_time = 0.0f) :
-			name(name), gain(gain), fade(fade), pitch(pitch), start_time(start_time),
-			loop(loop)
-	{
+			name(name), gain(gain), fade(fade), pitch(pitch), start_time(start_time), loop(loop) {
 	}
 
 	bool exists() const { return !name.empty(); }
@@ -46,8 +43,7 @@ struct SoundSpec
 	/**
 	 * Serialize a `SimpleSoundSpec`.
 	 */
-	void serializeSimple(std::ostream &os, u16 protocol_version) const
-	{
+	void serializeSimple(std::ostream &os, u16 protocol_version) const {
 		os << serializeString16(name);
 		writeF32(os, gain);
 		writeF32(os, pitch);
@@ -57,8 +53,7 @@ struct SoundSpec
 	/**
 	 * Deserialize a `SimpleSoundSpec`.
 	 */
-	void deSerializeSimple(std::istream &is, u16 protocol_version)
-	{
+	void deSerializeSimple(std::istream &is, u16 protocol_version) {
 		name = deSerializeString16(is);
 		gain = readF32(is);
 		pitch = readF32(is);
@@ -76,7 +71,6 @@ struct SoundSpec
 	// sound-group does not exist.
 	bool use_local_fallback = true;
 };
-
 
 // The order must not be changed. This is sent over the network.
 enum class SoundLocation : u8 {

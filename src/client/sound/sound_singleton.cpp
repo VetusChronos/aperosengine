@@ -26,8 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 namespace sound {
 
-bool SoundManagerSingleton::init()
-{
+bool SoundManagerSingleton::init() {
 	if (!(m_device = unique_ptr_alcdevice(alcOpenDevice(nullptr)))) {
 		errorstream << "Audio: Global Initialization: Failed to open device" << '\n';
 		return false;
@@ -59,14 +58,13 @@ bool SoundManagerSingleton::init()
 	}
 
 	infostream << "Audio: Global Initialized: OpenAL " << alGetString(AL_VERSION)
-		<< ", using " << alcGetString(m_device.get(), ALC_DEVICE_SPECIFIER)
-		<< '\n';
+			   << ", using " << alcGetString(m_device.get(), ALC_DEVICE_SPECIFIER)
+			   << '\n';
 
 	return true;
 }
 
-SoundManagerSingleton::~SoundManagerSingleton()
-{
+SoundManagerSingleton::~SoundManagerSingleton() {
 	infostream << "Audio: Global Deinitialized." << '\n';
 }
 

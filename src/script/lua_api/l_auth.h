@@ -24,8 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class AuthDatabase;
 struct AuthEntry;
 
-class ModApiAuth : public ModApiBase
-{
+class ModApiAuth : public ModApiBase {
 private:
 	// auth_read(name)
 	static int l_auth_read(lua_State *L);

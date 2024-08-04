@@ -27,12 +27,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "gamedef.h"
 #include "settings.h"
 #include "log.h"
-#include "porting.h"  // strlcpy
+#include "porting.h" // strlcpy
 
-
-Player::Player(const char *name, IItemDefManager *idef):
-	inventory(idef)
-{
+Player::Player(const char *name, IItemDefManager *idef) :
+		inventory(idef) {
 	strlcpy(m_name, name, PLAYERNAME_SIZE);
 
 	inventory.clear();
@@ -45,51 +43,48 @@ Player::Player(const char *name, IItemDefManager *idef):
 
 	// Can be redefined via Lua
 	inventory_formspec = "size[8,7.5]"
-		//"image[1,0.6;1,2;player.png]"
-		"list[current_player;main;0,3.5;8,4;]"
-		"list[current_player;craft;3,0;3,3;]"
-		"listring[]"
-		"list[current_player;craftpreview;7,1;1,1;]";
+						 //"image[1,0.6;1,2;player.png]"
+						 "list[current_player;main;0,3.5;8,4;]"
+						 "list[current_player;craft;3,0;3,3;]"
+						 "listring[]"
+						 "list[current_player;craftpreview;7,1;1,1;]";
 
 	// Initialize movement settings at default values, so movement can work
 	// if the server fails to send them
-	movement_acceleration_default   = 3    * BS;
-	movement_acceleration_air       = 2    * BS;
-	movement_acceleration_fast      = 10   * BS;
-	movement_speed_walk             = 4    * BS;
-	movement_speed_crouch           = 1.35 * BS;
-	movement_speed_fast             = 20   * BS;
-	movement_speed_climb            = 2    * BS;
-	movement_speed_jump             = 6.5  * BS;
-	movement_liquid_fluidity        = 1    * BS;
-	movement_liquid_fluidity_smooth = 0.5  * BS;
-	movement_liquid_sink            = 10   * BS;
-	movement_gravity                = 9.81 * BS;
-	local_animation_speed           = 0.0;
+	movement_acceleration_default = 3 * BS;
+	movement_acceleration_air = 2 * BS;
+	movement_acceleration_fast = 10 * BS;
+	movement_speed_walk = 4 * BS;
+	movement_speed_crouch = 1.35 * BS;
+	movement_speed_fast = 20 * BS;
+	movement_speed_climb = 2 * BS;
+	movement_speed_jump = 6.5 * BS;
+	movement_liquid_fluidity = 1 * BS;
+	movement_liquid_fluidity_smooth = 0.5 * BS;
+	movement_liquid_sink = 10 * BS;
+	movement_gravity = 9.81 * BS;
+	local_animation_speed = 0.0;
 
 	hud_flags =
-		HUD_FLAG_HOTBAR_VISIBLE    | HUD_FLAG_HEALTHBAR_VISIBLE |
-		HUD_FLAG_CROSSHAIR_VISIBLE | HUD_FLAG_WIELDITEM_VISIBLE |
-		HUD_FLAG_BREATHBAR_VISIBLE | HUD_FLAG_MINIMAP_VISIBLE   |
-		HUD_FLAG_MINIMAP_RADAR_VISIBLE | HUD_FLAG_BASIC_DEBUG   |
-		HUD_FLAG_CHAT_VISIBLE;
+			HUD_FLAG_HOTBAR_VISIBLE | HUD_FLAG_HEALTHBAR_VISIBLE |
+			HUD_FLAG_CROSSHAIR_VISIBLE | HUD_FLAG_WIELDITEM_VISIBLE |
+			HUD_FLAG_BREATHBAR_VISIBLE | HUD_FLAG_MINIMAP_VISIBLE |
+			HUD_FLAG_MINIMAP_RADAR_VISIBLE | HUD_FLAG_BASIC_DEBUG |
+			HUD_FLAG_CHAT_VISIBLE;
 
 	hud_hotbar_itemcount = HUD_HOTBAR_ITEMCOUNT_DEFAULT;
 }
 
-Player::~Player()
-{
+Player::~Player() {
 	clearHud();
 }
 
-void Player::setWieldIndex(u16 index)
-{
+void Player::setWieldIndex(u16 index) {
 	const InventoryList *mlist = inventory.getList("main");
 	m_wield_index = MYMIN(index, mlist ? mlist->getSize() : 0);
 }
 
-ItemStack &Player::getWieldedItem(ItemStack *selected, ItemStack *hand) const
-{
+ItemStack &Player::getWieldedItem(ItemStack *selected, ItemStack *hand) const {
 	assert(selected);
 
 	const InventoryList *mlist = inventory.getList("main"); // TODO: Make this generic
@@ -105,8 +100,7 @@ ItemStack &Player::getWieldedItem(ItemStack *selected, ItemStack *hand) const
 	return (hand && selected->name.empty()) ? *hand : *selected;
 }
 
-u32 Player::addHud(HudElement *toadd)
-{
+u32 Player::addHud(HudElement *toadd) {
 	MutexAutoLock lock(m_mutex);
 
 	u32 id = getFreeHudID();
@@ -119,8 +113,7 @@ u32 Player::addHud(HudElement *toadd)
 	return id;
 }
 
-HudElement* Player::getHud(u32 id)
-{
+HudElement *Player::getHud(u32 id) {
 	MutexAutoLock lock(m_mutex);
 
 	if (id < hud.size())
@@ -129,17 +122,15 @@ HudElement* Player::getHud(u32 id)
 	return NULL;
 }
 
-void Player::hudApply(std::function<void(const std::vector<HudElement*>&)> f)
-{
+void Player::hudApply(std::function<void(const std::vector<HudElement *> &)> f) {
 	MutexAutoLock lock(m_mutex);
 	f(hud);
 }
 
-HudElement* Player::removeHud(u32 id)
-{
+HudElement *Player::removeHud(u32 id) {
 	MutexAutoLock lock(m_mutex);
 
-	HudElement* retval = NULL;
+	HudElement *retval = NULL;
 	if (id < hud.size()) {
 		retval = hud[id];
 		hud[id] = NULL;
@@ -147,11 +138,10 @@ HudElement* Player::removeHud(u32 id)
 	return retval;
 }
 
-void Player::clearHud()
-{
+void Player::clearHud() {
 	MutexAutoLock lock(m_mutex);
 
-	while(!hud.empty()) {
+	while (!hud.empty()) {
 		delete hud.back();
 		hud.pop_back();
 	}
@@ -159,25 +149,21 @@ void Player::clearHud()
 
 #ifndef SERVER
 
-u32 PlayerControl::getKeysPressed() const
-{
+u32 PlayerControl::getKeysPressed() const {
 	u32 keypress_bits =
-		( (u32)(jump  & 1) << 4) |
-		( (u32)(aux1  & 1) << 5) |
-		( (u32)(sneak & 1) << 6) |
-		( (u32)(dig   & 1) << 7) |
-		( (u32)(place & 1) << 8) |
-		( (u32)(zoom  & 1) << 9)
-	;
+			((u32)(jump & 1) << 4) |
+			((u32)(aux1 & 1) << 5) |
+			((u32)(sneak & 1) << 6) |
+			((u32)(dig & 1) << 7) |
+			((u32)(place & 1) << 8) |
+			((u32)(zoom & 1) << 9);
 
 	// If any direction keys are pressed pass those through
-	if (direction_keys != 0)
-	{
+	if (direction_keys != 0) {
 		keypress_bits |= direction_keys;
 	}
 	// Otherwise set direction keys based on joystick movement (for mod compatibility)
-	else if (isMoving())
-	{
+	else if (isMoving()) {
 		float abs_d;
 
 		// (absolute value indicates forward / backward)
@@ -204,13 +190,12 @@ u32 PlayerControl::getKeysPressed() const
 
 #endif
 
-void PlayerControl::unpackKeysPressed(u32 keypress_bits)
-{
+void PlayerControl::unpackKeysPressed(u32 keypress_bits) {
 	direction_keys = keypress_bits & 0xf;
-	jump  = keypress_bits & (1 << 4);
-	aux1  = keypress_bits & (1 << 5);
+	jump = keypress_bits & (1 << 4);
+	aux1 = keypress_bits & (1 << 5);
 	sneak = keypress_bits & (1 << 6);
-	dig   = keypress_bits & (1 << 7);
+	dig = keypress_bits & (1 << 7);
 	place = keypress_bits & (1 << 8);
-	zoom  = keypress_bits & (1 << 9);
+	zoom = keypress_bits & (1 << 9);
 }

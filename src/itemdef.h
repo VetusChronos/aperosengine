@@ -45,8 +45,7 @@ struct ItemStack;
 	Base item definition
 */
 
-enum ItemType : u8
-{
+enum ItemType : u8 {
 	ITEM_NONE,
 	ITEM_NODE,
 	ITEM_CRAFT,
@@ -54,16 +53,14 @@ enum ItemType : u8
 	ItemType_END // Dummy for validity check
 };
 
-enum TouchInteractionMode : u8
-{
+enum TouchInteractionMode : u8 {
 	LONG_DIG_SHORT_PLACE,
 	SHORT_DIG_LONG_PLACE,
 	TouchInteractionMode_USER, // Meaning depends on client-side settings
 	TouchInteractionMode_END, // Dummy for validity check
 };
 
-struct TouchInteraction
-{
+struct TouchInteraction {
 	TouchInteractionMode pointed_nothing;
 	TouchInteractionMode pointed_node;
 	TouchInteractionMode pointed_object;
@@ -76,8 +73,7 @@ struct TouchInteraction
 	void deSerialize(std::istream &is);
 };
 
-struct ItemDefinition
-{
+struct ItemDefinition {
 	/*
 		Basic item properties
 	*/
@@ -130,53 +126,52 @@ struct ItemDefinition
 	*/
 	ItemDefinition();
 	ItemDefinition(const ItemDefinition &def);
-	ItemDefinition& operator=(const ItemDefinition &def);
+	ItemDefinition &operator=(const ItemDefinition &def);
 	~ItemDefinition();
 	void reset();
 	void serialize(std::ostream &os, u16 protocol_version) const;
 	void deSerialize(std::istream &is, u16 protocol_version);
+
 private:
 	void resetInitial();
 };
 
-class IItemDefManager
-{
+class IItemDefManager {
 public:
 	IItemDefManager() = default;
 
 	virtual ~IItemDefManager() = default;
 
 	// Get item definition
-	virtual const ItemDefinition& get(const std::string &name) const=0;
+	virtual const ItemDefinition &get(const std::string &name) const = 0;
 	// Get alias definition
-	virtual const std::string &getAlias(const std::string &name) const=0;
+	virtual const std::string &getAlias(const std::string &name) const = 0;
 	// Get set of all defined item names and aliases
-	virtual void getAll(std::set<std::string> &result) const=0;
+	virtual void getAll(std::set<std::string> &result) const = 0;
 	// Check if item is known
-	virtual bool isKnown(const std::string &name) const=0;
+	virtual bool isKnown(const std::string &name) const = 0;
 #ifndef SERVER
 	// Get item inventory texture
-	virtual video::ITexture* getInventoryTexture(const ItemStack &item, Client *client) const=0;
+	virtual video::ITexture *getInventoryTexture(const ItemStack &item, Client *client) const = 0;
 
 	/**
 	 * Get wield mesh
 	 *
 	 * Returns nullptr if there is an inventory image
 	 */
-	virtual ItemMesh* getWieldMesh(const ItemStack &item, Client *client) const = 0;
+	virtual ItemMesh *getWieldMesh(const ItemStack &item, Client *client) const = 0;
 	// Get item palette
-	virtual Palette* getPalette(const ItemStack &item, Client *client) const = 0;
+	virtual Palette *getPalette(const ItemStack &item, Client *client) const = 0;
 	// Returns the base color of an item stack: the color of all
 	// tiles that do not define their own color.
 	virtual video::SColor getItemstackColor(const ItemStack &stack,
-		Client *client) const = 0;
+			Client *client) const = 0;
 #endif
 
-	virtual void serialize(std::ostream &os, u16 protocol_version)=0;
+	virtual void serialize(std::ostream &os, u16 protocol_version) = 0;
 };
 
-class IWritableItemDefManager : public IItemDefManager
-{
+class IWritableItemDefManager : public IItemDefManager {
 public:
 	IWritableItemDefManager() = default;
 
@@ -184,21 +179,21 @@ public:
 
 	// Replace the textures of registered nodes with the ones specified in
 	// the texture pack's override.txt files
-	virtual void applyTextureOverrides(const std::vector<TextureOverride> &overrides)=0;
+	virtual void applyTextureOverrides(const std::vector<TextureOverride> &overrides) = 0;
 
 	// Remove all registered item and node definitions and aliases
 	// Then re-add the builtin item definitions
-	virtual void clear()=0;
+	virtual void clear() = 0;
 	// Register item definition
-	virtual void registerItem(const ItemDefinition &def)=0;
-	virtual void unregisterItem(const std::string &name)=0;
+	virtual void registerItem(const ItemDefinition &def) = 0;
+	virtual void unregisterItem(const std::string &name) = 0;
 	// Set an alias so that items named <name> will load as <convert_to>.
 	// Alias is not set if <name> has already been defined.
 	// Alias will be removed if <name> is defined at a later point of time.
 	virtual void registerAlias(const std::string &name,
-			const std::string &convert_to)=0;
+			const std::string &convert_to) = 0;
 
-	virtual void deSerialize(std::istream &is, u16 protocol_version)=0;
+	virtual void deSerialize(std::istream &is, u16 protocol_version) = 0;
 };
 
-IWritableItemDefManager* createItemDefManager();
+IWritableItemDefManager *createItemDefManager();

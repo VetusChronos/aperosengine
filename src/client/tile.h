@@ -24,7 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <vector>
 #include <SMaterial.h>
 
-enum MaterialType{
+enum MaterialType {
 	TILE_MATERIAL_BASIC,
 	TILE_MATERIAL_ALPHA,
 	TILE_MATERIAL_LIQUID_TRANSPARENT,
@@ -56,8 +56,7 @@ enum MaterialType{
 	This fully defines the looks of a tile.
 	The SMaterial of a tile is constructed according to this.
 */
-struct FrameSpec
-{
+struct FrameSpec {
 	FrameSpec() = default;
 
 	u32 texture_id = 0;
@@ -69,29 +68,25 @@ struct FrameSpec
 #define MAX_TILE_LAYERS 2
 
 //! Defines a layer of a tile.
-struct TileLayer
-{
+struct TileLayer {
 	TileLayer() = default;
 
 	/*!
 	 * Two layers are equal if they can be merged.
 	 */
-	bool operator==(const TileLayer &other) const
-	{
-		return
-			texture_id == other.texture_id &&
-			material_type == other.material_type &&
-			material_flags == other.material_flags &&
-			has_color == other.has_color &&
-			color == other.color &&
-			scale == other.scale;
+	bool operator==(const TileLayer &other) const {
+		return texture_id == other.texture_id &&
+				material_type == other.material_type &&
+				material_flags == other.material_flags &&
+				has_color == other.has_color &&
+				color == other.color &&
+				scale == other.scale;
 	}
 
 	/*!
 	 * Two tiles are not equal if they must have different vertices.
 	 */
-	bool operator!=(const TileLayer &other) const
-	{
+	bool operator!=(const TileLayer &other) const {
 		return !(*this == other);
 	}
 
@@ -100,13 +95,12 @@ struct TileLayer
 
 	void applyMaterialOptionsWithShaders(video::SMaterial &material) const;
 
-	bool isTransparent() const
-	{
+	bool isTransparent() const {
 		switch (material_type) {
-		case TILE_MATERIAL_ALPHA:
-		case TILE_MATERIAL_LIQUID_TRANSPARENT:
-		case TILE_MATERIAL_WAVING_LIQUID_TRANSPARENT:
-			return true;
+			case TILE_MATERIAL_ALPHA:
+			case TILE_MATERIAL_LIQUID_TRANSPARENT:
+			case TILE_MATERIAL_WAVING_LIQUID_TRANSPARENT:
+				return true;
 		}
 		return false;
 	}
@@ -126,10 +120,10 @@ struct TileLayer
 
 	u8 material_type = TILE_MATERIAL_BASIC;
 	u8 material_flags =
-		//0 // <- DEBUG, Use the one below
-		MATERIAL_FLAG_BACKFACE_CULLING |
-		MATERIAL_FLAG_TILEABLE_HORIZONTAL|
-		MATERIAL_FLAG_TILEABLE_VERTICAL;
+			//0 // <- DEBUG, Use the one below
+			MATERIAL_FLAG_BACKFACE_CULLING |
+			MATERIAL_FLAG_TILEABLE_HORIZONTAL |
+			MATERIAL_FLAG_TILEABLE_VERTICAL;
 
 	//! If true, the tile has its own color.
 	bool has_color = false;
@@ -145,7 +139,7 @@ struct TileLayer
 	u8 scale = 1;
 };
 
-enum class TileRotation: u8 {
+enum class TileRotation : u8 {
 	None,
 	R90,
 	R180,
@@ -155,8 +149,7 @@ enum class TileRotation: u8 {
 /*!
  * Defines a face of a node. May have up to two layers.
  */
-struct TileSpec
-{
+struct TileSpec {
 	TileSpec() = default;
 
 	//! If true, the tile rotation is ignored.

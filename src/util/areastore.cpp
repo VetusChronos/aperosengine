@@ -22,9 +22,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/container.h"
 
 #if USE_SPATIAL
-	#include <spatialindex/SpatialIndex.h>
-	#include <spatialindex/RTree.h>
-	#include <spatialindex/Point.h>
+#include <spatialindex/SpatialIndex.h>
+#include <spatialindex/RTree.h>
+#include <spatialindex/Point.h>
 #endif
 
 #define AST_SMALLER_EQ_AS(p, q) (((p).X <= (q).X) && ((p).Y <= (q).Y) && ((p).Z <= (q).Z))
@@ -33,20 +33,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	(!(((amine).d > (b)->maxedge.d) || ((amaxe).d < (b)->minedge.d)))
 
 #define AST_CONTAINS_PT(a, p) (AST_SMALLER_EQ_AS((a)->minedge, (p)) && \
-	AST_SMALLER_EQ_AS((p), (a)->maxedge))
+		AST_SMALLER_EQ_AS((p), (a)->maxedge))
 
-#define AST_CONTAINS_AREA(amine, amaxe, b)         \
-	(AST_SMALLER_EQ_AS((amine), (b)->minedge) \
-	&& AST_SMALLER_EQ_AS((b)->maxedge, (amaxe)))
+#define AST_CONTAINS_AREA(amine, amaxe, b) \
+	(AST_SMALLER_EQ_AS((amine), (b)->minedge) && AST_SMALLER_EQ_AS((b)->maxedge, (amaxe)))
 
-#define AST_AREAS_OVERLAP(amine, amaxe, b)                \
-	(AST_OVERLAPS_IN_DIMENSION((amine), (amaxe), (b), X) && \
-	AST_OVERLAPS_IN_DIMENSION((amine), (amaxe), (b), Y) &&  \
-	AST_OVERLAPS_IN_DIMENSION((amine), (amaxe), (b), Z))
+#define AST_AREAS_OVERLAP(amine, amaxe, b)                         \
+	(AST_OVERLAPS_IN_DIMENSION((amine), (amaxe), (b), X) &&        \
+			AST_OVERLAPS_IN_DIMENSION((amine), (amaxe), (b), Y) && \
+			AST_OVERLAPS_IN_DIMENSION((amine), (amaxe), (b), Z))
 
-
-AreaStore *AreaStore::getOptimalImplementation()
-{
+AreaStore *AreaStore::getOptimalImplementation() {
 #if USE_SPATIAL
 	return new SpatialAreaStore();
 #else
@@ -54,16 +51,14 @@ AreaStore *AreaStore::getOptimalImplementation()
 #endif
 }
 
-const Area *AreaStore::getArea(u32 id) const
-{
+const Area *AreaStore::getArea(u32 id) const {
 	AreaMap::const_iterator it = areas_map.find(id);
 	if (it == areas_map.end())
 		return nullptr;
 	return &it->second;
 }
 
-void AreaStore::serialize(std::ostream &os) const
-{
+void AreaStore::serialize(std::ostream &os) const {
 	// WARNING:
 	// Before 5.1.0-dev: version != 0 throws SerializationError
 	// After 5.1.0-dev:  version >= 5 throws SerializationError
@@ -86,13 +81,12 @@ void AreaStore::serialize(std::ostream &os) const
 		writeU32(os, it.second.id);
 }
 
-void AreaStore::deserialize(std::istream &is)
-{
+void AreaStore::deserialize(std::istream &is) {
 	u8 ver = readU8(is);
 	// Assume forwards-compatibility before version 5
 	if (ver >= 5)
 		throw SerializationError("Unknown AreaStore "
-				"serialization version!");
+								 "serialization version!");
 
 	u16 num_areas = readU16(is);
 	std::vector<Area> areas;
@@ -116,15 +110,13 @@ void AreaStore::deserialize(std::istream &is)
 	}
 }
 
-void AreaStore::invalidateCache()
-{
+void AreaStore::invalidateCache() {
 	if (m_cache_enabled) {
 		m_res_cache.invalidate();
 	}
 }
 
-u32 AreaStore::getNextId() const
-{
+u32 AreaStore::getNextId() const {
 	u32 free_id = 0;
 	for (const auto &area : areas_map) {
 		if (area.first > free_id)
@@ -136,25 +128,23 @@ u32 AreaStore::getNextId() const
 	return free_id;
 }
 
-void AreaStore::setCacheParams(bool enabled, u8 block_radius, size_t limit)
-{
+void AreaStore::setCacheParams(bool enabled, u8 block_radius, size_t limit) {
 	m_cache_enabled = enabled;
 	m_cacheblock_radius = MYMAX(block_radius, 16);
 	m_res_cache.setLimit(MYMAX(limit, 20));
 	invalidateCache();
 }
 
-void AreaStore::cacheMiss(void *data, const v3s16 &mpos, std::vector<Area *> *dest)
-{
+void AreaStore::cacheMiss(void *data, const v3s16 &mpos, std::vector<Area *> *dest) {
 	AreaStore *as = (AreaStore *)data;
 	u8 r = as->m_cacheblock_radius;
 
 	// get the points at the edges of the mapblock
 	v3s16 minedge(mpos.X * r, mpos.Y * r, mpos.Z * r);
 	v3s16 maxedge(
-		minedge.X + r - 1,
-		minedge.Y + r - 1,
-		minedge.Z + r - 1);
+			minedge.X + r - 1,
+			minedge.Y + r - 1,
+			minedge.Z + r - 1);
 
 	as->getAreasInArea(dest, minedge, maxedge, true);
 
@@ -165,8 +155,7 @@ void AreaStore::cacheMiss(void *data, const v3s16 &mpos, std::vector<Area *> *de
 			<< ")" << '\n'; // */
 }
 
-void AreaStore::getAreasForPos(std::vector<Area *> *result, v3s16 pos)
-{
+void AreaStore::getAreasForPos(std::vector<Area *> *result, v3s16 pos) {
 	if (m_cache_enabled) {
 		v3s16 mblock = getContainerPos(pos, m_cacheblock_radius);
 		const std::vector<Area *> *pre_list = m_res_cache.lookupCache(mblock);
@@ -183,14 +172,11 @@ void AreaStore::getAreasForPos(std::vector<Area *> *result, v3s16 pos)
 	}
 }
 
-
 ////
 // VectorAreaStore
 ////
 
-
-bool VectorAreaStore::insertArea(Area *a)
-{
+bool VectorAreaStore::insertArea(Area *a) {
 	if (a->id == U32_MAX)
 		a->id = getNextId();
 	std::pair<AreaMap::iterator, bool> res =
@@ -203,8 +189,7 @@ bool VectorAreaStore::insertArea(Area *a)
 	return true;
 }
 
-bool VectorAreaStore::removeArea(u32 id)
-{
+bool VectorAreaStore::removeArea(u32 id) {
 	AreaMap::iterator it = areas_map.find(id);
 	if (it == areas_map.end())
 		return false;
@@ -221,8 +206,7 @@ bool VectorAreaStore::removeArea(u32 id)
 	return true;
 }
 
-void VectorAreaStore::getAreasForPosImpl(std::vector<Area *> *result, v3s16 pos)
-{
+void VectorAreaStore::getAreasForPosImpl(std::vector<Area *> *result, v3s16 pos) {
 	for (Area *area : m_areas) {
 		if (AST_CONTAINS_PT(area, pos)) {
 			result->push_back(area);
@@ -231,11 +215,9 @@ void VectorAreaStore::getAreasForPosImpl(std::vector<Area *> *result, v3s16 pos)
 }
 
 void VectorAreaStore::getAreasInArea(std::vector<Area *> *result,
-		v3s16 minedge, v3s16 maxedge, bool accept_overlap)
-{
+		v3s16 minedge, v3s16 maxedge, bool accept_overlap) {
 	for (Area *area : m_areas) {
-		if (accept_overlap ? AST_AREAS_OVERLAP(minedge, maxedge, area) :
-				AST_CONTAINS_AREA(minedge, maxedge, area)) {
+		if (accept_overlap ? AST_AREAS_OVERLAP(minedge, maxedge, area) : AST_CONTAINS_AREA(minedge, maxedge, area)) {
 			result->push_back(area);
 		}
 	}
@@ -244,24 +226,20 @@ void VectorAreaStore::getAreasInArea(std::vector<Area *> *result,
 #if USE_SPATIAL
 
 static inline SpatialIndex::Region get_spatial_region(const v3s16 minedge,
-		const v3s16 maxedge)
-{
-	const double p_low[] = {(double)minedge.X,
-		(double)minedge.Y, (double)minedge.Z};
-	const double p_high[] = {(double)maxedge.X, (double)maxedge.Y,
-		(double)maxedge.Z};
+		const v3s16 maxedge) {
+	const double p_low[] = { (double)minedge.X,
+		(double)minedge.Y, (double)minedge.Z };
+	const double p_high[] = { (double)maxedge.X, (double)maxedge.Y,
+		(double)maxedge.Z };
 	return SpatialIndex::Region(p_low, p_high, 3);
 }
 
-static inline SpatialIndex::Point get_spatial_point(const v3s16 pos)
-{
-	const double p[] = {(double)pos.X, (double)pos.Y, (double)pos.Z};
+static inline SpatialIndex::Point get_spatial_point(const v3s16 pos) {
+	const double p[] = { (double)pos.X, (double)pos.Y, (double)pos.Z };
 	return SpatialIndex::Point(p, 3);
 }
 
-
-bool SpatialAreaStore::insertArea(Area *a)
-{
+bool SpatialAreaStore::insertArea(Area *a) {
 	if (a->id == U32_MAX)
 		a->id = getNextId();
 	if (!areas_map.insert(std::make_pair(a->id, *a)).second)
@@ -272,13 +250,13 @@ bool SpatialAreaStore::insertArea(Area *a)
 	return true;
 }
 
-bool SpatialAreaStore::removeArea(u32 id)
-{
+bool SpatialAreaStore::removeArea(u32 id) {
 	std::map<u32, Area>::iterator itr = areas_map.find(id);
 	if (itr != areas_map.end()) {
 		Area *a = &itr->second;
 		bool result = m_tree->deleteData(get_spatial_region(a->minedge,
-			a->maxedge), id);
+												 a->maxedge),
+				id);
 		areas_map.erase(itr);
 		invalidateCache();
 		return result;
@@ -287,43 +265,39 @@ bool SpatialAreaStore::removeArea(u32 id)
 	}
 }
 
-void SpatialAreaStore::getAreasForPosImpl(std::vector<Area *> *result, v3s16 pos)
-{
+void SpatialAreaStore::getAreasForPosImpl(std::vector<Area *> *result, v3s16 pos) {
 	VectorResultVisitor visitor(result, this);
 	m_tree->pointLocationQuery(get_spatial_point(pos), visitor);
 }
 
 void SpatialAreaStore::getAreasInArea(std::vector<Area *> *result,
-		v3s16 minedge, v3s16 maxedge, bool accept_overlap)
-{
+		v3s16 minedge, v3s16 maxedge, bool accept_overlap) {
 	VectorResultVisitor visitor(result, this);
 	if (accept_overlap) {
 		m_tree->intersectsWithQuery(get_spatial_region(minedge, maxedge),
-			visitor);
+				visitor);
 	} else {
 		m_tree->containsWhatQuery(get_spatial_region(minedge, maxedge), visitor);
 	}
 }
 
-SpatialAreaStore::~SpatialAreaStore()
-{
+SpatialAreaStore::~SpatialAreaStore() {
 	delete m_tree;
 	delete m_storagemanager;
 }
 
-SpatialAreaStore::SpatialAreaStore()
-{
+SpatialAreaStore::SpatialAreaStore() {
 	m_storagemanager =
-		SpatialIndex::StorageManager::createNewMemoryStorageManager();
+			SpatialIndex::StorageManager::createNewMemoryStorageManager();
 	SpatialIndex::id_type id;
 	m_tree = SpatialIndex::RTree::createNewRTree(
-		*m_storagemanager,
-		.7, // Fill factor
-		100, // Index capacity
-		100, // Leaf capacity
-		3, // dimension :)
-		SpatialIndex::RTree::RV_RSTAR,
-		id);
+			*m_storagemanager,
+			.7, // Fill factor
+			100, // Index capacity
+			100, // Leaf capacity
+			3, // dimension :)
+			SpatialIndex::RTree::RV_RSTAR,
+			id);
 }
 
 #endif

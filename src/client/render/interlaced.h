@@ -21,14 +21,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 #include "stereo.h"
 
-class InitInterlacedMaskStep : public TrivialRenderStep
-{
+class InitInterlacedMaskStep : public TrivialRenderStep {
 public:
 	InitInterlacedMaskStep(TextureBuffer *buffer, u8 index);
 	void run(PipelineContext &context);
+
 private:
 	TextureBuffer *buffer;
-	video::ITexture *last_mask { nullptr };
+	video::ITexture *last_mask{ nullptr };
 	u8 index;
 };
 

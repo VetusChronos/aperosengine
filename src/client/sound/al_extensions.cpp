@@ -25,8 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 namespace sound {
 
-ALExtensions::ALExtensions(const ALCdevice *deviceHandle [[maybe_unused]])
-{
+ALExtensions::ALExtensions(const ALCdevice *deviceHandle [[maybe_unused]]) {
 	auto blacklist_vec = str_split(g_settings->get("sound_extensions_blacklist"), ',');
 	for (auto &s : blacklist_vec) {
 		s = trim(s);
@@ -55,4 +54,4 @@ ALExtensions::ALExtensions(const ALCdevice *deviceHandle [[maybe_unused]])
 	}
 }
 
-}
+} //namespace sound

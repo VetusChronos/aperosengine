@@ -33,8 +33,7 @@ class InventoryList;
 struct InventoryLocation;
 
 class ScriptApiItem
-: virtual public ScriptApiBase
-{
+		: virtual public ScriptApiBase {
 public:
 	/*
 	 * Functions with std::optional<ItemStack> are for callbacks where Lua may
@@ -66,5 +65,4 @@ protected:
 	 * \param hitpoint If true, the exact pointing location is also pushed
 	 */
 	void pushPointedThing(const PointedThing &pointed, bool hitpoint = false);
-
 };

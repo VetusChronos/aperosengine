@@ -25,24 +25,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <vector>
 #include <memory>
 
-
-TextureBuffer::~TextureBuffer()
-{
+TextureBuffer::~TextureBuffer() {
 	for (u32 index = 0; index < m_textures.size(); index++)
 		m_driver->removeTexture(m_textures[index]);
 	m_textures.clear();
 }
 
-video::ITexture *TextureBuffer::getTexture(u8 index)
-{
+video::ITexture *TextureBuffer::getTexture(u8 index) {
 	if (index >= m_textures.size())
 		return nullptr;
 	return m_textures[index];
 }
 
-
-void TextureBuffer::setTexture(u8 index, core::dimension2du size, const std::string &name, video::ECOLOR_FORMAT format, bool clear)
-{
+void TextureBuffer::setTexture(u8 index, core::dimension2du size, const std::string &name, video::ECOLOR_FORMAT format, bool clear) {
 	assert(index != NO_DEPTH_TEXTURE);
 
 	if (m_definitions.size() <= index)
@@ -58,8 +53,7 @@ void TextureBuffer::setTexture(u8 index, core::dimension2du size, const std::str
 	definition.clear = clear;
 }
 
-void TextureBuffer::setTexture(u8 index, v2f scale_factor, const std::string &name, video::ECOLOR_FORMAT format, bool clear)
-{
+void TextureBuffer::setTexture(u8 index, v2f scale_factor, const std::string &name, video::ECOLOR_FORMAT format, bool clear) {
 	assert(index != NO_DEPTH_TEXTURE);
 
 	if (m_definitions.size() <= index)
@@ -75,8 +69,7 @@ void TextureBuffer::setTexture(u8 index, v2f scale_factor, const std::string &na
 	definition.clear = clear;
 }
 
-void TextureBuffer::reset(PipelineContext &context)
-{
+void TextureBuffer::reset(PipelineContext &context) {
 	if (!m_driver)
 		m_driver = context.device->getVideoDriver();
 
@@ -104,8 +97,7 @@ void TextureBuffer::reset(PipelineContext &context)
 	RenderSource::reset(context);
 }
 
-void TextureBuffer::swapTextures(u8 texture_a, u8 texture_b)
-{
+void TextureBuffer::swapTextures(u8 texture_a, u8 texture_b) {
 	assert(m_definitions[texture_a].valid && m_definitions[texture_b].valid);
 
 	video::ITexture *temp = m_textures[texture_a];
@@ -113,9 +105,7 @@ void TextureBuffer::swapTextures(u8 texture_a, u8 texture_b)
 	m_textures[texture_b] = temp;
 }
 
-
-bool TextureBuffer::ensureTexture(video::ITexture **texture, const TextureDefinition& definition, PipelineContext &context)
-{
+bool TextureBuffer::ensureTexture(video::ITexture **texture, const TextureDefinition &definition, PipelineContext &context) {
 	bool modify;
 	core::dimension2du size;
 	if (definition.valid) {
@@ -127,8 +117,7 @@ bool TextureBuffer::ensureTexture(video::ITexture **texture, const TextureDefini
 					(u32)(context.target_size.Y * definition.scale_factor.Y));
 
 		modify = definition.dirty || (*texture == nullptr) || (*texture)->getSize() != size;
-	}
-	else {
+	} else {
 		modify = (*texture != nullptr);
 	}
 
@@ -145,38 +134,31 @@ bool TextureBuffer::ensureTexture(video::ITexture **texture, const TextureDefini
 			std::memset(image->getData(), 0, image->getDataSizeFromFormat(definition.format, size.Width, size.Height));
 			*texture = m_driver->addTexture(definition.name.c_str(), image);
 			image->drop();
-		}
-		else {
+		} else {
 			*texture = m_driver->addRenderTargetTexture(size, definition.name.c_str(), definition.format);
 		}
-	}
-	else {
+	} else {
 		*texture = nullptr;
 	}
 
 	return true;
 }
 
-TextureBufferOutput::TextureBufferOutput(TextureBuffer *_buffer, u8 _texture_index)
-	: buffer(_buffer), texture_map({_texture_index})
-{}
+TextureBufferOutput::TextureBufferOutput(TextureBuffer *_buffer, u8 _texture_index) :
+		buffer(_buffer), texture_map({ _texture_index }) {}
 
-TextureBufferOutput::TextureBufferOutput(TextureBuffer *_buffer, const std::vector<u8> &_texture_map)
-	: buffer(_buffer), texture_map(_texture_map)
-{}
+TextureBufferOutput::TextureBufferOutput(TextureBuffer *_buffer, const std::vector<u8> &_texture_map) :
+		buffer(_buffer), texture_map(_texture_map) {}
 
-TextureBufferOutput::TextureBufferOutput(TextureBuffer *_buffer, const std::vector<u8> &_texture_map, u8 _depth_stencil)
-	: buffer(_buffer), texture_map(_texture_map), depth_stencil(_depth_stencil)
-{}
+TextureBufferOutput::TextureBufferOutput(TextureBuffer *_buffer, const std::vector<u8> &_texture_map, u8 _depth_stencil) :
+		buffer(_buffer), texture_map(_texture_map), depth_stencil(_depth_stencil) {}
 
-TextureBufferOutput::~TextureBufferOutput()
-{
+TextureBufferOutput::~TextureBufferOutput() {
 	if (render_target && driver)
 		driver->removeRenderTarget(render_target);
 }
 
-void TextureBufferOutput::activate(PipelineContext &context)
-{
+void TextureBufferOutput::activate(PipelineContext &context) {
 	if (!driver)
 		driver = context.device->getVideoDriver();
 
@@ -211,89 +193,75 @@ void TextureBufferOutput::activate(PipelineContext &context)
 	RenderTarget::activate(context);
 }
 
-u8 DynamicSource::getTextureCount()
-{
+u8 DynamicSource::getTextureCount() {
 	assert(isConfigured());
 	return upstream->getTextureCount();
 }
 
-video::ITexture *DynamicSource::getTexture(u8 index)
-{
+video::ITexture *DynamicSource::getTexture(u8 index) {
 	assert(isConfigured());
 	return upstream->getTexture(index);
 }
 
-void ScreenTarget::activate(PipelineContext &context)
-{
+void ScreenTarget::activate(PipelineContext &context) {
 	auto driver = context.device->getVideoDriver();
 	driver->setRenderTarget(nullptr, m_clear, m_clear, context.clear_color);
 	driver->OnResize(size);
 	RenderTarget::activate(context);
 }
 
-void DynamicTarget::activate(PipelineContext &context)
-{
+void DynamicTarget::activate(PipelineContext &context) {
 	if (!isConfigured())
 		throw std::logic_error("Dynamic render target is not configured before activation.");
 	upstream->activate(context);
 }
 
-void ScreenTarget::reset(PipelineContext &context)
-{
+void ScreenTarget::reset(PipelineContext &context) {
 	RenderTarget::reset(context);
 	size = context.device->getVideoDriver()->getScreenSize();
 }
 
-SetRenderTargetStep::SetRenderTargetStep(RenderStep *_step, RenderTarget *_target)
-	: step(_step), target(_target)
-{
+SetRenderTargetStep::SetRenderTargetStep(RenderStep *_step, RenderTarget *_target) :
+		step(_step), target(_target) {
 }
 
-void SetRenderTargetStep::run(PipelineContext &context)
-{
+void SetRenderTargetStep::run(PipelineContext &context) {
 	step->setRenderTarget(target);
 }
 
-SwapTexturesStep::SwapTexturesStep(TextureBuffer *_buffer, u8 _texture_a, u8 _texture_b)
-		: buffer(_buffer), texture_a(_texture_a), texture_b(_texture_b)
-{
+SwapTexturesStep::SwapTexturesStep(TextureBuffer *_buffer, u8 _texture_a, u8 _texture_b) :
+		buffer(_buffer), texture_a(_texture_a), texture_b(_texture_b) {
 }
 
-void SwapTexturesStep::run(PipelineContext &context)
-{
+void SwapTexturesStep::run(PipelineContext &context) {
 	buffer->swapTextures(texture_a, texture_b);
 }
 
-RenderSource *RenderPipeline::getInput()
-{
+RenderSource *RenderPipeline::getInput() {
 	return &m_input;
 }
 
-RenderTarget *RenderPipeline::getOutput()
-{
+RenderTarget *RenderPipeline::getOutput() {
 	return &m_output;
 }
 
-void RenderPipeline::run(PipelineContext &context)
-{
+void RenderPipeline::run(PipelineContext &context) {
 	v2u32 original_size = context.target_size;
 	context.target_size = v2u32(original_size.X * scale.X, original_size.Y * scale.Y);
 
 	for (auto &object : m_objects)
 		object->reset(context);
 
-	for (auto &step: m_pipeline)
+	for (auto &step : m_pipeline)
 		step->run(context);
 
 	context.target_size = original_size;
 }
 
-void RenderPipeline::setRenderSource(RenderSource *source)
-{
+void RenderPipeline::setRenderSource(RenderSource *source) {
 	m_input.setRenderSource(source);
 }
 
-void RenderPipeline::setRenderTarget(RenderTarget *target)
-{
+void RenderPipeline::setRenderTarget(RenderTarget *target) {
 	m_output.setRenderTarget(target);
 }

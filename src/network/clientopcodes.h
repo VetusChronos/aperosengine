@@ -32,16 +32,14 @@ enum ToClientConnectionState {
 	TOCLIENT_STATE_ALL,
 };
 
-struct ToClientCommandHandler
-{
-	const char* name;
+struct ToClientCommandHandler {
+	const char *name;
 	ToClientConnectionState state;
-	void (Client::*handler)(NetworkPacket* pkt);
+	void (Client::*handler)(NetworkPacket *pkt);
 };
 
-struct ServerCommandFactory
-{
-	const char* name;
+struct ServerCommandFactory {
+	const char *name;
 	u8 channel;
 	bool reliable;
 };

@@ -36,17 +36,14 @@ const int ID_soundExitButton = 264;
 const int ID_soundSlider = 265;
 const int ID_soundMuteButton = 266;
 
-GUIVolumeChange::GUIVolumeChange(gui::IGUIEnvironment* env,
-		gui::IGUIElement* parent, s32 id,
-		IMenuManager *menumgr, ISimpleTextureSource *tsrc
-):
-	GUIModalMenu(env, parent, id, menumgr),
-	m_tsrc(tsrc)
-{
+GUIVolumeChange::GUIVolumeChange(gui::IGUIEnvironment *env,
+		gui::IGUIElement *parent, s32 id,
+		IMenuManager *menumgr, ISimpleTextureSource *tsrc) :
+		GUIModalMenu(env, parent, id, menumgr),
+		m_tsrc(tsrc) {
 }
 
-void GUIVolumeChange::regenerateGui(v2u32 screensize)
-{
+void GUIVolumeChange::regenerateGui(v2u32 screensize) {
 	/*
 		Remove stuff
 	*/
@@ -94,19 +91,17 @@ void GUIVolumeChange::regenerateGui(v2u32 screensize)
 	}
 }
 
-void GUIVolumeChange::drawMenu()
-{
-	gui::IGUISkin* skin = Environment->getSkin();
+void GUIVolumeChange::drawMenu() {
+	gui::IGUISkin *skin = Environment->getSkin();
 	if (!skin)
 		return;
-	video::IVideoDriver* driver = Environment->getVideoDriver();
+	video::IVideoDriver *driver = Environment->getVideoDriver();
 	video::SColor bgcolor(140, 0, 0, 0);
 	driver->draw2DRectangle(bgcolor, AbsoluteRect, &AbsoluteClippingRect);
 	gui::IGUIElement::draw();
 }
 
-bool GUIVolumeChange::OnEvent(const SEvent& event)
-{
+bool GUIVolumeChange::OnEvent(const SEvent &event) {
 	if (event.EventType == EET_KEY_INPUT_EVENT) {
 		if (event.KeyInput.Key == KEY_ESCAPE && event.KeyInput.PressedDown) {
 			quitMenu();
@@ -121,7 +116,7 @@ bool GUIVolumeChange::OnEvent(const SEvent& event)
 		if (event.GUIEvent.EventType == gui::EGET_CHECKBOX_CHANGED) {
 			gui::IGUIElement *e = getElementFromId(ID_soundMuteButton);
 			if (e != NULL && e->getType() == gui::EGUIET_CHECK_BOX) {
-				g_settings->setBool("mute_sound", ((gui::IGUICheckBox*)e)->isChecked());
+				g_settings->setBool("mute_sound", ((gui::IGUICheckBox *)e)->isChecked());
 			}
 
 			Environment->setFocus(this);
@@ -136,11 +131,10 @@ bool GUIVolumeChange::OnEvent(const SEvent& event)
 			Environment->setFocus(this);
 		}
 
-		if (event.GUIEvent.EventType == gui::EGET_ELEMENT_FOCUS_LOST
-				&& isVisible()) {
+		if (event.GUIEvent.EventType == gui::EGET_ELEMENT_FOCUS_LOST && isVisible()) {
 			if (!canTakeFocus(event.GUIEvent.Element)) {
 				infostream << "GUIVolumeChange: Not allowing focus change."
-				<< '\n';
+						   << '\n';
 				// Returning true disables focus change
 				return true;
 			}
@@ -148,14 +142,13 @@ bool GUIVolumeChange::OnEvent(const SEvent& event)
 		if (event.GUIEvent.EventType == gui::EGET_SCROLL_BAR_CHANGED) {
 			if (event.GUIEvent.Caller->getID() == ID_soundSlider) {
 				s32 pos = static_cast<GUIScrollBar *>(event.GUIEvent.Caller)->getPos();
-				g_settings->setFloat("sound_volume", (float) pos / 100);
+				g_settings->setFloat("sound_volume", (float)pos / 100);
 
 				gui::IGUIElement *e = getElementFromId(ID_soundText);
 				e->setText(fwgettext("Sound Volume: %d%%", pos).c_str());
 				return true;
 			}
 		}
-
 	}
 
 	return Parent ? Parent->OnEvent(event) : false;

@@ -29,8 +29,7 @@ class MMVManip;
 /*
   VoxelManip
  */
-class LuaVoxelManip : public ModApiBase
-{
+class LuaVoxelManip : public ModApiBase {
 private:
 	bool is_mapgen_vm = false;
 

@@ -23,8 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <set>
 
 class ScriptApiServer
-		: virtual public ScriptApiBase
-{
+		: virtual public ScriptApiBase {
 public:
 	// Calls on_chat_message handlers
 	// Returns true if script handled message
@@ -38,17 +37,17 @@ public:
 
 	// Calls core.format_chat_message
 	std::string formatChatMessage(const std::string &name,
-		const std::string &message);
+			const std::string &message);
 
 	/* auth */
 	bool getAuth(const std::string &playername,
-		std::string *dst_password,
-		std::set<std::string> *dst_privs,
-		s64 *dst_last_login = nullptr);
+			std::string *dst_password,
+			std::set<std::string> *dst_privs,
+			s64 *dst_last_login = nullptr);
 	void createAuth(const std::string &playername,
-		const std::string &password);
+			const std::string &password);
 	bool setPassword(const std::string &playername,
-		const std::string &password);
+			const std::string &password);
 
 	/* dynamic media handling */
 	static u32 allocateDynamicMediaCallback(lua_State *L, int f_idx);

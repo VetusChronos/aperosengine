@@ -26,16 +26,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "irrlichttypes.h"
 #include "util/string.h"
 
-class Database
-{
+class Database {
 public:
 	virtual void beginSave() = 0;
 	virtual void endSave() = 0;
 	virtual bool initialized() const { return true; }
 };
 
-class MapDatabase : public Database
-{
+class MapDatabase : public Database {
 public:
 	virtual ~MapDatabase() = default;
 
@@ -52,8 +50,7 @@ public:
 class PlayerSAO;
 class RemotePlayer;
 
-class PlayerDatabase
-{
+class PlayerDatabase {
 public:
 	virtual ~PlayerDatabase() = default;
 
@@ -63,8 +60,7 @@ public:
 	virtual void listPlayers(std::vector<std::string> &res) = 0;
 };
 
-struct AuthEntry
-{
+struct AuthEntry {
 	u64 id;
 	std::string name;
 	std::string password;
@@ -72,8 +68,7 @@ struct AuthEntry
 	s64 last_login;
 };
 
-class AuthDatabase
-{
+class AuthDatabase {
 public:
 	virtual ~AuthDatabase() = default;
 
@@ -85,8 +80,7 @@ public:
 	virtual void reload() = 0;
 };
 
-class ModStorageDatabase : public Database
-{
+class ModStorageDatabase : public Database {
 public:
 	virtual ~ModStorageDatabase() = default;
 
@@ -94,9 +88,9 @@ public:
 	virtual void getModKeys(const std::string &modname, std::vector<std::string> *storage) = 0;
 	virtual bool hasModEntry(const std::string &modname, const std::string &key) = 0;
 	virtual bool getModEntry(const std::string &modname,
-		const std::string &key, std::string *value) = 0;
+			const std::string &key, std::string *value) = 0;
 	virtual bool setModEntry(const std::string &modname,
-		const std::string &key, std::string_view value) = 0;
+			const std::string &key, std::string_view value) = 0;
 	virtual bool removeModEntry(const std::string &modname, const std::string &key) = 0;
 	virtual bool removeModEntries(const std::string &modname) = 0;
 	virtual void listMods(std::vector<std::string> *res) = 0;

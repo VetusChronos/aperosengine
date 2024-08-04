@@ -22,8 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <string>
 #include "irrlichttypes.h"
 
-enum TimePrecision : s8
-{
+enum TimePrecision : s8 {
 	PRECISION_SECONDS,
 	PRECISION_MILLI,
 	PRECISION_MICRO,
@@ -31,7 +30,7 @@ enum TimePrecision : s8
 };
 
 constexpr const char *TimePrecision_units[] = {
-	"s"  /* PRECISION_SECONDS */,
+	"s" /* PRECISION_SECONDS */,
 	"ms" /* PRECISION_MILLI */,
 	"us" /* PRECISION_MICRO */,
 	"ns" /* PRECISION_NANO */,
@@ -43,12 +42,10 @@ constexpr const char *TimePrecision_units[] = {
 
 // Note: this class should be kept lightweight
 
-class TimeTaker
-{
+class TimeTaker {
 public:
 	TimeTaker(const std::string &name, u64 *result = nullptr,
-		TimePrecision prec = PRECISION_MILLI)
-	{
+			TimePrecision prec = PRECISION_MILLI) {
 		if (result)
 			m_result = result;
 		else
@@ -57,12 +54,11 @@ public:
 		start();
 	}
 
-	~TimeTaker()
-	{
+	~TimeTaker() {
 		stop();
 	}
 
-	u64 stop(bool quiet=false);
+	u64 stop(bool quiet = false);
 
 	u64 getTimerTime();
 

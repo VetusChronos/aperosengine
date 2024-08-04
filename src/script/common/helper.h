@@ -25,8 +25,7 @@ extern "C" {
 #include <lua.h>
 }
 
-class LuaHelper
-{
+class LuaHelper {
 protected:
 	/**
 	 * Read a value using a template type T from Lua state L at index
@@ -49,8 +48,7 @@ protected:
 	 * @return read value from Lua or default value if nil
 	 */
 	template <typename T>
-	static inline T readParam(lua_State *L, int index, const T &default_value)
-	{
+	static inline T readParam(lua_State *L, int index, const T &default_value) {
 		return lua_isnoneornil(L, index) ? default_value : readParam<T>(L, index);
 	}
 };

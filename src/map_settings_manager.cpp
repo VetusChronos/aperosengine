@@ -25,10 +25,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "map_settings_manager.h"
 
-MapSettingsManager::MapSettingsManager(const std::string &map_meta_path):
-	m_map_meta_path(map_meta_path),
-	m_hierarchy(g_settings)
-{
+MapSettingsManager::MapSettingsManager(const std::string &map_meta_path) :
+		m_map_meta_path(map_meta_path),
+		m_hierarchy(g_settings) {
 	/*
 	 * We build our own hierarchy which falls back to the global one.
 	 * It looks as follows: (lowest prio first)
@@ -40,33 +39,25 @@ MapSettingsManager::MapSettingsManager(const std::string &map_meta_path):
 	m_map_settings = new Settings("[end_of_params]", &m_hierarchy, 2);
 }
 
-
-MapSettingsManager::~MapSettingsManager()
-{
+MapSettingsManager::~MapSettingsManager() {
 	delete m_defaults;
 	delete m_map_settings;
 	delete mapgen_params;
 }
 
-
 bool MapSettingsManager::getMapSetting(
-	const std::string &name, std::string *value_out) const
-{
+		const std::string &name, std::string *value_out) const {
 	return m_map_settings->getNoEx(name, *value_out);
 }
 
-
 bool MapSettingsManager::getMapSettingNoiseParams(
-	const std::string &name, NoiseParams *value_out) const
-{
+		const std::string &name, NoiseParams *value_out) const {
 	// TODO: Rename to "getNoiseParams"
 	return m_map_settings->getNoiseParams(name, *value_out);
 }
 
-
 bool MapSettingsManager::setMapSetting(
-	const std::string &name, const std::string &value, bool override_meta)
-{
+		const std::string &name, const std::string &value, bool override_meta) {
 	if (mapgen_params)
 		return false;
 
@@ -78,10 +69,8 @@ bool MapSettingsManager::setMapSetting(
 	return true;
 }
 
-
 bool MapSettingsManager::setMapSettingNoiseParams(
-	const std::string &name, const NoiseParams *value, bool override_meta)
-{
+		const std::string &name, const NoiseParams *value, bool override_meta) {
 	if (mapgen_params)
 		return false;
 
@@ -93,9 +82,7 @@ bool MapSettingsManager::setMapSettingNoiseParams(
 	return true;
 }
 
-
-bool MapSettingsManager::loadMapMeta()
-{
+bool MapSettingsManager::loadMapMeta() {
 	auto is = open_ifstream(m_map_meta_path.c_str(), true);
 	if (!is.good())
 		return false;
@@ -108,20 +95,18 @@ bool MapSettingsManager::loadMapMeta()
 	return true;
 }
 
-
-bool MapSettingsManager::saveMapMeta()
-{
+bool MapSettingsManager::saveMapMeta() {
 	// If mapgen params haven't been created yet; abort
 	if (!mapgen_params) {
 		infostream << "saveMapMeta: mapgen_params not present! "
-			<< "Server startup was probably interrupted." << '\n';
+				   << "Server startup was probably interrupted." << '\n';
 		return false;
 	}
 
 	// Paths set up by subgames.cpp, but not in unittests
 	if (!fs::CreateAllDirs(fs::RemoveLastPathComponent(m_map_meta_path))) {
 		errorstream << "saveMapMeta: could not create dirs to "
-			<< m_map_meta_path;
+					<< m_map_meta_path;
 		return false;
 	}
 
@@ -130,16 +115,14 @@ bool MapSettingsManager::saveMapMeta()
 
 	if (!m_map_settings->updateConfigFile(m_map_meta_path.c_str())) {
 		errorstream << "saveMapMeta: could not write "
-			<< m_map_meta_path << '\n';
+					<< m_map_meta_path << '\n';
 		return false;
 	}
 
 	return true;
 }
 
-
-MapgenParams *MapSettingsManager::makeMapgenParams()
-{
+MapgenParams *MapSettingsManager::makeMapgenParams() {
 	if (mapgen_params)
 		return mapgen_params;
 
@@ -148,13 +131,10 @@ MapgenParams *MapSettingsManager::makeMapgenParams()
 
 	// Now, get the mapgen type so we can create the appropriate MapgenParams
 	std::string mg_name;
-	MapgenType mgtype = getMapSetting("mg_name", &mg_name) ?
-		Mapgen::getMapgenType(mg_name) : MAPGEN_DEFAULT;
+	MapgenType mgtype = getMapSetting("mg_name", &mg_name) ? Mapgen::getMapgenType(mg_name) : MAPGEN_DEFAULT;
 
 	if (mgtype == MAPGEN_INVALID) {
-		errorstream << "EmergeManager: mapgen '" << mg_name <<
-			"' not valid; falling back to " <<
-			Mapgen::getMapgenName(MAPGEN_DEFAULT) << '\n';
+		errorstream << "EmergeManager: mapgen '" << mg_name << "' not valid; falling back to " << Mapgen::getMapgenName(MAPGEN_DEFAULT) << '\n';
 		mgtype = MAPGEN_DEFAULT;
 	}
 

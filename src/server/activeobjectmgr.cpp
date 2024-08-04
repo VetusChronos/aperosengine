@@ -22,20 +22,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "profiler.h"
 #include "activeobjectmgr.h"
 
-namespace server
-{
+namespace server {
 
-ActiveObjectMgr::~ActiveObjectMgr()
-{
+ActiveObjectMgr::~ActiveObjectMgr() {
 	if (!m_active_objects.empty()) {
 		warningstream << "server::ActiveObjectMgr::~ActiveObjectMgr(): not cleared."
-				<< '\n';
+					  << '\n';
 		clear();
 	}
 }
 
-void ActiveObjectMgr::clearIf(const std::function<bool(ServerActiveObject *, u16)> &cb)
-{
+void ActiveObjectMgr::clearIf(const std::function<bool(ServerActiveObject *, u16)> &cb) {
 	for (auto &it : m_active_objects.iter()) {
 		if (!it.second)
 			continue;
@@ -47,8 +44,7 @@ void ActiveObjectMgr::clearIf(const std::function<bool(ServerActiveObject *, u16
 }
 
 void ActiveObjectMgr::step(
-		float dtime, const std::function<void(ServerActiveObject *)> &f)
-{
+		float dtime, const std::function<void(ServerActiveObject *)> &f) {
 	size_t count = 0;
 
 	for (auto &ao_it : m_active_objects.iter()) {
@@ -61,42 +57,41 @@ void ActiveObjectMgr::step(
 	g_profiler->avg("ActiveObjectMgr: SAO count [#]", count);
 }
 
-bool ActiveObjectMgr::registerObject(std::unique_ptr<ServerActiveObject> obj)
-{
+bool ActiveObjectMgr::registerObject(std::unique_ptr<ServerActiveObject> obj) {
 	assert(obj); // Pre-condition
 	if (obj->getId() == 0) {
 		u16 new_id = getFreeId();
 		if (new_id == 0) {
 			errorstream << "Server::ActiveObjectMgr::addActiveObjectRaw(): "
-					<< "no free id available" << '\n';
+						<< "no free id available" << '\n';
 			return false;
 		}
 		obj->setId(new_id);
 	} else {
 		verbosestream << "Server::ActiveObjectMgr::addActiveObjectRaw(): "
-				<< "supplied with id " << obj->getId() << '\n';
+					  << "supplied with id " << obj->getId() << '\n';
 	}
 
 	if (!isFreeId(obj->getId())) {
 		errorstream << "Server::ActiveObjectMgr::addActiveObjectRaw(): "
-				<< "id is not free (" << obj->getId() << ")" << '\n';
+					<< "id is not free (" << obj->getId() << ")" << '\n';
 		return false;
 	}
 
 	if (objectpos_over_limit(obj->getBasePosition())) {
 		v3f p = obj->getBasePosition();
 		warningstream << "Server::ActiveObjectMgr::addActiveObjectRaw(): "
-				<< "object position (" << p.X << "," << p.Y << "," << p.Z
-				<< ") outside maximum range" << '\n';
+					  << "object position (" << p.X << "," << p.Y << "," << p.Z
+					  << ") outside maximum range" << '\n';
 		return false;
 	}
 
-	auto obj_id = obj->getId(); 
+	auto obj_id = obj->getId();
 	m_active_objects.put(obj_id, std::move(obj));
 
 	auto new_size = m_active_objects.size();
 	verbosestream << "Server::ActiveObjectMgr::addActiveObjectRaw(): "
-			<< "Added id=" << obj_id << "; there are now ";
+				  << "Added id=" << obj_id << "; there are now ";
 	if (new_size == decltype(m_active_objects)::unknown)
 		verbosestream << "???";
 	else
@@ -105,23 +100,21 @@ bool ActiveObjectMgr::registerObject(std::unique_ptr<ServerActiveObject> obj)
 	return true;
 }
 
-void ActiveObjectMgr::removeObject(u16 id)
-{
+void ActiveObjectMgr::removeObject(u16 id) {
 	verbosestream << "Server::ActiveObjectMgr::removeObject(): "
-			<< "id=" << id << '\n';
+				  << "id=" << id << '\n';
 
 	// this will take the object out of the map and then destruct it
 	bool ok = m_active_objects.remove(id);
 	if (!ok) {
 		infostream << "Server::ActiveObjectMgr::removeObject(): "
-				<< "id=" << id << " not found" << '\n';
+				   << "id=" << id << " not found" << '\n';
 	}
 }
 
 void ActiveObjectMgr::getObjectsInsideRadius(const v3f &pos, float radius,
 		std::vector<ServerActiveObject *> &result,
-		std::function<bool(ServerActiveObject *obj)> include_obj_cb)
-{
+		std::function<bool(ServerActiveObject *obj)> include_obj_cb) {
 	float r2 = radius * radius;
 	for (auto &activeObject : m_active_objects.iter()) {
 		ServerActiveObject *obj = activeObject.second.get();
@@ -138,8 +131,7 @@ void ActiveObjectMgr::getObjectsInsideRadius(const v3f &pos, float radius,
 
 void ActiveObjectMgr::getObjectsInArea(const aabb3f &box,
 		std::vector<ServerActiveObject *> &result,
-		std::function<bool(ServerActiveObject *obj)> include_obj_cb)
-{
+		std::function<bool(ServerActiveObject *obj)> include_obj_cb) {
 	for (auto &activeObject : m_active_objects.iter()) {
 		ServerActiveObject *obj = activeObject.second.get();
 		if (!obj)
@@ -155,8 +147,7 @@ void ActiveObjectMgr::getObjectsInArea(const aabb3f &box,
 
 void ActiveObjectMgr::getAddedActiveObjectsAroundPos(v3f player_pos, f32 radius,
 		f32 player_radius, const std::set<u16> &current_objects,
-		std::vector<u16> &added_objects)
-{
+		std::vector<u16> &added_objects) {
 	/*
 		Go through the object list,
 		- discard removed/deactivated objects,

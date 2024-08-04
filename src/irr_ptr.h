@@ -40,8 +40,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 template <class ReferenceCounted,
 		class = typename std::enable_if<std::is_base_of<IReferenceCounted,
 				ReferenceCounted>::value>::type>
-class irr_ptr
-{
+class irr_ptr {
 	ReferenceCounted *value = nullptr;
 
 public:
@@ -53,17 +52,13 @@ public:
 
 	irr_ptr(irr_ptr &&b) noexcept { reset(b.release()); }
 
-	template <typename B, class = typename std::enable_if<std::is_convertible<B *,
-					      ReferenceCounted *>::value>::type>
-	irr_ptr(const irr_ptr<B> &b) noexcept
-	{
+	template <typename B, class = typename std::enable_if<std::is_convertible<B *, ReferenceCounted *>::value>::type>
+	irr_ptr(const irr_ptr<B> &b) noexcept {
 		grab(b.get());
 	}
 
-	template <typename B, class = typename std::enable_if<std::is_convertible<B *,
-					      ReferenceCounted *>::value>::type>
-	irr_ptr(irr_ptr<B> &&b) noexcept
-	{
+	template <typename B, class = typename std::enable_if<std::is_convertible<B *, ReferenceCounted *>::value>::type>
+	irr_ptr(irr_ptr<B> &&b) noexcept {
 		reset(b.release());
 	}
 
@@ -76,30 +71,24 @@ public:
 
 	~irr_ptr() { reset(); }
 
-	irr_ptr &operator=(const irr_ptr &b) noexcept
-	{
+	irr_ptr &operator=(const irr_ptr &b) noexcept {
 		grab(b.get());
 		return *this;
 	}
 
-	irr_ptr &operator=(irr_ptr &&b) noexcept
-	{
+	irr_ptr &operator=(irr_ptr &&b) noexcept {
 		reset(b.release());
 		return *this;
 	}
 
-	template <typename B, class = typename std::enable_if<std::is_convertible<B *,
-					      ReferenceCounted *>::value>::type>
-	irr_ptr &operator=(const irr_ptr<B> &b) noexcept
-	{
+	template <typename B, class = typename std::enable_if<std::is_convertible<B *, ReferenceCounted *>::value>::type>
+	irr_ptr &operator=(const irr_ptr<B> &b) noexcept {
 		grab(b.get());
 		return *this;
 	}
 
-	template <typename B, class = typename std::enable_if<std::is_convertible<B *,
-					      ReferenceCounted *>::value>::type>
-	irr_ptr &operator=(irr_ptr<B> &&b) noexcept
-	{
+	template <typename B, class = typename std::enable_if<std::is_convertible<B *, ReferenceCounted *>::value>::type>
+	irr_ptr &operator=(irr_ptr<B> &&b) noexcept {
 		reset(b.release());
 		return *this;
 	}
@@ -116,8 +105,7 @@ public:
 	/** Returns the stored pointer, erasing it from this class.
 	 * @note Move semantics: reference counter is not changed.
 	 */
-	ReferenceCounted *release() noexcept
-	{
+	ReferenceCounted *release() noexcept {
 		ReferenceCounted *object = value;
 		value = nullptr;
 		return object;
@@ -126,8 +114,7 @@ public:
 	/** Drops stored pointer replacing it with the given one.
 	 * @note Move semantics: reference counter is *not* increased.
 	 */
-	void reset(ReferenceCounted *object = nullptr) noexcept
-	{
+	void reset(ReferenceCounted *object = nullptr) noexcept {
 		if (value)
 			value->drop();
 		value = object;
@@ -136,8 +123,7 @@ public:
 	/** Drops stored pointer replacing it with the given one.
 	 * @note Copy semantics: reference counter *is* increased.
 	 */
-	void grab(ReferenceCounted *object) noexcept
-	{
+	void grab(ReferenceCounted *object) noexcept {
 		if (object)
 			object->grab();
 		reset(object);
@@ -152,53 +138,45 @@ public:
  * in this function and decreased when the returned pointer is destroyed.
  */
 template <class ReferenceCounted>
-irr_ptr<ReferenceCounted> grab(ReferenceCounted *object) noexcept
-{
+irr_ptr<ReferenceCounted> grab(ReferenceCounted *object) noexcept {
 	irr_ptr<ReferenceCounted> ptr;
 	ptr.grab(object);
 	return ptr;
 }
 
 template <typename ReferenceCounted>
-bool operator==(const irr_ptr<ReferenceCounted> &a, const irr_ptr<ReferenceCounted> &b) noexcept
-{
+bool operator==(const irr_ptr<ReferenceCounted> &a, const irr_ptr<ReferenceCounted> &b) noexcept {
 	return a.get() == b.get();
 }
 
 template <typename ReferenceCounted>
-bool operator==(const irr_ptr<ReferenceCounted> &a, const ReferenceCounted *b) noexcept
-{
+bool operator==(const irr_ptr<ReferenceCounted> &a, const ReferenceCounted *b) noexcept {
 	return a.get() == b;
 }
 
 template <typename ReferenceCounted>
-bool operator==(const ReferenceCounted *a, const irr_ptr<ReferenceCounted> &b) noexcept
-{
+bool operator==(const ReferenceCounted *a, const irr_ptr<ReferenceCounted> &b) noexcept {
 	return a == b.get();
 }
 
 template <typename ReferenceCounted>
-bool operator!=(const irr_ptr<ReferenceCounted> &a, const irr_ptr<ReferenceCounted> &b) noexcept
-{
+bool operator!=(const irr_ptr<ReferenceCounted> &a, const irr_ptr<ReferenceCounted> &b) noexcept {
 	return a.get() != b.get();
 }
 
 template <typename ReferenceCounted>
-bool operator!=(const irr_ptr<ReferenceCounted> &a, const ReferenceCounted *b) noexcept
-{
+bool operator!=(const irr_ptr<ReferenceCounted> &a, const ReferenceCounted *b) noexcept {
 	return a.get() != b;
 }
 
 template <typename ReferenceCounted>
-bool operator!=(const ReferenceCounted *a, const irr_ptr<ReferenceCounted> &b) noexcept
-{
+bool operator!=(const ReferenceCounted *a, const irr_ptr<ReferenceCounted> &b) noexcept {
 	return a != b.get();
 }
 
 /** Same as std::make_unique<T>, but for irr_ptr.
  */
 template <class T, class... Args>
-irr_ptr<T> make_irr(Args&&... args)
-{
+irr_ptr<T> make_irr(Args &&...args) {
 	return irr_ptr<T>(new T(std::forward<Args>(args)...));
 }

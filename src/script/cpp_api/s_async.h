@@ -34,12 +34,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // Forward declarations
 class AsyncEngine;
 
-
 // Declarations
 
 // Data required to queue a job
-struct LuaJobInfo
-{
+struct LuaJobInfo {
 	LuaJobInfo() = default;
 
 	// Function to be called in async environment (from string.dump)
@@ -60,15 +58,17 @@ struct LuaJobInfo
 
 // Asynchronous working environment
 class AsyncWorkerThread : public Thread,
-	virtual public ScriptApiBase, public ScriptApiSecurity {
+						  virtual public ScriptApiBase,
+						  public ScriptApiSecurity {
 	friend class AsyncEngine;
+
 public:
 	virtual ~AsyncWorkerThread();
 
 	void *run();
 
 protected:
-	AsyncWorkerThread(AsyncEngine* jobDispatcher, const std::string &name);
+	AsyncWorkerThread(AsyncEngine *jobDispatcher, const std::string &name);
 
 private:
 	AsyncEngine *jobDispatcher = nullptr;
@@ -79,9 +79,11 @@ private:
 class AsyncEngine {
 	friend class AsyncWorkerThread;
 	typedef void (*StateInitializer)(lua_State *L, int top);
+
 public:
 	AsyncEngine() = default;
-	AsyncEngine(Server *server) : server(server) {};
+	AsyncEngine(Server *server) :
+			server(server){};
 	~AsyncEngine();
 
 	/**
@@ -158,7 +160,7 @@ protected:
 	 * @param top Stack position
 	 * @return false if a mod error ocurred
 	 */
-	bool prepareEnvironment(lua_State* L, int top);
+	bool prepareEnvironment(lua_State *L, int top);
 
 private:
 	// Variable locking the engine against further modification
@@ -190,7 +192,7 @@ private:
 	std::deque<LuaJobInfo> resultQueue;
 
 	// List of current worker threads
-	std::vector<AsyncWorkerThread*> workerThreads;
+	std::vector<AsyncWorkerThread *> workerThreads;
 
 	// Counter semaphore for job dispatching
 	Semaphore jobQueueCounter;

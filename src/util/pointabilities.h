@@ -24,8 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <optional>
 #include "irrlichttypes.h"
 
-enum class PointabilityType : u8
-{
+enum class PointabilityType : u8 {
 	// Can be pointed through.
 	// Note: This MUST be the 0-th item in the enum for backwards compat.
 	// Older Minetest versions send "pointable=false" as "0".
@@ -41,8 +40,7 @@ enum class PointabilityType : u8
 };
 
 // An object to store overridden pointable properties
-struct Pointabilities
-{
+struct Pointabilities {
 	// Nodes
 	std::unordered_map<std::string, PointabilityType> nodes;
 	std::unordered_map<std::string, PointabilityType> node_groups;
@@ -55,9 +53,9 @@ struct Pointabilities
 	// otherwise the default pointability should be used.
 
 	std::optional<PointabilityType> matchNode(const std::string &name,
-		const ItemGroupList &groups) const;
+			const ItemGroupList &groups) const;
 	std::optional<PointabilityType> matchObject(const std::string &name,
-		const ItemGroupList &groups) const;
+			const ItemGroupList &groups) const;
 	// For players only armor groups will work
 	std::optional<PointabilityType> matchPlayer(const ItemGroupList &groups) const;
 
@@ -71,9 +69,9 @@ struct Pointabilities
 
 private:
 	static std::optional<PointabilityType> matchGroups(const ItemGroupList &groups,
-		const std::unordered_map<std::string, PointabilityType> &pointable_groups);
+			const std::unordered_map<std::string, PointabilityType> &pointable_groups);
 	static void serializeTypeMap(std::ostream &os,
-		const std::unordered_map<std::string, PointabilityType> &map);
+			const std::unordered_map<std::string, PointabilityType> &map);
 	static void deSerializeTypeMap(std::istream &is,
-		std::unordered_map<std::string, PointabilityType> &map);
+			std::unordered_map<std::string, PointabilityType> &map);
 };

@@ -27,8 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "lua_api/l_item.h"
 #include "util/string.h"
 
-void ScriptApiPlayer::on_newplayer(ServerActiveObject *player)
-{
+void ScriptApiPlayer::on_newplayer(ServerActiveObject *player) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_newplayers
@@ -39,8 +38,7 @@ void ScriptApiPlayer::on_newplayer(ServerActiveObject *player)
 	runCallbacks(1, RUN_CALLBACKS_MODE_FIRST);
 }
 
-void ScriptApiPlayer::on_dieplayer(ServerActiveObject *player, const PlayerHPChangeReason &reason)
-{
+void ScriptApiPlayer::on_dieplayer(ServerActiveObject *player, const PlayerHPChangeReason &reason) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get callback table
@@ -60,8 +58,7 @@ bool ScriptApiPlayer::on_punchplayer(ServerActiveObject *player,
 		float time_from_last_punch,
 		const ToolCapabilities *toolcap,
 		v3f dir,
-		s32 damage)
-{
+		s32 damage) {
 	SCRIPTAPI_PRECHECKHEADER
 	// Get core.registered_on_punchplayers
 	lua_getglobal(L, "core");
@@ -81,8 +78,7 @@ bool ScriptApiPlayer::on_punchplayer(ServerActiveObject *player,
 }
 
 void ScriptApiPlayer::on_rightclickplayer(ServerActiveObject *player,
-		ServerActiveObject *clicker)
-{
+		ServerActiveObject *clicker) {
 	SCRIPTAPI_PRECHECKHEADER
 	// Get core.registered_on_rightclickplayers
 	lua_getglobal(L, "core");
@@ -94,8 +90,7 @@ void ScriptApiPlayer::on_rightclickplayer(ServerActiveObject *player,
 }
 
 s32 ScriptApiPlayer::on_player_hpchange(ServerActiveObject *player,
-	s32 hp_change, const PlayerHPChangeReason &reason)
-{
+		s32 hp_change, const PlayerHPChangeReason &reason) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -117,8 +112,7 @@ s32 ScriptApiPlayer::on_player_hpchange(ServerActiveObject *player,
 	return hp_change;
 }
 
-bool ScriptApiPlayer::on_respawnplayer(ServerActiveObject *player)
-{
+bool ScriptApiPlayer::on_respawnplayer(ServerActiveObject *player) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_respawnplayers
@@ -131,10 +125,9 @@ bool ScriptApiPlayer::on_respawnplayer(ServerActiveObject *player)
 }
 
 bool ScriptApiPlayer::on_prejoinplayer(
-	const std::string &name,
-	const std::string &ip,
-	std::string *reason)
-{
+		const std::string &name,
+		const std::string &ip,
+		std::string *reason) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_prejoinplayers
@@ -150,8 +143,7 @@ bool ScriptApiPlayer::on_prejoinplayer(
 	return false;
 }
 
-bool ScriptApiPlayer::can_bypass_userlimit(const std::string &name, const std::string &ip)
-{
+bool ScriptApiPlayer::can_bypass_userlimit(const std::string &name, const std::string &ip) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_prejoinplayers
@@ -163,8 +155,7 @@ bool ScriptApiPlayer::can_bypass_userlimit(const std::string &name, const std::s
 	return lua_toboolean(L, -1);
 }
 
-void ScriptApiPlayer::on_joinplayer(ServerActiveObject *player, s64 last_login)
-{
+void ScriptApiPlayer::on_joinplayer(ServerActiveObject *player, s64 last_login) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_joinplayers
@@ -180,8 +171,7 @@ void ScriptApiPlayer::on_joinplayer(ServerActiveObject *player, s64 last_login)
 }
 
 void ScriptApiPlayer::on_leaveplayer(ServerActiveObject *player,
-		bool timeout)
-{
+		bool timeout) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_leaveplayers
@@ -194,8 +184,7 @@ void ScriptApiPlayer::on_leaveplayer(ServerActiveObject *player,
 }
 
 void ScriptApiPlayer::on_cheat(ServerActiveObject *player,
-		const std::string &cheat_type)
-{
+		const std::string &cheat_type) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_cheats
@@ -211,8 +200,7 @@ void ScriptApiPlayer::on_cheat(ServerActiveObject *player,
 
 void ScriptApiPlayer::on_playerReceiveFields(ServerActiveObject *player,
 		const std::string &formname,
-		const StringMap &fields)
-{
+		const StringMap &fields) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_player_receive_fields
@@ -236,8 +224,7 @@ void ScriptApiPlayer::on_playerReceiveFields(ServerActiveObject *player,
 	runCallbacks(3, RUN_CALLBACKS_MODE_OR_SC);
 }
 
-void ScriptApiPlayer::on_authplayer(const std::string &name, const std::string &ip, bool is_success)
-{
+void ScriptApiPlayer::on_authplayer(const std::string &name, const std::string &ip, bool is_success) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_authplayers
@@ -253,12 +240,11 @@ void ScriptApiPlayer::on_authplayer(const std::string &name, const std::string &
 
 void ScriptApiPlayer::pushMoveArguments(
 		const MoveAction &ma, int count,
-		ServerActiveObject *player)
-{
+		ServerActiveObject *player) {
 	lua_State *L = getStack();
 	objectrefGetOrCreate(L, player); // player
-	lua_pushstring(L, "move");       // action
-	InvRef::create(L, ma.from_inv);  // inventory
+	lua_pushstring(L, "move"); // action
+	InvRef::create(L, ma.from_inv); // inventory
 	lua_newtable(L);
 	{
 		// Table containing the action information
@@ -280,12 +266,11 @@ void ScriptApiPlayer::pushMoveArguments(
 void ScriptApiPlayer::pushPutTakeArguments(
 		const char *method, const InventoryLocation &loc,
 		const std::string &listname, int index, const ItemStack &stack,
-		ServerActiveObject *player)
-{
+		ServerActiveObject *player) {
 	lua_State *L = getStack();
 	objectrefGetOrCreate(L, player); // player
-	lua_pushstring(L, method);       // action
-	InvRef::create(L, loc);          // inventory
+	lua_pushstring(L, method); // action
+	InvRef::create(L, loc); // inventory
 	lua_newtable(L);
 	{
 		// Table containing the action information
@@ -303,8 +288,7 @@ void ScriptApiPlayer::pushPutTakeArguments(
 // Return number of accepted items to be moved
 int ScriptApiPlayer::player_inventory_AllowMove(
 		const MoveAction &ma, int count,
-		ServerActiveObject *player)
-{
+		ServerActiveObject *player) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	lua_getglobal(L, "core");
@@ -318,8 +302,7 @@ int ScriptApiPlayer::player_inventory_AllowMove(
 // Return number of accepted items to be put
 int ScriptApiPlayer::player_inventory_AllowPut(
 		const MoveAction &ma, const ItemStack &stack,
-		ServerActiveObject *player)
-{
+		ServerActiveObject *player) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	lua_getglobal(L, "core");
@@ -333,8 +316,7 @@ int ScriptApiPlayer::player_inventory_AllowPut(
 // Return number of accepted items to be taken
 int ScriptApiPlayer::player_inventory_AllowTake(
 		const MoveAction &ma, const ItemStack &stack,
-		ServerActiveObject *player)
-{
+		ServerActiveObject *player) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	lua_getglobal(L, "core");
@@ -348,8 +330,7 @@ int ScriptApiPlayer::player_inventory_AllowTake(
 // Report moved items
 void ScriptApiPlayer::player_inventory_OnMove(
 		const MoveAction &ma, int count,
-		ServerActiveObject *player)
-{
+		ServerActiveObject *player) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	lua_getglobal(L, "core");
@@ -361,8 +342,7 @@ void ScriptApiPlayer::player_inventory_OnMove(
 // Report put items
 void ScriptApiPlayer::player_inventory_OnPut(
 		const MoveAction &ma, const ItemStack &stack,
-		ServerActiveObject *player)
-{
+		ServerActiveObject *player) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	lua_getglobal(L, "core");
@@ -374,8 +354,7 @@ void ScriptApiPlayer::player_inventory_OnPut(
 // Report taken items
 void ScriptApiPlayer::player_inventory_OnTake(
 		const MoveAction &ma, const ItemStack &stack,
-		ServerActiveObject *player)
-{
+		ServerActiveObject *player) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	lua_getglobal(L, "core");

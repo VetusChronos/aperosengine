@@ -48,7 +48,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		Many things
 	PROTOCOL_VERSION 9:
 		ContentFeatures and NodeDefManager use a different serialization
-		    format; better for future version cross-compatibility
+			format; better for future version cross-compatibility
 		Many things
 		Obsolete TOCLIENT_PLAYERITEM
 	PROTOCOL_VERSION 10:
@@ -161,14 +161,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	PROTOCOL VERSION 34:
 		Add sound pitch
 	PROTOCOL VERSION 35:
- 		Rename TOCLIENT_CHAT_MESSAGE to TOCLIENT_CHAT_MESSAGE_OLD (0x30)
- 		Add TOCLIENT_CHAT_MESSAGE (0x2F)
- 			This chat message is a signalisation message containing various
+		Rename TOCLIENT_CHAT_MESSAGE to TOCLIENT_CHAT_MESSAGE_OLD (0x30)
+		Add TOCLIENT_CHAT_MESSAGE (0x2F)
+			This chat message is a signalisation message containing various
 			informations:
- 			* timestamp
- 			* sender
- 			* type (RAW, NORMAL, ANNOUNCE, SYSTEM)
- 			* content
+			* timestamp
+			* sender
+			* type (RAW, NORMAL, ANNOUNCE, SYSTEM)
+			* content
 		Add TOCLIENT_CSM_RESTRICTION_FLAGS to define which CSM features should be
 			limited
 		Add settable player collisionbox. Breaks compatibility with older
@@ -240,8 +240,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // Constant that differentiates the protocol from random data and other protocols
 #define PROTOCOL_ID 0x4f457403
 
-#define PASSWORD_SIZE 28    // Maximum password length. Allows for
-                            // base64-encoded SHA-1 (27+\0).
+#define PASSWORD_SIZE 28 // Maximum password length. Allows for
+						 // base64-encoded SHA-1 (27+\0).
 
 // See also formspec [Version History] in doc/lua_api.md
 #define FORMSPEC_API_VERSION 7
@@ -250,8 +250,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 typedef u16 session_t;
 
-enum ToClientCommand : u16
-{
+enum ToClientCommand : u16 {
 	TOCLIENT_HELLO = 0x02,
 	/*
 		Sent after TOSERVER_INIT.
@@ -270,7 +269,7 @@ enum ToClientCommand : u16
 		u64 map seed
 		f1000 recommended send interval
 		u32 : supported auth methods for sudo mode
-		      (where the user can change their password)
+			  (where the user can change their password)
 	*/
 	TOCLIENT_ACCEPT_SUDO_MODE = 0x04,
 	/*
@@ -645,7 +644,7 @@ enum ToClientCommand : u16
 			tween<v3f>        attractor_origin
 			u16               attractor_origin_attachment_object_id
 			u8                spawner_flags
-			    bit 1: attractor_kill (particles dies on contact)
+				bit 1: attractor_kill (particles dies on contact)
 			if attraction_mode > point {
 				tween<v3f> attractor_direction
 				u16        attractor_direction_attachment_object_id
@@ -803,8 +802,8 @@ enum ToClientCommand : u16
 	*/
 	TOCLIENT_UPDATE_PLAYER_LIST = 0x56,
 	/*
-	 	u8 type
-	 	u16 number of players
+		u8 type
+		u16 number of players
 		for each player
 			u16 len
 			u8[len] player name
@@ -813,18 +812,18 @@ enum ToClientCommand : u16
 	TOCLIENT_MODCHANNEL_MSG = 0x57,
 	/*
 		u16 channel name length
-	 	std::string channel name
-	 	u16 channel name sender
-	 	std::string channel name
-	 	u16 message length
-	 	std::string message
+		std::string channel name
+		u16 channel name sender
+		std::string channel name
+		u16 message length
+		std::string message
 	*/
 
 	TOCLIENT_MODCHANNEL_SIGNAL = 0x58,
 	/*
 		u8 signal id
-	 	u16 channel name length
-	 	std::string channel name
+		u16 channel name length
+		std::string channel name
 	*/
 
 	TOCLIENT_NODEMETA_CHANGED = 0x59,
@@ -904,8 +903,7 @@ enum ToClientCommand : u16
 	TOCLIENT_NUM_MSG_TYPES = 0x64,
 };
 
-enum ToServerCommand : u16
-{
+enum ToServerCommand : u16 {
 	TOSERVER_INIT = 0x02,
 	/*
 		Sent first after connected.
@@ -926,21 +924,21 @@ enum ToServerCommand : u16
 	TOSERVER_MODCHANNEL_JOIN = 0x17,
 	/*
 		u16 channel name length
-	 	std::string channel name
+		std::string channel name
 	 */
 
 	TOSERVER_MODCHANNEL_LEAVE = 0x18,
 	/*
 		u16 channel name length
-	 	std::string channel name
+		std::string channel name
 	 */
 
 	TOSERVER_MODCHANNEL_MSG = 0x19,
 	/*
 		u16 channel name length
-	 	std::string channel name
-	 	u16 message length
-	 	std::string message
+		std::string channel name
+		u16 message length
+		std::string message
 	 */
 
 	TOSERVER_PLAYERPOS = 0x23,
@@ -1092,8 +1090,8 @@ enum ToServerCommand : u16
 
 		std::string bytes_A
 		u8 current_login_based_on : on which version of the password's
-		                            hash this login is based on (0 legacy hash,
-		                            or 1 directly the password)
+									hash this login is based on (0 legacy hash,
+									or 1 directly the password)
 	*/
 
 	TOSERVER_SRP_BYTES_M = 0x52,
@@ -1114,8 +1112,7 @@ enum ToServerCommand : u16
 	TOSERVER_NUM_MSG_TYPES = 0x54,
 };
 
-enum AuthMechanism
-{
+enum AuthMechanism {
 	// reserved
 	AUTH_MECHANISM_NONE = 0,
 
@@ -1166,8 +1163,7 @@ constexpr const char *accessDeniedStrings[SERVER_ACCESSDENIED_MAX] = {
 	"The server has experienced an internal error.  You will now be disconnected."
 };
 
-enum PlayerListModifer : u8
-{
+enum PlayerListModifer : u8 {
 	PLAYER_LIST_INIT,
 	PLAYER_LIST_ADD,
 	PLAYER_LIST_REMOVE,
@@ -1180,20 +1176,19 @@ enum CSMRestrictionFlags : u64 {
 	// When those are complete, this should return to only being a restriction on the
 	// loading of client mods.
 	CSM_RF_LOAD_CLIENT_MODS = 0x00000001, // Don't load client-provided mods or 'builtin'
-	CSM_RF_CHAT_MESSAGES = 0x00000002,    // Disable chat message sending from CSM
-	CSM_RF_READ_ITEMDEFS = 0x00000004,    // Disable itemdef lookups
-	CSM_RF_READ_NODEDEFS = 0x00000008,    // Disable nodedef lookups
-	CSM_RF_LOOKUP_NODES = 0x00000010,     // Limit node lookups
-	CSM_RF_READ_PLAYERINFO = 0x00000020,  // Disable player info lookups
+	CSM_RF_CHAT_MESSAGES = 0x00000002, // Disable chat message sending from CSM
+	CSM_RF_READ_ITEMDEFS = 0x00000004, // Disable itemdef lookups
+	CSM_RF_READ_NODEDEFS = 0x00000008, // Disable nodedef lookups
+	CSM_RF_LOOKUP_NODES = 0x00000010, // Limit node lookups
+	CSM_RF_READ_PLAYERINFO = 0x00000020, // Disable player info lookups
 	CSM_RF_ALL = 0xFFFFFFFF,
 };
 
-enum InteractAction : u8
-{
-	INTERACT_START_DIGGING,     // 0: start digging (from undersurface) or use
-	INTERACT_STOP_DIGGING,      // 1: stop digging (all parameters ignored)
+enum InteractAction : u8 {
+	INTERACT_START_DIGGING, // 0: start digging (from undersurface) or use
+	INTERACT_STOP_DIGGING, // 1: stop digging (all parameters ignored)
 	INTERACT_DIGGING_COMPLETED, // 2: digging completed
-	INTERACT_PLACE,             // 3: place block or item (to abovesurface)
-	INTERACT_USE,               // 4: use item
-	INTERACT_ACTIVATE           // 5: rightclick air ("activate")
+	INTERACT_PLACE, // 3: place block or item (to abovesurface)
+	INTERACT_USE, // 4: use item
+	INTERACT_ACTIVATE // 5: rightclick air ("activate")
 };

@@ -23,8 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <utility>
 #include "config.h"
 
-class MetricCounter
-{
+class MetricCounter {
 public:
 	MetricCounter() = default;
 
@@ -36,8 +35,7 @@ public:
 
 typedef std::shared_ptr<MetricCounter> MetricCounterPtr;
 
-class MetricGauge
-{
+class MetricGauge {
 public:
 	MetricGauge() = default;
 	virtual ~MetricGauge() {}
@@ -50,8 +48,7 @@ public:
 
 typedef std::shared_ptr<MetricGauge> MetricGaugePtr;
 
-class MetricsBackend
-{
+class MetricsBackend {
 public:
 	MetricsBackend() = default;
 

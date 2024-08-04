@@ -59,25 +59,21 @@ struct ShaderInfo {
 */
 
 namespace irr::video {
-	class IMaterialRendererServices;
+class IMaterialRendererServices;
 }
-
 
 class IShaderConstantSetter {
 public:
 	virtual ~IShaderConstantSetter() = default;
 	virtual void onSetConstants(video::IMaterialRendererServices *services) = 0;
-	virtual void onSetMaterial(const video::SMaterial& material)
-	{ }
+	virtual void onSetMaterial(const video::SMaterial &material) {}
 };
-
 
 class IShaderConstantSetterFactory {
 public:
 	virtual ~IShaderConstantSetterFactory() = default;
-	virtual IShaderConstantSetter* create() = 0;
+	virtual IShaderConstantSetter *create() = 0;
 };
-
 
 template <typename T, std::size_t count, bool cache>
 class CachedShaderSetting {
@@ -85,13 +81,13 @@ class CachedShaderSetting {
 	T m_sent[count];
 	bool has_been_set = false;
 	bool is_pixel;
+
 protected:
 	CachedShaderSetting(const char *name, bool is_pixel) :
-		m_name(name), is_pixel(is_pixel)
-	{}
+			m_name(name), is_pixel(is_pixel) {}
+
 public:
-	void set(const T value[count], video::IMaterialRendererServices *services)
-	{
+	void set(const T value[count], video::IMaterialRendererServices *services) {
 		if (cache && has_been_set && std::equal(m_sent, m_sent + count, value))
 			return;
 		if (is_pixel)
@@ -119,26 +115,23 @@ public:
 	 * I extend my thanks to Microsoft®
 	 */
 #define SPECIALIZE(_type, _count_expr) \
-	template<typename T2 = T> \
+	template <typename T2 = T>         \
 	std::enable_if_t<std::is_same_v<T, T2> && std::is_same_v<T2, _type> && (_count_expr)>
 
 	SPECIALIZE(float, count == 2)
-	set(const v2f value, video::IMaterialRendererServices *services)
-	{
+	set(const v2f value, video::IMaterialRendererServices *services) {
 		float array[2] = { value.X, value.Y };
 		set(array, services);
 	}
 
 	SPECIALIZE(float, count == 3)
-	set(const v3f value, video::IMaterialRendererServices *services)
-	{
+	set(const v3f value, video::IMaterialRendererServices *services) {
 		float array[3] = { value.X, value.Y, value.Z };
 		set(array, services);
 	}
 
 	SPECIALIZE(float, count == 3 || count == 4)
-	set(const video::SColorf value, video::IMaterialRendererServices *services)
-	{
+	set(const video::SColorf value, video::IMaterialRendererServices *services) {
 		if constexpr (count == 3) {
 			float array[3] = { value.r, value.g, value.b };
 			set(array, services);
@@ -149,26 +142,25 @@ public:
 	}
 
 	SPECIALIZE(float, count == 16)
-	set(const core::matrix4 &value, video::IMaterialRendererServices *services)
-	{
+	set(const core::matrix4 &value, video::IMaterialRendererServices *services) {
 		set(value.pointer(), services);
 	}
 
 #undef SPECIALIZE
 };
 
-template <typename T, std::size_t count = 1, bool cache=true>
+template <typename T, std::size_t count = 1, bool cache = true>
 class CachedPixelShaderSetting : public CachedShaderSetting<T, count, cache> {
 public:
 	CachedPixelShaderSetting(const char *name) :
-		CachedShaderSetting<T, count, cache>(name, true){}
+			CachedShaderSetting<T, count, cache>(name, true) {}
 };
 
-template <typename T, std::size_t count = 1, bool cache=true>
+template <typename T, std::size_t count = 1, bool cache = true>
 class CachedVertexShaderSetting : public CachedShaderSetting<T, count, cache> {
 public:
 	CachedVertexShaderSetting(const char *name) :
-		CachedShaderSetting<T, count, cache>(name, false){}
+			CachedShaderSetting<T, count, cache>(name, false) {}
 };
 
 template <typename T, std::size_t count, bool cache, bool is_pixel>
@@ -176,14 +168,13 @@ class CachedStructShaderSetting {
 	const char *m_name;
 	T m_sent[count];
 	bool has_been_set = false;
-	std::array<const char*, count> m_fields;
-public:
-	CachedStructShaderSetting(const char *name, std::array<const char*, count> &&fields) :
-		m_name(name), m_fields(std::move(fields))
-	{}
+	std::array<const char *, count> m_fields;
 
-	void set(const T value[count], video::IMaterialRendererServices *services)
-	{
+public:
+	CachedStructShaderSetting(const char *name, std::array<const char *, count> &&fields) :
+			m_name(name), m_fields(std::move(fields)) {}
+
+	void set(const T value[count], video::IMaterialRendererServices *services) {
 		if (cache && has_been_set && std::equal(m_sent, m_sent + count, value))
 			return;
 
@@ -203,10 +194,10 @@ public:
 	}
 };
 
-template<typename T, std::size_t count, bool cache = true>
+template <typename T, std::size_t count, bool cache = true>
 using CachedStructVertexShaderSetting = CachedStructShaderSetting<T, count, cache, false>;
 
-template<typename T, std::size_t count, bool cache = true>
+template <typename T, std::size_t count, bool cache = true>
 using CachedStructPixelShaderSetting = CachedStructShaderSetting<T, count, cache, true>;
 
 /*
@@ -219,10 +210,10 @@ public:
 	virtual ~IShaderSource() = default;
 
 	virtual u32 getShaderIdDirect(const std::string &name,
-		MaterialType material_type, NodeDrawType drawtype = NDT_NORMAL){return 0;}
-	virtual ShaderInfo getShaderInfo(u32 id){return ShaderInfo();}
+			MaterialType material_type, NodeDrawType drawtype = NDT_NORMAL) { return 0; }
+	virtual ShaderInfo getShaderInfo(u32 id) { return ShaderInfo(); }
 	virtual u32 getShader(const std::string &name,
-		MaterialType material_type, NodeDrawType drawtype = NDT_NORMAL){return 0;}
+			MaterialType material_type, NodeDrawType drawtype = NDT_NORMAL) { return 0; }
 };
 
 class IWritableShaderSource : public IShaderSource {
@@ -230,10 +221,10 @@ public:
 	IWritableShaderSource() = default;
 	virtual ~IWritableShaderSource() = default;
 
-	virtual void processQueue()=0;
+	virtual void processQueue() = 0;
 	virtual void insertSourceShader(const std::string &name_of_shader,
-		const std::string &filename, const std::string &program)=0;
-	virtual void rebuildShaders()=0;
+			const std::string &filename, const std::string &program) = 0;
+	virtual void rebuildShaders() = 0;
 
 	/// @note Takes ownership of @p setter.
 	virtual void addShaderConstantSetterFactory(IShaderConstantSetterFactory *setter) = 0;
@@ -242,4 +233,4 @@ public:
 IWritableShaderSource *createShaderSource();
 
 void dumpShaderProgram(std::ostream &output_stream,
-	const std::string &program_type, std::string_view program);
+		const std::string &program_type, std::string_view program);

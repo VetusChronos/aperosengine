@@ -57,10 +57,9 @@ public:
 	Mapgen *getMapgen() { return m_mapgen; }
 
 protected:
-
 	void runCompletionCallbacks(
-		const v3s16 &pos, EmergeAction action,
-		const EmergeCallbackList &callbacks);
+			const v3s16 &pos, EmergeAction action,
+			const EmergeCallbackList &callbacks);
 
 private:
 	Server *m_server;
@@ -80,9 +79,9 @@ private:
 	bool popBlockEmerge(v3s16 *pos, BlockEmergeData *bedata);
 
 	EmergeAction getBlockOrStartGen(
-		const v3s16 &pos, bool allow_gen, MapBlock **block, BlockMakeData *data);
+			const v3s16 &pos, bool allow_gen, MapBlock **block, BlockMakeData *data);
 	MapBlock *finishGen(v3s16 pos, BlockMakeData *bmdata,
-		std::map<v3s16, MapBlock *> *modified_blocks);
+			std::map<v3s16, MapBlock *> *modified_blocks);
 
 	friend class EmergeManager;
 	friend class EmergeScripting;
@@ -90,20 +89,17 @@ private:
 };
 
 // Scoped helper to set Server::m_ignore_map_edit_events_area
-class MapEditEventAreaIgnorer
-{
+class MapEditEventAreaIgnorer {
 public:
-	MapEditEventAreaIgnorer(VoxelArea *ignorevariable, const VoxelArea &a):
-		m_ignorevariable(ignorevariable)
-	{
+	MapEditEventAreaIgnorer(VoxelArea *ignorevariable, const VoxelArea &a) :
+			m_ignorevariable(ignorevariable) {
 		if (m_ignorevariable->getVolume() == 0)
 			*m_ignorevariable = a;
 		else
 			m_ignorevariable = nullptr;
 	}
 
-	~MapEditEventAreaIgnorer()
-	{
+	~MapEditEventAreaIgnorer() {
 		if (m_ignorevariable) {
 			assert(m_ignorevariable->getVolume() != 0);
 			*m_ignorevariable = VoxelArea();

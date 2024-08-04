@@ -27,20 +27,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class FileCache {
 public:
-    // 'dir' is the file cache directory to use.
-    explicit FileCache(const std::string &dir) : m_dir(dir) {}
+	// 'dir' is the file cache directory to use.
+	explicit FileCache(const std::string &dir) :
+			m_dir(dir) {}
 
-    bool update(const std::string &name, std::string_view data);
-    bool load(const std::string &name, std::ostream &os);
-    bool exists(const std::string &name);
+	bool update(const std::string &name, std::string_view data);
+	bool load(const std::string &name, std::ostream &os);
+	bool exists(const std::string &name);
 
-    // Copy another file on disk into the cache
-    bool updateCopyFile(const std::string &name, const std::string &src_path);
+	// Copy another file on disk into the cache
+	bool updateCopyFile(const std::string &name, const std::string &src_path);
 
 private:
-    std::string m_dir;
+	std::string m_dir;
 
-    void createDir();
-    bool loadByPath(const std::string &path, std::ostream &os);
-    bool updateByPath(const std::string &path, std::string_view data);
+	void createDir();
+	bool loadByPath(const std::string &path, std::ostream &os);
+	bool updateByPath(const std::string &path, std::string_view data);
 };

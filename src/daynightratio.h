@@ -19,8 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #pragma once
 
-inline u32 time_to_daynight_ratio(float time_of_day, bool smooth)
-{
+inline u32 time_to_daynight_ratio(float time_of_day, bool smooth) {
 	float t = time_of_day;
 	if (t < 0.0f)
 		t += ((int)(-t) / 24000) * 24000.0f;
@@ -30,15 +29,15 @@ inline u32 time_to_daynight_ratio(float time_of_day, bool smooth)
 		t = 24000.0f - t;
 
 	const float values[9][2] = {
-		{4250.0f + 125.0f, 175.0f},
-		{4500.0f + 125.0f, 175.0f},
-		{4750.0f + 125.0f, 250.0f},
-		{5000.0f + 125.0f, 350.0f},
-		{5250.0f + 125.0f, 500.0f},
-		{5500.0f + 125.0f, 675.0f},
-		{5750.0f + 125.0f, 875.0f},
-		{6000.0f + 125.0f, 1000.0f},
-		{6250.0f + 125.0f, 1000.0f},
+		{ 4250.0f + 125.0f, 175.0f },
+		{ 4500.0f + 125.0f, 175.0f },
+		{ 4750.0f + 125.0f, 250.0f },
+		{ 5000.0f + 125.0f, 350.0f },
+		{ 5250.0f + 125.0f, 500.0f },
+		{ 5500.0f + 125.0f, 675.0f },
+		{ 5750.0f + 125.0f, 875.0f },
+		{ 6000.0f + 125.0f, 1000.0f },
+		{ 6250.0f + 125.0f, 1000.0f },
 	};
 
 	if (!smooth) {

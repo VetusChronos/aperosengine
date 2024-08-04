@@ -38,15 +38,13 @@ extern "C" {
 //
 
 // convert negative index to absolute position on Lua stack
-static inline int absidx(lua_State *L, int idx)
-{
+static inline int absidx(lua_State *L, int idx) {
 	assert(idx < 0);
 	return lua_gettop(L) + idx + 1;
 }
 
 // does the type put anything into PackedInstr::sdata?
-static inline bool uses_sdata(int type)
-{
+static inline bool uses_sdata(int type) {
 	switch (type) {
 		case LUA_TSTRING:
 		case LUA_TFUNCTION:
@@ -58,8 +56,7 @@ static inline bool uses_sdata(int type)
 }
 
 // does the type put anything into PackedInstr::<union>?
-static inline bool uses_union(int type)
-{
+static inline bool uses_union(int type) {
 	switch (type) {
 		case LUA_TNIL:
 		case LUA_TSTRING:
@@ -71,8 +68,7 @@ static inline bool uses_union(int type)
 }
 
 // can set_into be used with these key / value types in principle?
-static inline bool can_set_into(int ktype, int vtype)
-{
+static inline bool can_set_into(int ktype, int vtype) {
 	switch (ktype) {
 		case LUA_TNUMBER:
 			return !uses_union(vtype);
@@ -84,8 +80,7 @@ static inline bool can_set_into(int ktype, int vtype)
 }
 
 // is the actual key suitable for use with set_into?
-static inline bool suitable_key(lua_State *L, int idx)
-{
+static inline bool suitable_key(lua_State *L, int idx) {
 	if (lua_type(L, idx) == LUA_TSTRING) {
 		// strings may not have a NULL byte (-> lua_setfield)
 		size_t len;
@@ -103,9 +98,8 @@ static inline bool suitable_key(lua_State *L, int idx)
  * Push core.known_metatables to the stack if it exists.
  * @param L Lua state
  * @return true if core.known_metatables exists, false otherwise.
-*/
-static inline bool get_known_lua_metatables(lua_State *L)
-{
+ */
+static inline bool get_known_lua_metatables(lua_State *L) {
 	lua_getglobal(L, "core");
 	if (!lua_istable(L, -1)) {
 		lua_pop(L, 1);
@@ -121,49 +115,54 @@ static inline bool get_known_lua_metatables(lua_State *L)
 }
 
 namespace {
-	// checks if you left any values on the stack, for debugging
-	class StackChecker {
-		lua_State *L;
-		int top;
-	public:
-		StackChecker(lua_State *L) : L(L), top(lua_gettop(L)) {}
-		~StackChecker() {
-			assert(lua_gettop(L) >= top);
-			if (lua_gettop(L) > top) {
-				rawstream << "Lua stack not cleaned up: "
-					<< lua_gettop(L) << " != " << top
-					<< " (false-positive if exception thrown)" << '\n';
-			}
-		}
-	};
+// checks if you left any values on the stack, for debugging
+class StackChecker {
+	lua_State *L;
+	int top;
 
-	// Since an std::vector may reallocate, this is the only safe way to keep
-	// a reference to a particular element.
-	template <typename T>
-	class VectorRef {
-		std::vector<T> *vec;
-		size_t idx;
-		VectorRef(std::vector<T> *vec, size_t idx) : vec(vec), idx(idx) {}
-	public:
-		constexpr VectorRef() : vec(nullptr), idx(0) {}
-		static VectorRef<T> front(std::vector<T> &vec) {
-			return VectorRef(&vec, 0);
+public:
+	StackChecker(lua_State *L) :
+			L(L), top(lua_gettop(L)) {}
+	~StackChecker() {
+		assert(lua_gettop(L) >= top);
+		if (lua_gettop(L) > top) {
+			rawstream << "Lua stack not cleaned up: "
+					  << lua_gettop(L) << " != " << top
+					  << " (false-positive if exception thrown)" << '\n';
 		}
-		static VectorRef<T> back(std::vector<T> &vec) {
-			return VectorRef(&vec, vec.size() - 1);
-		}
-		T &operator*() { return (*vec)[idx]; }
-		T *operator->() { return &(*vec)[idx]; }
-		operator bool() const { return vec != nullptr; }
-	};
+	}
+};
 
-	struct Packer {
-		PackInFunc fin;
-		PackOutFunc fout;
-	};
+// Since an std::vector may reallocate, this is the only safe way to keep
+// a reference to a particular element.
+template <typename T>
+class VectorRef {
+	std::vector<T> *vec;
+	size_t idx;
+	VectorRef(std::vector<T> *vec, size_t idx) :
+			vec(vec), idx(idx) {}
 
-	typedef std::pair<std::string, Packer> PackerTuple;
-}
+public:
+	constexpr VectorRef() :
+			vec(nullptr), idx(0) {}
+	static VectorRef<T> front(std::vector<T> &vec) {
+		return VectorRef(&vec, 0);
+	}
+	static VectorRef<T> back(std::vector<T> &vec) {
+		return VectorRef(&vec, vec.size() - 1);
+	}
+	T &operator*() { return (*vec)[idx]; }
+	T *operator->() { return &(*vec)[idx]; }
+	operator bool() const { return vec != nullptr; }
+};
+
+struct Packer {
+	PackInFunc fin;
+	PackOutFunc fout;
+};
+
+typedef std::pair<std::string, Packer> PackerTuple;
+} //namespace
 
 /**
  * Append instruction to end.
@@ -171,9 +170,8 @@ namespace {
  * @param pv target
  * @param type instruction type
  * @return reference to instruction
-*/
-static inline auto emplace(PackedValue &pv, s16 type)
-{
+ */
+static inline auto emplace(PackedValue &pv, s16 type) {
 	pv.i.emplace_back();
 	auto ref = VectorRef<PackedInstr>::back(pv.i);
 	ref->type = type;
@@ -197,8 +195,7 @@ static std::unordered_map<std::string, Packer> g_packers;
 static std::mutex g_packers_lock;
 
 void script_register_packer(lua_State *L, const char *regname,
-	PackInFunc fin, PackOutFunc fout)
-{
+		PackInFunc fin, PackOutFunc fout) {
 	// Store away callbacks
 	{
 		MutexAutoLock autolock(g_packers_lock);
@@ -209,7 +206,7 @@ void script_register_packer(lua_State *L, const char *regname,
 			ref.fout = fout;
 		} else {
 			FATAL_ERROR_IF(it->second.fin != fin || it->second.fout != fout,
-				"Packer registered twice with mismatching callbacks");
+					"Packer registered twice with mismatching callbacks");
 		}
 	}
 
@@ -246,9 +243,8 @@ void script_register_packer(lua_State *L, const char *regname,
  * @param regname metatable name
  * @param out packer will be placed here
  * @return success
-*/
-static bool find_packer(const char *regname, PackerTuple &out)
-{
+ */
+static bool find_packer(const char *regname, PackerTuple &out) {
 	MutexAutoLock autolock(g_packers_lock);
 	auto it = g_packers.find(regname);
 	if (it == g_packers.end())
@@ -266,9 +262,8 @@ static bool find_packer(const char *regname, PackerTuple &out)
  * @param idx Index on stack
  * @param out packer will be placed here
  * @return success
-*/
-static bool find_packer(lua_State *L, int idx, PackerTuple &out)
-{
+ */
+static bool find_packer(lua_State *L, int idx, PackerTuple &out) {
 #ifndef NDEBUG
 	StackChecker checker(L);
 #endif
@@ -312,10 +307,9 @@ static bool find_packer(lua_State *L, int idx, PackerTuple &out)
  * @return empty reference (first time) or reference to instruction that
  *         reproduces the value (otherwise)
  *
-*/
+ */
 static VectorRef<PackedInstr> record_object(lua_State *L, int idx, PackedValue &pv,
-		std::unordered_map<const void *, s32> &seen)
-{
+		std::unordered_map<const void *, s32> &seen) {
 	const void *ptr = lua_topointer(L, idx);
 	assert(ptr);
 	auto found = seen.find(ptr);
@@ -344,10 +338,9 @@ static VectorRef<PackedInstr> record_object(lua_State *L, int idx, PackedValue &
  * @param pv target
  * @param seen Map of seen objects (see record_object)
  * @return reference to the instruction that creates the value
-*/
+ */
 static VectorRef<PackedInstr> pack_inner(lua_State *L, int idx, int vidx, PackedValue &pv,
-		std::unordered_map<const void *, s32> &seen)
-{
+		std::unordered_map<const void *, s32> &seen) {
 #ifndef NDEBUG
 	StackChecker checker(L);
 	assert(idx > 0);
@@ -488,8 +481,7 @@ static VectorRef<PackedInstr> pack_inner(lua_State *L, int idx, int vidx, Packed
 	return rtable;
 }
 
-PackedValue *script_pack(lua_State *L, int idx)
-{
+PackedValue *script_pack(lua_State *L, int idx) {
 	if (idx < 0)
 		idx = absidx(L, idx);
 
@@ -505,8 +497,7 @@ PackedValue *script_pack(lua_State *L, int idx)
 // Unpacking implementation
 //
 
-void script_unpack(lua_State *L, PackedValue *pv)
-{
+void script_unpack(lua_State *L, PackedValue *pv) {
 	// table that tracks objects for keep_ref / PUSHREF (key = instr index)
 	lua_newtable(L);
 	const int top = lua_gettop(L);
@@ -613,7 +604,7 @@ void script_unpack(lua_State *L, PackedValue *pv)
 	// as part of the unpacking process all userdata is "used up"
 	pv->contains_userdata = false;
 	// leave exactly one value on the stack
-	lua_settop(L, top+1);
+	lua_settop(L, top + 1);
 	lua_remove(L, top);
 }
 
@@ -621,8 +612,7 @@ void script_unpack(lua_State *L, PackedValue *pv)
 // PackedValue
 //
 
-PackedValue::~PackedValue()
-{
+PackedValue::~PackedValue() {
 	if (!contains_userdata)
 		return;
 	for (auto &i : this->i) {
@@ -642,8 +632,7 @@ PackedValue::~PackedValue()
 // script_dump_packed
 //
 
-void script_dump_packed(const PackedValue *val)
-{
+void script_dump_packed(const PackedValue *val) {
 	printf("instruction stream: [\n");
 	for (const auto &i : val->i) {
 		printf("\t(");

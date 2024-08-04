@@ -29,8 +29,7 @@ class Minimap;
 class RenderPipeline;
 class RenderTarget;
 
-class RenderingCore
-{
+class RenderingCore {
 protected:
 	IrrlichtDevice *device;
 	Client *client;
@@ -40,7 +39,7 @@ protected:
 	RenderPipeline *pipeline;
 
 	v2f virtual_size_scale;
-	v2u32 virtual_size { 0, 0 };
+	v2u32 virtual_size{ 0, 0 };
 
 public:
 	RenderingCore(IrrlichtDevice *device, Client *client, Hud *hud,

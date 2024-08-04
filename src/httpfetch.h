@@ -36,23 +36,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define HTTPFETCH_CID_START 3
 
 namespace {
-	// lower bound for curl_timeout (see also settingtypes.txt)
-	constexpr long MIN_HTTPFETCH_TIMEOUT_INTERACTIVE = 1000;
-	// lower bound for curl_file_download_timeout
-	constexpr long MIN_HTTPFETCH_TIMEOUT = 5000;
-}
+// lower bound for curl_timeout (see also settingtypes.txt)
+constexpr long MIN_HTTPFETCH_TIMEOUT_INTERACTIVE = 1000;
+// lower bound for curl_file_download_timeout
+constexpr long MIN_HTTPFETCH_TIMEOUT = 5000;
+} //namespace
 
 //  Methods
-enum HttpMethod : u8
-{
+enum HttpMethod : u8 {
 	HTTP_GET,
 	HTTP_POST,
 	HTTP_PUT,
 	HTTP_DELETE,
 };
 
-struct HTTPFetchRequest
-{
+struct HTTPFetchRequest {
 	std::string url = "";
 
 	// Identifies the caller (for asynchronous requests)
@@ -92,8 +90,7 @@ struct HTTPFetchRequest
 	HTTPFetchRequest();
 };
 
-struct HTTPFetchResult
-{
+struct HTTPFetchResult {
 	bool succeeded = false;
 	bool timeout = false;
 	long response_code = 0;
@@ -105,8 +102,7 @@ struct HTTPFetchResult
 	HTTPFetchResult() = default;
 
 	HTTPFetchResult(const HTTPFetchRequest &fetch_request) :
-			caller(fetch_request.caller), request_id(fetch_request.request_id)
-	{
+			caller(fetch_request.caller), request_id(fetch_request.request_id) {
 	}
 };
 

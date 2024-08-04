@@ -19,7 +19,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #pragma once
 
-
 /**
  * Parameters for automatic exposure compensation
  *
@@ -28,8 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
  * wanted_exposure = 2^exposure_correction / clamp(observed_luminance, 2^luminance_min, 2^luminance_max)
  *
  */
-struct AutoExposure
-{
+struct AutoExposure {
 	/// @brief Minimum boundary for computed luminance
 	float luminance_min;
 	/// @brief Maximum boundary for computed luminance
@@ -48,10 +46,9 @@ struct AutoExposure
 
 /** Describes ambient light settings for a player
  */
-struct Lighting
-{
+struct Lighting {
 	AutoExposure exposure;
-	float shadow_intensity {0.0f};
-	float saturation {1.0f};
-	float volumetric_light_strength {0.0f};
+	float shadow_intensity{ 0.0f };
+	float saturation{ 1.0f };
+	float volumetric_light_strength{ 0.0f };
 };

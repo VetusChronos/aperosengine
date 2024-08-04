@@ -114,9 +114,7 @@ with a buffer in the receiving and transmitting end.
 #define SEQNUM_INITIAL 65500
 #define SEQNUM_MAX 65535
 
-namespace con
-{
-
+namespace con {
 
 enum PacketType : u8 {
 	PACKET_TYPE_CONTROL = 0,
@@ -126,41 +124,35 @@ enum PacketType : u8 {
 	PACKET_TYPE_MAX
 };
 
-inline bool seqnum_higher(u16 totest, u16 base)
-{
-	if (totest > base)
-	{
-		if ((totest - base) > (SEQNUM_MAX/2))
+inline bool seqnum_higher(u16 totest, u16 base) {
+	if (totest > base) {
+		if ((totest - base) > (SEQNUM_MAX / 2))
 			return false;
 
 		return true;
 	}
 
-	if ((base - totest) > (SEQNUM_MAX/2))
+	if ((base - totest) > (SEQNUM_MAX / 2))
 		return true;
 
 	return false;
 }
 
-inline bool seqnum_in_window(u16 seqnum, u16 next,u16 window_size)
-{
+inline bool seqnum_in_window(u16 seqnum, u16 next, u16 window_size) {
 	u16 window_start = next;
-	u16 window_end   = ( next + window_size ) % (SEQNUM_MAX+1);
+	u16 window_end = (next + window_size) % (SEQNUM_MAX + 1);
 
 	if (window_start < window_end) {
 		return ((seqnum >= window_start) && (seqnum < window_end));
 	}
 
-
 	return ((seqnum < window_end) || (seqnum >= window_start));
 }
 
-inline float CALC_DTIME(u64 lasttime, u64 curtime)
-{
+inline float CALC_DTIME(u64 lasttime, u64 curtime) {
 	float value = (curtime - lasttime) / 1000.0f;
 	return MYMAX(MYMIN(value, 0.1f), 0.0f);
 }
-
 
 /*
 	Struct for all kinds of packets. Includes following data:
@@ -168,8 +160,7 @@ inline float CALC_DTIME(u64 lasttime, u64 curtime)
 		u8[] packet data (usually copied from SharedBuffer<u8>)
 */
 struct BufferedPacket {
-	BufferedPacket(u32 a_size)
-	{
+	BufferedPacket(u32 a_size) {
 		m_data.resize(a_size);
 		data = &m_data[0];
 	}
@@ -191,7 +182,6 @@ private:
 	std::vector<u8> m_data; // Data of the packet, including headers
 };
 
-
 // This adds the base headers to the data and makes a packet out of it
 BufferedPacketPtr makePacket(const Address &address, const SharedBuffer<u8> &data,
 		u32 protocol_id, session_t sender_peer_id, u8 channel);
@@ -204,10 +194,9 @@ void makeAutoSplitPacket(const SharedBuffer<u8> &data, u32 chunksize_max,
 // Add the TYPE_RELIABLE header to the data
 SharedBuffer<u8> makeReliablePacket(const SharedBuffer<u8> &data, u16 seqnum);
 
-struct IncomingSplitPacket
-{
-	IncomingSplitPacket(u32 cc, bool r):
-		chunk_count(cc), reliable(r) {}
+struct IncomingSplitPacket {
+	IncomingSplitPacket(u32 cc, bool r) :
+			chunk_count(cc), reliable(r) {}
 
 	IncomingSplitPacket() = delete;
 
@@ -215,8 +204,7 @@ struct IncomingSplitPacket
 	u32 chunk_count;
 	bool reliable; // If true, isn't deleted on timeout
 
-	bool allReceived() const
-	{
+	bool allReceived() const {
 		return (chunks.size() == chunk_count);
 	}
 	bool insert(u32 chunk_num, SharedBuffer<u8> &chunkdata);
@@ -232,8 +220,7 @@ private:
 	for fast access to the smallest one.
 */
 
-class ReliablePacketBuffer
-{
+class ReliablePacketBuffer {
 public:
 	bool getFirstSeqnum(u16 &result);
 
@@ -249,7 +236,6 @@ public:
 	void print();
 	bool empty();
 	u32 size();
-
 
 private:
 	typedef std::list<BufferedPacketPtr>::iterator FindResult;
@@ -267,8 +253,7 @@ private:
 	A buffer for reconstructing split packets
 */
 
-class IncomingSplitBuffer
-{
+class IncomingSplitBuffer {
 public:
 	~IncomingSplitBuffer();
 
@@ -282,12 +267,12 @@ public:
 
 private:
 	// Key is seqnum
-	std::map<u16, IncomingSplitPacket*> m_buf;
+	std::map<u16, IncomingSplitPacket *> m_buf;
 
 	std::mutex m_map_mutex;
 };
 
-enum ConnectionCommandType{
+enum ConnectionCommandType {
 	CONNCMD_NONE,
 	CONNCMD_SERVE,
 	CONNCMD_CONNECT,
@@ -301,8 +286,7 @@ enum ConnectionCommandType{
 };
 
 // This is very similar to ConnectionEvent
-struct ConnectionCommand
-{
+struct ConnectionCommand {
 	const ConnectionCommandType type;
 	Address address;
 	session_t peer_id = PEER_ID_INEXISTENT;
@@ -324,7 +308,7 @@ struct ConnectionCommand
 
 private:
 	ConnectionCommand(ConnectionCommandType type_) :
-		type(type_) {}
+			type(type_) {}
 
 	static ConnectionCommandPtr create(ConnectionCommandType type);
 };
@@ -339,14 +323,12 @@ private:
 /* minimum value for window size */
 #define MIN_RELIABLE_WINDOW_SIZE 0x40
 
-class Channel
-{
-
+class Channel {
 public:
 	u16 readNextIncomingSeqNum();
 	u16 incNextIncomingSeqNum();
 
-	u16 getOutgoingSequenceNumber(bool& successful);
+	u16 getOutgoingSequenceNumber(bool &successful);
 	u16 readOutgoingSequenceNumber();
 	bool putBackSequenceNumber(u16);
 
@@ -373,38 +355,55 @@ public:
 
 	void UpdatePacketLossCounter(unsigned int count);
 	void UpdatePacketTooLateCounter();
-	void UpdateBytesSent(unsigned int bytes,unsigned int packages=1);
+	void UpdateBytesSent(unsigned int bytes, unsigned int packages = 1);
 	void UpdateBytesLost(unsigned int bytes);
 	void UpdateBytesReceived(unsigned int bytes);
 
 	void UpdateTimers(float dtime);
 
-	float getCurrentDownloadRateKB()
-		{ MutexAutoLock lock(m_internal_mutex); return cur_kbps; };
-	float getMaxDownloadRateKB()
-		{ MutexAutoLock lock(m_internal_mutex); return max_kbps; };
+	float getCurrentDownloadRateKB() {
+		MutexAutoLock lock(m_internal_mutex);
+		return cur_kbps;
+	};
+	float getMaxDownloadRateKB() {
+		MutexAutoLock lock(m_internal_mutex);
+		return max_kbps;
+	};
 
-	float getCurrentLossRateKB()
-		{ MutexAutoLock lock(m_internal_mutex); return cur_kbps_lost; };
-	float getMaxLossRateKB()
-		{ MutexAutoLock lock(m_internal_mutex); return max_kbps_lost; };
+	float getCurrentLossRateKB() {
+		MutexAutoLock lock(m_internal_mutex);
+		return cur_kbps_lost;
+	};
+	float getMaxLossRateKB() {
+		MutexAutoLock lock(m_internal_mutex);
+		return max_kbps_lost;
+	};
 
-	float getCurrentIncomingRateKB()
-		{ MutexAutoLock lock(m_internal_mutex); return cur_incoming_kbps; };
-	float getMaxIncomingRateKB()
-		{ MutexAutoLock lock(m_internal_mutex); return max_incoming_kbps; };
+	float getCurrentIncomingRateKB() {
+		MutexAutoLock lock(m_internal_mutex);
+		return cur_incoming_kbps;
+	};
+	float getMaxIncomingRateKB() {
+		MutexAutoLock lock(m_internal_mutex);
+		return max_incoming_kbps;
+	};
 
-	float getAvgDownloadRateKB()
-		{ MutexAutoLock lock(m_internal_mutex); return avg_kbps; };
-	float getAvgLossRateKB()
-		{ MutexAutoLock lock(m_internal_mutex); return avg_kbps_lost; };
-	float getAvgIncomingRateKB()
-		{ MutexAutoLock lock(m_internal_mutex); return avg_incoming_kbps; };
+	float getAvgDownloadRateKB() {
+		MutexAutoLock lock(m_internal_mutex);
+		return avg_kbps;
+	};
+	float getAvgLossRateKB() {
+		MutexAutoLock lock(m_internal_mutex);
+		return avg_kbps_lost;
+	};
+	float getAvgIncomingRateKB() {
+		MutexAutoLock lock(m_internal_mutex);
+		return avg_incoming_kbps;
+	};
 
 	u16 getWindowSize() const { return m_window_size; };
 
-	void setWindowSize(long size)
-	{
+	void setWindowSize(long size) {
 		m_window_size = (u16)rangelim(size, MIN_RELIABLE_WINDOW_SIZE, MAX_RELIABLE_WINDOW_SIZE);
 	}
 
@@ -439,11 +438,8 @@ private:
 	unsigned int rate_samples = 0;
 };
 
-
-class UDPPeer final : public Peer
-{
+class UDPPeer final : public Peer {
 public:
-
 	friend class PeerHelper;
 	friend class ConnectionReceiveThread;
 	friend class ConnectionSendThread;
@@ -453,7 +449,7 @@ public:
 	virtual ~UDPPeer() = default;
 
 	void PutReliableSendCommand(ConnectionCommandPtr &c,
-							unsigned int max_packet_size) override;
+			unsigned int max_packet_size) override;
 
 	virtual const Address &getAddress() const override {
 		return address;
@@ -463,7 +459,7 @@ public:
 	void setNextSplitSequenceNumber(u8 channel, u16 seqnum) override;
 
 	SharedBuffer<u8> addSplitPacket(u8 channel, BufferedPacketPtr &toadd,
-		bool reliable) override;
+			bool reliable) override;
 
 	bool isTimedOut(float timeout, std::string &reason) override;
 
@@ -475,26 +471,31 @@ protected:
 	void reportRTT(float rtt) override;
 
 	void RunCommandQueues(
-					unsigned int max_packet_size,
-					unsigned int maxtransfer);
+			unsigned int max_packet_size,
+			unsigned int maxtransfer);
 
-	float getResendTimeout()
-		{ MutexAutoLock lock(m_exclusive_access_mutex); return resend_timeout; }
+	float getResendTimeout() {
+		MutexAutoLock lock(m_exclusive_access_mutex);
+		return resend_timeout;
+	}
 
-	void setResendTimeout(float timeout)
-		{ MutexAutoLock lock(m_exclusive_access_mutex); resend_timeout = timeout; }
+	void setResendTimeout(float timeout) {
+		MutexAutoLock lock(m_exclusive_access_mutex);
+		resend_timeout = timeout;
+	}
 
-	bool Ping(float dtime, SharedBuffer<u8>& data) override;
+	bool Ping(float dtime, SharedBuffer<u8> &data) override;
 
 	Channel channels[CHANNEL_COUNT];
 	bool m_pending_disconnect = false;
+
 private:
 	// This is changed dynamically
 	float resend_timeout = 0.5;
 
 	bool processReliableSendCommand(
-					ConnectionCommandPtr &c_ptr,
-					unsigned int max_packet_size);
+			ConnectionCommandPtr &c_ptr,
+			unsigned int max_packet_size);
 };
 
-}
+} //namespace con

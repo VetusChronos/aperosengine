@@ -35,12 +35,13 @@ public:
 
 	void insert(const std::string &name, video::IImage *img, bool prefer_local);
 
-	video::IImage* get(const std::string &name);
+	video::IImage *get(const std::string &name);
 
 	// Primarily fetches from cache, secondarily tries to read from filesystem.
 	video::IImage *getOrLoad(const std::string &name);
+
 private:
-	std::map<std::string, video::IImage*> m_images;
+	std::map<std::string, video::IImage *> m_images;
 };
 
 // Generates images using texture modifiers, and caches source images.
@@ -50,7 +51,7 @@ struct ImageSource {
 	 * The returned Image should be dropped.
 	 * source_image_names is important to determine when to flush the image from a cache (dynamic media)
 	 */
-	video::IImage* generateImage(std::string_view name, std::set<std::string> &source_image_names);
+	video::IImage *generateImage(std::string_view name, std::set<std::string> &source_image_names);
 
 	// Insert a source image into the cache without touching the filesystem.
 	void insertSourceImage(const std::string &name, video::IImage *img, bool prefer_local);
@@ -59,18 +60,16 @@ struct ImageSource {
 	static video::SColor getImageAverageColor(const video::IImage &image);
 
 	ImageSource() :
-		m_setting_mipmap{g_settings->getBool("mip_map")},
-		m_setting_trilinear_filter{g_settings->getBool("trilinear_filter")},
-		m_setting_bilinear_filter{g_settings->getBool("bilinear_filter")},
-		m_setting_anisotropic_filter{g_settings->getBool("anisotropic_filter")}
-	{};
+			m_setting_mipmap{ g_settings->getBool("mip_map") },
+			m_setting_trilinear_filter{ g_settings->getBool("trilinear_filter") },
+			m_setting_bilinear_filter{ g_settings->getBool("bilinear_filter") },
+			m_setting_anisotropic_filter{ g_settings->getBool("anisotropic_filter") } {};
 
 private:
-
 	// Generate image based on a string like "stone.png" or "[crack:1:0".
 	// If baseimg is NULL, it is created. Otherwise stuff is made on it.
 	// source_image_names is important to determine when to flush the image from a cache (dynamic media).
-	bool generateImagePart(std::string_view part_of_name, video::IImage *& baseimg,
+	bool generateImagePart(std::string_view part_of_name, video::IImage *&baseimg,
 			std::set<std::string> &source_image_names);
 
 	// Cached settings needed for making textures from meshes

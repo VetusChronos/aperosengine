@@ -39,8 +39,7 @@ static std::map<io::path, video::ITexture *> g_txrCache;
 /* Manually insert an image into the cache, useful to avoid texture-to-image
  * conversion whenever we can intercept it.
  */
-void guiScalingCache(const io::path &key, video::IVideoDriver *driver, video::IImage *value)
-{
+void guiScalingCache(const io::path &key, video::IVideoDriver *driver, video::IImage *value) {
 	if (!g_settings->getBool("gui_scaling_filter"))
 		return;
 
@@ -54,8 +53,7 @@ void guiScalingCache(const io::path &key, video::IVideoDriver *driver, video::II
 }
 
 // Manually clear the cache, e.g. when switching to different worlds.
-void guiScalingCacheClear()
-{
+void guiScalingCacheClear() {
 	for (auto &it : g_imgCache) {
 		if (it.second)
 			it.second->drop();
@@ -74,8 +72,7 @@ void guiScalingCacheClear()
  */
 video::ITexture *guiScalingResizeCached(video::IVideoDriver *driver,
 		video::ITexture *src, const core::rect<s32> &srcrect,
-		const core::rect<s32> &destrect)
-{
+		const core::rect<s32> &destrect) {
 	if (src == NULL)
 		return src;
 
@@ -85,12 +82,12 @@ video::ITexture *guiScalingResizeCached(video::IVideoDriver *driver,
 	// Calculate scaled texture name.
 	char rectstr[200];
 	porting::mt_snprintf(rectstr, sizeof(rectstr), "%d:%d:%d:%d:%d:%d",
-		srcrect.UpperLeftCorner.X,
-		srcrect.UpperLeftCorner.Y,
-		srcrect.getWidth(),
-		srcrect.getHeight(),
-		destrect.getWidth(),
-		destrect.getHeight());
+			srcrect.UpperLeftCorner.X,
+			srcrect.UpperLeftCorner.Y,
+			srcrect.getWidth(),
+			srcrect.getHeight(),
+			destrect.getWidth(),
+			destrect.getHeight());
 	io::path origname = src->getName().getPath();
 	io::path scalename = origname + "@guiScalingFilter:" + rectstr;
 
@@ -108,7 +105,7 @@ video::ITexture *guiScalingResizeCached(video::IVideoDriver *driver,
 		if (!g_settings->getBool("gui_scaling_filter_txr2img"))
 			return src;
 		srcimg = driver->createImageFromData(src->getColorFormat(),
-			src->getSize(), src->lock(video::ETLM_READ_ONLY), false);
+				src->getSize(), src->lock(video::ETLM_READ_ONLY), false);
 		src->unlock();
 		g_imgCache[origname] = srcimg;
 	}
@@ -125,7 +122,7 @@ video::ITexture *guiScalingResizeCached(video::IVideoDriver *driver,
 	}
 	video::IImage *destimg = driver->createImage(src->getColorFormat(),
 			core::dimension2d<u32>((u32)destrect.getWidth(),
-			(u32)destrect.getHeight()));
+					(u32)destrect.getHeight()));
 	imageScaleNNAA(srcimg, srcrect, destimg);
 
 	// Some platforms are picky about textures being powers of 2, so expand
@@ -133,7 +130,7 @@ video::ITexture *guiScalingResizeCached(video::IVideoDriver *driver,
 	if (!driver->queryFeature(video::EVDF_TEXTURE_NPOT)) {
 		video::IImage *po2img = driver->createImage(src->getColorFormat(),
 				core::dimension2d<u32>(npot2((u32)destrect.getWidth()),
-				npot2((u32)destrect.getHeight())));
+						npot2((u32)destrect.getHeight())));
 		po2img->fill(video::SColor(0, 0, 0, 0));
 		destimg->copyTo(po2img);
 		destimg->drop();
@@ -152,13 +149,12 @@ video::ITexture *guiScalingResizeCached(video::IVideoDriver *driver,
  * are available at GUI imagebutton creation time.
  */
 video::ITexture *guiScalingImageButton(video::IVideoDriver *driver,
-		video::ITexture *src, s32 width, s32 height)
-{
+		video::ITexture *src, s32 width, s32 height) {
 	if (src == NULL)
 		return src;
 	return guiScalingResizeCached(driver, src,
-		core::rect<s32>(0, 0, src->getSize().Width, src->getSize().Height),
-		core::rect<s32>(0, 0, width, height));
+			core::rect<s32>(0, 0, src->getSize().Width, src->getSize().Height),
+			core::rect<s32>(0, 0, width, height));
 }
 
 /* Replacement for driver->draw2DImage() that uses the high-quality pre-scaled
@@ -167,8 +163,7 @@ video::ITexture *guiScalingImageButton(video::IVideoDriver *driver,
 void draw2DImageFilterScaled(video::IVideoDriver *driver, video::ITexture *txr,
 		const core::rect<s32> &destrect, const core::rect<s32> &srcrect,
 		const core::rect<s32> *cliprect, const video::SColor *const colors,
-		bool usealpha)
-{
+		bool usealpha) {
 	// 9-sliced images might calculate negative texture dimensions. Skip them.
 	if (destrect.getWidth() <= 0 || destrect.getHeight() <= 0)
 		return;
@@ -180,8 +175,8 @@ void draw2DImageFilterScaled(video::IVideoDriver *driver, video::ITexture *txr,
 
 	// Correct source rect based on scaled image.
 	const core::rect<s32> mysrcrect = (scaled != txr)
-		? core::rect<s32>(0, 0, destrect.getWidth(), destrect.getHeight())
-		: srcrect;
+			? core::rect<s32>(0, 0, destrect.getWidth(), destrect.getHeight())
+			: srcrect;
 
 	driver->draw2DImage(scaled, destrect, mysrcrect, cliprect, colors, usealpha);
 }
@@ -189,8 +184,7 @@ void draw2DImageFilterScaled(video::IVideoDriver *driver, video::ITexture *txr,
 void draw2DImage9Slice(video::IVideoDriver *driver, video::ITexture *texture,
 		const core::rect<s32> &destrect, const core::rect<s32> &srcrect,
 		const core::rect<s32> &middlerect, const core::rect<s32> *cliprect,
-		const video::SColor *const colors)
-{
+		const video::SColor *const colors) {
 	// `-x` is interpreted as `w - x`
 	core::rect<s32> middle = middlerect;
 
@@ -200,7 +194,8 @@ void draw2DImage9Slice(video::IVideoDriver *driver, video::ITexture *texture,
 		middle.LowerRightCorner.Y += srcrect.getHeight();
 
 	core::vector2di lower_right_offset = core::vector2di(srcrect.getWidth(),
-			srcrect.getHeight()) - middle.LowerRightCorner;
+												 srcrect.getHeight()) -
+			middle.LowerRightCorner;
 
 	for (int y = 0; y < 3; ++y) {
 		for (int x = 0; x < 3; ++x) {
@@ -208,41 +203,41 @@ void draw2DImage9Slice(video::IVideoDriver *driver, video::ITexture *texture,
 			core::rect<s32> dest = destrect;
 
 			switch (x) {
-			case 0:
-				dest.LowerRightCorner.X = destrect.UpperLeftCorner.X + middle.UpperLeftCorner.X;
-				src.LowerRightCorner.X = srcrect.UpperLeftCorner.X + middle.UpperLeftCorner.X;
-				break;
+				case 0:
+					dest.LowerRightCorner.X = destrect.UpperLeftCorner.X + middle.UpperLeftCorner.X;
+					src.LowerRightCorner.X = srcrect.UpperLeftCorner.X + middle.UpperLeftCorner.X;
+					break;
 
-			case 1:
-				dest.UpperLeftCorner.X += middle.UpperLeftCorner.X;
-				dest.LowerRightCorner.X -= lower_right_offset.X;
-				src.UpperLeftCorner.X += middle.UpperLeftCorner.X;
-				src.LowerRightCorner.X -= lower_right_offset.X;
-				break;
+				case 1:
+					dest.UpperLeftCorner.X += middle.UpperLeftCorner.X;
+					dest.LowerRightCorner.X -= lower_right_offset.X;
+					src.UpperLeftCorner.X += middle.UpperLeftCorner.X;
+					src.LowerRightCorner.X -= lower_right_offset.X;
+					break;
 
-			case 2:
-				dest.UpperLeftCorner.X = destrect.LowerRightCorner.X - lower_right_offset.X;
-				src.UpperLeftCorner.X = srcrect.LowerRightCorner.X - lower_right_offset.X;
-				break;
+				case 2:
+					dest.UpperLeftCorner.X = destrect.LowerRightCorner.X - lower_right_offset.X;
+					src.UpperLeftCorner.X = srcrect.LowerRightCorner.X - lower_right_offset.X;
+					break;
 			}
 
 			switch (y) {
-			case 0:
-				dest.LowerRightCorner.Y = destrect.UpperLeftCorner.Y + middle.UpperLeftCorner.Y;
-				src.LowerRightCorner.Y = srcrect.UpperLeftCorner.Y + middle.UpperLeftCorner.Y;
-				break;
+				case 0:
+					dest.LowerRightCorner.Y = destrect.UpperLeftCorner.Y + middle.UpperLeftCorner.Y;
+					src.LowerRightCorner.Y = srcrect.UpperLeftCorner.Y + middle.UpperLeftCorner.Y;
+					break;
 
-			case 1:
-				dest.UpperLeftCorner.Y += middle.UpperLeftCorner.Y;
-				dest.LowerRightCorner.Y -= lower_right_offset.Y;
-				src.UpperLeftCorner.Y += middle.UpperLeftCorner.Y;
-				src.LowerRightCorner.Y -= lower_right_offset.Y;
-				break;
+				case 1:
+					dest.UpperLeftCorner.Y += middle.UpperLeftCorner.Y;
+					dest.LowerRightCorner.Y -= lower_right_offset.Y;
+					src.UpperLeftCorner.Y += middle.UpperLeftCorner.Y;
+					src.LowerRightCorner.Y -= lower_right_offset.Y;
+					break;
 
-			case 2:
-				dest.UpperLeftCorner.Y = destrect.LowerRightCorner.Y - lower_right_offset.Y;
-				src.UpperLeftCorner.Y = srcrect.LowerRightCorner.Y - lower_right_offset.Y;
-				break;
+				case 2:
+					dest.UpperLeftCorner.Y = destrect.LowerRightCorner.Y - lower_right_offset.Y;
+					src.UpperLeftCorner.Y = srcrect.LowerRightCorner.Y - lower_right_offset.Y;
+					break;
 			}
 
 			draw2DImageFilterScaled(driver, texture, dest, src, cliprect, colors, true);

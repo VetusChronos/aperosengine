@@ -23,37 +23,35 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/client.h"
 
 GUIInventoryList::GUIInventoryList(gui::IGUIEnvironment *env,
-	gui::IGUIElement *parent,
-	s32 id,
-	const core::rect<s32> &rectangle,
-	InventoryManager *invmgr,
-	const InventoryLocation &inventoryloc,
-	const std::string &listname,
-	const v2s32 &geom,
-	const s32 start_item_i,
-	const v2s32 &slot_size,
-	const v2f32 &slot_spacing,
-	GUIFormSpecMenu *fs_menu,
-	const Options &options,
-	gui::IGUIFont *font) :
-	gui::IGUIElement(gui::EGUIET_ELEMENT, env, parent, id, rectangle),
-	m_invmgr(invmgr),
-	m_inventoryloc(inventoryloc),
-	m_listname(listname),
-	m_geom(geom),
-	m_start_item_i(start_item_i),
-	m_slot_size(slot_size),
-	m_slot_spacing(slot_spacing),
-	m_fs_menu(fs_menu),
-	m_options(options),
-	m_font(font),
-	m_hovered_i(-1),
-	m_already_warned(false)
-{
+		gui::IGUIElement *parent,
+		s32 id,
+		const core::rect<s32> &rectangle,
+		InventoryManager *invmgr,
+		const InventoryLocation &inventoryloc,
+		const std::string &listname,
+		const v2s32 &geom,
+		const s32 start_item_i,
+		const v2s32 &slot_size,
+		const v2f32 &slot_spacing,
+		GUIFormSpecMenu *fs_menu,
+		const Options &options,
+		gui::IGUIFont *font) :
+		gui::IGUIElement(gui::EGUIET_ELEMENT, env, parent, id, rectangle),
+		m_invmgr(invmgr),
+		m_inventoryloc(inventoryloc),
+		m_listname(listname),
+		m_geom(geom),
+		m_start_item_i(start_item_i),
+		m_slot_size(slot_size),
+		m_slot_spacing(slot_spacing),
+		m_fs_menu(fs_menu),
+		m_options(options),
+		m_font(font),
+		m_hovered_i(-1),
+		m_already_warned(false) {
 }
 
-void GUIInventoryList::draw()
-{
+void GUIInventoryList::draw() {
 	if (!IsVisible)
 		return;
 
@@ -61,9 +59,9 @@ void GUIInventoryList::draw()
 	if (!inv) {
 		if (!m_already_warned) {
 			warningstream << "GUIInventoryList::draw(): "
-					<< "The inventory location "
-					<< "\"" << m_inventoryloc.dump() << "\" doesn't exist"
-					<< '\n';
+						  << "The inventory location "
+						  << "\"" << m_inventoryloc.dump() << "\" doesn't exist"
+						  << '\n';
 			m_already_warned = true;
 		}
 		return;
@@ -72,9 +70,9 @@ void GUIInventoryList::draw()
 	if (!ilist) {
 		if (!m_already_warned) {
 			warningstream << "GUIInventoryList::draw(): "
-					<< "The inventory list \"" << m_listname << "\" @ \""
-					<< m_inventoryloc.dump() << "\" doesn't exist"
-					<< '\n';
+						  << "The inventory list \"" << m_listname << "\" @ \""
+						  << m_inventoryloc.dump() << "\" doesn't exist"
+						  << '\n';
 			m_already_warned = true;
 		}
 		return;
@@ -101,13 +99,9 @@ void GUIInventoryList::draw()
 		ItemStack item = ilist->getItem(item_i);
 		ItemStack orig_item = item;
 
-		bool selected = selected_item
-			&& m_invmgr->getInventory(selected_item->inventoryloc) == inv
-			&& selected_item->listname == m_listname
-			&& selected_item->i == item_i;
+		bool selected = selected_item && m_invmgr->getInventory(selected_item->inventoryloc) == inv && selected_item->listname == m_listname && selected_item->i == item_i;
 		bool hovering = m_hovered_i == item_i;
-		ItemRotationKind rotation_kind = selected ? IT_ROT_SELECTED :
-			(hovering ? IT_ROT_HOVERED : IT_ROT_NONE);
+		ItemRotationKind rotation_kind = selected ? IT_ROT_SELECTED : (hovering ? IT_ROT_HOVERED : IT_ROT_NONE);
 
 		// layer 0
 		if (hovering) {
@@ -124,20 +118,24 @@ void GUIInventoryList::draw()
 			s32 y2 = rect.LowerRightCorner.Y;
 			s32 border = 1;
 			core::rect<s32> clipping_rect = Parent ? Parent->getAbsoluteClippingRect()
-					: core::rect<s32>();
+												   : core::rect<s32>();
 			core::rect<s32> *clipping_rect_ptr = Parent ? &clipping_rect : nullptr;
 			driver->draw2DRectangle(m_options.slotbordercolor,
-				core::rect<s32>(v2s32(x1 - border, y1 - border),
-								v2s32(x2 + border, y1)), clipping_rect_ptr);
+					core::rect<s32>(v2s32(x1 - border, y1 - border),
+							v2s32(x2 + border, y1)),
+					clipping_rect_ptr);
 			driver->draw2DRectangle(m_options.slotbordercolor,
-				core::rect<s32>(v2s32(x1 - border, y2),
-								v2s32(x2 + border, y2 + border)), clipping_rect_ptr);
+					core::rect<s32>(v2s32(x1 - border, y2),
+							v2s32(x2 + border, y2 + border)),
+					clipping_rect_ptr);
 			driver->draw2DRectangle(m_options.slotbordercolor,
-				core::rect<s32>(v2s32(x1 - border, y1),
-								v2s32(x1, y2)), clipping_rect_ptr);
+					core::rect<s32>(v2s32(x1 - border, y1),
+							v2s32(x1, y2)),
+					clipping_rect_ptr);
 			driver->draw2DRectangle(m_options.slotbordercolor,
-				core::rect<s32>(v2s32(x2, y1),
-								v2s32(x2 + border, y2)), clipping_rect_ptr);
+					core::rect<s32>(v2s32(x2, y1),
+							v2s32(x2 + border, y2)),
+					clipping_rect_ptr);
 		}
 
 		// layer 1
@@ -167,8 +165,7 @@ void GUIInventoryList::draw()
 	IGUIElement::draw();
 }
 
-bool GUIInventoryList::OnEvent(const SEvent &event)
-{
+bool GUIInventoryList::OnEvent(const SEvent &event) {
 	if (event.EventType != EET_MOUSE_INPUT_EVENT) {
 		if (event.EventType == EET_GUI_EVENT &&
 				event.GUIEvent.EventType == EGET_ELEMENT_LEFT) {
@@ -188,8 +185,8 @@ bool GUIInventoryList::OnEvent(const SEvent &event)
 	bool was_visible = IsVisible;
 	IsVisible = false;
 	IGUIElement *hovered =
-		Environment->getRootGUIElement()->getElementFromPoint(
-			core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y));
+			Environment->getRootGUIElement()->getElementFromPoint(
+					core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y));
 
 	// if the player clicks outside of the formspec window, hovered is not
 	// m_fs_menu, but some other weird element (with ID -1). we do however need
@@ -205,8 +202,7 @@ bool GUIInventoryList::OnEvent(const SEvent &event)
 	return ret;
 }
 
-s32 GUIInventoryList::getItemIndexAtPos(v2s32 p) const
-{
+s32 GUIInventoryList::getItemIndexAtPos(v2s32 p) const {
 	// no item if no gui element at pointer
 	if (!IsVisible || AbsoluteClippingRect.getArea() <= 0 ||
 			!AbsoluteClippingRect.isPointInside(p))
@@ -224,8 +220,7 @@ s32 GUIInventoryList::getItemIndexAtPos(v2s32 p) const
 	v2s32 base_pos = AbsoluteRect.UpperLeftCorner;
 
 	// instead of looping through each slot, we look where p would be in the grid
-	s32 i = static_cast<s32>((p.X - base_pos.X) / m_slot_spacing.X)
-			+ static_cast<s32>((p.Y - base_pos.Y) / m_slot_spacing.Y) * m_geom.X;
+	s32 i = static_cast<s32>((p.X - base_pos.X) / m_slot_spacing.X) + static_cast<s32>((p.Y - base_pos.Y) / m_slot_spacing.Y) * m_geom.X;
 
 	v2s32 p0((i % m_geom.X) * m_slot_spacing.X,
 			(i / m_geom.X) * m_slot_spacing.Y);

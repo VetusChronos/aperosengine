@@ -25,16 +25,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/string.h"
 
 // Basic metadata interface
-class IMetadata
-{
+class IMetadata {
 public:
 	virtual ~IMetadata() = default;
 
 	virtual void clear() = 0;
 
 	bool operator==(const IMetadata &other) const;
-	inline bool operator!=(const IMetadata &other) const
-	{
+	inline bool operator!=(const IMetadata &other) const {
 		return !(*this == other);
 	}
 
@@ -74,9 +72,9 @@ protected:
 };
 
 // Simple metadata parent class (in-memory storage)
-class SimpleMetadata: public virtual IMetadata
-{
+class SimpleMetadata : public virtual IMetadata {
 	bool m_modified = false;
+
 public:
 	virtual ~SimpleMetadata() = default;
 
@@ -92,26 +90,23 @@ public:
 	virtual bool setString(const std::string &name, std::string_view var) override;
 	const StringMap &getStrings(StringMap *) const override final;
 	const std::vector<std::string> &getKeys(std::vector<std::string> *place)
-		const override final;
+			const override final;
 
 	// Simple version of getters, possible due to in-memory storage:
 
-	inline const std::string &getString(const std::string &name, u16 recursion = 0) const
-	{
+	inline const std::string &getString(const std::string &name, u16 recursion = 0) const {
 		return IMetadata::getString(name, nullptr, recursion);
 	}
 
-	inline const std::string &resolveString(const std::string &str, u16 recursion = 0) const
-	{
+	inline const std::string &resolveString(const std::string &str, u16 recursion = 0) const {
 		return IMetadata::resolveString(str, nullptr, recursion);
 	}
 
-	inline const StringMap &getStrings() const
-	{
+	inline const StringMap &getStrings() const {
 		return SimpleMetadata::getStrings(nullptr);
 	}
 
-	inline bool isModified() const  { return m_modified; }
+	inline bool isModified() const { return m_modified; }
 	inline void setModified(bool v) { m_modified = v; }
 
 protected:

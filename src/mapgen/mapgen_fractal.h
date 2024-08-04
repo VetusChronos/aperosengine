@@ -26,15 +26,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "mapgen.h"
 
 ///////////// Mapgen Fractal flags
-#define MGFRACTAL_TERRAIN     0x01
+#define MGFRACTAL_TERRAIN 0x01
 
 class BiomeManager;
 
 extern FlagDesc flagdesc_mapgen_fractal[];
 
-
-struct MapgenFractalParams : public MapgenParams
-{
+struct MapgenFractalParams : public MapgenParams {
 	float cave_width = 0.09f;
 	s16 large_cave_depth = -33;
 	u16 small_cave_num_min = 0;
@@ -68,9 +66,7 @@ struct MapgenFractalParams : public MapgenParams
 	void setDefaultSettings(Settings *settings);
 };
 
-
-class MapgenFractal : public MapgenBasic
-{
+class MapgenFractal : public MapgenBasic {
 public:
 	MapgenFractal(MapgenFractalParams *params, EmergeParams *emerge);
 	~MapgenFractal();

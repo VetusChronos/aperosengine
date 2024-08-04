@@ -30,8 +30,7 @@
 
 class ISimpleTextureSource;
 
-struct key_setting
-{
+struct key_setting {
 	int id;
 	std::wstring button_name;
 	KeyPress key;
@@ -39,8 +38,7 @@ struct key_setting
 	gui::IGUIButton *button;
 };
 
-class GUIKeyChangeMenu : public GUIModalMenu
-{
+class GUIKeyChangeMenu : public GUIModalMenu {
 public:
 	GUIKeyChangeMenu(gui::IGUIEnvironment *env, gui::IGUIElement *parent, s32 id,
 			IMenuManager *menumgr, ISimpleTextureSource *tsrc);

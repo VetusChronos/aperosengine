@@ -35,10 +35,8 @@ namespace sound {
 PlayingSound::PlayingSound(ALuint source_id, std::shared_ptr<ISoundDataOpen> data,
 		bool loop, f32 volume, f32 pitch, f32 start_time,
 		const std::optional<std::pair<v3f, v3f>> &pos_vel_opt,
-		const ALExtensions &exts [[maybe_unused]])
-	: m_source_id(source_id), m_data(std::move(data)), m_looping(loop),
-	m_is_positional(pos_vel_opt.has_value())
-{
+		const ALExtensions &exts [[maybe_unused]]) :
+		m_source_id(source_id), m_data(std::move(data)), m_looping(loop), m_is_positional(pos_vel_opt.has_value()) {
 	// Calculate actual start_time (see lua_api.txt for specs)
 	f32 len_seconds = m_data->m_decode_info.length_seconds;
 	f32 len_samples = m_data->m_decode_info.length_samples;
@@ -113,8 +111,7 @@ PlayingSound::PlayingSound(ALuint source_id, std::shared_ptr<ISoundDataOpen> dat
 
 #ifdef AL_SOFT_direct_channels_remix
 		// Play directly on stereo output channels if possible. Improves sound quality.
-		if (exts.have_ext_AL_SOFT_direct_channels_remix
-				&& m_data->m_decode_info.is_stereo) {
+		if (exts.have_ext_AL_SOFT_direct_channels_remix && m_data->m_decode_info.is_stereo) {
 			alSourcei(m_source_id, AL_DIRECT_CHANNELS_SOFT, AL_REMIX_UNMATCHED_SOFT);
 			warn_if_al_error("PlayingSound::PlayingSound at setting AL_DIRECT_CHANNELS_SOFT");
 		}
@@ -124,8 +121,7 @@ PlayingSound::PlayingSound(ALuint source_id, std::shared_ptr<ISoundDataOpen> dat
 	setPitch(pitch);
 }
 
-bool PlayingSound::stepStream(bool playback_speed_changed)
-{
+bool PlayingSound::stepStream(bool playback_speed_changed) {
 	if (isDead())
 		return false;
 
@@ -182,27 +178,25 @@ bool PlayingSound::stepStream(bool playback_speed_changed)
 		if (getState() == AL_STOPPED) {
 			play();
 			warningstream << "PlayingSound::stepStream: Sound queue ran empty for \""
-					<< m_data->m_decode_info.name_for_logging << "\"" << '\n';
+						  << m_data->m_decode_info.name_for_logging << "\"" << '\n';
 		}
 	}
 
 	return true;
 }
 
-bool PlayingSound::fade(f32 step, f32 target_gain) noexcept
-{
+bool PlayingSound::fade(f32 step, f32 target_gain) noexcept {
 	bool already_fading = m_fade_state.has_value();
 
 	target_gain = MYMAX(target_gain, 0.0f); // 0.0f if nan
 	step = target_gain - getGain() > 0.0f ? std::abs(step) : -std::abs(step);
 
-	m_fade_state = FadeState{step, target_gain};
+	m_fade_state = FadeState{ step, target_gain };
 
 	return !already_fading;
 }
 
-bool PlayingSound::doFade(f32 dtime) noexcept
-{
+bool PlayingSound::doFade(f32 dtime) noexcept {
 	if (!m_fade_state || isDead())
 		return false;
 
@@ -239,8 +233,7 @@ bool PlayingSound::doFade(f32 dtime) noexcept
 	}
 }
 
-void PlayingSound::updatePosVel(const v3f &pos, const v3f &vel) noexcept
-{
+void PlayingSound::updatePosVel(const v3f &pos, const v3f &vel) noexcept {
 	alSourcei(m_source_id, AL_SOURCE_RELATIVE, false);
 	alSource3f(m_source_id, AL_POSITION, pos.X, pos.Y, pos.Z);
 	alSource3f(m_source_id, AL_VELOCITY, vel.X, vel.Y, vel.Z);
@@ -252,8 +245,7 @@ void PlayingSound::updatePosVel(const v3f &pos, const v3f &vel) noexcept
 	warn_if_al_error("PlayingSound::updatePosVel");
 }
 
-void PlayingSound::setGain(f32 gain) noexcept
-{
+void PlayingSound::setGain(f32 gain) noexcept {
 	// AL_REFERENCE_DISTANCE was once reduced from 3 nodes to 1 node.
 	// We compensate this by multiplying the volume by 3.
 	if (m_is_positional)
@@ -262,18 +254,16 @@ void PlayingSound::setGain(f32 gain) noexcept
 	alSourcef(m_source_id, AL_GAIN, gain);
 }
 
-f32 PlayingSound::getGain() noexcept
-{
+f32 PlayingSound::getGain() noexcept {
 	ALfloat gain;
 	alGetSourcef(m_source_id, AL_GAIN, &gain);
 	// Same as above, but inverse.
 	if (m_is_positional)
-		gain *= 1.0f/3.0f;
+		gain *= 1.0f / 3.0f;
 	return gain;
 }
 
-void PlayingSound::setPitch(f32 pitch)
-{
+void PlayingSound::setPitch(f32 pitch) {
 	alSourcef(m_source_id, AL_PITCH, pitch);
 	if (isStreaming())
 		stepStream(true);

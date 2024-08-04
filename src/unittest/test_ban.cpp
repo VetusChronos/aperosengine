@@ -21,8 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "server/ban.h"
 
-class TestBan : public TestBase
-{
+class TestBan : public TestBase {
 public:
 	TestBan() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestBan"; }
@@ -43,8 +42,7 @@ private:
 
 static TestBan g_test_instance;
 
-void TestBan::runTests(IGameDef *gamedef)
-{
+void TestBan::runTests(IGameDef *gamedef) {
 	reinitTestEnv();
 	TEST(testCreate);
 
@@ -64,8 +62,7 @@ void TestBan::runTests(IGameDef *gamedef)
 	TEST(testGetBanDescription);
 }
 
-void TestBan::reinitTestEnv()
-{
+void TestBan::reinitTestEnv() {
 	m_testbm = getTestTempDirectory().append(DIR_DELIM "testbm.txt");
 	m_testbm2 = getTestTempDirectory().append(DIR_DELIM "testbm2.txt");
 
@@ -73,8 +70,7 @@ void TestBan::reinitTestEnv()
 	fs::DeleteSingleFileOrEmptyDirectory(m_testbm2);
 }
 
-void TestBan::testCreate()
-{
+void TestBan::testCreate() {
 	// test save on object removal
 	{
 		BanManager bm(m_testbm);
@@ -90,8 +86,7 @@ void TestBan::testCreate()
 	}
 }
 
-void TestBan::testAdd()
-{
+void TestBan::testAdd() {
 	std::string bm_test1_entry = "192.168.0.246";
 	std::string bm_test1_result = "test_username";
 
@@ -101,8 +96,7 @@ void TestBan::testAdd()
 	UASSERT(bm.getBanName(bm_test1_entry) == bm_test1_result);
 }
 
-void TestBan::testRemove()
-{
+void TestBan::testRemove() {
 	std::string bm_test1_entry = "192.168.0.249";
 	std::string bm_test1_result = "test_username";
 
@@ -123,8 +117,7 @@ void TestBan::testRemove()
 	UASSERT(bm.getBanName(bm_test2_result).empty());
 }
 
-void TestBan::testModificationFlag()
-{
+void TestBan::testModificationFlag() {
 	BanManager bm(m_testbm);
 	bm.add("192.168.0.247", "test_username");
 	UASSERT(bm.isModified());
@@ -140,8 +133,7 @@ void TestBan::testModificationFlag()
 	UASSERT(!bm.isModified());
 }
 
-void TestBan::testGetBanName()
-{
+void TestBan::testGetBanName() {
 	std::string bm_test1_entry = "192.168.0.247";
 	std::string bm_test1_result = "test_username";
 
@@ -155,8 +147,7 @@ void TestBan::testGetBanName()
 	UASSERT(bm.getBanName("---invalid---").empty());
 }
 
-void TestBan::testGetBanDescription()
-{
+void TestBan::testGetBanDescription() {
 	std::string bm_test1_entry = "192.168.0.247";
 	std::string bm_test1_entry2 = "test_username";
 

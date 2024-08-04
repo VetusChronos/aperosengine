@@ -23,15 +23,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "server/mods.h"
 #include "scripting_server.h"
 
-class MockServer : public Server
-{
+class MockServer : public Server {
 public:
 	/* Set `path_world` to a real existing folder if you plan to initialize scripting! */
 	MockServer(const std::string &path_world = "fakepath") :
-		Server(path_world, SubgameSpec("fakespec", "fakespec"), true,
-			Address(), true, nullptr
-		)
-	{}
+			Server(path_world, SubgameSpec("fakespec", "fakespec"), true,
+					Address(), true, nullptr) {}
 
 	/*
 	 * Use this in unit tests to create scripting.

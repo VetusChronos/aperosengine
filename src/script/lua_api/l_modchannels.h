@@ -24,8 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class ModChannel;
 
-class ModApiChannels : public ModApiBase
-{
+class ModApiChannels : public ModApiBase {
 private:
 	// mod_channel_join(name)
 	static int l_mod_channel_join(lua_State *L);
@@ -34,8 +33,7 @@ public:
 	static void Initialize(lua_State *L, int top);
 };
 
-class ModChannelRef : public ModApiBase
-{
+class ModChannelRef : public ModApiBase {
 public:
 	ModChannelRef(const std::string &modchannel);
 	~ModChannelRef() = default;

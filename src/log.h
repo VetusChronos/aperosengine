@@ -37,7 +37,7 @@ enum LogLevel {
 	LL_NONE, // Special level that is always printed
 	LL_ERROR,
 	LL_WARNING,
-	LL_ACTION,  // In-game actions
+	LL_ACTION, // In-game actions
 	LL_INFO,
 	LL_VERBOSE,
 	LL_TRACE,
@@ -85,8 +85,8 @@ public:
 private:
 	void logToOutputsRaw(LogLevel, const std::string &line);
 	void logToOutputs(LogLevel, const std::string &combined,
-		const std::string &time, const std::string &thread_name,
-		const std::string &payload_text);
+			const std::string &time, const std::string &thread_name,
+			const std::string &payload_text);
 
 	const std::string &getThreadName();
 
@@ -101,16 +101,15 @@ class ILogOutput {
 public:
 	virtual void logRaw(LogLevel, const std::string &line) = 0;
 	virtual void log(LogLevel, const std::string &combined,
-		const std::string &time, const std::string &thread_name,
-		const std::string &payload_text) = 0;
+			const std::string &time, const std::string &thread_name,
+			const std::string &payload_text) = 0;
 };
 
 class ICombinedLogOutput : public ILogOutput {
 public:
 	void log(LogLevel lev, const std::string &combined,
-		const std::string &time, const std::string &thread_name,
-		const std::string &payload_text)
-	{
+			const std::string &time, const std::string &thread_name,
+			const std::string &payload_text) {
 		logRaw(lev, combined);
 	}
 };
@@ -130,8 +129,7 @@ class FileLogOutput : public ICombinedLogOutput {
 public:
 	void setFile(const std::string &filename, s64 file_size_max);
 
-	void logRaw(LogLevel lev, const std::string &line)
-	{
+	void logRaw(LogLevel lev, const std::string &line) {
 		m_stream << line << '\n';
 	}
 
@@ -142,13 +140,11 @@ private:
 class LogOutputBuffer : public ICombinedLogOutput {
 public:
 	LogOutputBuffer(Logger &logger) :
-		m_logger(logger)
-	{
+			m_logger(logger) {
 		updateLogLevel();
 	};
 
-	virtual ~LogOutputBuffer()
-	{
+	virtual ~LogOutputBuffer() {
 		m_logger.removeOutput(this);
 	}
 
@@ -156,20 +152,17 @@ public:
 
 	void logRaw(LogLevel lev, const std::string &line);
 
-	void clear()
-	{
+	void clear() {
 		MutexAutoLock lock(m_buffer_mutex);
 		m_buffer = std::queue<std::string>();
 	}
 
-	bool empty() const
-	{
+	bool empty() const {
 		MutexAutoLock lock(m_buffer_mutex);
 		return m_buffer.empty();
 	}
 
-	std::string get()
-	{
+	std::string get() {
 		MutexAutoLock lock(m_buffer_mutex);
 		if (m_buffer.empty())
 			return "";
@@ -209,7 +202,6 @@ public:
 	virtual void log(const std::string &buf) = 0;
 };
 
-
 /*
  * StreamProxy
  *
@@ -219,17 +211,18 @@ public:
  */
 class StreamProxy {
 public:
-	StreamProxy(std::ostream *os) : m_os(os) { }
+	StreamProxy(std::ostream *os) :
+			m_os(os) {}
 
-	template<typename T>
-	StreamProxy& operator<<(T&& arg) {
+	template <typename T>
+	StreamProxy &operator<<(T &&arg) {
 		if (m_os) {
 			*m_os << std::forward<T>(arg);
 		}
 		return *this;
 	}
 
-	StreamProxy& operator<<(std::ostream& (*manip)(std::ostream&)) {
+	StreamProxy &operator<<(std::ostream &(*manip)(std::ostream &)) {
 		if (m_os) {
 			*m_os << manip;
 		}
@@ -239,7 +232,6 @@ public:
 private:
 	std::ostream *m_os;
 };
-
 
 /*
  * LogStream
@@ -271,7 +263,7 @@ private:
  *       verbosestream << data << endl;
  *   }
  *
-*/
+ */
 
 class LogStream {
 public:
@@ -279,23 +271,23 @@ public:
 	DISABLE_CLASS_COPY(LogStream);
 
 	LogStream(LogTarget &target) :
-		m_target(target),
-		m_buffer(std::bind(&LogStream::internalFlush, this, std::placeholders::_1)),
-		m_dummy_buffer(),
-		m_stream(&m_buffer),
-		m_dummy_stream(&m_dummy_buffer),
-		m_proxy(&m_stream),
-		m_dummy_proxy(nullptr) { }
+			m_target(target),
+			m_buffer(std::bind(&LogStream::internalFlush, this, std::placeholders::_1)),
+			m_dummy_buffer(),
+			m_stream(&m_buffer),
+			m_dummy_stream(&m_dummy_buffer),
+			m_proxy(&m_stream),
+			m_dummy_proxy(nullptr) {}
 
-	template<typename T>
-	StreamProxy& operator<<(T&& arg) {
-		StreamProxy& sp = m_target.hasOutput() ? m_proxy : m_dummy_proxy;
+	template <typename T>
+	StreamProxy &operator<<(T &&arg) {
+		StreamProxy &sp = m_target.hasOutput() ? m_proxy : m_dummy_proxy;
 		sp << std::forward<T>(arg);
 		return sp;
 	}
 
-	StreamProxy& operator<<(std::ostream& (*manip)(std::ostream&)) {
-		StreamProxy& sp = m_target.hasOutput() ? m_proxy : m_dummy_proxy;
+	StreamProxy &operator<<(std::ostream &(*manip)(std::ostream &)) {
+		StreamProxy &sp = m_target.hasOutput() ? m_proxy : m_dummy_proxy;
 		sp << manip;
 		return sp;
 	}
@@ -308,7 +300,7 @@ public:
 		m_target.log(buf);
 	}
 
-	operator std::ostream&() {
+	operator std::ostream &() {
 		return m_target.hasOutput() ? m_stream : m_dummy_stream;
 	}
 
@@ -322,7 +314,6 @@ private:
 	std::ostream m_dummy_stream;
 	StreamProxy m_proxy;
 	StreamProxy m_dummy_proxy;
-
 };
 
 #ifdef __ANDROID__
@@ -343,10 +334,10 @@ extern Logger g_logger;
  * The finished lines are sent to a LogTarget which is a global (not thread-local)
  * object, and from there relayed to g_logger. The final writes are serialized
  * by the mutex in g_logger.
-*/
+ */
 
 extern thread_local LogStream dstream;
-extern thread_local LogStream rawstream;  // Writes directly to all LL_NONE log outputs with no prefix.
+extern thread_local LogStream rawstream; // Writes directly to all LL_NONE log outputs with no prefix.
 extern thread_local LogStream errorstream;
 extern thread_local LogStream warningstream;
 extern thread_local LogStream actionstream;
@@ -357,8 +348,9 @@ extern thread_local LogStream tracestream;
 extern thread_local LogStream derr_con;
 extern thread_local LogStream dout_con;
 
-#define TRACESTREAM(x) do {	\
-	if (tracestream) { 	\
-		tracestream x;	\
-	}			\
-} while (0)
+#define TRACESTREAM(x)     \
+	do {                   \
+		if (tracestream) { \
+			tracestream x; \
+		}                  \
+	} while (0)

@@ -19,11 +19,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <server/serveractiveobject.h>
 
-class MockServerActiveObject : public ServerActiveObject
-{
+class MockServerActiveObject : public ServerActiveObject {
 public:
 	MockServerActiveObject(ServerEnvironment *env = nullptr, const v3f &p = v3f()) :
-		ServerActiveObject(env, p) {}
+			ServerActiveObject(env, p) {}
 
 	virtual ActiveObjectType getType() const { return ACTIVEOBJECT_TYPE_TEST; }
 	virtual bool getCollisionBox(aabb3f *toset) const { return false; }

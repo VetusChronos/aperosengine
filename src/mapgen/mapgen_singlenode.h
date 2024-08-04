@@ -23,8 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "mapgen.h"
 
-struct MapgenSinglenodeParams : public MapgenParams
-{
+struct MapgenSinglenodeParams : public MapgenParams {
 	MapgenSinglenodeParams() = default;
 	~MapgenSinglenodeParams() = default;
 
@@ -32,8 +31,7 @@ struct MapgenSinglenodeParams : public MapgenParams
 	void writeParams(Settings *settings) const {}
 };
 
-class MapgenSinglenode : public Mapgen
-{
+class MapgenSinglenode : public Mapgen {
 public:
 	content_t c_node;
 	u8 set_light;

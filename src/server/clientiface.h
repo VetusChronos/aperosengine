@@ -19,10 +19,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #pragma once
 
-#include "irr_v3d.h"                   // for irrlicht datatypes
+#include "irr_v3d.h" // for irrlicht datatypes
 
 #include "constants.h"
-#include "serialization.h"             // for SER_FMT_VER_INVALID
+#include "serialization.h" // for SER_FMT_VER_INVALID
 #include "network/networkpacket.h"
 #include "network/networkprotocol.h"
 #include "network/address.h"
@@ -44,51 +44,51 @@ class EmergeManager;
 /*
  * State Transitions
 
-      Start
+	  Start
   (peer connect)
-        |
-        v
-      /-----------------\
-      |                 |
-      |    Created      |
-      |                 |
-      \-----------------/
-               |                  depending of the incoming packet
-               ----------------------------------------
-                                                      v
-                                       +-----------------------------+
-                                       |IN:                          |
-                                       | TOSERVER_INIT               |
-                                       +-----------------------------+
-                                                      | invalid playername
-                                                      | or denied by mod
-                                                      v
-                                       +-----------------------------+
-                                       |OUT:                         |
-                                       | TOCLIENT_HELLO              |
-                                       +-----------------------------+
-                                                      |
-                                                      |
-                                                      v
-      /-----------------\                    /-----------------\
-      |                 |                    |                 |
-      |  AwaitingInit2  |<---------          |    HelloSent    |
-      |                 |         |          |                 |
-      \-----------------/         |          \-----------------/
-               |                  |                   |
+		|
+		v
+	  /-----------------\
+	  |                 |
+	  |    Created      |
+	  |                 |
+	  \-----------------/
+			   |                  depending of the incoming packet
+			   ----------------------------------------
+													  v
+									   +-----------------------------+
+									   |IN:                          |
+									   | TOSERVER_INIT               |
+									   +-----------------------------+
+													  | invalid playername
+													  | or denied by mod
+													  v
+									   +-----------------------------+
+									   |OUT:                         |
+									   | TOCLIENT_HELLO              |
+									   +-----------------------------+
+													  |
+													  |
+													  v
+	  /-----------------\                    /-----------------\
+	  |                 |                    |                 |
+	  |  AwaitingInit2  |<---------          |    HelloSent    |
+	  |                 |         |          |                 |
+	  \-----------------/         |          \-----------------/
+			   |                  |                   |
 +-----------------------------+   |    *-----------------------------*     Auth fails
 |IN:                          |   |    |Authentication, depending on |------------------
 | TOSERVER_INIT2              |   |    | packet sent by client       |                 |
 +-----------------------------+   |    *-----------------------------*                 |
-               |                  |                   |                                |
-               |                  |                   | Authentication                 |
-               v                  |                   |  successful                    |
-      /-----------------\         |                   v                                |
-      |                 |         |    +-----------------------------+                 |
-      |    InitDone     |         |    |OUT:                         |                 |
-      |                 |         |    | TOCLIENT_AUTH_ACCEPT        |                 |
-      \-----------------/         |    +-----------------------------+                 |
-               |                  |                   |                                |
+			   |                  |                   |                                |
+			   |                  |                   | Authentication                 |
+			   v                  |                   |  successful                    |
+	  /-----------------\         |                   v                                |
+	  |                 |         |    +-----------------------------+                 |
+	  |    InitDone     |         |    |OUT:                         |                 |
+	  |                 |         |    | TOCLIENT_AUTH_ACCEPT        |                 |
+	  \-----------------/         |    +-----------------------------+                 |
+			   |                  |                   |                                |
 +-----------------------------+   ---------------------                                |
 |OUT:                         |                                                        |
 | TOCLIENT_MOVEMENT           |                                                        |
@@ -98,25 +98,25 @@ class EmergeManager;
 | TOCLIENT_DETACHED_INVENTORY |                                                        |
 | TOCLIENT_TIME_OF_DAY        |                                                        |
 +-----------------------------+                                                        |
-               |                                                                       |
-               |                                                                       |
-               |      -----------------------------                                    |
-               v      |                           |                                    |
-      /-----------------\                         v                                    |
-      |                 |             +-----------------------------+                  |
-      | DefinitionsSent |             |IN:                          |                  |
-      |                 |             | TOSERVER_REQUEST_MEDIA      |                  |
-      \-----------------/             |                             |                  |
-               |                      +-----------------------------+                  |
-               |      ^                           |                                    |
-               |      -----------------------------                                    |
-               v                                                                       v
+			   |                                                                       |
+			   |                                                                       |
+			   |      -----------------------------                                    |
+			   v      |                           |                                    |
+	  /-----------------\                         v                                    |
+	  |                 |             +-----------------------------+                  |
+	  | DefinitionsSent |             |IN:                          |                  |
+	  |                 |             | TOSERVER_REQUEST_MEDIA      |                  |
+	  \-----------------/             |                             |                  |
+			   |                      +-----------------------------+                  |
+			   |      ^                           |                                    |
+			   |      -----------------------------                                    |
+			   v                                                                       v
 +-----------------------------+                        --------------------------------+
 |IN:                          |                        |                               ^
 | TOSERVER_CLIENT_READY       |                        v                               |
 +-----------------------------+            +------------------------+                  |
-               |                           |OUT:                    |                  |
-               v                           | TOCLIENT_ACCESS_DENIED |                  |
+			   |                           |OUT:                    |                  |
+			   v                           | TOCLIENT_ACCESS_DENIED |                  |
 +-----------------------------+            +------------------------+                  |
 |OUT:                         |                        |                               |
 | TOCLIENT_MOVE_PLAYER        |                        v                               |
@@ -128,10 +128,10 @@ class EmergeManager;
 | TOCLIENT_BREATH             |                                                        |
 | TOCLIENT_DEATHSCREEN        |                                                        |
 +-----------------------------+                                                        |
-              |                                                                        |
-              v                                                                        |
-      /-----------------\      async mod action (ban, kick)                            |
-      |                 |---------------------------------------------------------------
+			  |                                                                        |
+			  v                                                                        |
+	  /-----------------\      async mod action (ban, kick)                            |
+	  |                 |---------------------------------------------------------------
  ---->|     Active      |
  |    |                 |----------------------------------------------
  |    \-----------------/      timeout                                v
@@ -164,19 +164,17 @@ class EmergeManager;
  |                  |                               +-----------------------------+
  |                  |    sets password accordingly  |IN:                          |
  -------------------+-------------------------------| TOSERVER_FIRST_SRP          |
-                                                    +-----------------------------+
+													+-----------------------------+
 
 */
 namespace con {
-	class Connection;
+class Connection;
 }
-
 
 // Also make sure to update the ClientInterface::statenames
 // array when modifying these enums
 
-enum ClientState
-{
+enum ClientState {
 	CS_Invalid,
 	CS_Disconnecting,
 	CS_Denied,
@@ -189,8 +187,7 @@ enum ClientState
 	CS_SudoMode
 };
 
-enum ClientStateEvent
-{
+enum ClientStateEvent {
 	CSE_Hello,
 	CSE_AuthAccept,
 	CSE_GotInit2,
@@ -207,16 +204,13 @@ enum ClientStateEvent
 
 	Lower priority number means higher priority.
 */
-struct PrioritySortedBlockTransfer
-{
-	PrioritySortedBlockTransfer(float a_priority, const v3s16 &a_pos, session_t a_peer_id)
-	{
+struct PrioritySortedBlockTransfer {
+	PrioritySortedBlockTransfer(float a_priority, const v3s16 &a_pos, session_t a_peer_id) {
 		priority = a_priority;
 		pos = a_pos;
 		peer_id = a_peer_id;
 	}
-	bool operator < (const PrioritySortedBlockTransfer &other) const
-	{
+	bool operator<(const PrioritySortedBlockTransfer &other) const {
 		return priority < other.priority;
 	}
 	float priority;
@@ -224,8 +218,7 @@ struct PrioritySortedBlockTransfer
 	session_t peer_id;
 };
 
-class RemoteClient
-{
+class RemoteClient {
 public:
 	// peer_id=0 means this client has no associated peer
 	// NOTE: If client is made allowed to exist while peer doesn't,
@@ -240,16 +233,15 @@ public:
 	/* Authentication information */
 	std::string enc_pwd = "";
 	bool create_player_on_auth_success = false;
-	AuthMechanism chosen_mech  = AUTH_MECHANISM_NONE;
+	AuthMechanism chosen_mech = AUTH_MECHANISM_NONE;
 	void *auth_data = nullptr;
 	u32 allowed_auth_mechs = 0;
 
 	void resetChosenMech();
 
-	bool isMechAllowed(AuthMechanism mech)
-	{ return allowed_auth_mechs & mech; }
+	bool isMechAllowed(AuthMechanism mech) { return allowed_auth_mechs & mech; }
 
-	void setEncryptedPassword(const std::string& pwd);
+	void setEncryptedPassword(const std::string &pwd);
 
 	RemoteClient();
 	~RemoteClient() = default;
@@ -259,7 +251,7 @@ public:
 		Environment should be locked when this is called.
 		dtime is used for resetting send radius at slow interval
 	*/
-	void GetNextBlocks(ServerEnvironment *env, EmergeManager* emerge,
+	void GetNextBlocks(ServerEnvironment *env, EmergeManager *emerge,
 			float dtime, std::vector<PrioritySortedBlockTransfer> &dest);
 
 	void GotBlock(v3s16 p);
@@ -279,8 +271,7 @@ public:
 
 	u32 getSendingCount() const { return m_blocks_sending.size(); }
 
-	bool isBlockSent(v3s16 p) const
-	{
+	bool isBlockSent(v3s16 p) const {
 		return m_blocks_sent.find(p) != m_blocks_sent.end();
 	}
 
@@ -289,14 +280,13 @@ public:
 		return insert_result.second; // true = was inserted
 	}
 
-	void PrintInfo(std::ostream &o)
-	{
-		o<<"RemoteClient "<<peer_id<<": "
-				<<"m_blocks_sent.size()="<<m_blocks_sent.size()
-				<<", m_blocks_sending.size()="<<m_blocks_sending.size()
-				<<", m_nearest_unsent_d="<<m_nearest_unsent_d
-				<<", m_excess_gotblocks="<<m_excess_gotblocks
-				<<std::endl;
+	void PrintInfo(std::ostream &o) {
+		o << "RemoteClient " << peer_id << ": "
+		  << "m_blocks_sent.size()=" << m_blocks_sent.size()
+		  << ", m_blocks_sending.size()=" << m_blocks_sending.size()
+		  << ", m_nearest_unsent_d=" << m_nearest_unsent_d
+		  << ", m_excess_gotblocks=" << m_excess_gotblocks
+		  << std::endl;
 		m_excess_gotblocks = 0;
 	}
 
@@ -318,14 +308,11 @@ public:
 	void notifyEvent(ClientStateEvent event);
 
 	/* set expected serialization version */
-	void setPendingSerializationVersion(u8 version)
-		{ m_pending_serialization_version = version; }
+	void setPendingSerializationVersion(u8 version) { m_pending_serialization_version = version; }
 
-	void setDeployedCompressionMode(u16 byteFlag)
-		{ m_deployed_compression = byteFlag; }
+	void setDeployedCompressionMode(u16 byteFlag) { m_deployed_compression = byteFlag; }
 
-	void confirmSerializationVersion()
-		{ serialization_version = m_pending_serialization_version; }
+	void confirmSerializationVersion() { serialization_version = m_pending_serialization_version; }
 
 	/* get uptime */
 	u64 uptime() const { return porting::getTimeS() - m_connection_time; }
@@ -457,11 +444,10 @@ private:
 	const u64 m_connection_time = porting::getTimeS();
 };
 
-typedef std::unordered_map<u16, RemoteClient*> RemoteClientMap;
+typedef std::unordered_map<u16, RemoteClient *> RemoteClientMap;
 
 class ClientInterface {
 public:
-
 	friend class Server;
 
 	ClientInterface(const std::shared_ptr<con::Connection> &con);
@@ -471,7 +457,7 @@ public:
 	void step(float dtime);
 
 	/* get list of active client id's */
-	std::vector<session_t> getClientIDs(ClientState min_state=CS_Active);
+	std::vector<session_t> getClientIDs(ClientState min_state = CS_Active);
 
 	/* mark blocks as not sent on all active clients */
 	void markBlocksNotSent(const std::vector<v3s16> &positions);
@@ -498,10 +484,10 @@ public:
 	void CreateClient(session_t peer_id);
 
 	/* get a client by peer_id */
-	RemoteClient *getClientNoEx(session_t peer_id,  ClientState state_min = CS_Active);
+	RemoteClient *getClientNoEx(session_t peer_id, ClientState state_min = CS_Active);
 
 	/* get client by peer_id (make sure you have list lock before!*/
-	RemoteClient *lockedGetClientNoEx(session_t peer_id,  ClientState state_min = CS_Active);
+	RemoteClient *lockedGetClientNoEx(session_t peer_id, ClientState state_min = CS_Active);
 
 	/* get state of client by id*/
 	ClientState getClientState(session_t peer_id);
@@ -520,23 +506,24 @@ public:
 	void event(session_t peer_id, ClientStateEvent event);
 
 	/* Set environment. Do not call this function if environment is already set */
-	void setEnv(ServerEnvironment *env)
-	{
+	void setEnv(ServerEnvironment *env) {
 		assert(m_env == NULL); // pre-condition
 		m_env = env;
 	}
 
 	static std::string state2Name(ClientState state);
+
 protected:
 	class AutoLock {
 	public:
-		AutoLock(ClientInterface &iface): m_lock(iface.m_clients_mutex) {}
+		AutoLock(ClientInterface &iface) :
+				m_lock(iface.m_clients_mutex) {}
 
 	private:
 		RecursiveMutexAutoLock m_lock;
 	};
 
-	RemoteClientMap& getClientList() { return m_clients; }
+	RemoteClientMap &getClientList() { return m_clients; }
 
 private:
 	/* update internal player list */

@@ -30,23 +30,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	PlayerSAO needs some internals exposed.
 */
 
-class LagPool
-{
+class LagPool {
 	float m_pool = 15.0f;
 	float m_max = 15.0f;
 
 public:
 	LagPool() = default;
 
-	void setMax(float new_max)
-	{
+	void setMax(float new_max) {
 		m_max = new_max;
 		if (m_pool > new_max)
 			m_pool = new_max;
 	}
 
-	void add(float dtime)
-	{
+	void add(float dtime) {
 		m_pool -= dtime;
 		if (m_pool < 0)
 			m_pool = 0;
@@ -54,8 +51,7 @@ public:
 
 	void empty() { m_pool = m_max; }
 
-	bool grab(float dtime)
-	{
+	bool grab(float dtime) {
 		if (dtime <= 0)
 			return true;
 		if (m_pool + dtime > m_max)
@@ -67,8 +63,7 @@ public:
 
 class RemotePlayer;
 
-class PlayerSAO : public UnitSAO
-{
+class PlayerSAO : public UnitSAO {
 public:
 	PlayerSAO(ServerEnvironment *env_, RemotePlayer *player_, session_t peer_id_,
 			bool is_singleplayer);
@@ -116,8 +111,7 @@ public:
 	u32 punch(v3f dir, const ToolCapabilities *toolcap, ServerActiveObject *puncher,
 			float time_from_last_punch, u16 initial_wear = 0) override;
 	void rightClick(ServerActiveObject *clicker) override;
-	void setHP(s32 hp, const PlayerHPChangeReason &reason) override
-	{
+	void setHP(s32 hp, const PlayerHPChangeReason &reason) override {
 		return setHP(hp, reason, false);
 	}
 	void setHP(s32 hp, const PlayerHPChangeReason &reason, bool from_client);
@@ -149,14 +143,12 @@ public:
 	// Cheat prevention
 
 	v3f getLastGoodPosition() const { return m_last_good_position; }
-	float resetTimeFromLastPunch()
-	{
+	float resetTimeFromLastPunch() {
 		float r = m_time_from_last_punch;
 		m_time_from_last_punch = 0.0;
 		return r;
 	}
-	void noCheatDigStart(const v3s16 &p)
-	{
+	void noCheatDigStart(const v3s16 &p) {
 		m_nocheat_dig_pos = p;
 		m_nocheat_dig_time = 0;
 	}
@@ -170,8 +162,7 @@ public:
 
 	// Other
 
-	void updatePrivileges(const std::set<std::string> &privs, bool is_singleplayer)
-	{
+	void updatePrivileges(const std::set<std::string> &privs, bool is_singleplayer) {
 		m_privs = privs;
 		m_is_singleplayer = is_singleplayer;
 	}
@@ -231,10 +222,8 @@ public:
 	bool m_physics_override_sent = false;
 };
 
-struct PlayerHPChangeReason
-{
-	enum Type : u8
-	{
+struct PlayerHPChangeReason {
+	enum Type : u8 {
 		SET_HP,
 		SET_HP_MAX, // internal type to allow distinguishing hp reset and damage (for effects)
 		PLAYER_PUNCH,
@@ -256,8 +245,7 @@ struct PlayerHPChangeReason
 
 	inline bool hasLuaReference() const { return lua_reference >= 0; }
 
-	bool setTypeFromString(const std::string &typestr)
-	{
+	bool setTypeFromString(const std::string &typestr) {
 		if (typestr == "set_hp")
 			type = SET_HP;
 		else if (typestr == "punch")
@@ -276,33 +264,33 @@ struct PlayerHPChangeReason
 		return true;
 	}
 
-	std::string getTypeAsString() const
-	{
+	std::string getTypeAsString() const {
 		switch (type) {
-		case PlayerHPChangeReason::SET_HP:
-		case PlayerHPChangeReason::SET_HP_MAX:
-			return "set_hp";
-		case PlayerHPChangeReason::PLAYER_PUNCH:
-			return "punch";
-		case PlayerHPChangeReason::FALL:
-			return "fall";
-		case PlayerHPChangeReason::NODE_DAMAGE:
-			return "node_damage";
-		case PlayerHPChangeReason::DROWNING:
-			return "drown";
-		case PlayerHPChangeReason::RESPAWN:
-			return "respawn";
-		default:
-			return "?";
+			case PlayerHPChangeReason::SET_HP:
+			case PlayerHPChangeReason::SET_HP_MAX:
+				return "set_hp";
+			case PlayerHPChangeReason::PLAYER_PUNCH:
+				return "punch";
+			case PlayerHPChangeReason::FALL:
+				return "fall";
+			case PlayerHPChangeReason::NODE_DAMAGE:
+				return "node_damage";
+			case PlayerHPChangeReason::DROWNING:
+				return "drown";
+			case PlayerHPChangeReason::RESPAWN:
+				return "respawn";
+			default:
+				return "?";
 		}
 	}
 
-	PlayerHPChangeReason(Type type) : type(type) {}
+	PlayerHPChangeReason(Type type) :
+			type(type) {}
 
 	PlayerHPChangeReason(Type type, ServerActiveObject *object) :
-			type(type), object(object)
-	{
+			type(type), object(object) {
 	}
 
-	PlayerHPChangeReason(Type type, std::string node, v3s16 node_pos) : type(type), node(node), node_pos(node_pos) {}
+	PlayerHPChangeReason(Type type, std::string node, v3s16 node_pos) :
+			type(type), node(node), node_pos(node_pos) {}
 };

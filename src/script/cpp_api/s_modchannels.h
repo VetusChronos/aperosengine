@@ -23,8 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 enum ModChannelSignal : u8;
 
-class ScriptApiModChannels : virtual public ScriptApiBase
-{
+class ScriptApiModChannels : virtual public ScriptApiBase {
 public:
 	void on_modchannel_message(const std::string &channel, const std::string &sender,
 			const std::string &message);

@@ -42,15 +42,13 @@ class ISimpleTextureSource;
 	CGUITable and CGUIListBox are licensed under the Irrlicht license;
 	they are Copyright (C) 2002-2012 Nikolaus Gebhardt
 */
-class GUITable : public gui::IGUIElement
-{
+class GUITable : public gui::IGUIElement {
 public:
 	/*
 		Stores dynamic data that should be preserved
 		when updating a formspec
 	*/
-	struct DynamicData
-	{
+	struct DynamicData {
 		s32 selected = 0;
 		s32 scrollpos = 0;
 		s32 keynav_time = 0;
@@ -61,15 +59,13 @@ public:
 	/*
 		An option of the form <name>=<value>
 	*/
-	struct Option
-	{
+	struct Option {
 		std::string name;
 		std::string value;
 
 		Option(const std::string &name_, const std::string &value_) :
-			name(name_),
-			value(value_)
-		{}
+				name(name_),
+				value(value_) {}
 	};
 
 	/*
@@ -80,13 +76,11 @@ public:
 	/*
 		A column with options
 	*/
-	struct TableColumn
-	{
+	struct TableColumn {
 		std::string type;
 		std::vector<Option> options;
 	};
 	typedef std::vector<TableColumn> TableColumns;
-
 
 	GUITable(gui::IGUIEnvironment *env,
 			gui::IGUIElement *parent, s32 id,
@@ -136,7 +130,7 @@ public:
 	void setDynamicData(const DynamicData &dyndata);
 
 	/* Returns "GUITable" */
-	virtual const c8* getTypeName() const;
+	virtual const c8 *getTypeName() const;
 
 	/* Must be called when position or size changes */
 	virtual void updateAbsolutePosition();
@@ -210,7 +204,7 @@ protected:
 
 	// Allocated strings and images
 	std::vector<core::stringw> m_strings;
-	std::vector<video::ITexture*> m_images;
+	std::vector<video::ITexture *> m_images;
 	std::map<std::string, s32> m_alloc_strings;
 	std::map<std::string, s32> m_alloc_images;
 

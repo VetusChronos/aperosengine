@@ -21,80 +21,79 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "exceptions.h"
 
-namespace con
-{
+namespace con {
 /*
 	Exceptions
 */
-class NotFoundException : public BaseException
-{
+class NotFoundException : public BaseException {
 public:
-	NotFoundException(const char *s) : BaseException(s) {}
+	NotFoundException(const char *s) :
+			BaseException(s) {}
 };
 
-class PeerNotFoundException : public BaseException
-{
+class PeerNotFoundException : public BaseException {
 public:
-	PeerNotFoundException(const char *s) : BaseException(s) {}
+	PeerNotFoundException(const char *s) :
+			BaseException(s) {}
 };
 
-class ConnectionException : public BaseException
-{
+class ConnectionException : public BaseException {
 public:
-	ConnectionException(const char *s) : BaseException(s) {}
+	ConnectionException(const char *s) :
+			BaseException(s) {}
 };
 
-class ConnectionBindFailed : public BaseException
-{
+class ConnectionBindFailed : public BaseException {
 public:
-	ConnectionBindFailed(const char *s) : BaseException(s) {}
+	ConnectionBindFailed(const char *s) :
+			BaseException(s) {}
 };
 
-class InvalidIncomingDataException : public BaseException
-{
+class InvalidIncomingDataException : public BaseException {
 public:
-	InvalidIncomingDataException(const char *s) : BaseException(s) {}
+	InvalidIncomingDataException(const char *s) :
+			BaseException(s) {}
 };
 
-class NoIncomingDataException : public BaseException
-{
+class NoIncomingDataException : public BaseException {
 public:
-	NoIncomingDataException(const char *s) : BaseException(s) {}
+	NoIncomingDataException(const char *s) :
+			BaseException(s) {}
 };
 
-class ProcessedSilentlyException : public BaseException
-{
+class ProcessedSilentlyException : public BaseException {
 public:
-	ProcessedSilentlyException(const char *s) : BaseException(s) {}
+	ProcessedSilentlyException(const char *s) :
+			BaseException(s) {}
 };
 
-class ProcessedQueued : public BaseException
-{
+class ProcessedQueued : public BaseException {
 public:
-	ProcessedQueued(const char *s) : BaseException(s) {}
+	ProcessedQueued(const char *s) :
+			BaseException(s) {}
 };
 
-class IncomingDataCorruption : public BaseException
-{
+class IncomingDataCorruption : public BaseException {
 public:
-	IncomingDataCorruption(const char *s) : BaseException(s) {}
+	IncomingDataCorruption(const char *s) :
+			BaseException(s) {}
 };
-}
+} //namespace con
 
-class SocketException : public BaseException
-{
+class SocketException : public BaseException {
 public:
-	SocketException(const std::string &s) : BaseException(s) {}
-};
-
-class ResolveError : public BaseException
-{
-public:
-	ResolveError(const std::string &s) : BaseException(s) {}
+	SocketException(const std::string &s) :
+			BaseException(s) {}
 };
 
-class SendFailedException : public BaseException
-{
+class ResolveError : public BaseException {
 public:
-	SendFailedException(const std::string &s) : BaseException(s) {}
+	ResolveError(const std::string &s) :
+			BaseException(s) {}
+};
+
+class SendFailedException : public BaseException {
+public:
+	SendFailedException(const std::string &s) :
+			BaseException(s) {}
 };

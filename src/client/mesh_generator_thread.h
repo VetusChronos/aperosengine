@@ -69,8 +69,7 @@ public:
 	// Marks a position as finished, unblocking the next update
 	void done(v3s16 pos);
 
-	u32 size()
-	{
+	u32 size() {
 		MutexAutoLock lock(m_mutex);
 		return m_queue.size();
 	}
@@ -131,7 +130,6 @@ public:
 	void putResult(const MeshUpdateResult &r);
 	bool getNextResult(MeshUpdateResult &r);
 
-
 	v3s16 m_camera_offset;
 
 	void start();
@@ -142,7 +140,6 @@ public:
 
 private:
 	void deferUpdate();
-
 
 	MeshUpdateQueue m_queue_in;
 	MutexedQueue<MeshUpdateResult> m_queue_out;

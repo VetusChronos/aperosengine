@@ -28,13 +28,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "threading/thread.h"
 #include "connection_internal.h"
 
-namespace con
-{
+namespace con {
 
 class Connection;
 
-struct OutgoingPacket
-{
+struct OutgoingPacket {
 	session_t peer_id;
 	u8 channelnum;
 	SharedBuffer<u8> data;
@@ -42,19 +40,16 @@ struct OutgoingPacket
 	bool ack;
 
 	OutgoingPacket(session_t peer_id_, u8 channelnum_, const SharedBuffer<u8> &data_,
-			bool reliable_,bool ack_=false):
-		peer_id(peer_id_),
-		channelnum(channelnum_),
-		data(data_),
-		reliable(reliable_),
-		ack(ack_)
-	{
+			bool reliable_, bool ack_ = false) :
+			peer_id(peer_id_),
+			channelnum(channelnum_),
+			data(data_),
+			reliable(reliable_),
+			ack(ack_) {
 	}
 };
 
-class ConnectionSendThread : public Thread
-{
-
+class ConnectionSendThread : public Thread {
 public:
 	friend class UDPPeer;
 
@@ -64,8 +59,7 @@ public:
 
 	void Trigger();
 
-	void setParent(Connection *parent)
-	{
+	void setParent(Connection *parent) {
 		assert(parent != NULL); // Pre-condition
 		m_connection = parent;
 	}
@@ -110,15 +104,13 @@ private:
 	unsigned int m_max_packets_requeued = 256;
 };
 
-class ConnectionReceiveThread : public Thread
-{
+class ConnectionReceiveThread : public Thread {
 public:
 	ConnectionReceiveThread();
 
 	void *run();
 
-	void setParent(Connection *parent)
-	{
+	void setParent(Connection *parent) {
 		assert(parent); // Pre-condition
 		m_connection = parent;
 	}
@@ -159,8 +151,7 @@ private:
 			const SharedBuffer<u8> &packetdata, Peer *peer, u8 channelnum,
 			bool reliable);
 
-	struct PacketTypeHandler
-	{
+	struct PacketTypeHandler {
 		SharedBuffer<u8> (ConnectionReceiveThread::*handler)(Channel *channel,
 				const SharedBuffer<u8> &packet, Peer *peer, u8 channelnum,
 				bool reliable);
@@ -187,4 +178,4 @@ private:
 
 	RateLimitHelper m_new_peer_ratelimit;
 };
-}
+} //namespace con

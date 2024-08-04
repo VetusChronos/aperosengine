@@ -24,20 +24,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "constants.h" // BS
 #include "log.h"
 
-ServerActiveObject::ServerActiveObject(ServerEnvironment *env, v3f pos):
-	ActiveObject(0),
-	m_env(env),
-	m_base_position(pos)
-{
+ServerActiveObject::ServerActiveObject(ServerEnvironment *env, v3f pos) :
+		ActiveObject(0),
+		m_env(env),
+		m_base_position(pos) {
 }
 
-float ServerActiveObject::getMinimumSavedMovement()
-{
-	return 2.0*BS;
+float ServerActiveObject::getMinimumSavedMovement() {
+	return 2.0 * BS;
 }
 
-ItemStack ServerActiveObject::getWieldedItem(ItemStack *selected, ItemStack *hand) const
-{
+ItemStack ServerActiveObject::getWieldedItem(ItemStack *selected, ItemStack *hand) const {
 	*selected = ItemStack();
 	if (hand)
 		*hand = ItemStack();
@@ -45,13 +42,11 @@ ItemStack ServerActiveObject::getWieldedItem(ItemStack *selected, ItemStack *han
 	return ItemStack();
 }
 
-bool ServerActiveObject::setWieldedItem(const ItemStack &item)
-{
+bool ServerActiveObject::setWieldedItem(const ItemStack &item) {
 	return false;
 }
 
-std::string ServerActiveObject::generateUpdateInfantCommand(u16 infant_id, u16 protocol_version)
-{
+std::string ServerActiveObject::generateUpdateInfantCommand(u16 infant_id, u16 protocol_version) {
 	std::ostringstream os(std::ios::binary);
 	// command
 	writeU8(os, AO_CMD_SPAWN_INFANT);
@@ -67,31 +62,27 @@ std::string ServerActiveObject::generateUpdateInfantCommand(u16 infant_id, u16 p
 	return os.str();
 }
 
-void ServerActiveObject::dumpAOMessagesToQueue(std::queue<ActiveObjectMessage> &queue)
-{
+void ServerActiveObject::dumpAOMessagesToQueue(std::queue<ActiveObjectMessage> &queue) {
 	while (!m_messages_out.empty()) {
 		queue.push(std::move(m_messages_out.front()));
 		m_messages_out.pop();
 	}
 }
 
-void ServerActiveObject::markForRemoval()
-{
+void ServerActiveObject::markForRemoval() {
 	if (!m_pending_removal) {
 		onMarkedForRemoval();
 		m_pending_removal = true;
 	}
 }
 
-void ServerActiveObject::markForDeactivation()
-{
+void ServerActiveObject::markForDeactivation() {
 	if (!m_pending_deactivation) {
 		onMarkedForDeactivation();
 		m_pending_deactivation = true;
 	}
 }
 
-InventoryLocation ServerActiveObject::getInventoryLocation() const
-{
+InventoryLocation ServerActiveObject::getInventoryLocation() const {
 	return InventoryLocation();
 }

@@ -79,34 +79,32 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	Should never be touched.
 */
 content_t trans_table_19[21][2] = {
-	{CONTENT_GRASS, 1},
-	{CONTENT_TREE, 4},
-	{CONTENT_LEAVES, 5},
-	{CONTENT_GRASS_FOOTSTEPS, 6},
-	{CONTENT_MESE, 7},
-	{CONTENT_MUD, 8},
-	{CONTENT_CLOUD, 10},
-	{CONTENT_COALSTONE, 11},
-	{CONTENT_WOOD, 12},
-	{CONTENT_SAND, 13},
-	{CONTENT_COBBLE, 18},
-	{CONTENT_STEEL, 19},
-	{CONTENT_GLASS, 20},
-	{CONTENT_MOSSYCOBBLE, 22},
-	{CONTENT_GRAVEL, 23},
-	{CONTENT_SANDSTONE, 24},
-	{CONTENT_CACTUS, 25},
-	{CONTENT_BRICK, 26},
-	{CONTENT_CLAY, 27},
-	{CONTENT_PAPYRUS, 28},
-	{CONTENT_BOOKSHELF, 29},
+	{ CONTENT_GRASS, 1 },
+	{ CONTENT_TREE, 4 },
+	{ CONTENT_LEAVES, 5 },
+	{ CONTENT_GRASS_FOOTSTEPS, 6 },
+	{ CONTENT_MESE, 7 },
+	{ CONTENT_MUD, 8 },
+	{ CONTENT_CLOUD, 10 },
+	{ CONTENT_COALSTONE, 11 },
+	{ CONTENT_WOOD, 12 },
+	{ CONTENT_SAND, 13 },
+	{ CONTENT_COBBLE, 18 },
+	{ CONTENT_STEEL, 19 },
+	{ CONTENT_GLASS, 20 },
+	{ CONTENT_MOSSYCOBBLE, 22 },
+	{ CONTENT_GRAVEL, 23 },
+	{ CONTENT_SANDSTONE, 24 },
+	{ CONTENT_CACTUS, 25 },
+	{ CONTENT_BRICK, 26 },
+	{ CONTENT_CLAY, 27 },
+	{ CONTENT_PAPYRUS, 28 },
+	{ CONTENT_BOOKSHELF, 29 },
 };
 
-MapNode mapnode_translate_to_internal(MapNode n_from, u8 version)
-{
+MapNode mapnode_translate_to_internal(MapNode n_from, u8 version) {
 	MapNode result = n_from;
-	if(version <= 19)
-	{
+	if (version <= 19) {
 		content_t c_from = n_from.getContent();
 		for (const auto &tt_i : trans_table_19) {
 			if (tt_i[1] == c_from) {
@@ -118,8 +116,7 @@ MapNode mapnode_translate_to_internal(MapNode n_from, u8 version)
 	return result;
 }
 
-void content_mapnode_get_name_id_mapping(NameIdMapping *nimap)
-{
+void content_mapnode_get_name_id_mapping(NameIdMapping *nimap) {
 	nimap->set(0, "default:stone");
 	nimap->set(2, "default:water_flowing");
 	nimap->set(3, "default:torch");
@@ -164,4 +161,3 @@ void content_mapnode_get_name_id_mapping(NameIdMapping *nimap)
 	nimap->set(CONTENT_IGNORE, "ignore");
 	nimap->set(CONTENT_AIR, "air");
 }
-

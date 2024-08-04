@@ -21,8 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "profiler.h"
 
-class TestProfiler : public TestBase
-{
+class TestProfiler : public TestBase {
 public:
 	TestProfiler() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestProfiler"; }
@@ -34,15 +33,13 @@ public:
 
 static TestProfiler g_test_instance;
 
-void TestProfiler::runTests(IGameDef *gamedef)
-{
+void TestProfiler::runTests(IGameDef *gamedef) {
 	TEST(testProfilerAverage);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestProfiler::testProfilerAverage()
-{
+void TestProfiler::testProfilerAverage() {
 	Profiler p;
 
 	p.avg("Test1", 1.f);

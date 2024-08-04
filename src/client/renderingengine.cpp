@@ -46,13 +46,11 @@ const float RenderingEngine::BASE_BLOOM_STRENGTH = 1.0f;
 
 /* Helper classes */
 
-void FpsControl::reset()
-{
+void FpsControl::reset() {
 	last_time = porting::getTimeUs();
 }
 
-void FpsControl::limit(IrrlichtDevice *device, f32 *dtime, bool assume_paused)
-{
+void FpsControl::limit(IrrlichtDevice *device, f32 *dtime, bool assume_paused) {
 	const float fps_limit = (device->isWindowFocused() && !assume_paused)
 			? g_settings->getFloat("fps_max")
 			: g_settings->getFloat("fps_max_unfocused");
@@ -85,15 +83,13 @@ void FpsControl::limit(IrrlichtDevice *device, f32 *dtime, bool assume_paused)
 	last_time = time;
 }
 
-class FogShaderConstantSetter : public IShaderConstantSetter
-{
-	CachedPixelShaderSetting<float, 4> m_fog_color{"fogColor"};
-	CachedPixelShaderSetting<float> m_fog_distance{"fogDistance"};
-	CachedPixelShaderSetting<float> m_fog_shading_parameter{"fogShadingParameter"};
+class FogShaderConstantSetter : public IShaderConstantSetter {
+	CachedPixelShaderSetting<float, 4> m_fog_color{ "fogColor" };
+	CachedPixelShaderSetting<float> m_fog_distance{ "fogDistance" };
+	CachedPixelShaderSetting<float> m_fog_shading_parameter{ "fogShadingParameter" };
 
 public:
-	void onSetConstants(video::IMaterialRendererServices *services) override
-	{
+	void onSetConstants(video::IMaterialRendererServices *services) override {
 		auto *driver = services->getVideoDriver();
 		assert(driver);
 
@@ -119,22 +115,20 @@ public:
 	}
 };
 
-IShaderConstantSetter *FogShaderConstantSetterFactory::create()
-{
+IShaderConstantSetter *FogShaderConstantSetterFactory::create() {
 	return new FogShaderConstantSetter();
 }
 
 /* Other helpers */
 
 static gui::GUISkin *createSkin(gui::IGUIEnvironment *environment,
-		gui::EGUI_SKIN_TYPE type, video::IVideoDriver *driver)
-{
+		gui::EGUI_SKIN_TYPE type, video::IVideoDriver *driver) {
 	gui::GUISkin *skin = new gui::GUISkin(type, driver);
 
 	gui::IGUIFont *builtinfont = environment->getBuiltInFont();
 	gui::IGUIFontBitmap *bitfont = nullptr;
 	if (builtinfont && builtinfont->getType() == gui::EGFT_BITMAP)
-		bitfont = (gui::IGUIFontBitmap*)builtinfont;
+		bitfont = (gui::IGUIFontBitmap *)builtinfont;
 
 	gui::IGUISpriteBank *bank = 0;
 	skin->setFont(builtinfont);
@@ -147,14 +141,13 @@ static gui::GUISkin *createSkin(gui::IGUIEnvironment *environment,
 	return skin;
 }
 
-static std::optional<video::E_DRIVER_TYPE> chooseVideoDriver()
-{
+static std::optional<video::E_DRIVER_TYPE> chooseVideoDriver() {
 	auto &&configured_name = g_settings->get("video_driver");
 	if (configured_name.empty())
 		return std::nullopt;
 
 	auto &&drivers = RenderingEngine::getSupportedVideoDrivers();
-	for (auto driver: drivers) {
+	for (auto driver : drivers) {
 		auto &&info = RenderingEngine::getVideoDriverInfo(driver);
 		if (!strcasecmp(configured_name.c_str(), info.name.c_str()))
 			return driver;
@@ -164,13 +157,11 @@ static std::optional<video::E_DRIVER_TYPE> chooseVideoDriver()
 	return std::nullopt;
 }
 
-static inline auto getVideoDriverName(video::E_DRIVER_TYPE driver)
-{
+static inline auto getVideoDriverName(video::E_DRIVER_TYPE driver) {
 	return RenderingEngine::getVideoDriverInfo(driver).friendly_name;
 }
 
-static irr::IrrlichtDevice *createDevice(SIrrlichtCreationParameters params, std::optional<video::E_DRIVER_TYPE> requested_driver)
-{
+static irr::IrrlichtDevice *createDevice(SIrrlichtCreationParameters params, std::optional<video::E_DRIVER_TYPE> requested_driver) {
 	if (requested_driver) {
 		params.DriverType = *requested_driver;
 		verbosestream << "Trying video driver " << getVideoDriverName(params.DriverType) << '\n';
@@ -181,7 +172,7 @@ static irr::IrrlichtDevice *createDevice(SIrrlichtCreationParameters params, std
 	sanity_check(requested_driver != video::EDT_NULL);
 
 	// try to find any working video driver
-	for (auto fallback_driver: RenderingEngine::getSupportedVideoDrivers()) {
+	for (auto fallback_driver : RenderingEngine::getSupportedVideoDrivers()) {
 		if (fallback_driver == video::EDT_NULL || fallback_driver == requested_driver)
 			continue;
 		params.DriverType = fallback_driver;
@@ -195,8 +186,7 @@ static irr::IrrlichtDevice *createDevice(SIrrlichtCreationParameters params, std
 
 /* RenderingEngine class */
 
-RenderingEngine::RenderingEngine(IEventReceiver *receiver)
-{
+RenderingEngine::RenderingEngine(IEventReceiver *receiver) {
 	sanity_check(!s_singleton);
 
 	// Resolution selection
@@ -237,8 +227,7 @@ RenderingEngine::RenderingEngine(IEventReceiver *receiver)
 	params.DriverDebug = g_settings->getBool("opengl_debug");
 
 	// there is no standardized path for these on desktop
-	std::string rel_path = std::string("client") + DIR_DELIM
-			+ "shaders" + DIR_DELIM + "Irrlicht";
+	std::string rel_path = std::string("client") + DIR_DELIM + "shaders" + DIR_DELIM + "Irrlicht";
 	params.OGLES2ShaderPath = (porting::path_share + DIR_DELIM + rel_path + DIR_DELIM).c_str();
 
 	m_device = createDevice(params, driverType);
@@ -258,8 +247,7 @@ RenderingEngine::RenderingEngine(IEventReceiver *receiver)
 	g_settings->registerChangedCallback("window_maximized", settingChangedCallback, this);
 }
 
-RenderingEngine::~RenderingEngine()
-{
+RenderingEngine::~RenderingEngine() {
 	sanity_check(s_singleton == this);
 
 	g_settings->deregisterChangedCallback("fullscreen", settingChangedCallback, this);
@@ -271,9 +259,8 @@ RenderingEngine::~RenderingEngine()
 	s_singleton = nullptr;
 }
 
-void RenderingEngine::settingChangedCallback(const std::string &name, void *data)
-{
-	IrrlichtDevice *device = static_cast<RenderingEngine*>(data)->m_device;
+void RenderingEngine::settingChangedCallback(const std::string &name, void *data) {
+	IrrlichtDevice *device = static_cast<RenderingEngine *>(data)->m_device;
 	if (name == "fullscreen") {
 		device->setFullscreen(g_settings->getBool("fullscreen"));
 
@@ -287,36 +274,30 @@ void RenderingEngine::settingChangedCallback(const std::string &name, void *data
 	}
 }
 
-v2u32 RenderingEngine::_getWindowSize() const
-{
+v2u32 RenderingEngine::_getWindowSize() const {
 	if (core)
 		return core->getVirtualSize();
 	return m_device->getVideoDriver()->getScreenSize();
 }
 
-void RenderingEngine::setResizable(bool resize)
-{
+void RenderingEngine::setResizable(bool resize) {
 	m_device->setResizable(resize);
 }
 
-void RenderingEngine::removeMesh(const scene::IMesh* mesh)
-{
+void RenderingEngine::removeMesh(const scene::IMesh *mesh) {
 	m_device->getSceneManager()->getMeshCache()->removeMesh(mesh);
 }
 
-void RenderingEngine::cleanupMeshCache()
-{
+void RenderingEngine::cleanupMeshCache() {
 	auto mesh_cache = m_device->getSceneManager()->getMeshCache();
 	mesh_cache->clear();
 }
 
-bool RenderingEngine::setupTopLevelWindow()
-{
+bool RenderingEngine::setupTopLevelWindow() {
 	return setWindowIcon();
 }
 
-bool RenderingEngine::setWindowIcon()
-{
+bool RenderingEngine::setWindowIcon() {
 	irr_ptr<video::IImage> img(driver->createImageFromFile(
 			(porting::path_share + "/textures/base/pack/logo.png").c_str()));
 	if (!img) {
@@ -334,8 +315,7 @@ bool RenderingEngine::setWindowIcon()
 */
 void RenderingEngine::draw_load_screen(const std::wstring &text,
 		gui::IGUIEnvironment *guienv, ITextureSource *tsrc, float dtime,
-		int percent, float *indef_pos)
-{
+		int percent, float *indef_pos) {
 	v2u32 screensize = getWindowSize();
 
 	v2s32 textsize(g_fontengine->getTextWidth(text), g_fontengine->getLineHeight());
@@ -359,8 +339,8 @@ void RenderingEngine::draw_load_screen(const std::wstring &text,
 	int percent_max = percent;
 	if (indef_pos) {
 		*indef_pos = fmodf(*indef_pos + (dtime * 50.0f), 140.0f);
-		percent_max = std::min((int) *indef_pos, 100);
-		percent_min = std::max((int) *indef_pos - 40, 0);
+		percent_max = std::min((int)*indef_pos, 100);
+		percent_min = std::max((int)*indef_pos - 40, 0);
 	}
 	// draw progress bar
 	if ((percent_min >= 0) && (percent_max <= 100)) {
@@ -409,8 +389,7 @@ void RenderingEngine::draw_load_screen(const std::wstring &text,
 	guitext->remove();
 }
 
-std::vector<video::E_DRIVER_TYPE> RenderingEngine::getSupportedVideoDrivers()
-{
+std::vector<video::E_DRIVER_TYPE> RenderingEngine::getSupportedVideoDrivers() {
 	// Only check these drivers. We do not support software and D3D in any capacity.
 	// Order by preference (best first)
 	static const video::E_DRIVER_TYPE glDrivers[] = {
@@ -422,7 +401,7 @@ std::vector<video::E_DRIVER_TYPE> RenderingEngine::getSupportedVideoDrivers()
 	};
 	std::vector<video::E_DRIVER_TYPE> drivers;
 
-	for (video::E_DRIVER_TYPE driver: glDrivers) {
+	for (video::E_DRIVER_TYPE driver : glDrivers) {
 		if (IrrlichtDevice::isDriverSupported(driver))
 			drivers.push_back(driver);
 	}
@@ -430,37 +409,32 @@ std::vector<video::E_DRIVER_TYPE> RenderingEngine::getSupportedVideoDrivers()
 	return drivers;
 }
 
-void RenderingEngine::initialize(Client *client, Hud *hud)
-{
+void RenderingEngine::initialize(Client *client, Hud *hud) {
 	const std::string &draw_mode = g_settings->get("3d_mode");
 	core.reset(createRenderingCore(draw_mode, m_device, client, hud));
 }
 
-void RenderingEngine::finalize()
-{
+void RenderingEngine::finalize() {
 	core.reset();
 }
 
 void RenderingEngine::draw_scene(video::SColor skycolor, bool show_hud,
-		bool draw_wield_tool, bool draw_crosshair)
-{
+		bool draw_wield_tool, bool draw_crosshair) {
 	core->draw(skycolor, show_hud, draw_wield_tool, draw_crosshair);
 }
 
-const VideoDriverInfo &RenderingEngine::getVideoDriverInfo(irr::video::E_DRIVER_TYPE type)
-{
+const VideoDriverInfo &RenderingEngine::getVideoDriverInfo(irr::video::E_DRIVER_TYPE type) {
 	static const std::unordered_map<int, VideoDriverInfo> driver_info_map = {
-		{(int)video::EDT_NULL,   {"null",   "NULL Driver"}},
-		{(int)video::EDT_OPENGL, {"opengl", "OpenGL"}},
-		{(int)video::EDT_OPENGL3, {"opengl3", "OpenGL 3+"}},
-		{(int)video::EDT_OGLES1, {"ogles1", "OpenGL ES1"}},
-		{(int)video::EDT_OGLES2, {"ogles2", "OpenGL ES2"}},
+		{ (int)video::EDT_NULL, { "null", "NULL Driver" } },
+		{ (int)video::EDT_OPENGL, { "opengl", "OpenGL" } },
+		{ (int)video::EDT_OPENGL3, { "opengl3", "OpenGL 3+" } },
+		{ (int)video::EDT_OGLES1, { "ogles1", "OpenGL ES1" } },
+		{ (int)video::EDT_OGLES2, { "ogles2", "OpenGL ES2" } },
 	};
 	return driver_info_map.at((int)type);
 }
 
-float RenderingEngine::getDisplayDensity()
-{
+float RenderingEngine::getDisplayDensity() {
 	float user_factor = g_settings->getFloat("display_density_factor", 0.5f, 5.0f);
 #ifndef __ANDROID__
 	float dpi = get_raw_device()->getDisplayDensity();
@@ -474,8 +448,7 @@ float RenderingEngine::getDisplayDensity()
 
 void RenderingEngine::autosaveScreensizeAndCo(
 		const irr::core::dimension2d<u32> initial_screen_size,
-		const bool initial_window_maximized)
-{
+		const bool initial_window_maximized) {
 	if (!g_settings->getBool("autosave_screensize"))
 		return;
 
@@ -488,7 +461,7 @@ void RenderingEngine::autosaveScreensizeAndCo(
 	bool fullscreen = RenderingEngine::get_raw_device()->isFullscreen();
 	// Screen size
 	const irr::core::dimension2d<u32> current_screen_size =
-		RenderingEngine::get_video_driver()->getScreenSize();
+			RenderingEngine::get_video_driver()->getScreenSize();
 	// Don't replace good value with (0, 0)
 	if (!fullscreen &&
 			current_screen_size != irr::core::dimension2d<u32>(0, 0) &&
@@ -499,7 +472,7 @@ void RenderingEngine::autosaveScreensizeAndCo(
 
 	// Window maximized
 	const bool is_window_maximized = RenderingEngine::get_raw_device()
-			->isWindowMaximized();
+											 ->isWindowMaximized();
 	if (is_window_maximized != initial_window_maximized)
 		g_settings->setBool("window_maximized", is_window_maximized);
 }

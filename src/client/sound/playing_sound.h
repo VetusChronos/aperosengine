@@ -25,7 +25,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include "sound_data.h"
-namespace sound { struct ALExtensions; }
+namespace sound {
+struct ALExtensions;
+}
 
 namespace sound {
 
@@ -34,8 +36,7 @@ namespace sound {
  * Can be streaming.
  * Can be fading.
  */
-class PlayingSound final
-{
+class PlayingSound final {
 	struct FadeState {
 		f32 step;
 		f32 target_gain;
@@ -55,8 +56,7 @@ public:
 			const std::optional<std::pair<v3f, v3f>> &pos_vel_opt,
 			const ALExtensions &exts [[maybe_unused]]);
 
-	~PlayingSound() noexcept
-	{
+	~PlayingSound() noexcept {
 		alDeleteSources(1, &m_source_id);
 	}
 
@@ -84,27 +84,23 @@ public:
 	void play() noexcept { alSourcePlay(m_source_id); }
 
 	// returns one of AL_INITIAL, AL_PLAYING, AL_PAUSED, AL_STOPPED
-	ALint getState() noexcept
-	{
+	ALint getState() noexcept {
 		ALint state;
 		alGetSourcei(m_source_id, AL_SOURCE_STATE, &state);
 		return state;
 	}
 
-	bool isDead() noexcept
-	{
+	bool isDead() noexcept {
 		// streaming sounds can (but should not) stop because the queue runs empty
 		return m_stopped_means_dead && getState() == AL_STOPPED;
 	}
 
-	void pause() noexcept
-	{
+	void pause() noexcept {
 		// this is a NOP if state != AL_PLAYING
 		alSourcePause(m_source_id);
 	}
 
-	void resume() noexcept
-	{
+	void resume() noexcept {
 		if (getState() == AL_PAUSED)
 			play();
 	}

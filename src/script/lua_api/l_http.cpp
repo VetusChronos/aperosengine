@@ -29,14 +29,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <iomanip>
 
-#define HTTP_API(name) \
-	lua_pushstring(L, #name); \
+#define HTTP_API(name)                   \
+	lua_pushstring(L, #name);            \
 	lua_pushcfunction(L, l_http_##name); \
 	lua_settable(L, -3);
 
 #if USE_CURL
-void ModApiHttp::read_http_fetch_request(lua_State *L, HTTPFetchRequest &req)
-{
+void ModApiHttp::read_http_fetch_request(lua_State *L, HTTPFetchRequest &req) {
 	luaL_checktype(L, 1, LUA_TTABLE);
 
 	req.caller = httpfetch_caller_alloc_secure();
@@ -65,8 +64,7 @@ void ModApiHttp::read_http_fetch_request(lua_State *L, HTTPFetchRequest &req)
 	if (lua_isnil(L, 2)) {
 		lua_pop(L, 1);
 		lua_getfield(L, 1, "data");
-	}
-	else {
+	} else {
 		req.method = HTTP_POST;
 	}
 
@@ -93,8 +91,7 @@ void ModApiHttp::read_http_fetch_request(lua_State *L, HTTPFetchRequest &req)
 	lua_pop(L, 1);
 }
 
-void ModApiHttp::push_http_fetch_result(lua_State *L, HTTPFetchResult &res, bool completed)
-{
+void ModApiHttp::push_http_fetch_result(lua_State *L, HTTPFetchResult &res, bool completed) {
 	lua_newtable(L);
 	setboolfield(L, -1, "succeeded", res.succeeded);
 	setboolfield(L, -1, "timeout", res.timeout);
@@ -104,8 +101,7 @@ void ModApiHttp::push_http_fetch_result(lua_State *L, HTTPFetchResult &res, bool
 }
 
 // http_api.fetch_sync(HTTPRequest definition)
-int ModApiHttp::l_http_fetch_sync(lua_State *L)
-{
+int ModApiHttp::l_http_fetch_sync(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	HTTPFetchRequest req;
@@ -122,8 +118,7 @@ int ModApiHttp::l_http_fetch_sync(lua_State *L)
 }
 
 // http_api.fetch_async(HTTPRequest definition)
-int ModApiHttp::l_http_fetch_async(lua_State *L)
-{
+int ModApiHttp::l_http_fetch_async(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	HTTPFetchRequest req;
@@ -142,8 +137,7 @@ int ModApiHttp::l_http_fetch_async(lua_State *L)
 }
 
 // http_api.fetch_async_get(handle)
-int ModApiHttp::l_http_fetch_async_get(lua_State *L)
-{
+int ModApiHttp::l_http_fetch_async_get(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	std::string handle_str = luaL_checkstring(L, 1);
@@ -162,8 +156,7 @@ int ModApiHttp::l_http_fetch_async_get(lua_State *L)
 	return 1;
 }
 
-int ModApiHttp::l_request_http_api(lua_State *L)
-{
+int ModApiHttp::l_request_http_api(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	if (!ScriptApiSecurity::checkWhitelisted(L, "secure.http_mods") &&
@@ -187,8 +180,7 @@ int ModApiHttp::l_request_http_api(lua_State *L)
 	return 1;
 }
 
-int ModApiHttp::l_get_http_api(lua_State *L)
-{
+int ModApiHttp::l_get_http_api(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	lua_newtable(L);
@@ -201,8 +193,7 @@ int ModApiHttp::l_get_http_api(lua_State *L)
 
 #endif
 
-int ModApiHttp::l_set_http_api_lua(lua_State *L)
-{
+int ModApiHttp::l_set_http_api_lua(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 #if USE_CURL
@@ -217,8 +208,7 @@ int ModApiHttp::l_set_http_api_lua(lua_State *L)
 	return 0;
 }
 
-void ModApiHttp::Initialize(lua_State *L, int top)
-{
+void ModApiHttp::Initialize(lua_State *L, int top) {
 #if USE_CURL
 
 	bool isMainmenu = false;
@@ -241,8 +231,7 @@ void ModApiHttp::Initialize(lua_State *L, int top)
 #endif
 }
 
-void ModApiHttp::InitializeAsync(lua_State *L, int top)
-{
+void ModApiHttp::InitializeAsync(lua_State *L, int top) {
 #if USE_CURL
 	API_FCT(get_http_api);
 #endif

@@ -32,8 +32,7 @@ class ShadowRenderer;
 /*
  * Holds color information of an item mesh's buffer.
  */
-class ItemPartColor
-{
+class ItemPartColor {
 	/*
 	 * Optional color that overrides the global base color.
 	 */
@@ -48,12 +47,10 @@ class ItemPartColor
 	bool last_colorized_set = false;
 
 public:
-
 	ItemPartColor() = default;
 
 	ItemPartColor(bool override, video::SColor color) :
-		override_color(color), override_color_set(override)
-	{}
+			override_color(color), override_color_set(override) {}
 
 	void applyOverride(video::SColor &dest) const {
 		if (override_color_set)
@@ -69,8 +66,7 @@ public:
 	}
 };
 
-struct ItemMesh
-{
+struct ItemMesh {
 	scene::IMesh *mesh = nullptr;
 	/*
 	 * Stores the color of each mesh buffer.
@@ -88,8 +84,7 @@ struct ItemMesh
 /*
 	Wield item scene node, renders the wield mesh of some item
 */
-class WieldMeshSceneNode : public scene::ISceneNode
-{
+class WieldMeshSceneNode : public scene::ISceneNode {
 public:
 	WieldMeshSceneNode(scene::ISceneManager *mgr, s32 id = -1, bool lighting = false);
 	virtual ~WieldMeshSceneNode();

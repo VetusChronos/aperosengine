@@ -19,10 +19,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <activeobject.h>
 
-class MockActiveObject : public ActiveObject
-{
+class MockActiveObject : public ActiveObject {
 public:
-	MockActiveObject(u16 id) : ActiveObject(id) {}
+	MockActiveObject(u16 id) :
+			ActiveObject(id) {}
 
 	virtual ActiveObjectType getType() const { return ACTIVEOBJECT_TYPE_TEST; }
 	virtual bool getCollisionBox(aabb3f *toset) const { return false; }

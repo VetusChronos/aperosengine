@@ -25,12 +25,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/camera.h"
 #include "client/client.h"
 
-LuaCamera::LuaCamera(Camera *m) : m_camera(m)
-{
+LuaCamera::LuaCamera(Camera *m) :
+		m_camera(m) {
 }
 
-void LuaCamera::create(lua_State *L, Camera *m)
-{
+void LuaCamera::create(lua_State *L, Camera *m) {
 	lua_getglobal(L, "core");
 	luaL_checktype(L, -1, LUA_TTABLE);
 	int objectstable = lua_gettop(L);
@@ -52,8 +51,7 @@ void LuaCamera::create(lua_State *L, Camera *m)
 }
 
 // set_camera_mode(self, mode)
-int LuaCamera::l_set_camera_mode(lua_State *L)
-{
+int LuaCamera::l_set_camera_mode(lua_State *L) {
 	Camera *camera = getobject(L, 1);
 	GenericCAO *playercao = getClient(L)->getEnv().getLocalPlayer()->getCAO();
 	if (!camera)
@@ -70,8 +68,7 @@ int LuaCamera::l_set_camera_mode(lua_State *L)
 }
 
 // get_camera_mode(self)
-int LuaCamera::l_get_camera_mode(lua_State *L)
-{
+int LuaCamera::l_get_camera_mode(lua_State *L) {
 	Camera *camera = getobject(L, 1);
 	if (!camera)
 		return 0;
@@ -82,8 +79,7 @@ int LuaCamera::l_get_camera_mode(lua_State *L)
 }
 
 // get_fov(self)
-int LuaCamera::l_get_fov(lua_State *L)
-{
+int LuaCamera::l_get_fov(lua_State *L) {
 	Camera *camera = getobject(L, 1);
 	if (!camera)
 		return 0;
@@ -101,8 +97,7 @@ int LuaCamera::l_get_fov(lua_State *L)
 }
 
 // get_pos(self)
-int LuaCamera::l_get_pos(lua_State *L)
-{
+int LuaCamera::l_get_pos(lua_State *L) {
 	Camera *camera = getobject(L, 1);
 	if (!camera)
 		return 0;
@@ -112,8 +107,7 @@ int LuaCamera::l_get_pos(lua_State *L)
 }
 
 // get_offset(self)
-int LuaCamera::l_get_offset(lua_State *L)
-{
+int LuaCamera::l_get_offset(lua_State *L) {
 	LocalPlayer *player = getClient(L)->getEnv().getLocalPlayer();
 	sanity_check(player);
 
@@ -122,8 +116,7 @@ int LuaCamera::l_get_offset(lua_State *L)
 }
 
 // get_look_dir(self)
-int LuaCamera::l_get_look_dir(lua_State *L)
-{
+int LuaCamera::l_get_look_dir(lua_State *L) {
 	Camera *camera = getobject(L, 1);
 	if (!camera)
 		return 0;
@@ -134,8 +127,7 @@ int LuaCamera::l_get_look_dir(lua_State *L)
 
 // get_look_horizontal(self)
 // FIXME: wouldn't localplayer be a better place for this?
-int LuaCamera::l_get_look_horizontal(lua_State *L)
-{
+int LuaCamera::l_get_look_horizontal(lua_State *L) {
 	LocalPlayer *player = getClient(L)->getEnv().getLocalPlayer();
 	sanity_check(player);
 
@@ -145,8 +137,7 @@ int LuaCamera::l_get_look_horizontal(lua_State *L)
 
 // get_look_vertical(self)
 // FIXME: wouldn't localplayer be a better place for this?
-int LuaCamera::l_get_look_vertical(lua_State *L)
-{
+int LuaCamera::l_get_look_vertical(lua_State *L) {
 	LocalPlayer *player = getClient(L)->getEnv().getLocalPlayer();
 	sanity_check(player);
 
@@ -155,8 +146,7 @@ int LuaCamera::l_get_look_vertical(lua_State *L)
 }
 
 // get_aspect_ratio(self)
-int LuaCamera::l_get_aspect_ratio(lua_State *L)
-{
+int LuaCamera::l_get_aspect_ratio(lua_State *L) {
 	Camera *camera = getobject(L, 1);
 	if (!camera)
 		return 0;
@@ -165,30 +155,26 @@ int LuaCamera::l_get_aspect_ratio(lua_State *L)
 	return 1;
 }
 
-Camera *LuaCamera::getobject(LuaCamera *ref)
-{
+Camera *LuaCamera::getobject(LuaCamera *ref) {
 	return ref->m_camera;
 }
 
-Camera *LuaCamera::getobject(lua_State *L, int narg)
-{
+Camera *LuaCamera::getobject(lua_State *L, int narg) {
 	LuaCamera *ref = checkObject<LuaCamera>(L, narg);
 	assert(ref);
 	return getobject(ref);
 }
 
-int LuaCamera::gc_object(lua_State *L)
-{
+int LuaCamera::gc_object(lua_State *L) {
 	LuaCamera *o = *(LuaCamera **)(lua_touserdata(L, 1));
 	delete o;
 	return 0;
 }
 
-void LuaCamera::Register(lua_State *L)
-{
+void LuaCamera::Register(lua_State *L) {
 	static const luaL_Reg metamethods[] = {
-		{"__gc", gc_object},
-		{0, 0}
+		{ "__gc", gc_object },
+		{ 0, 0 }
 	};
 	registerClass(L, className, methods, metamethods);
 }
@@ -205,5 +191,5 @@ const luaL_Reg LuaCamera::methods[] = {
 	luamethod(LuaCamera, get_look_horizontal),
 	luamethod(LuaCamera, get_aspect_ratio),
 
-	{0, 0}
+	{ 0, 0 }
 };

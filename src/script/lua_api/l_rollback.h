@@ -21,8 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "lua_api/l_base.h"
 
-class ModApiRollback : public ModApiBase
-{
+class ModApiRollback : public ModApiBase {
 private:
 	// rollback_get_node_actions(pos, range, seconds) -> {{actor, pos, time, oldnode, newnode}, ...}
 	static int l_rollback_get_node_actions(lua_State *L);

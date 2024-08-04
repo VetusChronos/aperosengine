@@ -25,7 +25,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <unordered_map>
 #include <unordered_set>
 
-
 class ClientEnvironment;
 class ITextureSource;
 class Client;
@@ -34,8 +33,7 @@ class LocalPlayer;
 struct ItemStack;
 class WieldMeshSceneNode;
 
-class ClientActiveObject : public ActiveObject
-{
+class ClientActiveObject : public ActiveObject {
 public:
 	ClientActiveObject(u16 id, Client *client, ClientEnvironment *env);
 	virtual ~ClientActiveObject();
@@ -50,16 +48,16 @@ public:
 	virtual bool collideWithObjects() const { return false; }
 	virtual const v3f getPosition() const { return v3f(0.0f); } // in BS-space
 	virtual const v3f getVelocity() const { return v3f(0.0f); } // in BS-space
-	virtual scene::ISceneNode *getSceneNode() const
-	{ return NULL; }
-	virtual scene::IAnimatedMeshSceneNode *getAnimatedMeshSceneNode() const
-	{ return NULL; }
+	virtual scene::ISceneNode *getSceneNode() const { return NULL; }
+	virtual scene::IAnimatedMeshSceneNode *getAnimatedMeshSceneNode() const { return NULL; }
 	virtual bool isLocalPlayer() const { return false; }
 
 	virtual ClientActiveObject *getParent() const { return nullptr; };
-	virtual const std::unordered_set<int> &getAttachmentChildIds() const
-	{ static std::unordered_set<int> rv; return rv; }
-	virtual void updateAttachments() {};
+	virtual const std::unordered_set<int> &getAttachmentChildIds() const {
+		static std::unordered_set<int> rv;
+		return rv;
+	}
+	virtual void updateAttachments(){};
 
 	virtual bool doShowSelectionBox() { return true; }
 
@@ -84,7 +82,7 @@ public:
 
 	// If returns true, punch will not be sent to the server
 	virtual bool directReportPunch(v3f dir, const ItemStack *punchitem = nullptr,
-		float time_from_last_punch = 1000000) { return false; }
+			float time_from_last_punch = 1000000) { return false; }
 
 protected:
 	// Used for creating objects based on type
@@ -92,24 +90,22 @@ protected:
 	static void registerType(u16 type, Factory f);
 	Client *m_client;
 	ClientEnvironment *m_env;
+
 private:
 	// Used for creating objects based on type
 	static std::unordered_map<u16, Factory> m_types;
 };
 
-class DistanceSortedActiveObject
-{
+class DistanceSortedActiveObject {
 public:
 	ClientActiveObject *obj;
 
-	DistanceSortedActiveObject(ClientActiveObject *a_obj, f32 a_d)
-	{
+	DistanceSortedActiveObject(ClientActiveObject *a_obj, f32 a_d) {
 		obj = a_obj;
 		d = a_d;
 	}
 
-	bool operator < (const DistanceSortedActiveObject &other) const
-	{
+	bool operator<(const DistanceSortedActiveObject &other) const {
 		return d < other.d;
 	}
 

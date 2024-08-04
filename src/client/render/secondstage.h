@@ -25,8 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 /**
  *  Step to apply post-processing filter to the rendered image
  */
-class PostProcessingStep : public RenderStep
-{
+class PostProcessingStep : public RenderStep {
 public:
 	/**
 	 * Construct a new PostProcessingStep object
@@ -35,7 +34,6 @@ public:
 	 * @param texture_map Map of textures to be chosen from the render source
 	 */
 	PostProcessingStep(u32 shader_id, const std::vector<u8> &texture_map);
-
 
 	void setRenderSource(RenderSource *source) override;
 	void setRenderTarget(RenderTarget *target) override;
@@ -49,11 +47,12 @@ public:
 	 * @param value true to enable the bilinear filter, false to disable
 	 */
 	void setBilinearFilter(u8 index, bool value);
+
 private:
 	u32 shader_id;
 	std::vector<u8> texture_map;
-	RenderSource *source { nullptr };
-	RenderTarget *target { nullptr };
+	RenderSource *source{ nullptr };
+	RenderTarget *target{ nullptr };
 	video::SMaterial material;
 
 	void configureMaterial();

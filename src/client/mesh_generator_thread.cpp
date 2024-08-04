@@ -50,8 +50,8 @@ QueuedMeshUpdate::~QueuedMeshUpdate() {
 	MeshUpdateQueue
 */
 
-MeshUpdateQueue::MeshUpdateQueue(Client *client):
-	m_client(client) {
+MeshUpdateQueue::MeshUpdateQueue(Client *client) :
+		m_client(client) {
 	m_cache_enable_shaders = g_settings->getBool("enable_shaders");
 	m_cache_smooth_lighting = g_settings->getBool("smooth_lighting");
 }
@@ -71,7 +71,9 @@ MeshUpdateQueue::~MeshUpdateQueue() {
 
 bool MeshUpdateQueue::addBlock(Map *map, v3s16 p, bool ack_block_to_server, bool urgent) {
 	MapBlock *main_block = map->getBlockNoCreateNoEx(p);
-	if (!main_block) { return false; }
+	if (!main_block) {
+		return false;
+	}
 
 	MutexAutoLock lock(m_mutex);
 
@@ -95,7 +97,7 @@ bool MeshUpdateQueue::addBlock(Map *map, v3s16 p, bool ack_block_to_server, bool
 		if (q->p == mesh_position) {
 			// NOTE: We are not adding a new position to the queue, thus
 			//       refcount_from_queue stays the same.
-			if(ack_block_to_server) {
+			if (ack_block_to_server) {
 				q->ack_list.push_back(p);
 			}
 			q->crack_level = m_client->getCrackLevel();
@@ -117,7 +119,7 @@ bool MeshUpdateQueue::addBlock(Map *map, v3s16 p, bool ack_block_to_server, bool
 					}
 				}
 			}
-			
+
 			return true;
 		}
 	}
@@ -126,7 +128,7 @@ bool MeshUpdateQueue::addBlock(Map *map, v3s16 p, bool ack_block_to_server, bool
 		Make a list of blocks necessary for mesh generation and lock the blocks in memory.
 	*/
 	std::vector<MapBlock *> map_blocks;
-	map_blocks.reserve((mesh_grid.cell_size+2)*(mesh_grid.cell_size+2)*(mesh_grid.cell_size+2));
+	map_blocks.reserve((mesh_grid.cell_size + 2) * (mesh_grid.cell_size + 2) * (mesh_grid.cell_size + 2));
 	v3s16 pos;
 	for (pos.X = mesh_position.X - 1; pos.X <= mesh_position.X + mesh_grid.cell_size; pos.X++) {
 		for (pos.Z = mesh_position.Z - 1; pos.Z <= mesh_position.Z + mesh_grid.cell_size; pos.Z++) {
@@ -164,11 +166,15 @@ QueuedMeshUpdate *MeshUpdateQueue::pop() {
 		MutexAutoLock lock(m_mutex);
 
 		bool must_be_urgent = !m_urgents.empty();
-		for (std::vector<QueuedMeshUpdate*>::iterator i = m_queue.begin(); i != m_queue.end(); ++i) {
+		for (std::vector<QueuedMeshUpdate *>::iterator i = m_queue.begin(); i != m_queue.end(); ++i) {
 			QueuedMeshUpdate *q = *i;
-			if (must_be_urgent && m_urgents.count(q->p) == 0) { continue; }
+			if (must_be_urgent && m_urgents.count(q->p) == 0) {
+				continue;
+			}
 			// Make sure no two threads are processing the same mapblock, as that causes racing conditions
-			if (m_inflight_blocks.find(q->p) != m_inflight_blocks.end()) { continue; }
+			if (m_inflight_blocks.find(q->p) != m_inflight_blocks.end()) {
+				continue;
+			}
 			m_queue.erase(i);
 			m_urgents.erase(q->p);
 			m_inflight_blocks.insert(q->p);
@@ -188,7 +194,6 @@ void MeshUpdateQueue::done(v3s16 pos) {
 	MutexAutoLock lock(m_mutex);
 	m_inflight_blocks.erase(pos);
 }
-
 
 void MeshUpdateQueue::fillDataFromMapBlocks(QueuedMeshUpdate *q) {
 	auto mesh_grid = m_client->getMeshGrid();
@@ -273,11 +278,11 @@ MeshUpdateManager::MeshUpdateManager(Client *client) :
 
 void MeshUpdateManager::updateBlock(Map *map, v3s16 p, bool ack_block_to_server,
 		bool urgent, bool update_neighbors) {
-	static thread_local const bool many_neighbors = g_settings->getBool("smooth_lighting") && 
+	static thread_local const bool many_neighbors = g_settings->getBool("smooth_lighting") &&
 			!g_settings->getFlag("performance_tradeoffs");
 	if (!m_queue_in.addBlock(map, p, ack_block_to_server, urgent)) {
 		warningstream << "Update requested for non-existent block at ("
-				<< p.X << ", " << p.Y << ", " << p.Z << ")" << '\n';
+					  << p.X << ", " << p.Y << ", " << p.Z << ")" << '\n';
 		return;
 	}
 
@@ -322,31 +327,29 @@ void MeshUpdateManager::deferUpdate() {
 	}
 }
 
-void MeshUpdateManager::start()
-{
-	for (auto &thread: m_workers) {
+void MeshUpdateManager::start() {
+	for (auto &thread : m_workers) {
 		thread->start();
 	}
 }
 
-void MeshUpdateManager::stop()
-{
-	for (auto &thread: m_workers) {
+void MeshUpdateManager::stop() {
+	for (auto &thread : m_workers) {
 		thread->stop();
 	}
 }
 
-void MeshUpdateManager::wait()
-{
-	for (auto &thread: m_workers) {
+void MeshUpdateManager::wait() {
+	for (auto &thread : m_workers) {
 		thread->wait();
 	}
 }
 
-bool MeshUpdateManager::isRunning()
-{
-	for (auto &thread: m_workers) {
-		if (thread->isRunning()) { return true; }
+bool MeshUpdateManager::isRunning() {
+	for (auto &thread : m_workers) {
+		if (thread->isRunning()) {
+			return true;
+		}
 	}
 
 	return false;

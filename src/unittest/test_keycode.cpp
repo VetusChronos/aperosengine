@@ -37,8 +37,7 @@ public:
 
 static TestKeycode g_test_instance;
 
-void TestKeycode::runTests(IGameDef *gamedef)
-{
+void TestKeycode::runTests(IGameDef *gamedef) {
 	TEST(testCreateFromString);
 	TEST(testCreateFromSKeyInput);
 	TEST(testCompare);
@@ -48,8 +47,7 @@ void TestKeycode::runTests(IGameDef *gamedef)
 
 #define UASSERTEQ_STR(one, two) UASSERT(strcmp(one, two) == 0)
 
-void TestKeycode::testCreateFromString()
-{
+void TestKeycode::testCreateFromString() {
 	KeyPress k;
 
 	// Character key, from char
@@ -77,8 +75,7 @@ void TestKeycode::testCreateFromString()
 	UASSERTCMP(int, >, strlen(k.name()), 0);
 }
 
-void TestKeycode::testCreateFromSKeyInput()
-{
+void TestKeycode::testCreateFromSKeyInput() {
 	KeyPress k;
 	irr::SEvent::SKeyInput in;
 
@@ -107,8 +104,7 @@ void TestKeycode::testCreateFromSKeyInput()
 	UASSERTEQ_STR(k.sym(), "KEY_KEY_G");
 }
 
-void TestKeycode::testCompare()
-{
+void TestKeycode::testCompare() {
 	// Basic comparison
 	UASSERT(KeyPress("5") == KeyPress("KEY_KEY_5"));
 	UASSERT(!(KeyPress("5") == KeyPress("KEY_NUMPAD5")));

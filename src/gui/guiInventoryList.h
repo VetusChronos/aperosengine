@@ -25,26 +25,22 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class GUIFormSpecMenu;
 
-class GUIInventoryList : public gui::IGUIElement
-{
+class GUIInventoryList : public gui::IGUIElement {
 public:
-	struct ItemSpec
-	{
+	struct ItemSpec {
 		ItemSpec() = default;
 
 		ItemSpec(const InventoryLocation &a_inventoryloc,
 				const std::string &a_listname,
 				s32 a_i,
 				const v2s32 slotsize) :
-			inventoryloc(a_inventoryloc),
-			listname(a_listname),
-			i(a_i),
-			slotsize(slotsize)
-		{
+				inventoryloc(a_inventoryloc),
+				listname(a_listname),
+				i(a_i),
+				slotsize(slotsize) {
 		}
 
-		bool operator==(const ItemSpec& other) const
-		{
+		bool operator==(const ItemSpec &other) const {
 			return inventoryloc == other.inventoryloc &&
 					listname == other.listname && i == other.i;
 		}
@@ -68,48 +64,43 @@ public:
 	};
 
 	GUIInventoryList(gui::IGUIEnvironment *env,
-		gui::IGUIElement *parent,
-		s32 id,
-		const core::rect<s32> &rectangle,
-		InventoryManager *invmgr,
-		const InventoryLocation &inventoryloc,
-		const std::string &listname,
-		const v2s32 &geom,
-		const s32 start_item_i,
-		const v2s32 &slot_size,
-		const v2f32 &slot_spacing,
-		GUIFormSpecMenu *fs_menu,
-		const Options &options,
-		gui::IGUIFont *font);
+			gui::IGUIElement *parent,
+			s32 id,
+			const core::rect<s32> &rectangle,
+			InventoryManager *invmgr,
+			const InventoryLocation &inventoryloc,
+			const std::string &listname,
+			const v2s32 &geom,
+			const s32 start_item_i,
+			const v2s32 &slot_size,
+			const v2f32 &slot_spacing,
+			GUIFormSpecMenu *fs_menu,
+			const Options &options,
+			gui::IGUIFont *font);
 
 	virtual void draw() override;
 
 	virtual bool OnEvent(const SEvent &event) override;
 
-	const InventoryLocation &getInventoryloc() const
-	{
+	const InventoryLocation &getInventoryloc() const {
 		return m_inventoryloc;
 	}
 
-	const std::string &getListname() const
-	{
+	const std::string &getListname() const {
 		return m_listname;
 	}
 
-	void setSlotBGColors(const video::SColor &slotbg_n, const video::SColor &slotbg_h)
-	{
+	void setSlotBGColors(const video::SColor &slotbg_n, const video::SColor &slotbg_h) {
 		m_options.slotbg_n = slotbg_n;
 		m_options.slotbg_h = slotbg_h;
 	}
 
-	void setSlotBorders(bool slotborder, const video::SColor &slotbordercolor)
-	{
+	void setSlotBorders(bool slotborder, const video::SColor &slotbordercolor) {
 		m_options.slotborder = slotborder;
 		m_options.slotbordercolor = slotbordercolor;
 	}
 
-	const v2s32 getSlotSize() const noexcept
-	{
+	const v2s32 getSlotSize() const noexcept {
 		return m_slot_size;
 	}
 

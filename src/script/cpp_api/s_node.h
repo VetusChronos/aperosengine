@@ -29,8 +29,7 @@ class ServerActiveObject;
 
 class ScriptApiNode
 		: virtual public ScriptApiBase,
-		  public ScriptApiNodemeta
-{
+		  public ScriptApiNodemeta {
 public:
 	ScriptApiNode() = default;
 	virtual ~ScriptApiNode() = default;
@@ -48,6 +47,7 @@ public:
 			const std::string &formname,
 			const StringMap &fields,
 			ServerActiveObject *sender);
+
 public:
 	static struct EnumString es_DrawType[];
 	static struct EnumString es_ContentParamType[];

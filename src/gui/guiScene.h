@@ -25,11 +25,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 using namespace irr;
 
-class GUIScene : public gui::IGUIElement
-{
+class GUIScene : public gui::IGUIElement {
 public:
 	GUIScene(gui::IGUIEnvironment *env, scene::ISceneManager *smgr,
-		 gui::IGUIElement *parent, core::recti rect, s32 id = -1);
+			gui::IGUIElement *parent, core::recti rect, s32 id = -1);
 
 	~GUIScene();
 
@@ -80,7 +79,7 @@ private:
 
 	bool m_mouse_ctrl = true;
 	bool m_update_cam = false;
-	bool m_inf_rot    = false;
+	bool m_inf_rot = false;
 	bool m_initial_rotation = true;
 
 	video::SColor m_bgcolor = 0;

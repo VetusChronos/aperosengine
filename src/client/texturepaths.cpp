@@ -28,19 +28,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // A cache from texture name to texture path
 static MutexedMap<std::string, std::string> g_texturename_to_path_cache;
 
-void clearTextureNameCache()
-{
+void clearTextureNameCache() {
 	g_texturename_to_path_cache.clear();
 }
 
 // Find out the full path of an image by trying different filename extensions.
 // If failed, return "".
-std::string getImagePath(std::string_view path)
-{
+std::string getImagePath(std::string_view path) {
 	// A NULL-ended list of possible image extensions
 	// (In newer C++ versions a fixed size array and ranges::subrange could be used
 	// or just modernise removeStringEnd.)
-	static const char *extensions[] = {".png", ".jpg", ".bmp", ".tga", nullptr};
+	static const char *extensions[] = { ".png", ".jpg", ".bmp", ".tga", nullptr };
 
 	// Remove present extension
 	std::string_view stripped_path = removeStringEnd(path, extensions);
@@ -68,9 +66,8 @@ std::string getImagePath(std::string_view path)
  * If not found, returns "".
  *
  * Utilizes a thread-safe cache.
-*/
-std::string getTexturePath(const std::string &filename, bool *is_base_pack)
-{
+ */
+std::string getTexturePath(const std::string &filename, bool *is_base_pack) {
 	std::string fullpath;
 
 	// This can set a wrong value on cached textures, but is irrelevant because
@@ -93,8 +90,7 @@ std::string getTexturePath(const std::string &filename, bool *is_base_pack)
 
 	// Check from default data directory i.e. .../minetest/textures/base/pack
 	if (fullpath.empty()) {
-		std::string base_path = porting::path_share + DIR_DELIM + "textures"
-				+ DIR_DELIM + "base" + DIR_DELIM + "pack";
+		std::string base_path = porting::path_share + DIR_DELIM + "textures" + DIR_DELIM + "base" + DIR_DELIM + "pack";
 		// Check all filename extensions. Returns "" if not found.
 		fullpath = getImagePath(base_path + DIR_DELIM + filename);
 		if (is_base_pack && !fullpath.empty())
@@ -108,7 +104,6 @@ std::string getTexturePath(const std::string &filename, bool *is_base_pack)
 	return fullpath;
 }
 
-std::vector<std::string> getTextureDirs()
-{
+std::vector<std::string> getTextureDirs() {
 	return fs::GetRecursiveDirs(g_settings->get("texture_path"));
 }

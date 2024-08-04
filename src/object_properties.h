@@ -28,8 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <vector>
 #include "util/pointabilities.h"
 
-struct ObjectProperties
-{
+struct ObjectProperties {
 	/* member variables ordered roughly by size */
 
 	std::vector<std::string> textures;
@@ -81,15 +80,14 @@ private:
 	auto tie() const {
 		// Make sure to add new members to this list!
 		return std::tie(
-		textures, colors, collisionbox, selectionbox, visual, mesh, damage_texture_modifier,
-		nametag, infotext, wield_item, visual_size, nametag_color, nametag_bgcolor,
-		spritediv, initial_sprite_basepos, stepheight, automatic_rotate,
-		automatic_face_movement_dir_offset, automatic_face_movement_max_rotation_per_sec,
-		eye_height, zoom_fov, hp_max, breath_max, glow, pointable, physical,
-		collideWithObjects, rotate_selectionbox, is_visible, makes_footstep_sound,
-		automatic_face_movement_dir, backface_culling, static_save, use_texture_alpha,
-		shaded, show_on_minimap
-		);
+				textures, colors, collisionbox, selectionbox, visual, mesh, damage_texture_modifier,
+				nametag, infotext, wield_item, visual_size, nametag_color, nametag_bgcolor,
+				spritediv, initial_sprite_basepos, stepheight, automatic_rotate,
+				automatic_face_movement_dir_offset, automatic_face_movement_max_rotation_per_sec,
+				eye_height, zoom_fov, hp_max, breath_max, glow, pointable, physical,
+				collideWithObjects, rotate_selectionbox, is_visible, makes_footstep_sound,
+				automatic_face_movement_dir, backface_culling, static_save, use_texture_alpha,
+				shaded, show_on_minimap);
 	}
 
 public:
@@ -104,7 +102,7 @@ public:
 	 * Check limits of some important properties that'd cause exceptions later on.
 	 * Errornous values are discarded after printing a warning.
 	 * @return true if a problem was found
-	*/
+	 */
 	bool validate();
 
 	void serialize(std::ostream &os) const;

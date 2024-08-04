@@ -31,14 +31,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 namespace sound {
 
-void OpenALSoundManager::stepStreams(f32 dtime)
-{
+void OpenALSoundManager::stepStreams(f32 dtime) {
 	// spread work across steps
 	const size_t num_issued_sounds = std::min(
 			m_sounds_streaming_current_bigstep.size(),
-			(size_t)std::ceil(m_sounds_streaming_current_bigstep.size()
-				* dtime / m_stream_timer)
-		);
+			(size_t)std::ceil(m_sounds_streaming_current_bigstep.size() * dtime / m_stream_timer));
 
 	for (size_t i = 0; i < num_issued_sounds; ++i) {
 		auto wptr = std::move(m_sounds_streaming_current_bigstep.back());
@@ -63,8 +60,7 @@ void OpenALSoundManager::stepStreams(f32 dtime)
 	}
 }
 
-void OpenALSoundManager::doFades(f32 dtime)
-{
+void OpenALSoundManager::doFades(f32 dtime) {
 	for (size_t i = 0; i < m_sounds_fading.size();) {
 		std::shared_ptr<PlayingSound> snd = m_sounds_fading[i].lock();
 		if (snd) {
@@ -82,8 +78,7 @@ void OpenALSoundManager::doFades(f32 dtime)
 	}
 }
 
-std::shared_ptr<ISoundDataOpen> OpenALSoundManager::openSingleSound(const std::string &sound_name)
-{
+std::shared_ptr<ISoundDataOpen> OpenALSoundManager::openSingleSound(const std::string &sound_name) {
 	// if already open, nothing to do
 	auto it = m_sound_datas_open.find(sound_name);
 	if (it != m_sound_datas_open.end())
@@ -104,8 +99,7 @@ std::shared_ptr<ISoundDataOpen> OpenALSoundManager::openSingleSound(const std::s
 	return opn_snd;
 }
 
-std::string OpenALSoundManager::getLoadedSoundNameFromGroup(const std::string &group_name)
-{
+std::string OpenALSoundManager::getLoadedSoundNameFromGroup(const std::string &group_name) {
 	std::string chosen_sound_name = "";
 
 	auto it_groups = m_sound_groups.find(group_name);
@@ -132,15 +126,14 @@ std::string OpenALSoundManager::getLoadedSoundNameFromGroup(const std::string &g
 	return "";
 }
 
-std::string OpenALSoundManager::getOrLoadLoadedSoundNameFromGroup(const std::string &group_name)
-{
+std::string OpenALSoundManager::getOrLoadLoadedSoundNameFromGroup(const std::string &group_name) {
 	std::string sound_name = getLoadedSoundNameFromGroup(group_name);
 	if (!sound_name.empty())
 		return sound_name;
 
 	// load
 	std::vector<std::string> paths = m_fallback_path_provider
-			->getLocalFallbackPathsForSoundname(group_name);
+											 ->getLocalFallbackPathsForSoundname(group_name);
 	for (const std::string &path : paths) {
 		if (loadSoundFile(path, path))
 			addSoundToGroup(path, group_name);
@@ -150,26 +143,23 @@ std::string OpenALSoundManager::getOrLoadLoadedSoundNameFromGroup(const std::str
 
 std::shared_ptr<PlayingSound> OpenALSoundManager::createPlayingSound(
 		const std::string &sound_name, bool loop, f32 volume, f32 pitch,
-		f32 start_time, const std::optional<std::pair<v3f, v3f>> &pos_vel_opt)
-{
+		f32 start_time, const std::optional<std::pair<v3f, v3f>> &pos_vel_opt) {
 	infostream << "OpenALSoundManager: Creating playing sound \"" << sound_name
-			<< "\"" << '\n';
+			   << "\"" << '\n';
 	warn_if_al_error("before createPlayingSound");
 
 	std::shared_ptr<ISoundDataOpen> lsnd = openSingleSound(sound_name);
 	if (!lsnd) {
 		// does not happen because of the call to getLoadedSoundNameFromGroup
 		errorstream << "OpenALSoundManager::createPlayingSound: Sound \""
-				<< sound_name << "\" disappeared." << '\n';
+					<< sound_name << "\" disappeared." << '\n';
 		return nullptr;
 	}
 
-	if (lsnd->m_decode_info.is_stereo && pos_vel_opt.has_value()
-			&& m_warned_positional_stereo_sounds.find(sound_name)
-					== m_warned_positional_stereo_sounds.end()) {
+	if (lsnd->m_decode_info.is_stereo && pos_vel_opt.has_value() && m_warned_positional_stereo_sounds.find(sound_name) == m_warned_positional_stereo_sounds.end()) {
 		warningstream << "OpenALSoundManager::createPlayingSound: "
-				<< "Creating positional stereo sound \"" << sound_name << "\"."
-				<< '\n';
+					  << "Creating positional stereo sound \"" << sound_name << "\"."
+					  << '\n';
 		m_warned_positional_stereo_sounds.insert(sound_name);
 	}
 
@@ -191,8 +181,7 @@ std::shared_ptr<PlayingSound> OpenALSoundManager::createPlayingSound(
 
 void OpenALSoundManager::playSoundGeneric(sound_handle_t id, const std::string &group_name,
 		bool loop, f32 volume, f32 fade, f32 pitch, bool use_local_fallback,
-		f32 start_time, const std::optional<std::pair<v3f, v3f>> &pos_vel_opt)
-{
+		f32 start_time, const std::optional<std::pair<v3f, v3f>> &pos_vel_opt) {
 	assert(id != 0);
 
 	if (group_name.empty()) {
@@ -201,12 +190,10 @@ void OpenALSoundManager::playSoundGeneric(sound_handle_t id, const std::string &
 	}
 
 	// choose random sound name from group name
-	std::string sound_name = use_local_fallback ?
-			getOrLoadLoadedSoundNameFromGroup(group_name) :
-			getLoadedSoundNameFromGroup(group_name);
+	std::string sound_name = use_local_fallback ? getOrLoadLoadedSoundNameFromGroup(group_name) : getLoadedSoundNameFromGroup(group_name);
 	if (sound_name.empty()) {
 		infostream << "OpenALSoundManager: \"" << group_name << "\" not found."
-				<< '\n';
+				   << '\n';
 		reportRemovedSound(id);
 		return;
 	}
@@ -218,13 +205,13 @@ void OpenALSoundManager::playSoundGeneric(sound_handle_t id, const std::string &
 
 	if (!(pitch > 0.0f)) {
 		warningstream << "OpenALSoundManager::playSoundGeneric: Illegal pitch value: "
-				<< start_time << '\n';
+					  << start_time << '\n';
 		pitch = 1.0f;
 	}
 
 	if (!std::isfinite(start_time)) {
 		warningstream << "OpenALSoundManager::playSoundGeneric: Illegal start_time value: "
-				<< start_time << '\n';
+					  << start_time << '\n';
 		start_time = 0.0f;
 	}
 
@@ -246,8 +233,7 @@ void OpenALSoundManager::playSoundGeneric(sound_handle_t id, const std::string &
 		fadeSound(id, fade, target_fade_volume);
 }
 
-int OpenALSoundManager::removeDeadSounds()
-{
+int OpenALSoundManager::removeDeadSounds() {
 	int num_deleted_sounds = 0;
 
 	for (auto it = m_sounds_playing.begin(); it != m_sounds_playing.end();) {
@@ -268,42 +254,39 @@ int OpenALSoundManager::removeDeadSounds()
 
 OpenALSoundManager::OpenALSoundManager(SoundManagerSingleton *smg,
 		std::unique_ptr<SoundFallbackPathProvider> fallback_path_provider) :
-	Thread("OpenALSoundManager"),
-	m_fallback_path_provider(std::move(fallback_path_provider)),
-	m_device(smg->m_device.get()),
-	m_context(smg->m_context.get()),
-	m_exts(m_device)
-{
+		Thread("OpenALSoundManager"),
+		m_fallback_path_provider(std::move(fallback_path_provider)),
+		m_device(smg->m_device.get()),
+		m_context(smg->m_context.get()),
+		m_exts(m_device) {
 	SANITY_CHECK(!!m_fallback_path_provider);
 
 	infostream << "Audio: Initialized: OpenAL " << '\n';
 }
 
-OpenALSoundManager::~OpenALSoundManager()
-{
+OpenALSoundManager::~OpenALSoundManager() {
 	infostream << "Audio: Deinitializing..." << '\n';
 }
 
 /* Interface */
 
-void OpenALSoundManager::step(f32 dtime)
-{
+void OpenALSoundManager::step(f32 dtime) {
 	m_time_until_dead_removal -= dtime;
 	if (m_time_until_dead_removal <= 0.0f) {
 		if (!m_sounds_playing.empty()) {
 			verbosestream << "OpenALSoundManager::step(): "
-					<< m_sounds_playing.size() << " playing sounds, "
-					<< m_sound_datas_unopen.size() << " unopen sounds, "
-					<< m_sound_datas_open.size() << " open sounds and "
-					<< m_sound_groups.size() << " sound groups loaded."
-					<< '\n';
+						  << m_sounds_playing.size() << " playing sounds, "
+						  << m_sound_datas_unopen.size() << " unopen sounds, "
+						  << m_sound_datas_open.size() << " open sounds and "
+						  << m_sound_groups.size() << " sound groups loaded."
+						  << '\n';
 		}
 
 		int num_deleted_sounds = removeDeadSounds();
 
 		if (num_deleted_sounds != 0)
 			verbosestream << "OpenALSoundManager::step(): Deleted "
-					<< num_deleted_sounds << " dead playing sounds." << '\n';
+						  << num_deleted_sounds << " dead playing sounds." << '\n';
 
 		m_time_until_dead_removal = REMOVE_DEAD_SOUNDS_INTERVAL;
 	}
@@ -312,8 +295,7 @@ void OpenALSoundManager::step(f32 dtime)
 	stepStreams(dtime);
 }
 
-void OpenALSoundManager::pauseAll()
-{
+void OpenALSoundManager::pauseAll() {
 	for (auto &snd_p : m_sounds_playing) {
 		PlayingSound &snd = *snd_p.second;
 		snd.pause();
@@ -321,8 +303,7 @@ void OpenALSoundManager::pauseAll()
 	m_is_paused = true;
 }
 
-void OpenALSoundManager::resumeAll()
-{
+void OpenALSoundManager::resumeAll() {
 	for (auto &snd_p : m_sounds_playing) {
 		PlayingSound &snd = *snd_p.second;
 		snd.resume();
@@ -331,13 +312,12 @@ void OpenALSoundManager::resumeAll()
 }
 
 void OpenALSoundManager::updateListener(const v3f &pos_, const v3f &vel_,
-		const v3f &at_, const v3f &up_)
-{
+		const v3f &at_, const v3f &up_) {
 	v3f pos = swap_handedness(pos_);
 	v3f vel = swap_handedness(vel_);
 	v3f at = swap_handedness(at_);
 	v3f up = swap_handedness(up_);
-	ALfloat orientation[6] = {at.X, at.Y, at.Z, up.X, up.Y, up.Z};
+	ALfloat orientation[6] = { at.X, at.Y, at.Z, up.X, up.Y, up.Z };
 
 	alListener3f(AL_POSITION, pos.X, pos.Y, pos.Z);
 	alListener3f(AL_VELOCITY, vel.X, vel.Y, vel.Z);
@@ -345,13 +325,11 @@ void OpenALSoundManager::updateListener(const v3f &pos_, const v3f &vel_,
 	warn_if_al_error("updateListener");
 }
 
-void OpenALSoundManager::setListenerGain(f32 gain)
-{
+void OpenALSoundManager::setListenerGain(f32 gain) {
 	alListenerf(AL_GAIN, gain);
 }
 
-bool OpenALSoundManager::loadSoundFile(const std::string &name, const std::string &filepath)
-{
+bool OpenALSoundManager::loadSoundFile(const std::string &name, const std::string &filepath) {
 	// do not add twice
 	if (m_sound_datas_open.count(name) != 0 || m_sound_datas_unopen.count(name) != 0)
 		return false;
@@ -364,8 +342,7 @@ bool OpenALSoundManager::loadSoundFile(const std::string &name, const std::strin
 	return true;
 }
 
-bool OpenALSoundManager::loadSoundData(const std::string &name, std::string &&filedata)
-{
+bool OpenALSoundManager::loadSoundData(const std::string &name, std::string &&filedata) {
 	// do not add twice
 	if (m_sound_datas_open.count(name) != 0 || m_sound_datas_unopen.count(name) != 0)
 		return false;
@@ -374,53 +351,44 @@ bool OpenALSoundManager::loadSoundData(const std::string &name, std::string &&fi
 	return true;
 }
 
-void OpenALSoundManager::loadSoundFileNoCheck(const std::string &name, const std::string &filepath)
-{
+void OpenALSoundManager::loadSoundFileNoCheck(const std::string &name, const std::string &filepath) {
 	// remember for lazy loading
 	m_sound_datas_unopen.emplace(name, std::make_unique<SoundDataUnopenFile>(filepath));
 }
 
-void OpenALSoundManager::loadSoundDataNoCheck(const std::string &name, std::string &&filedata)
-{
+void OpenALSoundManager::loadSoundDataNoCheck(const std::string &name, std::string &&filedata) {
 	// remember for lazy loading
 	m_sound_datas_unopen.emplace(name, std::make_unique<SoundDataUnopenBuffer>(std::move(filedata)));
 }
 
-void OpenALSoundManager::addSoundToGroup(const std::string &sound_name, const std::string &group_name)
-{
+void OpenALSoundManager::addSoundToGroup(const std::string &sound_name, const std::string &group_name) {
 	auto it_groups = m_sound_groups.find(group_name);
 	if (it_groups != m_sound_groups.end())
 		it_groups->second.push_back(sound_name);
 	else
-		m_sound_groups.emplace(group_name, std::vector<std::string>{sound_name});
+		m_sound_groups.emplace(group_name, std::vector<std::string>{ sound_name });
 }
 
-void OpenALSoundManager::playSound(sound_handle_t id, const SoundSpec &spec)
-{
+void OpenALSoundManager::playSound(sound_handle_t id, const SoundSpec &spec) {
 	return playSoundGeneric(id, spec.name, spec.loop, spec.gain, spec.fade, spec.pitch,
 			spec.use_local_fallback, spec.start_time, std::nullopt);
 }
 
 void OpenALSoundManager::playSoundAt(sound_handle_t id, const SoundSpec &spec,
-		const v3f &pos_, const v3f &vel_)
-{
-	std::optional<std::pair<v3f, v3f>> pos_vel_opt({
-			swap_handedness(pos_),
-			swap_handedness(vel_)
-		});
+		const v3f &pos_, const v3f &vel_) {
+	std::optional<std::pair<v3f, v3f>> pos_vel_opt({ swap_handedness(pos_),
+			swap_handedness(vel_) });
 
 	return playSoundGeneric(id, spec.name, spec.loop, spec.gain, spec.fade, spec.pitch,
 			spec.use_local_fallback, spec.start_time, pos_vel_opt);
 }
 
-void OpenALSoundManager::stopSound(sound_handle_t sound)
-{
+void OpenALSoundManager::stopSound(sound_handle_t sound) {
 	m_sounds_playing.erase(sound);
 	reportRemovedSound(sound);
 }
 
-void OpenALSoundManager::fadeSound(sound_handle_t soundid, f32 step, f32 target_gain)
-{
+void OpenALSoundManager::fadeSound(sound_handle_t soundid, f32 step, f32 target_gain) {
 	// Ignore the command if step isn't valid.
 	if (step == 0.0f)
 		return;
@@ -433,8 +401,7 @@ void OpenALSoundManager::fadeSound(sound_handle_t soundid, f32 step, f32 target_
 }
 
 void OpenALSoundManager::updateSoundPosVel(sound_handle_t id, const v3f &pos_,
-		const v3f &vel_)
-{
+		const v3f &vel_) {
 	v3f pos = swap_handedness(pos_);
 	v3f vel = swap_handedness(vel_);
 
@@ -446,48 +413,75 @@ void OpenALSoundManager::updateSoundPosVel(sound_handle_t id, const v3f &pos_,
 
 /* Thread stuff */
 
-void *OpenALSoundManager::run()
-{
+void *OpenALSoundManager::run() {
 	using namespace sound_manager_messages_to_mgr;
 
 	struct MsgVisitor {
-		enum class Result { Ok, Empty, StopRequested };
+		enum class Result { Ok,
+			Empty,
+			StopRequested };
 
 		OpenALSoundManager &mgr;
 
 		Result operator()(std::monostate &&) {
-			return Result::Empty; }
+			return Result::Empty;
+		}
 
 		Result operator()(PauseAll &&) {
-			mgr.pauseAll(); return Result::Ok; }
+			mgr.pauseAll();
+			return Result::Ok;
+		}
 		Result operator()(ResumeAll &&) {
-			mgr.resumeAll(); return Result::Ok; }
+			mgr.resumeAll();
+			return Result::Ok;
+		}
 
 		Result operator()(UpdateListener &&msg) {
-			mgr.updateListener(msg.pos_, msg.vel_, msg.at_, msg.up_); return Result::Ok; }
+			mgr.updateListener(msg.pos_, msg.vel_, msg.at_, msg.up_);
+			return Result::Ok;
+		}
 		Result operator()(SetListenerGain &&msg) {
-			mgr.setListenerGain(msg.gain); return Result::Ok; }
+			mgr.setListenerGain(msg.gain);
+			return Result::Ok;
+		}
 
 		Result operator()(LoadSoundFile &&msg) {
-			mgr.loadSoundFileNoCheck(msg.name, msg.filepath); return Result::Ok; }
+			mgr.loadSoundFileNoCheck(msg.name, msg.filepath);
+			return Result::Ok;
+		}
 		Result operator()(LoadSoundData &&msg) {
-			mgr.loadSoundDataNoCheck(msg.name, std::move(msg.filedata)); return Result::Ok; }
+			mgr.loadSoundDataNoCheck(msg.name, std::move(msg.filedata));
+			return Result::Ok;
+		}
 		Result operator()(AddSoundToGroup &&msg) {
-			mgr.addSoundToGroup(msg.sound_name, msg.group_name); return Result::Ok; }
+			mgr.addSoundToGroup(msg.sound_name, msg.group_name);
+			return Result::Ok;
+		}
 
 		Result operator()(PlaySound &&msg) {
-			mgr.playSound(msg.id, msg.spec); return Result::Ok; }
+			mgr.playSound(msg.id, msg.spec);
+			return Result::Ok;
+		}
 		Result operator()(PlaySoundAt &&msg) {
-			mgr.playSoundAt(msg.id, msg.spec, msg.pos_, msg.vel_); return Result::Ok; }
+			mgr.playSoundAt(msg.id, msg.spec, msg.pos_, msg.vel_);
+			return Result::Ok;
+		}
 		Result operator()(StopSound &&msg) {
-			mgr.stopSound(msg.sound); return Result::Ok; }
+			mgr.stopSound(msg.sound);
+			return Result::Ok;
+		}
 		Result operator()(FadeSound &&msg) {
-			mgr.fadeSound(msg.soundid, msg.step, msg.target_gain); return Result::Ok; }
+			mgr.fadeSound(msg.soundid, msg.step, msg.target_gain);
+			return Result::Ok;
+		}
 		Result operator()(UpdateSoundPosVel &&msg) {
-			mgr.updateSoundPosVel(msg.sound, msg.pos_, msg.vel_); return Result::Ok; }
+			mgr.updateSoundPosVel(msg.sound, msg.pos_, msg.vel_);
+			return Result::Ok;
+		}
 
 		Result operator()(PleaseStop &&msg) {
-			return Result::StopRequested; }
+			return Result::StopRequested;
+		}
 	};
 
 	u64 t_step_start = porting::getTimeMs();
@@ -505,7 +499,7 @@ void *OpenALSoundManager::run()
 			SoundManagerMsgToMgr msg =
 					m_queue_to_mgr.pop_frontNoEx(std::max(get_remaining_timeout(), 0));
 
-			MsgVisitor::Result res = std::visit(MsgVisitor{*this}, std::move(msg));
+			MsgVisitor::Result res = std::visit(MsgVisitor{ *this }, std::move(msg));
 
 			if (res == MsgVisitor::Result::Empty && get_remaining_timeout() <= 0) {
 				break; // finished sleeping

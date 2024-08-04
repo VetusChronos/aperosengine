@@ -24,11 +24,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 	Cross-platform compatibility stuff should go in porting.h.
 
-    Some things here are legacy.
+	Some things here are legacy.
 */
 
 /*
-    Connection
+	Connection
 */
 
 #define PEER_ID_INEXISTENT 0
@@ -43,7 +43,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define CONNECTION_TIMEOUT 30
 
 /*
-    Server
+	Server
 */
 
 // This many blocks are sent when player is building
@@ -52,14 +52,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define BLOCK_SEND_DISABLE_LIMITS_MAX_D 1
 
 /*
-    Client/Server
+	Client/Server
 */
 
 // Limit maximum dtime in client/server step(...) and for collision detection
 #define DTIME_LIMIT 2.5f
 
 /*
-    Map-related things
+	Map-related things
 */
 
 // The absolute working limit is (2^15 - viewing_range).
@@ -85,7 +85,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define PLAYER_DEFAULT_STEPHEIGHT 0.6f
 
 /*
-    Old stuff that shouldn't be hardcoded
+	Old stuff that shouldn't be hardcoded
 */
 
 // Size of player's main inventory
@@ -109,7 +109,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define SCREENSHOT_MAX_SERIAL_TRIES 1000
 
 /*
-    GUI related things
+	GUI related things
 */
 
 #define TTF_DEFAULT_FONT_SIZE (20)

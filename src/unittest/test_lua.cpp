@@ -25,9 +25,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 extern "C" {
 #if USE_LUAJIT
-	#include <luajit.h>
+#include <luajit.h>
 #else
-	#include <lua.h>
+#include <lua.h>
 #endif
 #include <lauxlib.h>
 }
@@ -40,8 +40,7 @@ extern "C" {
  * - http://lua-users.org/wiki/ErrorHandlingBetweenLuaAndCplusplus
  */
 
-class TestLua : public TestBase
-{
+class TestLua : public TestBase {
 public:
 	TestLua() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestLua"; }
@@ -54,8 +53,7 @@ public:
 
 static TestLua g_test_instance;
 
-void TestLua::runTests(IGameDef *gamedef)
-{
+void TestLua::runTests(IGameDef *gamedef) {
 	TEST(testLuaDestructors);
 	TEST(testCxxExceptions);
 }
@@ -67,34 +65,34 @@ void TestLua::runTests(IGameDef *gamedef)
 	(This is not the case with PUC Lua unless it was compiled as C++.)
 */
 
-namespace
-{
+namespace {
 
-	class DestructorDetector {
-		bool *did_destruct;
-	public:
-		DestructorDetector(bool *did_destruct) : did_destruct(did_destruct)
-		{
-			*did_destruct = false;
-		}
-		~DestructorDetector()
-		{
-			*did_destruct = true;
-		}
-	};
+class DestructorDetector {
+	bool *did_destruct;
 
-}
+public:
+	DestructorDetector(bool *did_destruct) :
+			did_destruct(did_destruct) {
+		*did_destruct = false;
+	}
+	~DestructorDetector() {
+		*did_destruct = true;
+	}
+};
 
-void TestLua::testLuaDestructors()
-{
+} //namespace
+
+void TestLua::testLuaDestructors() {
 	bool did_destruct = false;
 
 	lua_State *L = luaL_newstate();
-	lua_cpcall(L, [](lua_State *L) -> int {
-		DestructorDetector d(reinterpret_cast<bool*>(lua_touserdata(L, 1)));
-		luaL_error(L, "error");
-		return 0;
-	}, &did_destruct);
+	lua_cpcall(
+			L, [](lua_State *L) -> int {
+				DestructorDetector d(reinterpret_cast<bool *>(lua_touserdata(L, 1)));
+				luaL_error(L, "error");
+				return 0;
+			},
+			&did_destruct);
 	lua_close(L);
 
 	UASSERT(did_destruct);
@@ -102,17 +100,16 @@ void TestLua::testLuaDestructors()
 
 namespace {
 
-	int wrapper(lua_State *L, lua_CFunction inner)
-	{
-		try {
-			return inner(L);
-		} catch (std::exception &e) {
-			lua_pushstring(L, e.what());
-			return lua_error(L);
-		}
+int wrapper(lua_State *L, lua_CFunction inner) {
+	try {
+		return inner(L);
+	} catch (std::exception &e) {
+		lua_pushstring(L, e.what());
+		return lua_error(L);
 	}
-
 }
+
+} //namespace
 
 /*
 	Check that C++ exceptions are caught and re-thrown as Lua errors.
@@ -120,12 +117,11 @@ namespace {
 	(PUC Lua does not support use of such a wrapper, we have a patched version)
 */
 
-void TestLua::testCxxExceptions()
-{
+void TestLua::testCxxExceptions() {
 	lua_State *L = luaL_newstate();
 
 #if USE_LUAJIT
-	lua_pushlightuserdata(L, reinterpret_cast<void*>(wrapper));
+	lua_pushlightuserdata(L, reinterpret_cast<void *>(wrapper));
 	luaJIT_setmode(L, -1, LUAJIT_MODE_WRAPCFUNC | LUAJIT_MODE_ON);
 	lua_pop(L, 1);
 #else

@@ -24,10 +24,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "../activeobjectmgr.h"
 #include "clientobject.h"
 
-namespace client
-{
-class ActiveObjectMgr final : public ::ActiveObjectMgr<ClientActiveObject>
-{
+namespace client {
+class ActiveObjectMgr final : public ::ActiveObjectMgr<ClientActiveObject> {
 public:
 	~ActiveObjectMgr() override;
 

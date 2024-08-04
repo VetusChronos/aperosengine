@@ -24,8 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "string.h"
 #include <sstream>
 
-std::string colorize_url(const std::string &url)
-{
+std::string colorize_url(const std::string &url) {
 	auto urlHandleRAII = std::unique_ptr<CURLU, decltype(&curl_url_cleanup)>(
 			curl_url(), curl_url_cleanup);
 	CURLU *urlHandle = urlHandleRAII.get();
@@ -35,7 +34,7 @@ std::string colorize_url(const std::string &url)
 		throw std::runtime_error("URL is not valid");
 	}
 
-	auto url_get = [&] (CURLUPart what) -> std::string {
+	auto url_get = [&](CURLUPart what) -> std::string {
 		char *tmp = nullptr;
 		curl_url_get(urlHandle, what, &tmp, 0);
 		std::string ret(tmp ? tmp : "");
@@ -89,7 +88,7 @@ std::string colorize_url(const std::string &url)
 			os << c;
 		} else {
 			os << "%" << std::setfill('0') << std::setw(2) << std::hex
-				<< (static_cast<unsigned int>(c) & 0xff);
+			   << (static_cast<unsigned int>(c) & 0xff);
 		}
 	}
 

@@ -31,16 +31,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "voxelalgorithms.h"
 
 // garbage collector
-int LuaVoxelManip::gc_object(lua_State *L)
-{
+int LuaVoxelManip::gc_object(lua_State *L) {
 	LuaVoxelManip *o = *(LuaVoxelManip **)(lua_touserdata(L, 1));
 	delete o;
 
 	return 0;
 }
 
-int LuaVoxelManip::l_read_from_map(lua_State *L)
-{
+int LuaVoxelManip::l_read_from_map(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
@@ -63,12 +61,11 @@ int LuaVoxelManip::l_read_from_map(lua_State *L)
 	return 2;
 }
 
-int LuaVoxelManip::l_get_data(lua_State *L)
-{
+int LuaVoxelManip::l_get_data(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
-	bool use_buffer  = lua_istable(L, 2);
+	bool use_buffer = lua_istable(L, 2);
 
 	MMVManip *vm = o->vm;
 
@@ -88,8 +85,7 @@ int LuaVoxelManip::l_get_data(lua_State *L)
 	return 1;
 }
 
-int LuaVoxelManip::l_set_data(lua_State *L)
-{
+int LuaVoxelManip::l_set_data(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
@@ -111,8 +107,7 @@ int LuaVoxelManip::l_set_data(lua_State *L)
 	return 0;
 }
 
-int LuaVoxelManip::l_write_to_map(lua_State *L)
-{
+int LuaVoxelManip::l_write_to_map(lua_State *L) {
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
 	bool update_light = !lua_isboolean(L, 2) || readParam<bool>(L, 2);
 
@@ -127,7 +122,7 @@ int LuaVoxelManip::l_write_to_map(lua_State *L)
 
 	ServerMap *map = &(env->getServerMap());
 
-	std::map<v3s16, MapBlock*> modified_blocks;
+	std::map<v3s16, MapBlock *> modified_blocks;
 	if (o->is_mapgen_vm || !update_light) {
 		o->vm->blitBackAll(&modified_blocks);
 	} else {
@@ -142,42 +137,38 @@ int LuaVoxelManip::l_write_to_map(lua_State *L)
 	return 0;
 }
 
-int LuaVoxelManip::l_get_node_at(lua_State *L)
-{
+int LuaVoxelManip::l_get_node_at(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
-	v3s16 pos        = check_v3s16(L, 2);
+	v3s16 pos = check_v3s16(L, 2);
 
 	pushnode(L, o->vm->getNodeNoExNoEmerge(pos));
 	return 1;
 }
 
-int LuaVoxelManip::l_set_node_at(lua_State *L)
-{
+int LuaVoxelManip::l_set_node_at(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
-	v3s16 pos        = check_v3s16(L, 2);
-	MapNode n        = readnode(L, 3);
+	v3s16 pos = check_v3s16(L, 2);
+	MapNode n = readnode(L, 3);
 
 	lua_pushboolean(L, o->vm->setNodeNoEmerge(pos, n));
 	return 1;
 }
 
-int LuaVoxelManip::l_update_liquids(lua_State *L)
-{
+int LuaVoxelManip::l_update_liquids(lua_State *L) {
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
 
 	return ModApiMapgen::update_liquids(L, o->vm);
 }
 
-int LuaVoxelManip::l_calc_lighting(lua_State *L)
-{
+int LuaVoxelManip::l_calc_lighting(lua_State *L) {
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
 	if (!o->is_mapgen_vm) {
 		log_deprecated(L, "calc_lighting called for a non-mapgen "
-			"VoxelManip object");
+						  "VoxelManip object");
 		return 0;
 	}
 
@@ -195,19 +186,18 @@ int LuaVoxelManip::l_calc_lighting(lua_State *L)
 	return ModApiMapgen::calc_lighting(L, vm, pmin, pmax, propagate_shadow);
 }
 
-int LuaVoxelManip::l_set_lighting(lua_State *L)
-{
+int LuaVoxelManip::l_set_lighting(lua_State *L) {
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
 	if (!o->is_mapgen_vm) {
 		log_deprecated(L, "set_lighting called for a non-mapgen "
-			"VoxelManip object");
+						  "VoxelManip object");
 		return 0;
 	}
 
 	luaL_checktype(L, 2, LUA_TTABLE);
 
 	u8 light;
-	light  = (getintfield_default(L, 2, "day",   0) & 0x0F);
+	light = (getintfield_default(L, 2, "day", 0) & 0x0F);
 	light |= (getintfield_default(L, 2, "night", 0) & 0x0F) << 4;
 
 	MMVManip *vm = o->vm;
@@ -223,12 +213,11 @@ int LuaVoxelManip::l_set_lighting(lua_State *L)
 	return ModApiMapgen::set_lighting(L, vm, pmin, pmax, light);
 }
 
-int LuaVoxelManip::l_get_light_data(lua_State *L)
-{
+int LuaVoxelManip::l_get_light_data(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
-	bool use_buffer  = lua_istable(L, 2);
+	bool use_buffer = lua_istable(L, 2);
 
 	MMVManip *vm = o->vm;
 
@@ -248,8 +237,7 @@ int LuaVoxelManip::l_get_light_data(lua_State *L)
 	return 1;
 }
 
-int LuaVoxelManip::l_set_light_data(lua_State *L)
-{
+int LuaVoxelManip::l_set_light_data(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
@@ -257,7 +245,7 @@ int LuaVoxelManip::l_set_light_data(lua_State *L)
 
 	if (!lua_istable(L, 2))
 		throw LuaError("VoxelManip:set_light_data called with missing "
-				"parameter");
+					   "parameter");
 
 	u32 volume = vm->m_area.getVolume();
 	for (u32 i = 0; i != volume; i++) {
@@ -272,12 +260,11 @@ int LuaVoxelManip::l_set_light_data(lua_State *L)
 	return 0;
 }
 
-int LuaVoxelManip::l_get_param2_data(lua_State *L)
-{
+int LuaVoxelManip::l_get_param2_data(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
-	bool use_buffer  = lua_istable(L, 2);
+	bool use_buffer = lua_istable(L, 2);
 
 	MMVManip *vm = o->vm;
 
@@ -297,8 +284,7 @@ int LuaVoxelManip::l_get_param2_data(lua_State *L)
 	return 1;
 }
 
-int LuaVoxelManip::l_set_param2_data(lua_State *L)
-{
+int LuaVoxelManip::l_set_param2_data(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
@@ -306,7 +292,7 @@ int LuaVoxelManip::l_set_param2_data(lua_State *L)
 
 	if (!lua_istable(L, 2))
 		throw LuaError("VoxelManip:set_param2_data called with missing "
-				"parameter");
+					   "parameter");
 
 	u32 volume = vm->m_area.getVolume();
 	for (u32 i = 0; i != volume; i++) {
@@ -321,13 +307,11 @@ int LuaVoxelManip::l_set_param2_data(lua_State *L)
 	return 0;
 }
 
-int LuaVoxelManip::l_update_map(lua_State *L)
-{
+int LuaVoxelManip::l_update_map(lua_State *L) {
 	return 0;
 }
 
-int LuaVoxelManip::l_was_modified(lua_State *L)
-{
+int LuaVoxelManip::l_was_modified(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
@@ -338,8 +322,7 @@ int LuaVoxelManip::l_was_modified(lua_State *L)
 	return 1;
 }
 
-int LuaVoxelManip::l_get_emerged_area(lua_State *L)
-{
+int LuaVoxelManip::l_get_emerged_area(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, 1);
@@ -351,17 +334,15 @@ int LuaVoxelManip::l_get_emerged_area(lua_State *L)
 }
 
 LuaVoxelManip::LuaVoxelManip(MMVManip *mmvm, bool is_mg_vm) :
-	is_mapgen_vm(is_mg_vm),
-	vm(mmvm)
-{
+		is_mapgen_vm(is_mg_vm),
+		vm(mmvm) {
 }
 
-LuaVoxelManip::LuaVoxelManip(Map *map) : vm(new MMVManip(map))
-{
+LuaVoxelManip::LuaVoxelManip(Map *map) :
+		vm(new MMVManip(map)) {
 }
 
-LuaVoxelManip::LuaVoxelManip(Map *map, v3s16 p1, v3s16 p2)
-{
+LuaVoxelManip::LuaVoxelManip(Map *map, v3s16 p1, v3s16 p2) {
 	vm = new MMVManip(map);
 
 	v3s16 bp1 = getNodeBlockPos(p1);
@@ -370,22 +351,18 @@ LuaVoxelManip::LuaVoxelManip(Map *map, v3s16 p1, v3s16 p2)
 	vm->initialEmerge(bp1, bp2);
 }
 
-LuaVoxelManip::~LuaVoxelManip()
-{
+LuaVoxelManip::~LuaVoxelManip() {
 	if (!is_mapgen_vm)
 		delete vm;
 }
 
 // LuaVoxelManip()
 // Creates an LuaVoxelManip and leaves it on top of stack
-int LuaVoxelManip::create_object(lua_State *L)
-{
+int LuaVoxelManip::create_object(lua_State *L) {
 	GET_ENV_PTR;
 
 	Map *map = &(env->getMap());
-	LuaVoxelManip *o = (lua_istable(L, 1) && lua_istable(L, 2)) ?
-		new LuaVoxelManip(map, check_v3s16(L, 1), check_v3s16(L, 2)) :
-		new LuaVoxelManip(map);
+	LuaVoxelManip *o = (lua_istable(L, 1) && lua_istable(L, 2)) ? new LuaVoxelManip(map, check_v3s16(L, 1), check_v3s16(L, 2)) : new LuaVoxelManip(map);
 
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;
 	luaL_getmetatable(L, className);
@@ -393,16 +370,14 @@ int LuaVoxelManip::create_object(lua_State *L)
 	return 1;
 }
 
-void LuaVoxelManip::create(lua_State *L, MMVManip *mmvm, bool is_mapgen_vm)
-{
+void LuaVoxelManip::create(lua_State *L, MMVManip *mmvm, bool is_mapgen_vm) {
 	LuaVoxelManip *o = new LuaVoxelManip(mmvm, is_mapgen_vm);
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;
 	luaL_getmetatable(L, className);
 	lua_setmetatable(L, -2);
 }
 
-void *LuaVoxelManip::packIn(lua_State *L, int idx)
-{
+void *LuaVoxelManip::packIn(lua_State *L, int idx) {
 	LuaVoxelManip *o = checkObject<LuaVoxelManip>(L, idx);
 
 	if (o->is_mapgen_vm)
@@ -410,9 +385,8 @@ void *LuaVoxelManip::packIn(lua_State *L, int idx)
 	return o->vm->clone();
 }
 
-void LuaVoxelManip::packOut(lua_State *L, void *ptr)
-{
-	MMVManip *vm = reinterpret_cast<MMVManip*>(ptr);
+void LuaVoxelManip::packOut(lua_State *L, void *ptr) {
+	MMVManip *vm = reinterpret_cast<MMVManip *>(ptr);
 	if (!L) {
 		delete vm;
 		return;
@@ -426,11 +400,10 @@ void LuaVoxelManip::packOut(lua_State *L, void *ptr)
 	create(L, vm, false);
 }
 
-void LuaVoxelManip::Register(lua_State *L)
-{
+void LuaVoxelManip::Register(lua_State *L) {
 	static const luaL_Reg metamethods[] = {
-		{"__gc", gc_object},
-		{0, 0}
+		{ "__gc", gc_object },
+		{ 0, 0 }
 	};
 	registerClass(L, className, methods, metamethods);
 
@@ -458,5 +431,5 @@ const luaL_Reg LuaVoxelManip::methods[] = {
 	luamethod(LuaVoxelManip, set_param2_data),
 	luamethod(LuaVoxelManip, was_modified),
 	luamethod(LuaVoxelManip, get_emerged_area),
-	{0,0}
+	{ 0, 0 }
 };

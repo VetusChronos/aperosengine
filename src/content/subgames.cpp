@@ -35,20 +35,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // The maximum number of identical world names allowed
 #define MAX_WORLD_NAMES 100
 
-namespace
-{
+namespace {
 
-bool getGameMinetestConfig(const std::string &game_path, Settings &conf)
-{
+bool getGameMinetestConfig(const std::string &game_path, Settings &conf) {
 	std::string conf_path = game_path + DIR_DELIM + "aperosvoxel.conf";
 	return conf.readConfigFile(conf_path.c_str());
 }
 
-}
+} //namespace
 
-
-void SubgameSpec::checkAndLog() const
-{
+void SubgameSpec::checkAndLog() const {
 	// Log deprecation messages
 	auto handling_mode = get_deprecated_handling_mode();
 	if (!deprecation_msgs.empty() && handling_mode != DeprecatedHandlingMode::Ignore) {
@@ -64,24 +60,20 @@ void SubgameSpec::checkAndLog() const
 	}
 }
 
-
-struct GameFindPath
-{
+struct GameFindPath {
 	std::string path;
 	bool user_specific;
 	GameFindPath(const std::string &path, bool user_specific) :
-			path(path), user_specific(user_specific)
-	{
+			path(path), user_specific(user_specific) {
 	}
 };
 
-std::string getSubgamePathEnv()
-{
+std::string getSubgamePathEnv() {
 	static bool has_warned = false;
 	char *subgame_path = getenv("MINETEST_SUBGAME_PATH");
 	if (subgame_path && !has_warned) {
 		warningstream << "MINETEST_SUBGAME_PATH is deprecated, use MINETEST_GAME_PATH instead."
-				<< '\n';
+					  << '\n';
 		has_warned = true;
 	}
 
@@ -97,8 +89,7 @@ std::string getSubgamePathEnv()
 static SubgameSpec getSubgameSpec(const std::string &game_id,
 		const std::string &game_path,
 		const std::unordered_map<std::string, std::string> &mods_paths,
-		const std::string &menuicon_path)
-{
+		const std::string &menuicon_path) {
 	const auto gamemods_path = game_path + DIR_DELIM + "mods";
 	// Get meta
 	const std::string conf_path = game_path + DIR_DELIM + "game.conf";
@@ -138,8 +129,7 @@ static SubgameSpec getSubgameSpec(const std::string &game_id,
 	return spec;
 }
 
-SubgameSpec findSubgame(const std::string &id)
-{
+SubgameSpec findSubgame(const std::string &id) {
 	if (id.empty())
 		return SubgameSpec();
 	std::string share = porting::path_share;
@@ -200,8 +190,7 @@ SubgameSpec findSubgame(const std::string &id)
 	return getSubgameSpec(id, game_path, mods_paths, menuicon_path);
 }
 
-SubgameSpec findWorldSubgame(const std::string &world_path)
-{
+SubgameSpec findWorldSubgame(const std::string &world_path) {
 	std::string world_gameid = getWorldGameId(world_path, true);
 	// See if world contains an embedded game; if so, use it.
 	std::string world_gamepath = world_path + DIR_DELIM + "game";
@@ -210,8 +199,7 @@ SubgameSpec findWorldSubgame(const std::string &world_path)
 	return findSubgame(world_gameid);
 }
 
-std::set<std::string> getAvailableGameIds()
-{
+std::set<std::string> getAvailableGameIds() {
 	std::set<std::string> gameids;
 	std::set<std::string> gamespaths;
 	gamespaths.insert(porting::path_share + DIR_DELIM + "games");
@@ -231,12 +219,12 @@ std::set<std::string> getAvailableGameIds()
 			// If configuration file is not found or broken, ignore game
 			Settings conf;
 			std::string conf_path = gamespath + DIR_DELIM + dln.name +
-						DIR_DELIM + "game.conf";
+					DIR_DELIM + "game.conf";
 			if (!conf.readConfigFile(conf_path.c_str()))
 				continue;
 
 			// Add it to result
-			const char *ends[] = {"_game", NULL};
+			const char *ends[] = { "_game", NULL };
 			auto shorter = removeStringEnd(dln.name, ends);
 			if (!shorter.empty())
 				gameids.emplace(shorter);
@@ -247,8 +235,7 @@ std::set<std::string> getAvailableGameIds()
 	return gameids;
 }
 
-std::vector<SubgameSpec> getAvailableGames()
-{
+std::vector<SubgameSpec> getAvailableGames() {
 	std::vector<SubgameSpec> specs;
 	std::set<std::string> gameids = getAvailableGameIds();
 	specs.reserve(gameids.size());
@@ -259,15 +246,13 @@ std::vector<SubgameSpec> getAvailableGames()
 
 #define LEGACY_GAMEID "minetest"
 
-bool getWorldExists(const std::string &world_path)
-{
+bool getWorldExists(const std::string &world_path) {
 	return (fs::PathExists(world_path + DIR_DELIM + "map_meta.txt") ||
 			fs::PathExists(world_path + DIR_DELIM + "world.apr"));
 }
 
 //! Try to get the displayed name of a world
-std::string getWorldName(const std::string &world_path, const std::string &default_name)
-{
+std::string getWorldName(const std::string &world_path, const std::string &default_name) {
 	std::string conf_path = world_path + DIR_DELIM + "world.apr";
 	Settings conf;
 	bool succeeded = conf.readConfigFile(conf_path.c_str());
@@ -280,8 +265,7 @@ std::string getWorldName(const std::string &world_path, const std::string &defau
 	return conf.get("world_name");
 }
 
-std::string getWorldGameId(const std::string &world_path, bool can_be_legacy)
-{
+std::string getWorldGameId(const std::string &world_path, bool can_be_legacy) {
 	std::string conf_path = world_path + DIR_DELIM + "world.apr";
 	Settings conf;
 	bool succeeded = conf.readConfigFile(conf_path.c_str());
@@ -301,14 +285,12 @@ std::string getWorldGameId(const std::string &world_path, bool can_be_legacy)
 	return conf.get("gameid");
 }
 
-std::string getWorldPathEnv()
-{
+std::string getWorldPathEnv() {
 	char *world_path = getenv("MINETEST_WORLD_PATH");
 	return world_path ? std::string(world_path) : "";
 }
 
-std::vector<WorldSpec> getAvailableWorlds()
-{
+std::vector<WorldSpec> getAvailableWorlds() {
 	std::vector<WorldSpec> worlds;
 	std::set<std::string> worldspaths;
 
@@ -356,8 +338,7 @@ std::vector<WorldSpec> getAvailableWorlds()
 }
 
 void loadGameConfAndInitWorld(const std::string &path, const std::string &name,
-		const SubgameSpec &gamespec, bool create_world)
-{
+		const SubgameSpec &gamespec, bool create_world) {
 	std::string final_path = path;
 
 	// If we're creating a new world, ensure that the path isn't already taken
@@ -435,8 +416,7 @@ void loadGameConfAndInitWorld(const std::string &path, const std::string &name,
 		delete game_settings;
 }
 
-std::vector<std::string> getEnvModPaths()
-{
+std::vector<std::string> getEnvModPaths() {
 	const char *c_mod_path = getenv("MINETEST_MOD_PATH");
 	std::vector<std::string> paths;
 	Strfnd search_paths(c_mod_path ? c_mod_path : "");

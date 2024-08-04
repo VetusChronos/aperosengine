@@ -23,8 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class Camera;
 
-class LuaCamera : public ModApiBase
-{
+class LuaCamera : public ModApiBase {
 private:
 	static const luaL_Reg methods[];
 

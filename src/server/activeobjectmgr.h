@@ -24,10 +24,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "../activeobjectmgr.h"
 #include "serveractiveobject.h"
 
-namespace server
-{
-class ActiveObjectMgr final : public ::ActiveObjectMgr<ServerActiveObject>
-{
+namespace server {
+class ActiveObjectMgr final : public ::ActiveObjectMgr<ServerActiveObject> {
 public:
 	~ActiveObjectMgr() override;
 

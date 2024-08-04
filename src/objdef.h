@@ -100,10 +100,10 @@ public:
 	u32 validateHandle(ObjDefHandle handle) const;
 	static ObjDefHandle createHandle(u32 index, ObjDefType type, u32 uid);
 	static bool decodeHandle(ObjDefHandle handle, u32 *index,
-		ObjDefType *type, u32 *uid);
+			ObjDefType *type, u32 *uid);
 
 protected:
-	ObjDefManager() {};
+	ObjDefManager(){};
 	// Helper for child classes to implement clone()
 	void cloneTo(ObjDefManager *mgr) const;
 

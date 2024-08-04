@@ -36,40 +36,33 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	Queue with unique values with fast checking of value existence
 */
 
-template<typename Value>
-class UniqueQueue
-{
+template <typename Value>
+class UniqueQueue {
 public:
-
 	/*
 	Does nothing if value is already queued.
 	Return value:
 	true: value added
 	false: value already exists
 	*/
-	bool push_back(const Value& value)
-	{
-		if (m_set.insert(value).second)
-		{
+	bool push_back(const Value &value) {
+		if (m_set.insert(value).second) {
 			m_queue.push(value);
 			return true;
 		}
 		return false;
 	}
 
-	void pop_front()
-	{
+	void pop_front() {
 		m_set.erase(m_queue.front());
 		m_queue.pop();
 	}
 
-	const Value& front() const
-	{
+	const Value &front() const {
 		return m_queue.front();
 	}
 
-	u32 size() const
-	{
+	u32 size() const {
 		return m_queue.size();
 	}
 
@@ -82,20 +75,17 @@ private:
 	Thread-safe map
 */
 
-template<typename Key, typename Value>
-class MutexedMap
-{
+template <typename Key, typename Value>
+class MutexedMap {
 public:
 	MutexedMap() = default;
 
-	void set(const Key &name, const Value &value)
-	{
+	void set(const Key &name, const Value &value) {
 		MutexAutoLock lock(m_mutex);
 		m_values[name] = value;
 	}
 
-	bool get(const Key &name, Value *result) const
-	{
+	bool get(const Key &name, Value *result) const {
 		MutexAutoLock lock(m_mutex);
 		auto n = m_values.find(name);
 		if (n == m_values.end())
@@ -105,8 +95,7 @@ public:
 		return true;
 	}
 
-	std::vector<Value> getValues() const
-	{
+	std::vector<Value> getValues() const {
 		MutexAutoLock lock(m_mutex);
 		std::vector<Value> result;
 		result.reserve(m_values.size());
@@ -122,45 +111,39 @@ private:
 	mutable std::mutex m_mutex;
 };
 
-
 /*
 	Thread-safe double-ended queue
 */
 
-template<typename T>
-class MutexedQueue
-{
+template <typename T>
+class MutexedQueue {
 public:
-	template<typename Key, typename U, typename Caller, typename CallerData>
+	template <typename Key, typename U, typename Caller, typename CallerData>
 	friend class RequestQueue;
 
 	MutexedQueue() = default;
 
-	bool empty() const
-	{
+	bool empty() const {
 		MutexAutoLock lock(m_mutex);
 		return m_queue.empty();
 	}
 
-	void push_back(const T &t)
-	{
+	void push_back(const T &t) {
 		MutexAutoLock lock(m_mutex);
 		m_queue.push_back(t);
 		m_signal.post();
 	}
 
-	void push_back(T &&t)
-	{
+	void push_back(T &&t) {
 		MutexAutoLock lock(m_mutex);
 		m_queue.push_back(std::move(t));
 		m_signal.post();
 	}
 
 	/* this version of pop_front returns an empty element of T on timeout.
-	* Make sure default constructor of T creates a recognizable "empty" element
-	*/
-	T pop_frontNoEx(u32 wait_time_max_ms)
-	{
+	 * Make sure default constructor of T creates a recognizable "empty" element
+	 */
+	T pop_frontNoEx(u32 wait_time_max_ms) {
 		if (m_signal.wait(wait_time_max_ms)) {
 			MutexAutoLock lock(m_mutex);
 
@@ -172,8 +155,7 @@ public:
 		return T();
 	}
 
-	T pop_front(u32 wait_time_max_ms)
-	{
+	T pop_front(u32 wait_time_max_ms) {
 		if (m_signal.wait(wait_time_max_ms)) {
 			MutexAutoLock lock(m_mutex);
 
@@ -185,8 +167,7 @@ public:
 		throw ItemNotFoundException("MutexedQueue: queue is empty");
 	}
 
-	T pop_frontNoEx()
-	{
+	T pop_frontNoEx() {
 		m_signal.wait();
 
 		MutexAutoLock lock(m_mutex);
@@ -196,8 +177,7 @@ public:
 		return t;
 	}
 
-	T pop_back(u32 wait_time_max_ms=0)
-	{
+	T pop_back(u32 wait_time_max_ms = 0) {
 		if (m_signal.wait(wait_time_max_ms)) {
 			MutexAutoLock lock(m_mutex);
 
@@ -210,10 +190,9 @@ public:
 	}
 
 	/* this version of pop_back returns an empty element of T on timeout.
-	* Make sure default constructor of T creates a recognizable "empty" element
-	*/
-	T pop_backNoEx(u32 wait_time_max_ms)
-	{
+	 * Make sure default constructor of T creates a recognizable "empty" element
+	 */
+	T pop_backNoEx(u32 wait_time_max_ms) {
 		if (m_signal.wait(wait_time_max_ms)) {
 			MutexAutoLock lock(m_mutex);
 
@@ -225,8 +204,7 @@ public:
 		return T();
 	}
 
-	T pop_backNoEx()
-	{
+	T pop_backNoEx() {
 		m_signal.wait();
 
 		MutexAutoLock lock(m_mutex);
@@ -250,32 +228,27 @@ protected:
 	LRU cache
 */
 
-template<typename K, typename V>
-class LRUCache
-{
+template <typename K, typename V>
+class LRUCache {
 public:
 	LRUCache(size_t limit, void (*cache_miss)(void *data, const K &key, V *dest),
-			void *data)
-	{
+			void *data) {
 		m_limit = limit;
 		m_cache_miss = cache_miss;
 		m_cache_miss_data = data;
 	}
 
-	void setLimit(size_t limit)
-	{
+	void setLimit(size_t limit) {
 		m_limit = limit;
 		invalidate();
 	}
 
-	void invalidate()
-	{
+	void invalidate() {
 		m_map.clear();
 		m_queue.clear();
 	}
 
-	const V *lookupCache(K key)
-	{
+	const V *lookupCache(K key) {
 		typename cache_type::iterator it = m_map.find(key);
 		V *ret;
 		if (it != m_map.end()) {
@@ -292,7 +265,7 @@ public:
 		} else {
 			// cache miss -- enter into cache
 			cache_entry_t &entry =
-				m_map[key];
+					m_map[key];
 			ret = &entry.second;
 			m_cache_miss(m_cache_miss_data, key, &entry.second);
 
@@ -308,6 +281,7 @@ public:
 		}
 		return ret;
 	}
+
 private:
 	void (*m_cache_miss)(void *data, const K &key, V *dest);
 	void *m_cache_miss_data;
@@ -334,17 +308,16 @@ private:
 	- when iteration finishes the "new" map is merged into the "real" map
 */
 
-template<typename K, typename V>
-class ModifySafeMap
-{
+template <typename K, typename V>
+class ModifySafeMap {
 public:
 	// this allows bare pointers but also e.g. std::unique_ptr
 	static_assert(std::is_default_constructible<V>::value,
-		"Value type must be default constructible");
+			"Value type must be default constructible");
 	static_assert(std::is_constructible<bool, V>::value,
-		"Value type must be convertible to bool");
+			"Value type must be convertible to bool");
 	static_assert(std::is_move_assignable<V>::value,
-		"Value type must be move-assignable");
+			"Value type must be move-assignable");
 
 	typedef K key_type;
 	typedef V mapped_type;
@@ -501,7 +474,7 @@ protected:
 		assert(!m_iterating);
 		if (m_values.size() < GC_MIN_SIZE || m_garbage < m_values.size() / 2)
 			return;
-		for (auto it = m_values.begin(); it != m_values.end(); ) {
+		for (auto it = m_values.begin(); it != m_values.end();) {
 			if (!it->second)
 				it = m_values.erase(it);
 			else
@@ -525,7 +498,8 @@ protected:
 		auto end() { return m->m_values.cend(); }
 
 	private:
-		IterationHelper(ModifySafeMap<K, V> *parent) : m(parent) {
+		IterationHelper(ModifySafeMap<K, V> *parent) :
+				m(parent) {
 			assert(m->m_iterating < std::numeric_limits<decltype(m_iterating)>::max());
 			m->m_iterating++;
 		}

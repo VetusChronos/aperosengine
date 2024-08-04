@@ -24,17 +24,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class Client;
 
-class GUIItemImage : public gui::IGUIElement
-{
+class GUIItemImage : public gui::IGUIElement {
 public:
 	GUIItemImage(gui::IGUIEnvironment *env, gui::IGUIElement *parent, s32 id,
-		const core::rect<s32> &rectangle, const std::string &item_name,
-		gui::IGUIFont *font, Client *client);
+			const core::rect<s32> &rectangle, const std::string &item_name,
+			gui::IGUIFont *font, Client *client);
 
 	virtual void draw() override;
 
-	virtual void setText(const wchar_t *text) override
-	{
+	virtual void setText(const wchar_t *text) override {
 		m_label = text;
 	}
 

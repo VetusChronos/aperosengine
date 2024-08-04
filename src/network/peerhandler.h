@@ -21,11 +21,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "networkprotocol.h"
 
-namespace con
-{
+namespace con {
 
-typedef enum
-{
+typedef enum {
 	MIN_RTT,
 	MAX_RTT,
 	AVG_RTT,
@@ -36,8 +34,7 @@ typedef enum
 
 class Peer;
 
-class PeerHandler
-{
+class PeerHandler {
 public:
 	PeerHandler() = default;
 
@@ -56,17 +53,14 @@ public:
 	virtual void deletingPeer(Peer *peer, bool timeout) = 0;
 };
 
-enum PeerChangeType : u8
-{
+enum PeerChangeType : u8 {
 	PEER_ADDED,
 	PEER_REMOVED
 };
 
-struct PeerChange
-{
+struct PeerChange {
 	PeerChange(PeerChangeType t, session_t _peer_id, bool _timeout) :
-			type(t), peer_id(_peer_id), timeout(_timeout)
-	{
+			type(t), peer_id(_peer_id), timeout(_timeout) {
 	}
 	PeerChange() = delete;
 
@@ -74,4 +68,4 @@ struct PeerChange
 	session_t peer_id;
 	bool timeout;
 };
-}
+} //namespace con

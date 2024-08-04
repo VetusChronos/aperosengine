@@ -34,13 +34,12 @@ namespace sound {
  */
 
 std::shared_ptr<ISoundDataOpen> ISoundDataOpen::fromOggFile(std::unique_ptr<RAIIOggFile> oggfile,
-		const std::string &filename_for_logging)
-{
+		const std::string &filename_for_logging) {
 	// Get some information about the OGG file
 	std::optional<OggFileDecodeInfo> decode_info = oggfile->getDecodeInfo(filename_for_logging);
 	if (!decode_info.has_value()) {
 		warningstream << "Audio: Error decoding "
-				<< filename_for_logging << '\n';
+					  << filename_for_logging << '\n';
 		return nullptr;
 	}
 
@@ -56,8 +55,7 @@ std::shared_ptr<ISoundDataOpen> ISoundDataOpen::fromOggFile(std::unique_ptr<RAII
  * SoundDataUnopenBuffer struct
  */
 
-std::shared_ptr<ISoundDataOpen> SoundDataUnopenBuffer::open(const std::string &sound_name) &&
-{
+std::shared_ptr<ISoundDataOpen> SoundDataUnopenBuffer::open(const std::string &sound_name) && {
 	// load from m_buffer
 
 	auto oggfile = std::make_unique<RAIIOggFile>();
@@ -67,9 +65,9 @@ std::shared_ptr<ISoundDataOpen> SoundDataUnopenBuffer::open(const std::string &s
 
 	oggfile->m_needs_clear = true;
 	if (ov_open_callbacks(buffer_source.release(), oggfile->get(), nullptr, 0,
-			OggVorbisBufferSource::s_ov_callbacks) != 0) {
+				OggVorbisBufferSource::s_ov_callbacks) != 0) {
 		warningstream << "Audio: Error opening " << sound_name << " for decoding"
-				<< '\n';
+					  << '\n';
 		return nullptr;
 	}
 
@@ -80,15 +78,14 @@ std::shared_ptr<ISoundDataOpen> SoundDataUnopenBuffer::open(const std::string &s
  * SoundDataUnopenFile struct
  */
 
-std::shared_ptr<ISoundDataOpen> SoundDataUnopenFile::open(const std::string &sound_name) &&
-{
+std::shared_ptr<ISoundDataOpen> SoundDataUnopenFile::open(const std::string &sound_name) && {
 	// load from file at m_path
 
 	auto oggfile = std::make_unique<RAIIOggFile>();
 
 	if (ov_fopen(m_path.c_str(), oggfile->get()) != 0) {
 		warningstream << "Audio: Error opening " << m_path << " for decoding"
-				<< '\n';
+					  << '\n';
 		return nullptr;
 	}
 	oggfile->m_needs_clear = true;
@@ -101,12 +98,12 @@ std::shared_ptr<ISoundDataOpen> SoundDataUnopenFile::open(const std::string &sou
  */
 
 SoundDataOpenBuffer::SoundDataOpenBuffer(std::unique_ptr<RAIIOggFile> oggfile,
-		const OggFileDecodeInfo &decode_info) : ISoundDataOpen(decode_info)
-{
+		const OggFileDecodeInfo &decode_info) :
+		ISoundDataOpen(decode_info) {
 	m_buffer = oggfile->loadBuffer(m_decode_info, 0, m_decode_info.length_samples);
 	if (m_buffer.get() == 0) {
 		warningstream << "SoundDataOpenBuffer: Failed to load sound \""
-				<< m_decode_info.name_for_logging << "\"" << '\n';
+					  << m_decode_info.name_for_logging << "\"" << '\n';
 		return;
 	}
 }
@@ -117,15 +114,13 @@ SoundDataOpenBuffer::SoundDataOpenBuffer(std::unique_ptr<RAIIOggFile> oggfile,
 
 SoundDataOpenStream::SoundDataOpenStream(std::unique_ptr<RAIIOggFile> oggfile,
 		const OggFileDecodeInfo &decode_info) :
-	ISoundDataOpen(decode_info), m_oggfile(std::move(oggfile))
-{
+		ISoundDataOpen(decode_info), m_oggfile(std::move(oggfile)) {
 	// do nothing here. buffers are loaded at getOrLoadBufferAt
 }
 
-std::tuple<ALuint, ALuint, ALuint> SoundDataOpenStream::getOrLoadBufferAt(ALuint offset)
-{
+std::tuple<ALuint, ALuint, ALuint> SoundDataOpenStream::getOrLoadBufferAt(ALuint offset) {
 	if (offset >= m_decode_info.length_samples)
-		return {0, m_decode_info.length_samples, 0};
+		return { 0, m_decode_info.length_samples, 0 };
 
 	// find the right-most ContiguousBuffers, such that `m_start <= offset`
 	// equivalent: the first element from the right such that `!(m_start > offset)`
@@ -147,8 +142,8 @@ std::tuple<ALuint, ALuint, ALuint> SoundDataOpenStream::getOrLoadBufferAt(ALuint
 
 		if (upper_it != bufs.end()) {
 			ALuint start = upper_it == bufs.begin() ? lower_rit->m_start
-					: (upper_it - 1)->m_end;
-			return {upper_it->m_buffer.get(), upper_it->m_end, offset - start};
+													: (upper_it - 1)->m_end;
+			return { upper_it->m_buffer.get(), upper_it->m_end, offset - start };
 		}
 	}
 
@@ -162,8 +157,7 @@ std::tuple<ALuint, ALuint, ALuint> SoundDataOpenStream::getOrLoadBufferAt(ALuint
 }
 
 std::tuple<ALuint, ALuint, ALuint> SoundDataOpenStream::loadBufferAt(ALuint offset,
-		std::vector<ContiguousBuffers>::iterator after_it)
-{
+		std::vector<ContiguousBuffers>::iterator after_it) {
 	bool has_before = after_it != m_bufferss.begin();
 	bool has_after = after_it != m_bufferss.end();
 
@@ -187,8 +181,7 @@ std::tuple<ALuint, ALuint, ALuint> SoundDataOpenStream::loadBufferAt(ALuint offs
 			new_buf_start = std::max(
 					end_before,
 					new_buf_end < min_buf_len_samples ? 0
-							: new_buf_end - min_buf_len_samples
-				);
+													  : new_buf_end - min_buf_len_samples);
 		}
 	}
 
@@ -215,11 +208,11 @@ std::tuple<ALuint, ALuint, ALuint> SoundDataOpenStream::loadBufferAt(ALuint offs
 	//   last buffer and the new buffer
 	// * A new ContiguousBuffers otherwise
 	auto it = has_before && new_buf_start == end_before ? after_it - 1
-			: m_bufferss.insert(after_it, ContiguousBuffers{new_buf_start, {}});
+														: m_bufferss.insert(after_it, ContiguousBuffers{ new_buf_start, {} });
 
 	// Add the new SoundBufferUntil
 	size_t new_buf_i = it->m_buffers.size();
-	it->m_buffers.push_back(SoundBufferUntil{new_buf_end, std::move(new_buf)});
+	it->m_buffers.push_back(SoundBufferUntil{ new_buf_end, std::move(new_buf) });
 
 	if (has_after && new_buf_end == start_after) {
 		// Merge after into my ContiguousBuffers
@@ -230,7 +223,7 @@ std::tuple<ALuint, ALuint, ALuint> SoundDataOpenStream::loadBufferAt(ALuint offs
 		it = m_bufferss.erase(it + 1) - 1;
 	}
 
-	return {it->m_buffers[new_buf_i].m_buffer.get(), new_buf_end, offset - new_buf_start};
+	return { it->m_buffers[new_buf_i].m_buffer.get(), new_buf_end, offset - new_buf_start };
 }
 
 } // namespace sound

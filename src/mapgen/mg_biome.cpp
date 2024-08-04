@@ -32,28 +32,26 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 BiomeManager::BiomeManager(Server *server) :
-	ObjDefManager(server, OBJDEF_BIOME)
-{
+		ObjDefManager(server, OBJDEF_BIOME) {
 	m_server = server;
 
 	// Create default biome to be used in case none exist
 	Biome *b = new Biome;
 
-	b->name            = "default";
-	b->flags           = 0;
-	b->depth_top       = 0;
-	b->depth_filler    = -MAX_MAP_GENERATION_LIMIT;
+	b->name = "default";
+	b->flags = 0;
+	b->depth_top = 0;
+	b->depth_filler = -MAX_MAP_GENERATION_LIMIT;
 	b->depth_water_top = 0;
-	b->depth_riverbed  = 0;
-	b->min_pos         = v3s16(-MAX_MAP_GENERATION_LIMIT,
+	b->depth_riverbed = 0;
+	b->min_pos = v3s16(-MAX_MAP_GENERATION_LIMIT,
 			-MAX_MAP_GENERATION_LIMIT, -MAX_MAP_GENERATION_LIMIT);
-	b->max_pos         = v3s16(MAX_MAP_GENERATION_LIMIT,
+	b->max_pos = v3s16(MAX_MAP_GENERATION_LIMIT,
 			MAX_MAP_GENERATION_LIMIT, MAX_MAP_GENERATION_LIMIT);
-	b->heat_point      = 0.0;
-	b->humidity_point  = 0.0;
-	b->vertical_blend  = 0;
+	b->heat_point = 0.0;
+	b->humidity_point = 0.0;
+	b->vertical_blend = 0;
 
 	b->m_nodenames.emplace_back("mapgen_stone");
 	b->m_nodenames.emplace_back("mapgen_stone");
@@ -73,9 +71,7 @@ BiomeManager::BiomeManager(Server *server) :
 	add(b);
 }
 
-
-void BiomeManager::clear()
-{
+void BiomeManager::clear() {
 	EmergeManager *emerge = m_server->getEmergeManager();
 
 	// Remove all dangling references in Decorations
@@ -92,9 +88,7 @@ void BiomeManager::clear()
 	m_objects.resize(1);
 }
 
-
-BiomeManager *BiomeManager::clone() const
-{
+BiomeManager *BiomeManager::clone() const {
 	auto mgr = new BiomeManager();
 	assert(mgr);
 	ObjDefManager::cloneTo(mgr);
@@ -104,43 +98,38 @@ BiomeManager *BiomeManager::clone() const
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void BiomeParamsOriginal::readParams(const Settings *settings)
-{
-	settings->getNoiseParams("mg_biome_np_heat",           np_heat);
-	settings->getNoiseParams("mg_biome_np_heat_blend",     np_heat_blend);
-	settings->getNoiseParams("mg_biome_np_humidity",       np_humidity);
+void BiomeParamsOriginal::readParams(const Settings *settings) {
+	settings->getNoiseParams("mg_biome_np_heat", np_heat);
+	settings->getNoiseParams("mg_biome_np_heat_blend", np_heat_blend);
+	settings->getNoiseParams("mg_biome_np_humidity", np_humidity);
 	settings->getNoiseParams("mg_biome_np_humidity_blend", np_humidity_blend);
 }
 
-
-void BiomeParamsOriginal::writeParams(Settings *settings) const
-{
-	settings->setNoiseParams("mg_biome_np_heat",           np_heat);
-	settings->setNoiseParams("mg_biome_np_heat_blend",     np_heat_blend);
-	settings->setNoiseParams("mg_biome_np_humidity",       np_humidity);
+void BiomeParamsOriginal::writeParams(Settings *settings) const {
+	settings->setNoiseParams("mg_biome_np_heat", np_heat);
+	settings->setNoiseParams("mg_biome_np_heat_blend", np_heat_blend);
+	settings->setNoiseParams("mg_biome_np_humidity", np_humidity);
 	settings->setNoiseParams("mg_biome_np_humidity_blend", np_humidity_blend);
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
 BiomeGenOriginal::BiomeGenOriginal(BiomeManager *biomemgr,
-	const BiomeParamsOriginal *params, v3s16 chunksize)
-{
-	m_bmgr   = biomemgr;
+		const BiomeParamsOriginal *params, v3s16 chunksize) {
+	m_bmgr = biomemgr;
 	m_params = params;
-	m_csize  = chunksize;
+	m_csize = chunksize;
 
-	noise_heat           = new Noise(&params->np_heat,
-									params->seed, m_csize.X, m_csize.Z);
-	noise_humidity       = new Noise(&params->np_humidity,
-									params->seed, m_csize.X, m_csize.Z);
-	noise_heat_blend     = new Noise(&params->np_heat_blend,
-									params->seed, m_csize.X, m_csize.Z);
+	noise_heat = new Noise(&params->np_heat,
+			params->seed, m_csize.X, m_csize.Z);
+	noise_humidity = new Noise(&params->np_humidity,
+			params->seed, m_csize.X, m_csize.Z);
+	noise_heat_blend = new Noise(&params->np_heat_blend,
+			params->seed, m_csize.X, m_csize.Z);
 	noise_humidity_blend = new Noise(&params->np_humidity_blend,
-									params->seed, m_csize.X, m_csize.Z);
+			params->seed, m_csize.X, m_csize.Z);
 
-	heatmap  = noise_heat->result;
+	heatmap = noise_heat->result;
 	humidmap = noise_humidity->result;
 
 	biomemap = new biome_t[m_csize.X * m_csize.Z];
@@ -165,7 +154,7 @@ BiomeGenOriginal::BiomeGenOriginal(BiomeManager *biomemgr,
 	// Getting rid of duplicate biome transition points
 	s16 last = temp_transition_heights[0];
 	size_t out_pos = 1;
-	for (size_t i = 1; i < temp_transition_heights.size(); i++){
+	for (size_t i = 1; i < temp_transition_heights.size(); i++) {
 		if (temp_transition_heights[i] != last) {
 			last = temp_transition_heights[i];
 			temp_transition_heights[out_pos++] = last;
@@ -176,47 +165,39 @@ BiomeGenOriginal::BiomeGenOriginal(BiomeManager *biomemgr,
 	memcpy(biome_transitions, temp_transition_heights.data(), sizeof(s16) * out_pos);
 }
 
-BiomeGenOriginal::~BiomeGenOriginal()
-{
-	delete []biomemap;
+BiomeGenOriginal::~BiomeGenOriginal() {
+	delete[] biomemap;
 
-	delete []biome_transitions;
+	delete[] biome_transitions;
 	delete noise_heat;
 	delete noise_humidity;
 	delete noise_heat_blend;
 	delete noise_humidity_blend;
 }
 
-s16* BiomeGenOriginal::getBiomeTransitions() const
-{
+s16 *BiomeGenOriginal::getBiomeTransitions() const {
 	return biome_transitions;
 }
 
-BiomeGen *BiomeGenOriginal::clone(BiomeManager *biomemgr) const
-{
+BiomeGen *BiomeGenOriginal::clone(BiomeManager *biomemgr) const {
 	return new BiomeGenOriginal(biomemgr, m_params, m_csize);
 }
 
-float BiomeGenOriginal::calcHeatAtPoint(v3s16 pos) const
-{
+float BiomeGenOriginal::calcHeatAtPoint(v3s16 pos) const {
 	return NoisePerlin2D(&m_params->np_heat, pos.X, pos.Z, m_params->seed) +
-		NoisePerlin2D(&m_params->np_heat_blend, pos.X, pos.Z, m_params->seed);
+			NoisePerlin2D(&m_params->np_heat_blend, pos.X, pos.Z, m_params->seed);
 }
 
-float BiomeGenOriginal::calcHumidityAtPoint(v3s16 pos) const
-{
+float BiomeGenOriginal::calcHumidityAtPoint(v3s16 pos) const {
 	return NoisePerlin2D(&m_params->np_humidity, pos.X, pos.Z, m_params->seed) +
-		NoisePerlin2D(&m_params->np_humidity_blend, pos.X, pos.Z, m_params->seed);
+			NoisePerlin2D(&m_params->np_humidity_blend, pos.X, pos.Z, m_params->seed);
 }
 
-Biome *BiomeGenOriginal::calcBiomeAtPoint(v3s16 pos) const
-{
+Biome *BiomeGenOriginal::calcBiomeAtPoint(v3s16 pos) const {
 	return calcBiomeFromNoise(calcHeatAtPoint(pos), calcHumidityAtPoint(pos), pos);
 }
 
-
-void BiomeGenOriginal::calcBiomeNoise(v3s16 pmin)
-{
+void BiomeGenOriginal::calcBiomeNoise(v3s16 pmin) {
 	m_pmin = pmin;
 
 	noise_heat->perlinMap2D(pmin.X, pmin.Z);
@@ -225,48 +206,40 @@ void BiomeGenOriginal::calcBiomeNoise(v3s16 pmin)
 	noise_humidity_blend->perlinMap2D(pmin.X, pmin.Z);
 
 	for (s32 i = 0; i < m_csize.X * m_csize.Z; i++) {
-		noise_heat->result[i]     += noise_heat_blend->result[i];
+		noise_heat->result[i] += noise_heat_blend->result[i];
 		noise_humidity->result[i] += noise_humidity_blend->result[i];
 	}
 }
 
-
-biome_t *BiomeGenOriginal::getBiomes(s16 *heightmap, v3s16 pmin)
-{
+biome_t *BiomeGenOriginal::getBiomes(s16 *heightmap, v3s16 pmin) {
 	for (s16 zr = 0; zr < m_csize.Z; zr++)
-	for (s16 xr = 0; xr < m_csize.X; xr++) {
-		s32 i = zr * m_csize.X + xr;
-		Biome *biome = calcBiomeFromNoise(
-			noise_heat->result[i],
-			noise_humidity->result[i],
-			v3s16(pmin.X + xr, heightmap[i], pmin.Z + zr));
+		for (s16 xr = 0; xr < m_csize.X; xr++) {
+			s32 i = zr * m_csize.X + xr;
+			Biome *biome = calcBiomeFromNoise(
+					noise_heat->result[i],
+					noise_humidity->result[i],
+					v3s16(pmin.X + xr, heightmap[i], pmin.Z + zr));
 
-		biomemap[i] = biome->index;
-	}
+			biomemap[i] = biome->index;
+		}
 
 	return biomemap;
 }
 
-
-Biome *BiomeGenOriginal::getBiomeAtPoint(v3s16 pos) const
-{
+Biome *BiomeGenOriginal::getBiomeAtPoint(v3s16 pos) const {
 	return getBiomeAtIndex(
-		(pos.Z - m_pmin.Z) * m_csize.X + (pos.X - m_pmin.X),
-		pos);
+			(pos.Z - m_pmin.Z) * m_csize.X + (pos.X - m_pmin.X),
+			pos);
 }
 
-
-Biome *BiomeGenOriginal::getBiomeAtIndex(size_t index, v3s16 pos) const
-{
+Biome *BiomeGenOriginal::getBiomeAtIndex(size_t index, v3s16 pos) const {
 	return calcBiomeFromNoise(
-		noise_heat->result[index],
-		noise_humidity->result[index],
-		pos);
+			noise_heat->result[index],
+			noise_humidity->result[index],
+			pos);
 }
 
-
-Biome *BiomeGenOriginal::calcBiomeFromNoise(float heat, float humidity, v3s16 pos) const
-{
+Biome *BiomeGenOriginal::calcBiomeFromNoise(float heat, float humidity, v3s16 pos) const {
 	Biome *biome_closest = nullptr;
 	Biome *biome_closest_blend = nullptr;
 	float dist_min = FLT_MAX;
@@ -307,17 +280,15 @@ Biome *BiomeGenOriginal::calcBiomeFromNoise(float heat, float humidity, v3s16 po
 
 	if (biome_closest_blend && dist_min_blend <= dist_min &&
 			rng.range(0, biome_closest_blend->vertical_blend) >=
-			pos.Y - biome_closest_blend->max_pos.Y)
+					pos.Y - biome_closest_blend->max_pos.Y)
 		return biome_closest_blend;
 
 	return (biome_closest) ? biome_closest : (Biome *)m_bmgr->getRaw(BIOME_NONE);
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
-ObjDef *Biome::clone() const
-{
+ObjDef *Biome::clone() const {
 	auto obj = new Biome();
 	ObjDef::cloneTo(obj);
 	NodeResolver::cloneTo(obj);
@@ -351,18 +322,17 @@ ObjDef *Biome::clone() const
 	return obj;
 }
 
-void Biome::resolveNodeNames()
-{
-	getIdFromNrBacklog(&c_top,           "mapgen_stone",              CONTENT_AIR,    false);
-	getIdFromNrBacklog(&c_filler,        "mapgen_stone",              CONTENT_AIR,    false);
-	getIdFromNrBacklog(&c_stone,         "mapgen_stone",              CONTENT_AIR,    false);
-	getIdFromNrBacklog(&c_water_top,     "mapgen_water_source",       CONTENT_AIR,    false);
-	getIdFromNrBacklog(&c_water,         "mapgen_water_source",       CONTENT_AIR,    false);
-	getIdFromNrBacklog(&c_river_water,   "mapgen_river_water_source", CONTENT_AIR,    false);
-	getIdFromNrBacklog(&c_riverbed,      "mapgen_stone",              CONTENT_AIR,    false);
-	getIdFromNrBacklog(&c_dust,          "ignore",                    CONTENT_IGNORE, false);
+void Biome::resolveNodeNames() {
+	getIdFromNrBacklog(&c_top, "mapgen_stone", CONTENT_AIR, false);
+	getIdFromNrBacklog(&c_filler, "mapgen_stone", CONTENT_AIR, false);
+	getIdFromNrBacklog(&c_stone, "mapgen_stone", CONTENT_AIR, false);
+	getIdFromNrBacklog(&c_water_top, "mapgen_water_source", CONTENT_AIR, false);
+	getIdFromNrBacklog(&c_water, "mapgen_water_source", CONTENT_AIR, false);
+	getIdFromNrBacklog(&c_river_water, "mapgen_river_water_source", CONTENT_AIR, false);
+	getIdFromNrBacklog(&c_riverbed, "mapgen_stone", CONTENT_AIR, false);
+	getIdFromNrBacklog(&c_dust, "ignore", CONTENT_IGNORE, false);
 	getIdsFromNrBacklog(&c_cave_liquid);
-	getIdFromNrBacklog(&c_dungeon,       "ignore",                    CONTENT_IGNORE, false);
-	getIdFromNrBacklog(&c_dungeon_alt,   "ignore",                    CONTENT_IGNORE, false);
-	getIdFromNrBacklog(&c_dungeon_stair, "ignore",                    CONTENT_IGNORE, false);
+	getIdFromNrBacklog(&c_dungeon, "ignore", CONTENT_IGNORE, false);
+	getIdFromNrBacklog(&c_dungeon_alt, "ignore", CONTENT_IGNORE, false);
+	getIdFromNrBacklog(&c_dungeon_stair, "ignore", CONTENT_IGNORE, false);
 }

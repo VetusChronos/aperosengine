@@ -23,10 +23,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <string>
 #include <functional>
 
-template<int BufferLength, typename Emitter = std::function<void(const std::string &)> >
+template <int BufferLength, typename Emitter = std::function<void(const std::string &)>>
 class StringStreamBuffer : public std::streambuf {
 public:
-	StringStreamBuffer(Emitter emitter) : m_emitter(emitter) {
+	StringStreamBuffer(Emitter emitter) :
+			m_emitter(emitter) {
 		buffer_index = 0;
 	}
 
@@ -54,6 +55,7 @@ public:
 			push_back(s[i]);
 		return n;
 	}
+
 private:
 	Emitter m_emitter;
 	char buffer[BufferLength];

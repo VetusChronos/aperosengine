@@ -33,8 +33,7 @@ namespace sound {
 /**
  * Stores sound pcm data buffers.
  */
-struct ISoundDataOpen
-{
+struct ISoundDataOpen {
 	OggFileDecodeInfo m_decode_info;
 
 	explicit ISoundDataOpen(const OggFileDecodeInfo &decode_info) :
@@ -67,14 +66,13 @@ struct ISoundDataOpen
 	virtual std::tuple<ALuint, ALuint, ALuint> getOrLoadBufferAt(ALuint offset) = 0;
 
 	static std::shared_ptr<ISoundDataOpen> fromOggFile(std::unique_ptr<RAIIOggFile> oggfile,
-		const std::string &filename_for_logging);
+			const std::string &filename_for_logging);
 };
 
 /**
  * Will be opened lazily when first used.
  */
-struct ISoundDataUnopen
-{
+struct ISoundDataUnopen {
 	virtual ~ISoundDataUnopen() = default;
 
 	// Note: The ISoundDataUnopen is moved (see &&). It is not meant to be kept
@@ -85,11 +83,11 @@ struct ISoundDataUnopen
 /**
  * Sound file is in a memory buffer.
  */
-struct SoundDataUnopenBuffer final : ISoundDataUnopen
-{
+struct SoundDataUnopenBuffer final : ISoundDataUnopen {
 	std::string m_buffer;
 
-	explicit SoundDataUnopenBuffer(std::string &&buffer) : m_buffer(std::move(buffer)) {}
+	explicit SoundDataUnopenBuffer(std::string &&buffer) :
+			m_buffer(std::move(buffer)) {}
 
 	std::shared_ptr<ISoundDataOpen> open(const std::string &sound_name) && override;
 };
@@ -97,11 +95,11 @@ struct SoundDataUnopenBuffer final : ISoundDataUnopen
 /**
  * Sound file is in file system.
  */
-struct SoundDataUnopenFile final : ISoundDataUnopen
-{
+struct SoundDataUnopenFile final : ISoundDataUnopen {
 	std::string m_path;
 
-	explicit SoundDataUnopenFile(const std::string &path) : m_path(path) {}
+	explicit SoundDataUnopenFile(const std::string &path) :
+			m_path(path) {}
 
 	std::shared_ptr<ISoundDataOpen> open(const std::string &sound_name) && override;
 };
@@ -110,8 +108,7 @@ struct SoundDataUnopenFile final : ISoundDataUnopen
  * Non-streaming opened sound data.
  * All data is completely loaded in one buffer.
  */
-struct SoundDataOpenBuffer final : ISoundDataOpen
-{
+struct SoundDataOpenBuffer final : ISoundDataOpen {
 	RAIIALSoundBuffer m_buffer;
 
 	SoundDataOpenBuffer(std::unique_ptr<RAIIOggFile> oggfile,
@@ -119,11 +116,10 @@ struct SoundDataOpenBuffer final : ISoundDataOpen
 
 	bool isStreaming() const noexcept override { return false; }
 
-	std::tuple<ALuint, ALuint, ALuint> getOrLoadBufferAt(ALuint offset) override
-	{
+	std::tuple<ALuint, ALuint, ALuint> getOrLoadBufferAt(ALuint offset) override {
 		if (offset >= m_decode_info.length_samples)
-			return {0, m_decode_info.length_samples, 0};
-		return {m_buffer.get(), m_decode_info.length_samples, offset};
+			return { 0, m_decode_info.length_samples, 0 };
+		return { m_buffer.get(), m_decode_info.length_samples, offset };
 	}
 };
 
@@ -133,13 +129,11 @@ struct SoundDataOpenBuffer final : ISoundDataOpen
  * Uses a sorted list of contiguous sound data regions (`ContiguousBuffers`s) for
  * efficient seeking.
  */
-struct SoundDataOpenStream final : ISoundDataOpen
-{
+struct SoundDataOpenStream final : ISoundDataOpen {
 	/**
 	 * An OpenAL buffer that goes until `m_end` (exclusive).
 	 */
-	struct SoundBufferUntil final
-	{
+	struct SoundBufferUntil final {
 		ALuint m_end;
 		RAIIALSoundBuffer m_buffer;
 	};
@@ -149,8 +143,7 @@ struct SoundDataOpenStream final : ISoundDataOpen
 	 * The start (inclusive) of each buffer is the end of its predecessor, or
 	 * `m_start` for the first buffer.
 	 */
-	struct ContiguousBuffers final
-	{
+	struct ContiguousBuffers final {
 		ALuint m_start;
 		std::vector<SoundBufferUntil> m_buffers;
 	};

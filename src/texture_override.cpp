@@ -47,8 +47,7 @@ static const std::map<std::string, OverrideTarget> override_LUT = {
 	{ "*", OverrideTarget::ALL_FACES }
 };
 
-TextureOverrideSource::TextureOverrideSource(const std::string &filepath)
-{
+TextureOverrideSource::TextureOverrideSource(const std::string &filepath) {
 	auto infile = open_ifstream(filepath.c_str(), false);
 	std::string line;
 	int line_index = 0;
@@ -66,9 +65,9 @@ TextureOverrideSource::TextureOverrideSource(const std::string &filepath)
 		std::vector<std::string> splitted = str_split(line, ' ');
 		if (splitted.size() < 3) {
 			warningstream << filepath << ":" << line_index
-					<< " Syntax error in texture override \"" << line
-					<< "\": Expected 3 arguments, got " << splitted.size()
-					<< '\n';
+						  << " Syntax error in texture override \"" << line
+						  << "\": Expected 3 arguments, got " << splitted.size()
+						  << '\n';
 			continue;
 		}
 
@@ -100,10 +99,9 @@ TextureOverrideSource::TextureOverrideSource(const std::string &filepath)
 
 			// Report invalid target
 			warningstream << filepath << ":" << line_index
-					<< " Syntax error in texture override \"" << line
-					<< "\": Unknown target \"" << target << "\""
-					<< '\n';
-
+						  << " Syntax error in texture override \"" << line
+						  << "\": Unknown target \"" << target << "\""
+						  << '\n';
 		}
 
 		// If there are no valid targets, skip adding this override
@@ -116,8 +114,7 @@ TextureOverrideSource::TextureOverrideSource(const std::string &filepath)
 }
 
 //! Get all overrides that apply to item definitions
-std::vector<TextureOverride> TextureOverrideSource::getItemTextureOverrides() const
-{
+std::vector<TextureOverride> TextureOverrideSource::getItemTextureOverrides() const {
 	std::vector<TextureOverride> found_overrides;
 
 	for (const TextureOverride &texture_override : m_overrides) {
@@ -129,8 +126,7 @@ std::vector<TextureOverride> TextureOverrideSource::getItemTextureOverrides() co
 }
 
 //! Get all overrides that apply to node definitions
-std::vector<TextureOverride> TextureOverrideSource::getNodeTileOverrides() const
-{
+std::vector<TextureOverride> TextureOverrideSource::getNodeTileOverrides() const {
 	std::vector<TextureOverride> found_overrides;
 
 	for (const TextureOverride &texture_override : m_overrides) {

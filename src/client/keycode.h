@@ -25,18 +25,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <IEventReceiver.h>
 #include <string>
 
-class UnknownKeycode : public BaseException
-{
+class UnknownKeycode : public BaseException {
 public:
 	UnknownKeycode(const char *s) :
-		BaseException(s) {};
+			BaseException(s){};
 };
 
 /* A key press, consisting of either an Irrlicht keycode
    or an actual char */
 
-class KeyPress
-{
+class KeyPress {
 public:
 	KeyPress() = default;
 
@@ -44,8 +42,7 @@ public:
 
 	KeyPress(const irr::SEvent::SKeyInput &in, bool prefer_character = false);
 
-	bool operator==(const KeyPress &o) const
-	{
+	bool operator==(const KeyPress &o) const {
 		return (Char > 0 && Char == o.Char) || (valid_kcode(Key) && Key == o.Key);
 	}
 
@@ -53,8 +50,7 @@ public:
 	const char *name() const;
 
 protected:
-	static bool valid_kcode(irr::EKEY_CODE k)
-	{
+	static bool valid_kcode(irr::EKEY_CODE k) {
 		return k > 0 && k < irr::KEY_KEY_CODES_COUNT;
 	}
 

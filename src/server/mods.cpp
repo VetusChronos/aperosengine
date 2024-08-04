@@ -34,9 +34,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
  * Creates a ServerModManager which targets worldpath
  * @param worldpath
  */
-ServerModManager::ServerModManager(const std::string &worldpath):
-	configuration()
-{
+ServerModManager::ServerModManager(const std::string &worldpath) :
+		configuration() {
 	SubgameSpec gamespec = findWorldSubgame(worldpath);
 
 	// Add all game mods and all world mods
@@ -50,8 +49,7 @@ ServerModManager::ServerModManager(const std::string &worldpath):
 }
 
 // This function cannot be currenctly easily tested but it should be ASAP
-void ServerModManager::loadMods(ServerScripting &script)
-{
+void ServerModManager::loadMods(ServerScripting &script) {
 	// Print mods
 	infostream << "Server: Loading mods: ";
 	for (const ModSpec &mod : configuration.getMods()) {
@@ -67,15 +65,14 @@ void ServerModManager::loadMods(ServerScripting &script)
 		auto t = porting::getTimeMs();
 		script.loadMod(script_path, mod.name);
 		infostream << "Mod \"" << mod.name << "\" loaded after "
-			<< (porting::getTimeMs() - t) << " ms" << '\n';
+				   << (porting::getTimeMs() - t) << " ms" << '\n';
 	}
 
 	// Run a callback when mods are loaded
 	script.on_mods_loaded();
 }
 
-const ModSpec *ServerModManager::getModSpec(const std::string &modname) const
-{
+const ModSpec *ServerModManager::getModSpec(const std::string &modname) const {
 	for (const auto &mod : configuration.getMods()) {
 		if (mod.name == modname)
 			return &mod;
@@ -84,14 +81,12 @@ const ModSpec *ServerModManager::getModSpec(const std::string &modname) const
 	return nullptr;
 }
 
-void ServerModManager::getModNames(std::vector<std::string> &modlist) const
-{
+void ServerModManager::getModNames(std::vector<std::string> &modlist) const {
 	for (const ModSpec &spec : configuration.getMods())
 		modlist.push_back(spec.name);
 }
 
-void ServerModManager::getModsMediaPaths(std::vector<std::string> &paths) const
-{
+void ServerModManager::getModsMediaPaths(std::vector<std::string> &paths) const {
 	// Iterate mods in reverse load order: Media loading expects higher priority media files first
 	// and mods loading later should be able to override media of already loaded mods
 	const auto &mods = configuration.getMods();

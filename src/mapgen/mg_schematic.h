@@ -68,20 +68,19 @@ class Server;
 
 //// Schematic constants
 #define MTSCHEM_FILE_SIGNATURE 0x4d54534d // 'MTSM'
-#define MTSCHEM_FILE_VER_HIGHEST_READ  4
+#define MTSCHEM_FILE_VER_HIGHEST_READ 4
 #define MTSCHEM_FILE_VER_HIGHEST_WRITE 4
-#define MTSCHEM_MAPNODE_SER_FMT_VER    28 // Fixed serialization version for schematics since these still need to use Zlib
+#define MTSCHEM_MAPNODE_SER_FMT_VER 28 // Fixed serialization version for schematics since these still need to use Zlib
 
-#define MTSCHEM_PROB_MASK       0x7F
+#define MTSCHEM_PROB_MASK 0x7F
 
-#define MTSCHEM_PROB_NEVER      0x00
-#define MTSCHEM_PROB_ALWAYS     0x7F
+#define MTSCHEM_PROB_NEVER 0x00
+#define MTSCHEM_PROB_ALWAYS 0x7F
 #define MTSCHEM_PROB_ALWAYS_OLD 0xFF
 
-#define MTSCHEM_FORCE_PLACE     0x80
+#define MTSCHEM_FORCE_PLACE 0x80
 
-enum SchematicType
-{
+enum SchematicType {
 	SCHEMATIC_NORMAL,
 };
 
@@ -101,9 +100,9 @@ public:
 	virtual void resolveNodeNames();
 
 	bool loadSchematicFromFile(const std::string &filename,
-		const NodeDefManager *ndef, StringMap *replace_names = NULL);
+			const NodeDefManager *ndef, StringMap *replace_names = NULL);
 	bool saveSchematicToFile(const std::string &filename,
-		const NodeDefManager *ndef);
+			const NodeDefManager *ndef);
 	bool getSchematicFromMap(Map *map, v3s16 p1, v3s16 p2);
 
 	bool deserializeFromMts(std::istream *is);
@@ -115,8 +114,8 @@ public:
 	void placeOnMap(ServerMap *map, v3s16 p, u32 flags, Rotation rot, bool force_place);
 
 	void applyProbabilities(v3s16 p0,
-		std::vector<std::pair<v3s16, u8> > *plist,
-		std::vector<std::pair<s16, u8> > *splist);
+			std::vector<std::pair<v3s16, u8>> *plist,
+			std::vector<std::pair<s16, u8>> *splist);
 
 	std::vector<content_t> c_nodes;
 	u32 flags = 0;
@@ -138,19 +137,16 @@ public:
 
 	virtual void clear();
 
-	const char *getObjectTitle() const
-	{
+	const char *getObjectTitle() const {
 		return "schematic";
 	}
 
-	static Schematic *create(SchematicType type)
-	{
+	static Schematic *create(SchematicType type) {
 		return new Schematic;
 	}
 
 private:
-	SchematicManager() {};
+	SchematicManager(){};
 
 	Server *m_server;
 };
-

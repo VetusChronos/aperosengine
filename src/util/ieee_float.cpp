@@ -32,8 +32,7 @@
 
 // Given an unsigned 32-bit integer representing an IEEE-754 single-precision
 // float, return the float.
-f32 u32Tof32Slow(u32 i)
-{
+f32 u32Tof32Slow(u32 i) {
 	int exp = (i >> 23) & 0xFF;
 	u32 sign = i & 0x80000000UL;
 	u32 imant = i & 0x7FFFFFUL;
@@ -41,13 +40,10 @@ f32 u32Tof32Slow(u32 i)
 		// Inf/NaN
 		if (imant == 0) {
 			if (std::numeric_limits<f32>::has_infinity)
-				return sign ? -std::numeric_limits<f32>::infinity() :
-					std::numeric_limits<f32>::infinity();
-			return sign ? std::numeric_limits<f32>::max() :
-				std::numeric_limits<f32>::lowest();
+				return sign ? -std::numeric_limits<f32>::infinity() : std::numeric_limits<f32>::infinity();
+			return sign ? std::numeric_limits<f32>::max() : std::numeric_limits<f32>::lowest();
 		}
-		return std::numeric_limits<f32>::has_quiet_NaN ?
-			std::numeric_limits<f32>::quiet_NaN() : -0.f;
+		return std::numeric_limits<f32>::has_quiet_NaN ? std::numeric_limits<f32>::quiet_NaN() : -0.f;
 	}
 
 	if (!exp) {
@@ -55,14 +51,12 @@ f32 u32Tof32Slow(u32 i)
 		return sign ? -ldexpf((f32)imant, -149) : ldexpf((f32)imant, -149);
 	}
 
-	return sign ? -ldexpf((f32)(imant | 0x800000UL), exp - 150) :
-		ldexpf((f32)(imant | 0x800000UL), exp - 150);
+	return sign ? -ldexpf((f32)(imant | 0x800000UL), exp - 150) : ldexpf((f32)(imant | 0x800000UL), exp - 150);
 }
 
 // Given a float, return an unsigned 32-bit integer representing the f32
 // in IEEE-754 single-precision format.
-u32 f32Tou32Slow(f32 f)
-{
+u32 f32Tou32Slow(f32 f) {
 	u32 signbit = std::copysign(1.0f, f) == 1.0f ? 0 : 0x80000000UL;
 	if (f == 0.f)
 		return signbit;
@@ -92,8 +86,7 @@ u32 f32Tou32Slow(f32 f)
 // This test needs the following requisites in order to work:
 // - The float type must be a 32 bits IEEE-754 single-precision float.
 // - The endianness of f32s and integers must match.
-FloatType getFloatSerializationType()
-{
+FloatType getFloatSerializationType() {
 	const f32 cf = -22220490.f;
 	const u32 cu = 0xCBA98765UL;
 	if (std::numeric_limits<f32>::is_iec559 && sizeof(cf) == 4 &&
@@ -104,21 +97,22 @@ FloatType getFloatSerializationType()
 
 	// Run quick tests to ensure the custom functions provide acceptable results
 	warningstream << "floatSerialization: f32 and u32 endianness are "
-		"not equal or machine is not IEEE-754 compliant" << '\n';
+					 "not equal or machine is not IEEE-754 compliant"
+				  << '\n';
 	u32 i;
 	char buf[128];
 
 	// NaN checks aren't included in the main loop
 	if (!std::isnan(u32Tof32Slow(0x7FC00000UL))) {
 		porting::mt_snprintf(buf, sizeof(buf),
-			"u32Tof32Slow(0x7FC00000) failed to produce a NaN, actual: %.9g",
-			u32Tof32Slow(0x7FC00000UL));
+				"u32Tof32Slow(0x7FC00000) failed to produce a NaN, actual: %.9g",
+				u32Tof32Slow(0x7FC00000UL));
 		infostream << buf << '\n';
 	}
 	if (!std::isnan(u32Tof32Slow(0xFFC00000UL))) {
 		porting::mt_snprintf(buf, sizeof(buf),
-			"u32Tof32Slow(0xFFC00000) failed to produce a NaN, actual: %.9g",
-			u32Tof32Slow(0xFFC00000UL));
+				"u32Tof32Slow(0xFFC00000) failed to produce a NaN, actual: %.9g",
+				u32Tof32Slow(0xFFC00000UL));
 		infostream << buf << '\n';
 	}
 
@@ -126,7 +120,7 @@ FloatType getFloatSerializationType()
 	// check that it corresponds to a NaN encoding
 	if ((i & 0x7F800000UL) != 0x7F800000UL || (i & 0x7FFFFFUL) == 0) {
 		porting::mt_snprintf(buf, sizeof(buf),
-			"f32Tou32Slow(NaN) failed to encode NaN, actual: 0x%X", i);
+				"f32Tou32Slow(NaN) failed to encode NaN, actual: 0x%X", i);
 		infostream << buf << '\n';
 	}
 

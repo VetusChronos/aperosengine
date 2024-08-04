@@ -31,11 +31,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class TestFailedException { // don’t derive from std::exception to avoid accidental catch
 public:
-	TestFailedException(std::string in_message, const char *in_file, int in_line)
-		: message(std::move(in_message))
-		, file(fs::GetFilenameFromPath(in_file))
-		, line(in_line)
-	{}
+	TestFailedException(std::string in_message, const char *in_file, int in_line) :
+			message(std::move(in_message)), file(fs::GetFilenameFromPath(in_file)), line(in_line) {}
 
 	const std::string message;
 	const std::string file;
@@ -43,48 +40,52 @@ public:
 };
 
 // Runs a unit test and reports results
-#define TEST(fxn, ...) runTest(#fxn, [&] () { fxn(__VA_ARGS__); });
+#define TEST(fxn, ...) runTest(#fxn, [&]() { fxn(__VA_ARGS__); });
 
 // Asserts the specified condition is true, or fails the current unit test
-#define UASSERT(x) \
-	if (!(x)) { \
+#define UASSERT(x)                                         \
+	if (!(x)) {                                            \
 		throw TestFailedException(#x, __FILE__, __LINE__); \
 	}
 
 // Asserts the specified condition is true, or fails the current unit test
 // and prints the format specifier fmt
-#define UTEST(x, fmt, ...) \
-	if (!(x)) { \
-		char utest_buf[1024]; \
+#define UTEST(x, fmt, ...)                                        \
+	if (!(x)) {                                                   \
+		char utest_buf[1024];                                     \
 		snprintf(utest_buf, sizeof(utest_buf), fmt, __VA_ARGS__); \
 		throw TestFailedException(utest_buf, __FILE__, __LINE__); \
 	}
 
 // Asserts the comparison specified by CMP is true, or fails the current unit test
-#define UASSERTCMP(T, CMP, actual, expected) { \
-	T a = (actual); \
-	T e = (expected); \
-	if (!(a CMP e)) { \
-		std::ostringstream message; \
-		message << #actual " " #CMP " " #expected; \
-		message << '\n' << "    actual  : " << a; \
-		message << '\n' << "    expected: " << e; \
-		throw TestFailedException(message.str(), __FILE__, __LINE__); \
-	} \
-}
+#define UASSERTCMP(T, CMP, actual, expected)                              \
+	{                                                                     \
+		T a = (actual);                                                   \
+		T e = (expected);                                                 \
+		if (!(a CMP e)) {                                                 \
+			std::ostringstream message;                                   \
+			message << #actual " " #CMP " " #expected;                    \
+			message << '\n'                                               \
+					<< "    actual  : " << a;                             \
+			message << '\n'                                               \
+					<< "    expected: " << e;                             \
+			throw TestFailedException(message.str(), __FILE__, __LINE__); \
+		}                                                                 \
+	}
 
 #define UASSERTEQ(T, actual, expected) UASSERTCMP(T, ==, actual, expected)
 
 // UASSERTs that the specified exception occurs
-#define EXCEPTION_CHECK(EType, code) {    \
-	bool exception_thrown = false;        \
-	try {                                 \
-		code;                             \
-	} catch (EType &e) {                  \
-		exception_thrown = true;          \
-	}                                     \
-	UASSERT(exception_thrown);            \
-}
+#define EXCEPTION_CHECK(EType, code)   \
+	{                                  \
+		bool exception_thrown = false; \
+		try {                          \
+			code;                      \
+		} catch (EType & e) {          \
+			exception_thrown = true;   \
+		}                              \
+		UASSERT(exception_thrown);     \
+	}
 
 class IGameDef;
 
@@ -108,14 +109,12 @@ private:
 
 class TestManager {
 public:
-	static std::vector<TestBase *> &getTestModules()
-	{
+	static std::vector<TestBase *> &getTestModules() {
 		static std::vector<TestBase *> m_modules_to_test;
 		return m_modules_to_test;
 	}
 
-	static void registerTestModule(TestBase *module)
-	{
+	static void registerTestModule(TestBase *module) {
 		getTestModules().push_back(module);
 	}
 };

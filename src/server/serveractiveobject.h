@@ -26,7 +26,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "itemgroup.h"
 #include "util/container.h"
 
-
 /*
 
 Some planning
@@ -51,8 +50,7 @@ struct PlayerHPChangeReason;
 class Inventory;
 struct InventoryLocation;
 
-class ServerActiveObject : public ActiveObject
-{
+class ServerActiveObject : public ActiveObject {
 public:
 	/*
 		NOTE: m_env can be NULL, but step() isn't called if it is.
@@ -61,8 +59,7 @@ public:
 	ServerActiveObject(ServerEnvironment *env, v3f pos);
 	virtual ~ServerActiveObject() = default;
 
-	virtual ActiveObjectType getSendType() const
-	{ return getType(); }
+	virtual ActiveObjectType getSendType() const { return getType(); }
 
 	// Called after id has been set and has been inserted in environment
 	virtual void addedToEnvironment(u32 dtime_s){};
@@ -77,25 +74,22 @@ public:
 		Some simple getters/setters
 	*/
 	v3f getBasePosition() const { return m_base_position; }
-	void setBasePosition(v3f pos){ m_base_position = pos; }
-	ServerEnvironment* getEnv(){ return m_env; }
+	void setBasePosition(v3f pos) { m_base_position = pos; }
+	ServerEnvironment *getEnv() { return m_env; }
 
 	/*
 		Some more dynamic interface
 	*/
 
-	virtual void setPos(const v3f &pos)
-		{ setBasePosition(pos); }
-	virtual void addPos(const v3f &added_pos)
-		{ setBasePosition(m_base_position + added_pos); }
+	virtual void setPos(const v3f &pos) { setBasePosition(pos); }
+	virtual void addPos(const v3f &added_pos) { setBasePosition(m_base_position + added_pos); }
 	// continuous: if true, object does not stop immediately at pos
-	virtual void moveTo(v3f pos, bool continuous)
-		{ setBasePosition(pos); }
+	virtual void moveTo(v3f pos, bool continuous) { setBasePosition(pos); }
 	// If object has moved less than this and data has not changed,
 	// saving to disk may be omitted
 	virtual float getMinimumSavedMovement();
 
-	virtual std::string getDescription(){return "SAO";}
+	virtual std::string getDescription() { return "SAO"; }
 
 	/*
 		Step object in time.
@@ -107,21 +101,20 @@ public:
 			same time so that the data can be combined in a single
 			packet.
 	*/
-	virtual void step(float dtime, bool send_recommended){}
+	virtual void step(float dtime, bool send_recommended) {}
 
 	/*
 		The return value of this is passed to the client-side object
 		when it is created
 	*/
-	virtual std::string getClientInitializationData(u16 protocol_version) {return "";}
+	virtual std::string getClientInitializationData(u16 protocol_version) { return ""; }
 
 	/*
 		The return value of this is passed to the server-side object
 		when it is created (converted from static to active - actually
 		the data is the static form)
 	*/
-	virtual void getStaticData(std::string *result) const
-	{
+	virtual void getStaticData(std::string *result) const {
 		assert(isStaticAllowed());
 		*result = "";
 	}
@@ -130,74 +123,63 @@ public:
 		Return false in here to never save and instead remove object
 		on unload. getStaticData() will not be called in that case.
 	*/
-	virtual bool isStaticAllowed() const
-	{return true;}
+	virtual bool isStaticAllowed() const { return true; }
 
 	/*
 		Return false here to never unload the object.
 		isStaticAllowed && shouldUnload -> unload when out of active block range
 		!isStaticAllowed && shouldUnload -> unload when block is unloaded
 	*/
-	virtual bool shouldUnload() const
-	{ return true; }
+	virtual bool shouldUnload() const { return true; }
 
 	// Returns added tool wear
 	virtual u32 punch(v3f dir,
 			const ToolCapabilities *toolcap = nullptr,
 			ServerActiveObject *puncher = nullptr,
 			float time_from_last_punch = 1000000.0f,
-			u16 initial_wear = 0)
-	{ return 0; }
-	virtual void rightClick(ServerActiveObject *clicker)
-	{}
-	virtual void setHP(s32 hp, const PlayerHPChangeReason &reason)
-	{}
-	virtual u16 getHP() const
-	{ return 0; }
+			u16 initial_wear = 0) { return 0; }
+	virtual void rightClick(ServerActiveObject *clicker) {}
+	virtual void setHP(s32 hp, const PlayerHPChangeReason &reason) {}
+	virtual u16 getHP() const { return 0; }
 
-	virtual void setArmorGroups(const ItemGroupList &armor_groups)
-	{}
-	virtual const ItemGroupList &getArmorGroups() const
-	{ static ItemGroupList rv; return rv; }
-	virtual void setAnimation(v2f frames, float frame_speed, float frame_blend, bool frame_loop)
-	{}
-	virtual void getAnimation(v2f *frames, float *frame_speed, float *frame_blend, bool *frame_loop)
-	{}
-	virtual void setAnimationSpeed(float frame_speed)
-	{}
-	virtual void setBoneOverride(const std::string &bone, const BoneOverride &props)
-	{}
-	virtual BoneOverride getBoneOverride(const std::string &bone)
-	{ BoneOverride props; return props; }
-	virtual const BoneOverrideMap &getBoneOverrides() const
-	{ static BoneOverrideMap rv; return rv; }
-	virtual const std::unordered_set<int> &getAttachmentChildIds() const
-	{ static std::unordered_set<int> rv; return rv; }
+	virtual void setArmorGroups(const ItemGroupList &armor_groups) {}
+	virtual const ItemGroupList &getArmorGroups() const {
+		static ItemGroupList rv;
+		return rv;
+	}
+	virtual void setAnimation(v2f frames, float frame_speed, float frame_blend, bool frame_loop) {}
+	virtual void getAnimation(v2f *frames, float *frame_speed, float *frame_blend, bool *frame_loop) {}
+	virtual void setAnimationSpeed(float frame_speed) {}
+	virtual void setBoneOverride(const std::string &bone, const BoneOverride &props) {}
+	virtual BoneOverride getBoneOverride(const std::string &bone) {
+		BoneOverride props;
+		return props;
+	}
+	virtual const BoneOverrideMap &getBoneOverrides() const {
+		static BoneOverrideMap rv;
+		return rv;
+	}
+	virtual const std::unordered_set<int> &getAttachmentChildIds() const {
+		static std::unordered_set<int> rv;
+		return rv;
+	}
 	virtual ServerActiveObject *getParent() const { return nullptr; }
-	virtual ObjectProperties *accessObjectProperties()
-	{ return NULL; }
-	virtual void notifyObjectPropertiesModified()
-	{}
+	virtual ObjectProperties *accessObjectProperties() { return NULL; }
+	virtual void notifyObjectPropertiesModified() {}
 
 	// Inventory and wielded item
-	virtual Inventory *getInventory() const
-	{ return NULL; }
+	virtual Inventory *getInventory() const { return NULL; }
 	virtual InventoryLocation getInventoryLocation() const;
-	virtual void setInventoryModified()
-	{}
-	virtual std::string getWieldList() const
-	{ return ""; }
-	virtual u16 getWieldIndex() const
-	{ return 0; }
+	virtual void setInventoryModified() {}
+	virtual std::string getWieldList() const { return ""; }
+	virtual u16 getWieldIndex() const { return 0; }
 	virtual ItemStack getWieldedItem(ItemStack *selected,
 			ItemStack *hand = nullptr) const;
 	virtual bool setWieldedItem(const ItemStack &item);
-	inline void attachParticleSpawner(u32 id)
-	{
+	inline void attachParticleSpawner(u32 id) {
 		m_attached_particle_spawners.insert(id);
 	}
-	inline void detachParticleSpawner(u32 id)
-	{
+	inline void detachParticleSpawner(u32 id) {
 		m_attached_particle_spawners.erase(id);
 	}
 
@@ -216,11 +198,9 @@ public:
 		A getter that unifies the above to answer the question:
 		"Can the environment still interact with this object?"
 	*/
-	inline bool isGone() const
-	{ return m_pending_removal || m_pending_deactivation; }
+	inline bool isGone() const { return m_pending_removal || m_pending_deactivation; }
 
-	inline bool isPendingRemoval() const
-	{ return m_pending_removal; }
+	inline bool isPendingRemoval() const { return m_pending_removal; }
 
 	/*
 		Whether the object's static data has been stored to a block
@@ -234,7 +214,7 @@ public:
 		The block from which the object was loaded from, and in which
 		a copy of the static data resides.
 	*/
-	v3s16 m_static_block = v3s16(1337,1337,1337);
+	v3s16 m_static_block = v3s16(1337, 1337, 1337);
 
 protected:
 	virtual void onMarkedForDeactivation() {}

@@ -22,8 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "exceptions.h"
 #include "objdef.h"
 
-class TestObjDef : public TestBase
-{
+class TestObjDef : public TestBase {
 public:
 	TestObjDef() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestObjDef"; }
@@ -37,8 +36,7 @@ public:
 
 static TestObjDef g_test_instance;
 
-void TestObjDef::runTests(IGameDef *gamedef)
-{
+void TestObjDef::runTests(IGameDef *gamedef) {
 	TEST(testHandles);
 	TEST(testAddGetSetClear);
 	TEST(testClone);
@@ -48,11 +46,9 @@ void TestObjDef::runTests(IGameDef *gamedef)
 
 /* Minimal implementation of ObjDef and ObjDefManager subclass */
 
-class MyObjDef : public ObjDef
-{
+class MyObjDef : public ObjDef {
 public:
-	ObjDef *clone() const
-	{
+	ObjDef *clone() const {
 		auto def = new MyObjDef();
 		ObjDef::cloneTo(def);
 		def->testvalue = testvalue;
@@ -62,12 +58,11 @@ public:
 	u32 testvalue;
 };
 
-class MyObjDefManager : public ObjDefManager
-{
+class MyObjDefManager : public ObjDefManager {
 public:
-	MyObjDefManager(ObjDefType type) : ObjDefManager(NULL, type){};
-	MyObjDefManager *clone() const
-	{
+	MyObjDefManager(ObjDefType type) :
+			ObjDefManager(NULL, type){};
+	MyObjDefManager *clone() const {
 		auto mgr = new MyObjDefManager();
 		ObjDefManager::cloneTo(mgr);
 		return mgr;
@@ -77,8 +72,7 @@ protected:
 	MyObjDefManager(){};
 };
 
-void TestObjDef::testHandles()
-{
+void TestObjDef::testHandles() {
 	u32 uid = 0;
 	u32 index = 0;
 	ObjDefType type = OBJDEF_GENERIC;
@@ -94,8 +88,7 @@ void TestObjDef::testHandles()
 	UASSERTEQ(ObjDefHandle, OBJDEF_ORE, type);
 }
 
-void TestObjDef::testAddGetSetClear()
-{
+void TestObjDef::testAddGetSetClear() {
 	ObjDefManager testmgr(NULL, OBJDEF_GENERIC);
 	ObjDefHandle hObj0, hObj1, hObj2, hObj3;
 	ObjDef *obj0, *obj1, *obj2, *obj3;
@@ -138,8 +131,7 @@ void TestObjDef::testAddGetSetClear()
 	UASSERTEQ(size_t, testmgr.getNumObjects(), 0);
 }
 
-void TestObjDef::testClone()
-{
+void TestObjDef::testClone() {
 	MyObjDefManager testmgr(OBJDEF_GENERIC);
 	ObjDefManager *mgrcopy;
 	MyObjDef *obj, *temp2;

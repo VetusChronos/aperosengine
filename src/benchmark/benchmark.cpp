@@ -22,8 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
 #include "catch.h"
 
-bool run_benchmarks(const char *arg)
-{
+bool run_benchmarks(const char *arg) {
 	const char *const argv[] = {
 		"MinetestBenchmark", arg, nullptr
 	};

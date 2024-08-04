@@ -24,19 +24,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/string.h"
 
 #if USE_GETTEXT
-	#include <libintl.h>
+#include <libintl.h>
 #else
-	// In certain environments, some standard headers like <iomanip>
-	// and <locale> include libintl.h. If libintl.h is included after
-	// we define our gettext macro below, this causes a syntax error
-	// at the declaration of the gettext function in libintl.h.
-	// Fix this by including such a header before defining the macro.
-	// See issue #4446.
-	// Note that we can't include libintl.h directly since we're in
-	// the USE_GETTEXT=0 case and can't assume that gettext is installed.
-	#include <locale>
+// In certain environments, some standard headers like <iomanip>
+// and <locale> include libintl.h. If libintl.h is included after
+// we define our gettext macro below, this causes a syntax error
+// at the declaration of the gettext function in libintl.h.
+// Fix this by including such a header before defining the macro.
+// See issue #4446.
+// Note that we can't include libintl.h directly since we're in
+// the USE_GETTEXT=0 case and can't assume that gettext is installed.
+#include <locale>
 
-	#define gettext(String) String
+#define gettext(String) String
 #endif
 
 #define _(String) gettext(String)
@@ -44,26 +44,22 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define N_(String) gettext_noop((String))
 
 void init_gettext(const char *path, const std::string &configured_language,
-	int argc, char *argv[]);
+		int argc, char *argv[]);
 
-inline std::string strgettext(const char *str)
-{
+inline std::string strgettext(const char *str) {
 	// We must check here that is not an empty string to avoid trying to translate it
 	return str[0] ? gettext(str) : "";
 }
 
-inline std::string strgettext(const std::string &str)
-{
+inline std::string strgettext(const std::string &str) {
 	return strgettext(str.c_str());
 }
 
-inline std::wstring wstrgettext(const char *str)
-{
+inline std::wstring wstrgettext(const char *str) {
 	return utf8_to_wide(strgettext(str));
 }
 
-inline std::wstring wstrgettext(const std::string &str)
-{
+inline std::wstring wstrgettext(const std::string &str) {
 	return wstrgettext(str.c_str());
 }
 
@@ -75,9 +71,8 @@ inline std::wstring wstrgettext(const std::string &str)
  * @param args Variable format args
  * @return translated string
  */
-template <typename ...Args>
-inline std::wstring fwgettext(const char *src, Args&&... args)
-{
+template <typename... Args>
+inline std::wstring fwgettext(const char *src, Args &&...args) {
 	wchar_t buf[255];
 	swprintf(buf, sizeof(buf) / sizeof(wchar_t), wstrgettext(src).c_str(),
 			std::forward<Args>(args)...);
@@ -92,9 +87,8 @@ inline std::wstring fwgettext(const char *src, Args&&... args)
  * @param args Variable format args
  * @return translated string.
  */
-template <typename ...Args>
-inline std::string fmtgettext(const char *format, Args&&... args)
-{
+template <typename... Args>
+inline std::string fmtgettext(const char *format, Args &&...args) {
 	std::string buf;
 	std::size_t buf_size = 256;
 	buf.resize(buf_size);
@@ -102,9 +96,10 @@ inline std::string fmtgettext(const char *format, Args&&... args)
 	format = gettext(format);
 
 	int len = porting::mt_snprintf(&buf[0], buf_size, format, std::forward<Args>(args)...);
-	if (len <= 0) throw std::runtime_error("gettext format error: " + std::string(format));
+	if (len <= 0)
+		throw std::runtime_error("gettext format error: " + std::string(format));
 	if ((size_t)len >= buf.size()) {
-		buf.resize(len+1); // extra null byte
+		buf.resize(len + 1); // extra null byte
 		porting::mt_snprintf(&buf[0], buf.size(), format, std::forward<Args>(args)...);
 	}
 	buf.resize(len); // remove null bytes

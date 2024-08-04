@@ -53,16 +53,16 @@ public:
 	bool getMapSetting(const std::string &name, std::string *value_out) const;
 
 	bool getMapSettingNoiseParams(const std::string &name,
-		NoiseParams *value_out) const;
+			NoiseParams *value_out) const;
 
 	// Note: Map config becomes read-only after makeMapgenParams() gets called
 	// (i.e. mapgen_params is non-NULL).  Attempts to set map config after
 	// params have been finalized will result in failure.
 	bool setMapSetting(const std::string &name,
-		const std::string &value, bool override_meta = false);
+			const std::string &value, bool override_meta = false);
 
 	bool setMapSettingNoiseParams(const std::string &name,
-		const NoiseParams *value, bool override_meta = false);
+			const NoiseParams *value, bool override_meta = false);
 
 	bool loadMapMeta();
 	bool saveMapMeta();

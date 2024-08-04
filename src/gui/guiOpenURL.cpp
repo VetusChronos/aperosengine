@@ -26,24 +26,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "util/colorize.h"
 
 namespace {
-	constexpr int ID_url = 256;
-	constexpr int ID_open = 259;
-	constexpr int ID_cancel = 261;
-}
+constexpr int ID_url = 256;
+constexpr int ID_open = 259;
+constexpr int ID_cancel = 261;
+} //namespace
 
-GUIOpenURLMenu::GUIOpenURLMenu(gui::IGUIEnvironment* env,
-		gui::IGUIElement* parent, s32 id,
+GUIOpenURLMenu::GUIOpenURLMenu(gui::IGUIEnvironment *env,
+		gui::IGUIElement *parent, s32 id,
 		IMenuManager *menumgr,
-		ISimpleTextureSource *tsrc, const std::string &url
-):
-	GUIModalMenu(env, parent, id, menumgr),
-	m_tsrc(tsrc),
-	url(url)
-{
+		ISimpleTextureSource *tsrc, const std::string &url) :
+		GUIModalMenu(env, parent, id, menumgr),
+		m_tsrc(tsrc),
+		url(url) {
 }
 
-static std::string maybe_colorize_url(const std::string &url)
-{
+static std::string maybe_colorize_url(const std::string &url) {
 	// Forbid escape codes in URL
 	if (url.find('\x1b') != std::string::npos) {
 		throw std::runtime_error("URL contains escape codes");
@@ -56,8 +53,7 @@ static std::string maybe_colorize_url(const std::string &url)
 #endif
 }
 
-void GUIOpenURLMenu::regenerateGui(v2u32 screensize)
-{
+void GUIOpenURLMenu::regenerateGui(v2u32 screensize) {
 	/*
 		Remove stuff
 	*/
@@ -141,8 +137,7 @@ void GUIOpenURLMenu::regenerateGui(v2u32 screensize)
 	}
 }
 
-void GUIOpenURLMenu::drawMenu()
-{
+void GUIOpenURLMenu::drawMenu() {
 	gui::IGUISkin *skin = Environment->getSkin();
 	if (!skin)
 		return;
@@ -157,8 +152,7 @@ void GUIOpenURLMenu::drawMenu()
 #endif
 }
 
-bool GUIOpenURLMenu::OnEvent(const SEvent &event)
-{
+bool GUIOpenURLMenu::OnEvent(const SEvent &event) {
 	if (event.EventType == EET_KEY_INPUT_EVENT) {
 		if (event.KeyInput.Key == KEY_ESCAPE && event.KeyInput.PressedDown) {
 			quitMenu();
@@ -176,7 +170,7 @@ bool GUIOpenURLMenu::OnEvent(const SEvent &event)
 				isVisible()) {
 			if (!canTakeFocus(event.GUIEvent.Element)) {
 				infostream << "GUIOpenURLMenu: Not allowing focus change."
-					<< '\n';
+						   << '\n';
 				// Returning true disables focus change
 				return true;
 			}
@@ -184,13 +178,13 @@ bool GUIOpenURLMenu::OnEvent(const SEvent &event)
 
 		if (event.GUIEvent.EventType == gui::EGET_BUTTON_CLICKED) {
 			switch (event.GUIEvent.Caller->getID()) {
-			case ID_open:
-				porting::open_url(url);
-				quitMenu();
-				return true;
-			case ID_cancel:
-				quitMenu();
-				return true;
+				case ID_open:
+					porting::open_url(url);
+					quitMenu();
+					return true;
+				case ID_cancel:
+					quitMenu();
+					return true;
 			}
 		}
 	}

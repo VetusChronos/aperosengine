@@ -23,20 +23,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/camera.h"
 
 DrawImageStep::DrawImageStep(u8 texture_index, v2f _offset) :
-	texture_index(texture_index), offset(_offset)
-{}
+		texture_index(texture_index), offset(_offset) {}
 
-void DrawImageStep::setRenderSource(RenderSource *_source)
-{
+void DrawImageStep::setRenderSource(RenderSource *_source) {
 	source = _source;
 }
-void DrawImageStep::setRenderTarget(RenderTarget *_target)
-{
+void DrawImageStep::setRenderTarget(RenderTarget *_target) {
 	target = _target;
 }
 
-void DrawImageStep::run(PipelineContext &context)
-{
+void DrawImageStep::run(PipelineContext &context) {
 	if (target)
 		target->activate(context);
 
@@ -46,8 +42,7 @@ void DrawImageStep::run(PipelineContext &context)
 	context.device->getVideoDriver()->draw2DImage(texture, pos);
 }
 
-void populateSideBySidePipeline(RenderPipeline *pipeline, Client *client, bool horizontal, bool flipped, v2f &virtual_size_scale)
-{
+void populateSideBySidePipeline(RenderPipeline *pipeline, Client *client, bool horizontal, bool flipped, v2f &virtual_size_scale) {
 	static const u8 TEXTURE_LEFT = 0;
 	static const u8 TEXTURE_RIGHT = 1;
 
@@ -55,8 +50,7 @@ void populateSideBySidePipeline(RenderPipeline *pipeline, Client *client, bool h
 	if (horizontal) {
 		virtual_size_scale = v2f(1.0f, 0.5f);
 		offset = v2f(0.0f, 0.5f);
-	}
-	else {
+	} else {
 		virtual_size_scale = v2f(0.5f, 1.0f);
 		offset = v2f(0.5f, 0.0f);
 	}

@@ -31,11 +31,9 @@ class Client;
 class Hud;
 class ShadowRenderer;
 
-struct PipelineContext
-{
-	PipelineContext(IrrlichtDevice *_device, Client *_client, Hud *_hud, ShadowRenderer *_shadow_renderer, video::SColor _color, v2u32 _target_size)
-		: device(_device), client(_client), hud(_hud), shadow_renderer(_shadow_renderer), clear_color(_color), target_size(_target_size)
-	{
+struct PipelineContext {
+	PipelineContext(IrrlichtDevice *_device, Client *_client, Hud *_hud, ShadowRenderer *_shadow_renderer, video::SColor _color, v2u32 _target_size) :
+			device(_device), client(_client), hud(_hud), shadow_renderer(_shadow_renderer), clear_color(_color), target_size(_target_size) {
 	}
 
 	IrrlichtDevice *device;
@@ -45,17 +43,16 @@ struct PipelineContext
 	video::SColor clear_color;
 	v2u32 target_size;
 
-	bool show_hud {true};
-	bool draw_wield_tool {true};
-	bool draw_crosshair {true};
+	bool show_hud{ true };
+	bool draw_wield_tool{ true };
+	bool draw_crosshair{ true };
 };
 
 /**
  * Base object that can be owned by RenderPipeline
  *
  */
-class RenderPipelineObject
-{
+class RenderPipelineObject {
 public:
 	virtual ~RenderPipelineObject() = default;
 	virtual void reset(PipelineContext &context) {}
@@ -64,8 +61,7 @@ public:
 /**
  * Represents a source of rendering information such as textures
  */
-class RenderSource : virtual public RenderPipelineObject
-{
+class RenderSource : virtual public RenderPipelineObject {
 public:
 	/**
 	 * Return the number of textures in the source.
@@ -82,28 +78,25 @@ public:
 /**
  *	Represents a render target (screen or framebuffer)
  */
-class RenderTarget : virtual public RenderPipelineObject
-{
+class RenderTarget : virtual public RenderPipelineObject {
 public:
 	/**
 	 * Activate the render target and configure OpenGL state for the output.
 	 * This is usually done by @see RenderStep implementations.
 	 */
-	virtual void activate(PipelineContext &context)
-	{
+	virtual void activate(PipelineContext &context) {
 		m_clear = false;
 	}
 
 	/**
 	 * Resets the state of the object for the next pipeline iteration
 	 */
-	virtual void reset(PipelineContext &context) override
-	{
+	virtual void reset(PipelineContext &context) override {
 		m_clear = true;
 	}
 
 protected:
-	bool m_clear {true};
+	bool m_clear{ true };
 };
 
 /**
@@ -111,8 +104,7 @@ protected:
  *
  * @note Use of TextureBuffer requires use of gl_FragData[] in the shader
  */
-class TextureBuffer : public RenderSource
-{
+class TextureBuffer : public RenderSource {
 public:
 	virtual ~TextureBuffer() override;
 
@@ -125,7 +117,7 @@ public:
 	 * @param name unique name of the texture
 	 * @param format color format
 	 */
-	void setTexture(u8 index, core::dimension2du size, const std::string& name, video::ECOLOR_FORMAT format, bool clear = false);
+	void setTexture(u8 index, core::dimension2du size, const std::string &name, video::ECOLOR_FORMAT format, bool clear = false);
 
 	/**
 	 * Configure relative-size texture for the specific index
@@ -135,21 +127,21 @@ public:
 	 * @param name unique name of the texture
 	 * @param format color format
 	 */
-	void setTexture(u8 index, v2f scale_factor, const std::string& name, video::ECOLOR_FORMAT format, bool clear = false);
+	void setTexture(u8 index, v2f scale_factor, const std::string &name, video::ECOLOR_FORMAT format, bool clear = false);
 
 	virtual u8 getTextureCount() override { return m_textures.size(); }
 	virtual video::ITexture *getTexture(u8 index) override;
 	virtual void reset(PipelineContext &context) override;
 	void swapTextures(u8 texture_a, u8 texture_b);
+
 private:
 	static const u8 NO_DEPTH_TEXTURE = 255;
 
-	struct TextureDefinition
-	{
-		bool valid { false };
-		bool fixed_size { false };
-		bool dirty { false };
-		bool clear { false };
+	struct TextureDefinition {
+		bool valid{ false };
+		bool fixed_size{ false };
+		bool dirty{ false };
+		bool clear{ false };
 		v2f scale_factor;
 		core::dimension2du size;
 		std::string name;
@@ -164,9 +156,9 @@ private:
 	 * @return true if a new texture was created and put into the slot
 	 * @return false if the slot was not modified
 	 */
-	bool ensureTexture(video::ITexture **textureSlot, const TextureDefinition& definition, PipelineContext &context);
+	bool ensureTexture(video::ITexture **textureSlot, const TextureDefinition &definition, PipelineContext &context);
 
-	video::IVideoDriver *m_driver { nullptr };
+	video::IVideoDriver *m_driver{ nullptr };
 	std::vector<TextureDefinition> m_definitions;
 	core::array<video::ITexture *> m_textures;
 };
@@ -174,22 +166,22 @@ private:
 /**
  * Targets output to designated texture in texture buffer
  */
-class TextureBufferOutput : public RenderTarget
-{
+class TextureBufferOutput : public RenderTarget {
 public:
 	TextureBufferOutput(TextureBuffer *buffer, u8 texture_index);
 	TextureBufferOutput(TextureBuffer *buffer, const std::vector<u8> &texture_map);
 	TextureBufferOutput(TextureBuffer *buffer, const std::vector<u8> &texture_map, u8 depth_stencil);
 	virtual ~TextureBufferOutput() override;
 	void activate(PipelineContext &context) override;
+
 private:
 	static const u8 NO_DEPTH_TEXTURE = 255;
 
 	TextureBuffer *buffer;
 	std::vector<u8> texture_map;
-	u8 depth_stencil { NO_DEPTH_TEXTURE };
-	video::IRenderTarget* render_target { nullptr };
-	video::IVideoDriver* driver { nullptr };
+	u8 depth_stencil{ NO_DEPTH_TEXTURE };
+	video::IRenderTarget *render_target{ nullptr };
+	video::IVideoDriver *driver{ nullptr };
 };
 
 /**
@@ -197,12 +189,10 @@ private:
  *
  * @note all unmapped indexes are passed through to the underlying render source.
  */
-class RemappingSource : RenderSource
-{
+class RemappingSource : RenderSource {
 public:
-	RemappingSource(RenderSource *source)
-			: m_source(source)
-	{}
+	RemappingSource(RenderSource *source) :
+			m_source(source) {}
 
 	/**
 	 * Maps texture index to a different index in the dependent source.
@@ -210,8 +200,7 @@ public:
 	 * @param index texture index as requested by the @see RenderStep.
 	 * @param target_index matching texture index in the underlying @see RenderSource.
 	 */
-	void setMapping(u8 index, u8 target_index)
-	{
+	void setMapping(u8 index, u8 target_index) {
 		if (index >= m_mappings.size()) {
 			u8 start = m_mappings.size();
 			m_mappings.resize(index);
@@ -222,25 +211,23 @@ public:
 		m_mappings[index] = target_index;
 	}
 
-	virtual u8 getTextureCount() override
-	{
+	virtual u8 getTextureCount() override {
 		return m_mappings.size();
 	}
 
-	virtual video::ITexture *getTexture(u8 index) override
-	{
+	virtual video::ITexture *getTexture(u8 index) override {
 		if (index < m_mappings.size())
 			index = m_mappings[index];
 
 		return m_source->getTexture(index);
 	}
+
 public:
 	RenderSource *m_source;
 	std::vector<u8> m_mappings;
 };
 
-class DynamicSource : public RenderSource
-{
+class DynamicSource : public RenderSource {
 public:
 	bool isConfigured() { return upstream != nullptr; }
 	void setRenderSource(RenderSource *value) { upstream = value; }
@@ -255,37 +242,37 @@ public:
 	 * Returns nullptr is the texture does not exist.
 	 */
 	virtual video::ITexture *getTexture(u8 index) override;
+
 private:
-	RenderSource *upstream { nullptr };
+	RenderSource *upstream{ nullptr };
 };
 
 /**
  * Implements direct output to screen framebuffer.
  */
-class ScreenTarget : public RenderTarget
-{
+class ScreenTarget : public RenderTarget {
 public:
 	virtual void activate(PipelineContext &context) override;
 	virtual void reset(PipelineContext &context) override;
+
 private:
 	core::dimension2du size;
 };
 
-class DynamicTarget : public RenderTarget
-{
+class DynamicTarget : public RenderTarget {
 public:
 	bool isConfigured() { return upstream != nullptr; }
 	void setRenderTarget(RenderTarget *value) { upstream = value; }
 	virtual void activate(PipelineContext &context) override;
+
 private:
-	RenderTarget *upstream { nullptr };
+	RenderTarget *upstream{ nullptr };
 };
 
 /**
  * Base class for rendering steps in the pipeline
  */
-class RenderStep : virtual public RenderPipelineObject
-{
+class RenderStep : virtual public RenderPipelineObject {
 public:
 	/**
 	 * Assigns render source to this step.
@@ -310,8 +297,7 @@ public:
 /**
  * Provides default empty implementation of supporting methods in a rendering step.
  */
-class TrivialRenderStep : public RenderStep
-{
+class TrivialRenderStep : public RenderStep {
 public:
 	virtual void setRenderSource(RenderSource *source) override {}
 	virtual void setRenderTarget(RenderTarget *target) override {}
@@ -323,11 +309,11 @@ public:
  *
  * This allows re-running parts of the pipeline with different outputs
  */
-class SetRenderTargetStep : public TrivialRenderStep
-{
+class SetRenderTargetStep : public TrivialRenderStep {
 public:
 	SetRenderTargetStep(RenderStep *step, RenderTarget *target);
 	virtual void run(PipelineContext &context) override;
+
 private:
 	RenderStep *step;
 	RenderTarget *target;
@@ -337,11 +323,11 @@ private:
  * Swaps two textures in the texture buffer.
  *
  */
-class SwapTexturesStep : public TrivialRenderStep
-{
+class SwapTexturesStep : public TrivialRenderStep {
 public:
 	SwapTexturesStep(TextureBuffer *buffer, u8 texture_a, u8 texture_b);
 	virtual void run(PipelineContext &context) override;
+
 private:
 	TextureBuffer *buffer;
 	u8 texture_a;
@@ -353,16 +339,14 @@ private:
  *
  * RenderPipeline also implements @see RenderStep, allowing for nesting of the pipelines.
  */
-class RenderPipeline : public RenderStep
-{
+class RenderPipeline : public RenderStep {
 public:
 	/**
 	 * Add a step to the end of the pipeline
 	 *
 	 * @param step reference to a @see RenderStep implementation.
 	 */
-	RenderStep *addStep(RenderStep *step)
-	{
+	RenderStep *addStep(RenderStep *step) {
 		m_pipeline.push_back(step);
 		return step;
 	}
@@ -375,10 +359,9 @@ public:
 	 * @param step reference to the instance.
 	 * @return RenderStep* value of the 'step' parameter.
 	 */
-	template<typename T>
-	T *own(std::unique_ptr<T> &&object)
-	{
-		T* result = object.release();
+	template <typename T>
+	T *own(std::unique_ptr<T> &&object) {
+		T *result = object.release();
 		m_objects.push_back(std::unique_ptr<RenderPipelineObject>(result));
 		return result;
 	}
@@ -391,8 +374,8 @@ public:
 	 * @param args constructor arguments
 	 * @return T* pointer to the newly created object
 	 */
-	template<typename T, typename... Args>
-	T *createOwned(Args&&... args) {
+	template <typename T, typename... Args>
+	T *createOwned(Args &&...args) {
 		return own(std::make_unique<T>(std::forward<Args>(args)...));
 	}
 
@@ -405,9 +388,9 @@ public:
 	 * @param args Constructor parameters
 	 * @return RenderStep* Pointer to the created step for further configuration.
 	 */
-	template<typename T, typename... Args>
-	T *addStep(Args&&... args) {
-		T* result = own(std::make_unique<T>(std::forward<Args>(args)...));
+	template <typename T, typename... Args>
+	T *addStep(Args &&...args) {
+		T *result = own(std::make_unique<T>(std::forward<Args>(args)...));
 		addStep(result);
 		return result;
 	}
@@ -423,10 +406,11 @@ public:
 
 	virtual void setRenderSource(RenderSource *source) override;
 	virtual void setRenderTarget(RenderTarget *target) override;
+
 private:
 	std::vector<RenderStep *> m_pipeline;
-	std::vector< std::unique_ptr<RenderPipelineObject> > m_objects;
+	std::vector<std::unique_ptr<RenderPipelineObject>> m_objects;
 	DynamicSource m_input;
 	DynamicTarget m_output;
-	v2f scale { 1.0f, 1.0f };
+	v2f scale{ 1.0f, 1.0f };
 };

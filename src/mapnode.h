@@ -81,8 +81,7 @@ struct ContentLightingFlags {
 	bool light_propagates : 1;
 	bool sunlight_propagates : 1;
 
-	bool operator==(const ContentLightingFlags &other) const
-	{
+	bool operator==(const ContentLightingFlags &other) const {
 		return has_light == other.has_light && light_propagates == other.light_propagates &&
 				sunlight_propagates == other.sunlight_propagates &&
 				light_source == other.light_source;
@@ -91,8 +90,7 @@ struct ContentLightingFlags {
 };
 static_assert(sizeof(ContentLightingFlags) == 1, "Unexpected ContentLightingFlags size");
 
-enum LightBank
-{
+enum LightBank {
 	LIGHTBANK_DAY,
 	LIGHTBANK_NIGHT
 };
@@ -119,7 +117,7 @@ enum Rotation {
 
 /* maximum amount of liquid in a block */
 #define LIQUID_LEVEL_MAX LIQUID_LEVEL_MASK
-#define LIQUID_LEVEL_SOURCE (LIQUID_LEVEL_MAX+1)
+#define LIQUID_LEVEL_SOURCE (LIQUID_LEVEL_MAX + 1)
 
 #define LIQUID_INFINITY_MASK 0x80 //0b10000000
 
@@ -127,16 +125,13 @@ enum Rotation {
 #define LEVELED_MASK 0x7F
 #define LEVELED_MAX LEVELED_MASK
 
-
 struct ContentFeatures;
 
 /*
 	This is the stuff what the whole world consists of.
 */
 
-
-struct alignas(u32) MapNode
-{
+struct alignas(u32) MapNode {
 	/*
 		Main content
 	*/
@@ -160,42 +155,33 @@ struct alignas(u32) MapNode
 
 	MapNode() = default;
 
-	MapNode(content_t content, u8 a_param1=0, u8 a_param2=0) noexcept
-		: param0(content),
-		  param1(a_param1),
-		  param2(a_param2)
-	{ }
+	MapNode(content_t content, u8 a_param1 = 0, u8 a_param2 = 0) noexcept
+			:
+			param0(content),
+			param1(a_param1),
+			param2(a_param2) {}
 
-	bool operator==(const MapNode &other) const noexcept
-	{
-		return (param0 == other.param0
-				&& param1 == other.param1
-				&& param2 == other.param2);
+	bool operator==(const MapNode &other) const noexcept {
+		return (param0 == other.param0 && param1 == other.param1 && param2 == other.param2);
 	}
 
 	// To be used everywhere
-	content_t getContent() const noexcept
-	{
+	content_t getContent() const noexcept {
 		return param0;
 	}
-	void setContent(content_t c) noexcept
-	{
+	void setContent(content_t c) noexcept {
 		param0 = c;
 	}
-	u8 getParam1() const noexcept
-	{
+	u8 getParam1() const noexcept {
 		return param1;
 	}
-	void setParam1(u8 p) noexcept
-	{
+	void setParam1(u8 p) noexcept {
 		param1 = p;
 	}
-	u8 getParam2() const noexcept
-	{
+	u8 getParam2() const noexcept {
 		return param2;
 	}
-	void setParam2(u8 p) noexcept
-	{
+	void setParam2(u8 p) noexcept {
 		param2 = p;
 	}
 
@@ -207,8 +193,7 @@ struct alignas(u32) MapNode
 	 */
 	void getColor(const ContentFeatures &f, video::SColor *color) const;
 
-	inline void setLight(LightBank bank, u8 a_light, ContentLightingFlags f) noexcept
-	{
+	inline void setLight(LightBank bank, u8 a_light, ContentLightingFlags f) noexcept {
 		// If node doesn't contain light data, ignore this
 		if (!f.has_light)
 			return;
@@ -218,7 +203,7 @@ struct alignas(u32) MapNode
 		} else {
 			assert(bank == LIGHTBANK_NIGHT);
 			param1 &= 0x0f;
-			param1 |= (a_light & 0x0f)<<4;
+			param1 |= (a_light & 0x0f) << 4;
 		}
 	}
 
@@ -227,13 +212,11 @@ struct alignas(u32) MapNode
 	 *
 	 * @return If the light values are equal, returns true; otherwise false
 	 */
-	inline bool isLightDayNightEq(ContentLightingFlags f) const noexcept
-	{
+	inline bool isLightDayNightEq(ContentLightingFlags f) const noexcept {
 		return !f.has_light || getLight(LIGHTBANK_DAY, f) == getLight(LIGHTBANK_NIGHT, f);
 	}
 
-	inline u8 getLight(LightBank bank, ContentLightingFlags f) const noexcept
-	{
+	inline u8 getLight(LightBank bank, ContentLightingFlags f) const noexcept {
 		u8 raw_light = getLightRaw(bank, f);
 		return MYMAX(f.light_source, raw_light);
 	}
@@ -243,17 +226,15 @@ struct alignas(u32) MapNode
 	 * If the node emits light, it is ignored.
 	 * \param f the ContentLightingFlags of this node.
 	 */
-	inline u8 getLightRaw(LightBank bank, ContentLightingFlags f) const noexcept
-	{
-		if(f.has_light)
+	inline u8 getLightRaw(LightBank bank, ContentLightingFlags f) const noexcept {
+		if (f.has_light)
 			return bank == LIGHTBANK_DAY ? param1 & 0x0f : (param1 >> 4) & 0x0f;
 		return 0;
 	}
 
 	// 0 <= daylight_factor <= 1000
 	// 0 <= return value <= LIGHT_SUN
-	u8 getLightBlend(u32 daylight_factor, ContentLightingFlags f) const
-	{
+	u8 getLightBlend(u32 daylight_factor, ContentLightingFlags f) const {
 		u8 lightday = getLight(LIGHTBANK_DAY, f);
 		u8 lightnight = getLight(LIGHTBANK_NIGHT, f);
 		return blend_light(daylight_factor, lightday, lightnight);
@@ -279,19 +260,19 @@ struct alignas(u32) MapNode
 		Gets list of node boxes (used for rendering (NDT_NODEBOX))
 	*/
 	void getNodeBoxes(const NodeDefManager *nodemgr, std::vector<aabb3f> *boxes,
-		u8 neighbors = 0) const;
+			u8 neighbors = 0) const;
 
 	/*
 		Gets list of selection boxes
 	*/
 	void getSelectionBoxes(const NodeDefManager *nodemg,
-		std::vector<aabb3f> *boxes, u8 neighbors = 0) const;
+			std::vector<aabb3f> *boxes, u8 neighbors = 0) const;
 
 	/*
 		Gets list of collision boxes
 	*/
 	void getCollisionBoxes(const NodeDefManager *nodemgr,
-		std::vector<aabb3f> *boxes, u8 neighbors = 0) const;
+			std::vector<aabb3f> *boxes, u8 neighbors = 0) const;
 
 	/*
 		Liquid/leveled helpers

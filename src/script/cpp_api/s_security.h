@@ -21,24 +21,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "cpp_api/s_base.h"
 
-
-#define CHECK_SECURE_PATH_INTERNAL(L, path, write_required, ptr) \
-	if (!ScriptApiSecurity::checkPath(L, path, write_required, ptr)) { \
+#define CHECK_SECURE_PATH_INTERNAL(L, path, write_required, ptr)         \
+	if (!ScriptApiSecurity::checkPath(L, path, write_required, ptr)) {   \
 		throw LuaError(std::string("Mod security: Blocked attempted ") + \
-				(write_required ? "write to " : "read from ") + path); \
+				(write_required ? "write to " : "read from ") + path);   \
 	}
-#define CHECK_SECURE_PATH(L, path, write_required) \
-	if (ScriptApiSecurity::isSecure(L)) { \
+#define CHECK_SECURE_PATH(L, path, write_required)                 \
+	if (ScriptApiSecurity::isSecure(L)) {                          \
 		CHECK_SECURE_PATH_INTERNAL(L, path, write_required, NULL); \
 	}
-#define CHECK_SECURE_PATH_POSSIBLE_WRITE(L, path, ptr) \
-	if (ScriptApiSecurity::isSecure(L)) { \
+#define CHECK_SECURE_PATH_POSSIBLE_WRITE(L, path, ptr)   \
+	if (ScriptApiSecurity::isSecure(L)) {                \
 		CHECK_SECURE_PATH_INTERNAL(L, path, false, ptr); \
 	}
 
-
-class ScriptApiSecurity : virtual public ScriptApiBase
-{
+class ScriptApiSecurity : virtual public ScriptApiBase {
 public:
 	// Sets up security on the ScriptApi's Lua state
 	void initializeSecurity();
@@ -54,7 +51,7 @@ public:
 	static bool checkWhitelisted(lua_State *L, const std::string &setting);
 	// Checks if mods are allowed to read (and optionally write) to the path
 	static bool checkPath(lua_State *L, const char *path, bool write_required,
-			bool *write_allowed=NULL);
+			bool *write_allowed = NULL);
 
 private:
 	int getThread(lua_State *L);

@@ -28,8 +28,7 @@ struct ToolCapabilities;
 struct collisionMoveResult;
 
 class ScriptApiEntity
-		: virtual public ScriptApiBase
-{
+		: virtual public ScriptApiBase {
 public:
 	bool luaentity_Add(u16 id, const char *name);
 	void luaentity_Activate(u16 id,
@@ -40,7 +39,7 @@ public:
 	void luaentity_GetProperties(u16 id,
 			ServerActiveObject *self, ObjectProperties *prop, const std::string &entity_name);
 	void luaentity_Step(u16 id, float dtime,
-		const collisionMoveResult *moveresult);
+			const collisionMoveResult *moveresult);
 	bool luaentity_Punch(u16 id,
 			ServerActiveObject *puncher, float time_from_last_punch,
 			const ToolCapabilities *toolcap, v3f dir, s32 damage);
@@ -49,9 +48,10 @@ public:
 	void luaentity_on_attach_child(u16 id, ServerActiveObject *child);
 	void luaentity_on_detach_child(u16 id, ServerActiveObject *child);
 	void luaentity_on_detach(u16 id, ServerActiveObject *parent);
+
 private:
 	bool luaentity_run_simple_callback(u16 id, ServerActiveObject *sao,
-		const char *field);
+			const char *field);
 
 	void logDeprecationForExistingProperties(lua_State *L, int index, const std::string &name);
 

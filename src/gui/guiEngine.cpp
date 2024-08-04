@@ -42,39 +42,34 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/imagefilters.h"
 
 #if USE_SOUND
-	#include "client/sound/sound_openal.h"
+#include "client/sound/sound_openal.h"
 #endif
 
-
 /******************************************************************************/
-void TextDestGuiEngine::gotText(const StringMap &fields)
-{
+void TextDestGuiEngine::gotText(const StringMap &fields) {
 	m_engine->getScriptIface()->handleMainMenuButtons(fields);
 }
 
 /******************************************************************************/
-void TextDestGuiEngine::gotText(const std::wstring &text)
-{
+void TextDestGuiEngine::gotText(const std::wstring &text) {
 	m_engine->getScriptIface()->handleMainMenuEvent(wide_to_utf8(text));
 }
 
 /******************************************************************************/
-MenuTextureSource::~MenuTextureSource()
-{
+MenuTextureSource::~MenuTextureSource() {
 	u32 before = m_driver->getTextureCount();
 
-	for (const auto &it: m_to_delete) {
+	for (const auto &it : m_to_delete) {
 		m_driver->removeTexture(it);
 	}
 	m_to_delete.clear();
 
-	infostream << "~MenuTextureSource() before cleanup: "<< before
-			<< " after: " << m_driver->getTextureCount() << '\n';
+	infostream << "~MenuTextureSource() before cleanup: " << before
+			   << " after: " << m_driver->getTextureCount() << '\n';
 }
 
 /******************************************************************************/
-video::ITexture *MenuTextureSource::getTexture(const std::string &name, u32 *id)
-{
+video::ITexture *MenuTextureSource::getTexture(const std::string &name, u32 *id) {
 	if (id)
 		*id = 0;
 
@@ -103,8 +98,7 @@ video::ITexture *MenuTextureSource::getTexture(const std::string &name, u32 *id)
 /** MenuMusicFetcher                                                          */
 /******************************************************************************/
 void MenuMusicFetcher::addThePaths(const std::string &name,
-		std::vector<std::string> &paths)
-{
+		std::vector<std::string> &paths) {
 	// Allow full paths
 	if (name.find(DIR_DELIM_CHAR) != std::string::npos) {
 		addAllAlternatives(name, paths);
@@ -123,13 +117,12 @@ GUIEngine::GUIEngine(JoystickController *joystick,
 		IMenuManager *menumgr,
 		MainMenuData *data,
 		bool &kill) :
-	m_rendering_engine(rendering_engine),
-	m_parent(parent),
-	m_menumanager(menumgr),
-	m_smgr(rendering_engine->get_scene_manager()),
-	m_data(data),
-	m_kill(kill)
-{
+		m_rendering_engine(rendering_engine),
+		m_parent(parent),
+		m_menumanager(menumgr),
+		m_smgr(rendering_engine->get_scene_manager()),
+		m_data(data),
+		m_kill(kill) {
 	// initialize texture pointers
 	for (image_definition &texture : m_textures) {
 		texture.texture = NULL;
@@ -159,7 +152,7 @@ GUIEngine::GUIEngine(JoystickController *joystick,
 	m_toplefttext = L"";
 
 	core::rect<s32> rect(0, 0, g_fontengine->getTextWidth(m_toplefttext.c_str()),
-		g_fontengine->getTextHeight());
+			g_fontengine->getTextHeight());
 	rect += v2s32(4, 0);
 
 	m_irr_toplefttext = gui::StaticText::add(rendering_engine->get_gui_env(),
@@ -185,7 +178,7 @@ GUIEngine::GUIEngine(JoystickController *joystick,
 			false);
 
 	m_menu->allowClose(false);
-	m_menu->lockSize(true,v2u32(800,600));
+	m_menu->lockSize(true, v2u32(800, 600));
 
 	// Initialize scripting
 
@@ -214,10 +207,8 @@ GUIEngine::GUIEngine(JoystickController *joystick,
 	m_menu.reset();
 }
 
-
 /******************************************************************************/
-std::string findLocaleFileInMods(const std::string &path, const std::string &filename)
-{
+std::string findLocaleFileInMods(const std::string &path, const std::string &filename) {
 	std::vector<ModSpec> mods = flattenMods(getModsInPath(path, "root", true));
 
 	for (const auto &mod : mods) {
@@ -232,8 +223,7 @@ std::string findLocaleFileInMods(const std::string &path, const std::string &fil
 
 /******************************************************************************/
 Translations *GUIEngine::getContentTranslations(const std::string &path,
-		const std::string &domain, const std::string &lang_code)
-{
+		const std::string &domain, const std::string &lang_code) {
 	if (domain.empty() || lang_code.empty())
 		return nullptr;
 
@@ -266,8 +256,7 @@ Translations *GUIEngine::getContentTranslations(const std::string &path,
 }
 
 /******************************************************************************/
-bool GUIEngine::loadMainMenuScript()
-{
+bool GUIEngine::loadMainMenuScript() {
 	// Set main menu path (for core.get_mainmenu_path())
 	m_scriptdir = g_settings->get("main_menu_path");
 	if (m_scriptdir.empty()) {
@@ -283,15 +272,14 @@ bool GUIEngine::loadMainMenuScript()
 		return true;
 	} catch (const ModError &e) {
 		errorstream << "GUIEngine: execution of menu script failed: "
-			<< e.what() << '\n';
+					<< e.what() << '\n';
 	}
 
 	return false;
 }
 
 /******************************************************************************/
-void GUIEngine::run()
-{
+void GUIEngine::run() {
 	IrrlichtDevice *device = m_rendering_engine->get_raw_device();
 	video::IVideoDriver *driver = device->getVideoDriver();
 
@@ -319,8 +307,7 @@ void GUIEngine::run()
 
 	const irr::core::dimension2d<u32> initial_screen_size(
 			g_settings->getU16("screen_w"),
-			g_settings->getU16("screen_h")
-		);
+			g_settings->getU16("screen_h"));
 	const bool initial_window_maximized = !g_settings->getBool("fullscreen") &&
 			g_settings->getBool("window_maximized");
 
@@ -330,7 +317,6 @@ void GUIEngine::run()
 	fps_control.reset();
 
 	while (m_rendering_engine->run() && !m_startgame && !m_kill) {
-
 		fps_control.limit(device, &dtime);
 
 		if (device->isWindowVisible()) {
@@ -378,8 +364,7 @@ void GUIEngine::run()
 }
 
 /******************************************************************************/
-GUIEngine::~GUIEngine()
-{
+GUIEngine::~GUIEngine() {
 	g_settings->deregisterChangedCallback("fullscreen", fullscreenChangedCallback, this);
 
 	// deinitialize script first. gc destructors might depend on other stuff
@@ -400,46 +385,41 @@ GUIEngine::~GUIEngine()
 }
 
 /******************************************************************************/
-void GUIEngine::cloudInit()
-{
+void GUIEngine::cloudInit() {
 	m_shader_source->addShaderConstantSetterFactory(
-		new FogShaderConstantSetterFactory());
+			new FogShaderConstantSetterFactory());
 
 	m_cloud.clouds = make_irr<Clouds>(m_smgr, m_shader_source.get(), -1, rand());
 	m_cloud.clouds->setHeight(100.0f);
-	m_cloud.clouds->update(v3f(0, 0, 0), video::SColor(255,240,240,255));
+	m_cloud.clouds->update(v3f(0, 0, 0), video::SColor(255, 240, 240, 255));
 
 	m_cloud.camera = m_smgr->addCameraSceneNode(0,
-				v3f(0,0,0), v3f(0, 60, 100));
+			v3f(0, 0, 0), v3f(0, 60, 100));
 	m_cloud.camera->setFarValue(10000);
 }
 
 /******************************************************************************/
-void GUIEngine::drawClouds(float dtime)
-{
-	m_cloud.clouds->step(dtime*3);
+void GUIEngine::drawClouds(float dtime) {
+	m_cloud.clouds->step(dtime * 3);
 	m_smgr->drawAll();
 }
 
 /******************************************************************************/
-void GUIEngine::setFormspecPrepend(const std::string &fs)
-{
+void GUIEngine::setFormspecPrepend(const std::string &fs) {
 	if (m_menu) {
 		m_menu->setFormspecPrepend(fs);
 	}
 }
 
-
 /******************************************************************************/
-void GUIEngine::drawBackground(video::IVideoDriver *driver)
-{
+void GUIEngine::drawBackground(video::IVideoDriver *driver) {
 	v2u32 screensize = driver->getScreenSize();
 
-	video::ITexture* texture = m_textures[TEX_LAYER_BACKGROUND].texture;
+	video::ITexture *texture = m_textures[TEX_LAYER_BACKGROUND].texture;
 
 	/* If no texture, draw background of solid color */
-	if(!texture){
-		video::SColor color(255,80,58,37);
+	if (!texture) {
+		video::SColor color(255, 80, 58, 37);
 		core::rect<s32> rect(0, 0, screensize.X, screensize.Y);
 		driver->draw2DRectangle(color, rect, NULL);
 		return;
@@ -447,19 +427,16 @@ void GUIEngine::drawBackground(video::IVideoDriver *driver)
 
 	v2u32 sourcesize = texture->getOriginalSize();
 
-	if (m_textures[TEX_LAYER_BACKGROUND].tile)
-	{
+	if (m_textures[TEX_LAYER_BACKGROUND].tile) {
 		v2u32 tilesize(
-				MYMAX(sourcesize.X,m_textures[TEX_LAYER_BACKGROUND].minsize),
-				MYMAX(sourcesize.Y,m_textures[TEX_LAYER_BACKGROUND].minsize));
-		for (unsigned int x = 0; x < screensize.X; x += tilesize.X )
-		{
-			for (unsigned int y = 0; y < screensize.Y; y += tilesize.Y )
-			{
+				MYMAX(sourcesize.X, m_textures[TEX_LAYER_BACKGROUND].minsize),
+				MYMAX(sourcesize.Y, m_textures[TEX_LAYER_BACKGROUND].minsize));
+		for (unsigned int x = 0; x < screensize.X; x += tilesize.X) {
+			for (unsigned int y = 0; y < screensize.Y; y += tilesize.Y) {
 				draw2DImageFilterScaled(driver, texture,
-					core::rect<s32>(x, y, x+tilesize.X, y+tilesize.Y),
-					core::rect<s32>(0, 0, sourcesize.X, sourcesize.Y),
-					NULL, NULL, true);
+						core::rect<s32>(x, y, x + tilesize.X, y + tilesize.Y),
+						core::rect<s32>(0, 0, sourcesize.X, sourcesize.Y),
+						NULL, NULL, true);
 			}
 		}
 		return;
@@ -468,48 +445,46 @@ void GUIEngine::drawBackground(video::IVideoDriver *driver)
 	// Chop background image to the smaller screen dimension
 	v2u32 bg_size = screensize;
 	v2f32 scale(
-			(f32) bg_size.X / sourcesize.X,
-			(f32) bg_size.Y / sourcesize.Y);
+			(f32)bg_size.X / sourcesize.X,
+			(f32)bg_size.Y / sourcesize.Y);
 	if (scale.X < scale.Y)
-		bg_size.X = (int) (scale.Y * sourcesize.X);
+		bg_size.X = (int)(scale.Y * sourcesize.X);
 	else
-		bg_size.Y = (int) (scale.X * sourcesize.Y);
+		bg_size.Y = (int)(scale.X * sourcesize.Y);
 	v2s32 offset = v2s32(
-		(s32) screensize.X - (s32) bg_size.X,
-		(s32) screensize.Y - (s32) bg_size.Y
-	) / 2;
+						   (s32)screensize.X - (s32)bg_size.X,
+						   (s32)screensize.Y - (s32)bg_size.Y) /
+			2;
 	/* Draw background texture */
 	draw2DImageFilterScaled(driver, texture,
-		core::rect<s32>(offset.X, offset.Y, bg_size.X + offset.X, bg_size.Y + offset.Y),
-		core::rect<s32>(0, 0, sourcesize.X, sourcesize.Y),
-		NULL, NULL, true);
+			core::rect<s32>(offset.X, offset.Y, bg_size.X + offset.X, bg_size.Y + offset.Y),
+			core::rect<s32>(0, 0, sourcesize.X, sourcesize.Y),
+			NULL, NULL, true);
 }
 
 /******************************************************************************/
-void GUIEngine::drawOverlay(video::IVideoDriver *driver)
-{
+void GUIEngine::drawOverlay(video::IVideoDriver *driver) {
 	v2u32 screensize = driver->getScreenSize();
 
-	video::ITexture* texture = m_textures[TEX_LAYER_OVERLAY].texture;
+	video::ITexture *texture = m_textures[TEX_LAYER_OVERLAY].texture;
 
 	/* If no texture, draw nothing */
-	if(!texture)
+	if (!texture)
 		return;
 
 	/* Draw background texture */
 	v2u32 sourcesize = texture->getOriginalSize();
 	draw2DImageFilterScaled(driver, texture,
-		core::rect<s32>(0, 0, screensize.X, screensize.Y),
-		core::rect<s32>(0, 0, sourcesize.X, sourcesize.Y),
-		NULL, NULL, true);
+			core::rect<s32>(0, 0, screensize.X, screensize.Y),
+			core::rect<s32>(0, 0, sourcesize.X, sourcesize.Y),
+			NULL, NULL, true);
 }
 
 /******************************************************************************/
-void GUIEngine::drawHeader(video::IVideoDriver *driver)
-{
+void GUIEngine::drawHeader(video::IVideoDriver *driver) {
 	core::dimension2d<u32> screensize = driver->getScreenSize();
 
-	video::ITexture* texture = m_textures[TEX_LAYER_HEADER].texture;
+	video::ITexture *texture = m_textures[TEX_LAYER_HEADER].texture;
 
 	// If no texture, draw nothing
 	if (!texture)
@@ -535,11 +510,11 @@ void GUIEngine::drawHeader(video::IVideoDriver *driver)
 	v2s32 splashsize(((f32)texture->getOriginalSize().Width) * mult,
 			((f32)texture->getOriginalSize().Height) * mult);
 
-	s32 free_space = (((s32)screensize.Height)-320)/2;
+	s32 free_space = (((s32)screensize.Height) - 320) / 2;
 
 	core::rect<s32> desired_rect(0, 0, splashsize.X, splashsize.Y);
-	desired_rect += v2s32((screensize.Width/2)-(splashsize.X/2),
-			((free_space/2)-splashsize.Y/2)+10);
+	desired_rect += v2s32((screensize.Width / 2) - (splashsize.X / 2),
+			((free_space / 2) - splashsize.Y / 2) + 10);
 
 	/*
 	 * Make the preferred rectangle fit into the maximum rectangle
@@ -558,20 +533,19 @@ void GUIEngine::drawHeader(video::IVideoDriver *driver)
 	desired_rect.constrainTo(max_rect);
 
 	draw2DImageFilterScaled(driver, texture, desired_rect,
-		core::rect<s32>(core::position2d<s32>(0,0),
-		core::dimension2di(texture->getOriginalSize())),
-		NULL, NULL, true);
+			core::rect<s32>(core::position2d<s32>(0, 0),
+					core::dimension2di(texture->getOriginalSize())),
+			NULL, NULL, true);
 }
 
 /******************************************************************************/
-void GUIEngine::drawFooter(video::IVideoDriver *driver)
-{
+void GUIEngine::drawFooter(video::IVideoDriver *driver) {
 	core::dimension2d<u32> screensize = driver->getScreenSize();
 
-	video::ITexture* texture = m_textures[TEX_LAYER_FOOTER].texture;
+	video::ITexture *texture = m_textures[TEX_LAYER_FOOTER].texture;
 
 	/* If no texture, draw nothing */
-	if(!texture)
+	if (!texture)
 		return;
 
 	f32 mult = (((f32)screensize.Width)) /
@@ -581,24 +555,23 @@ void GUIEngine::drawFooter(video::IVideoDriver *driver)
 			((f32)texture->getOriginalSize().Height) * mult);
 
 	// Don't draw the footer if there isn't enough room
-	s32 free_space = (((s32)screensize.Height)-320)/2;
+	s32 free_space = (((s32)screensize.Height) - 320) / 2;
 
 	if (free_space > footersize.Y) {
-		core::rect<s32> rect(0,0,footersize.X,footersize.Y);
-		rect += v2s32(screensize.Width/2,screensize.Height-footersize.Y);
-		rect -= v2s32(footersize.X/2, 0);
+		core::rect<s32> rect(0, 0, footersize.X, footersize.Y);
+		rect += v2s32(screensize.Width / 2, screensize.Height - footersize.Y);
+		rect -= v2s32(footersize.X / 2, 0);
 
 		draw2DImageFilterScaled(driver, texture, rect,
-			core::rect<s32>(core::position2d<s32>(0,0),
-			core::dimension2di(texture->getOriginalSize())),
-			NULL, NULL, true);
+				core::rect<s32>(core::position2d<s32>(0, 0),
+						core::dimension2di(texture->getOriginalSize())),
+				NULL, NULL, true);
 	}
 }
 
 /******************************************************************************/
 bool GUIEngine::setTexture(texture_layer layer, const std::string &texturepath,
-		bool tile_image, unsigned int minsize)
-{
+		bool tile_image, unsigned int minsize) {
 	video::IVideoDriver *driver = m_rendering_engine->get_video_driver();
 
 	if (m_textures[layer].texture) {
@@ -611,7 +584,7 @@ bool GUIEngine::setTexture(texture_layer layer, const std::string &texturepath,
 	}
 
 	m_textures[layer].texture = driver->getTexture(texturepath.c_str());
-	m_textures[layer].tile    = tile_image;
+	m_textures[layer].tile = tile_image;
 	m_textures[layer].minsize = minsize;
 
 	if (!m_textures[layer].texture) {
@@ -622,8 +595,7 @@ bool GUIEngine::setTexture(texture_layer layer, const std::string &texturepath,
 }
 
 /******************************************************************************/
-bool GUIEngine::downloadFile(const std::string &url, const std::string &target)
-{
+bool GUIEngine::downloadFile(const std::string &url, const std::string &target) {
 #if USE_CURL
 	auto target_file = open_ofstream(target.c_str(), true);
 	if (!target_file.good())
@@ -634,7 +606,7 @@ bool GUIEngine::downloadFile(const std::string &url, const std::string &target)
 	fetch_request.url = url;
 	fetch_request.caller = HTTPFETCH_SYNC;
 	fetch_request.timeout = std::max(MIN_HTTPFETCH_TIMEOUT,
-		(long)g_settings->getS32("curl_file_download_timeout"));
+			(long)g_settings->getS32("curl_file_download_timeout"));
 	bool completed = httpfetch_sync_interruptible(fetch_request, fetch_result);
 
 	if (!completed || !fetch_result.succeeded) {
@@ -653,18 +625,16 @@ bool GUIEngine::downloadFile(const std::string &url, const std::string &target)
 }
 
 /******************************************************************************/
-void GUIEngine::setTopleftText(const std::string &text)
-{
+void GUIEngine::setTopleftText(const std::string &text) {
 	m_toplefttext = translate_string(utf8_to_wide(text));
 
 	updateTopLeftTextSize();
 }
 
 /******************************************************************************/
-void GUIEngine::updateTopLeftTextSize()
-{
+void GUIEngine::updateTopLeftTextSize() {
 	core::rect<s32> rect(0, 0, g_fontengine->getTextWidth(m_toplefttext.c_str()),
-		g_fontengine->getTextHeight());
+			g_fontengine->getTextHeight());
 	rect += v2s32(4, 0);
 
 	m_irr_toplefttext->remove();
@@ -673,7 +643,6 @@ void GUIEngine::updateTopLeftTextSize()
 }
 
 /******************************************************************************/
-void GUIEngine::fullscreenChangedCallback(const std::string &name, void *data)
-{
-	static_cast<GUIEngine*>(data)->getScriptIface()->handleMainMenuEvent("FullscreenChange");
+void GUIEngine::fullscreenChangedCallback(const std::string &name, void *data) {
+	static_cast<GUIEngine *>(data)->getScriptIface()->handleMainMenuEvent("FullscreenChange");
 }

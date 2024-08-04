@@ -24,21 +24,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "settings.h"
 
 RenderingCore::RenderingCore(IrrlichtDevice *_device, Client *_client, Hud *_hud,
-		ShadowRenderer *_shadow_renderer, RenderPipeline *_pipeline, v2f _virtual_size_scale)
-	: device(_device), client(_client), hud(_hud), shadow_renderer(_shadow_renderer),
-	pipeline(_pipeline), virtual_size_scale(_virtual_size_scale)
-{
+		ShadowRenderer *_shadow_renderer, RenderPipeline *_pipeline, v2f _virtual_size_scale) :
+		device(_device), client(_client), hud(_hud), shadow_renderer(_shadow_renderer), pipeline(_pipeline), virtual_size_scale(_virtual_size_scale) {
 }
 
-RenderingCore::~RenderingCore()
-{
+RenderingCore::~RenderingCore() {
 	delete pipeline;
 	delete shadow_renderer;
 }
 
 void RenderingCore::draw(video::SColor _skycolor, bool _show_hud,
-		bool _draw_wield_tool, bool _draw_crosshair)
-{
+		bool _draw_wield_tool, bool _draw_crosshair) {
 	v2u32 screensize = device->getVideoDriver()->getScreenSize();
 	virtual_size = v2u32(screensize.X * virtual_size_scale.X, screensize.Y * virtual_size_scale.Y);
 
@@ -51,7 +47,6 @@ void RenderingCore::draw(video::SColor _skycolor, bool _show_hud,
 	pipeline->run(context);
 }
 
-v2u32 RenderingCore::getVirtualSize() const
-{
+v2u32 RenderingCore::getVirtualSize() const {
 	return virtual_size;
 }

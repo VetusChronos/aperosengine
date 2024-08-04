@@ -25,18 +25,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <S3DVertex.h>
 #include "client/tile.h"
 
-struct PreMeshBuffer
-{
+struct PreMeshBuffer {
 	TileLayer layer;
 	std::vector<u16> indices;
 	std::vector<video::S3DVertex> vertices;
 
 	PreMeshBuffer() = default;
-	explicit PreMeshBuffer(const TileLayer &layer) : layer(layer) {}
+	explicit PreMeshBuffer(const TileLayer &layer) :
+			layer(layer) {}
 };
 
-struct MeshCollector
-{
+struct MeshCollector {
 	std::array<std::vector<PreMeshBuffer>, MAX_TILE_LAYERS> prebuffers;
 	// bounding sphere radius and center
 	f32 m_bounding_radius_sq = 0.0f;
@@ -45,7 +44,8 @@ struct MeshCollector
 
 	// center_pos: pos to use for bounding-sphere, in BS-space
 	// offset: offset added to vertices
-	MeshCollector(const v3f center_pos, v3f offset = v3f()) : m_center_pos(center_pos), offset(offset) {}
+	MeshCollector(const v3f center_pos, v3f offset = v3f()) :
+			m_center_pos(center_pos), offset(offset) {}
 
 	void append(const TileSpec &material,
 			const video::S3DVertex *vertices, u32 numVertices,

@@ -17,7 +17,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-
 #include "lua_api/l_areastore.h"
 #include "lua_api/l_internal.h"
 #include "common/c_converter.h"
@@ -28,8 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fstream>
 
 static inline void get_data_and_corner_flags(lua_State *L, u8 start_i,
-		bool *corners, bool *data)
-{
+		bool *corners, bool *data) {
 	if (!lua_isboolean(L, start_i))
 		return;
 	*corners = lua_toboolean(L, start_i);
@@ -39,8 +37,7 @@ static inline void get_data_and_corner_flags(lua_State *L, u8 start_i,
 }
 
 static void push_area(lua_State *L, const Area *a,
-		bool include_corners, bool include_data)
-{
+		bool include_corners, bool include_data) {
 	if (!include_corners && !include_data) {
 		lua_pushboolean(L, true);
 		return;
@@ -59,8 +56,7 @@ static void push_area(lua_State *L, const Area *a,
 }
 
 static inline void push_areas(lua_State *L, const std::vector<Area *> &areas,
-		bool corners, bool data)
-{
+		bool corners, bool data) {
 	lua_newtable(L);
 	size_t cnt = areas.size();
 	for (size_t i = 0; i < cnt; i++) {
@@ -72,8 +68,7 @@ static inline void push_areas(lua_State *L, const std::vector<Area *> &areas,
 
 // Deserializes value and handles errors
 static int deserialization_helper(lua_State *L, AreaStore *as,
-		std::istream &is)
-{
+		std::istream &is) {
 	try {
 		as->deserialize(is);
 	} catch (const SerializationError &e) {
@@ -87,16 +82,14 @@ static int deserialization_helper(lua_State *L, AreaStore *as,
 }
 
 // garbage collector
-int LuaAreaStore::gc_object(lua_State *L)
-{
+int LuaAreaStore::gc_object(lua_State *L) {
 	LuaAreaStore *o = *(LuaAreaStore **)(lua_touserdata(L, 1));
 	delete o;
 	return 0;
 }
 
 // get_area(id, include_corners, include_data)
-int LuaAreaStore::l_get_area(lua_State *L)
-{
+int LuaAreaStore::l_get_area(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -120,8 +113,7 @@ int LuaAreaStore::l_get_area(lua_State *L)
 }
 
 // get_areas_for_pos(pos, include_corners, include_data)
-int LuaAreaStore::l_get_areas_for_pos(lua_State *L)
-{
+int LuaAreaStore::l_get_areas_for_pos(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -142,8 +134,7 @@ int LuaAreaStore::l_get_areas_for_pos(lua_State *L)
 }
 
 // get_areas_in_area(corner1, corner2, accept_overlap, include_corners, include_data)
-int LuaAreaStore::l_get_areas_in_area(lua_State *L)
-{
+int LuaAreaStore::l_get_areas_in_area(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -169,8 +160,7 @@ int LuaAreaStore::l_get_areas_in_area(lua_State *L)
 }
 
 // insert_area(corner1, corner2, data, id)
-int LuaAreaStore::l_insert_area(lua_State *L)
-{
+int LuaAreaStore::l_insert_area(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -195,8 +185,7 @@ int LuaAreaStore::l_insert_area(lua_State *L)
 }
 
 // reserve(count)
-int LuaAreaStore::l_reserve(lua_State *L)
-{
+int LuaAreaStore::l_reserve(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -208,8 +197,7 @@ int LuaAreaStore::l_reserve(lua_State *L)
 }
 
 // remove_area(id)
-int LuaAreaStore::l_remove_area(lua_State *L)
-{
+int LuaAreaStore::l_remove_area(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -223,8 +211,7 @@ int LuaAreaStore::l_remove_area(lua_State *L)
 }
 
 // set_cache_params(params)
-int LuaAreaStore::l_set_cache_params(lua_State *L)
-{
+int LuaAreaStore::l_set_cache_params(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -242,8 +229,7 @@ int LuaAreaStore::l_set_cache_params(lua_State *L)
 }
 
 // to_string()
-int LuaAreaStore::l_to_string(lua_State *L)
-{
+int LuaAreaStore::l_to_string(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -257,8 +243,7 @@ int LuaAreaStore::l_to_string(lua_State *L)
 }
 
 // to_file(filename)
-int LuaAreaStore::l_to_file(lua_State *L)
-{
+int LuaAreaStore::l_to_file(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -275,8 +260,7 @@ int LuaAreaStore::l_to_file(lua_State *L)
 }
 
 // from_string(str)
-int LuaAreaStore::l_from_string(lua_State *L)
-{
+int LuaAreaStore::l_from_string(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -289,8 +273,7 @@ int LuaAreaStore::l_from_string(lua_State *L)
 }
 
 // from_file(filename)
-int LuaAreaStore::l_from_file(lua_State *L)
-{
+int LuaAreaStore::l_from_file(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
@@ -302,12 +285,11 @@ int LuaAreaStore::l_from_file(lua_State *L)
 	return deserialization_helper(L, o->as, is);
 }
 
-LuaAreaStore::LuaAreaStore() : as(AreaStore::getOptimalImplementation())
-{
+LuaAreaStore::LuaAreaStore() :
+		as(AreaStore::getOptimalImplementation()) {
 }
 
-LuaAreaStore::LuaAreaStore(const std::string &type)
-{
+LuaAreaStore::LuaAreaStore(const std::string &type) {
 #if USE_SPATIAL
 	if (type == "LibSpatial") {
 		as = new SpatialAreaStore();
@@ -318,20 +300,16 @@ LuaAreaStore::LuaAreaStore(const std::string &type)
 	}
 }
 
-LuaAreaStore::~LuaAreaStore()
-{
+LuaAreaStore::~LuaAreaStore() {
 	delete as;
 }
 
 // LuaAreaStore()
 // Creates an LuaAreaStore and leaves it on top of stack
-int LuaAreaStore::create_object(lua_State *L)
-{
+int LuaAreaStore::create_object(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
-	LuaAreaStore *o = (lua_isstring(L, 1)) ?
-		new LuaAreaStore(readParam<std::string>(L, 1)) :
-		new LuaAreaStore();
+	LuaAreaStore *o = (lua_isstring(L, 1)) ? new LuaAreaStore(readParam<std::string>(L, 1)) : new LuaAreaStore();
 
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;
 	luaL_getmetatable(L, className);
@@ -339,11 +317,10 @@ int LuaAreaStore::create_object(lua_State *L)
 	return 1;
 }
 
-void LuaAreaStore::Register(lua_State *L)
-{
+void LuaAreaStore::Register(lua_State *L) {
 	static const luaL_Reg metamethods[] = {
-		{"__gc", gc_object},
-		{0, 0}
+		{ "__gc", gc_object },
+		{ 0, 0 }
 	};
 	registerClass(L, className, methods, metamethods);
 
@@ -364,5 +341,5 @@ const luaL_Reg LuaAreaStore::methods[] = {
 	luamethod(LuaAreaStore, to_file),
 	luamethod(LuaAreaStore, from_string),
 	luamethod(LuaAreaStore, from_file),
-	{0,0}
+	{ 0, 0 }
 };

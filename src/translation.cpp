@@ -22,22 +22,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/string.h"
 #include <unordered_map>
 
-
 #ifndef SERVER
 // Client translations
 static Translations client_translations;
 Translations *g_client_translations = &client_translations;
 #endif
 
-
-void Translations::clear()
-{
+void Translations::clear() {
 	m_translations.clear();
 }
 
 const std::wstring &Translations::getTranslation(
-		const std::wstring &textdomain, const std::wstring &s) const
-{
+		const std::wstring &textdomain, const std::wstring &s) const {
 	std::wstring key = textdomain + L"|" + s;
 	auto it = m_translations.find(key);
 	if (it != m_translations.end())
@@ -45,8 +41,7 @@ const std::wstring &Translations::getTranslation(
 	return s;
 }
 
-void Translations::loadTranslation(const std::string &data)
-{
+void Translations::loadTranslation(const std::string &data) {
 	std::istringstream is(data);
 	std::string textdomain_narrow;
 	std::wstring textdomain;
@@ -55,14 +50,14 @@ void Translations::loadTranslation(const std::string &data)
 	while (is.good()) {
 		std::getline(is, line);
 		// Trim last character if file was using a \r\n line ending
-		if (line.length () > 0 && line[line.length() - 1] == '\r')
+		if (line.length() > 0 && line[line.length() - 1] == '\r')
 			line.resize(line.length() - 1);
 
 		if (str_starts_with(line, "# textdomain:")) {
 			auto parts = str_split(line, ':');
 			if (parts.size() < 2) {
 				errorstream << "Invalid textdomain translation line \"" << line
-						<< "\"" << '\n';
+							<< "\"" << '\n';
 				continue;
 			}
 			textdomain_narrow = trim(parts[1]);
@@ -112,7 +107,7 @@ void Translations::loadTranslation(const std::string &data)
 
 		if (i == wline.length()) {
 			errorstream << "Malformed translation line \"" << line << "\""
-			            << " in text domain " << textdomain_narrow << '\n';
+						<< " in text domain " << textdomain_narrow << '\n';
 			continue;
 		}
 		i++;

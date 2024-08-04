@@ -48,4 +48,3 @@ void imageScaleNNAA(video::IImage *src, const core::rect<s32> &srcrect, video::I
  * @return image or copy of image aligned to npot2
  */
 video::IImage *Align2Npot2(video::IImage *image, video::IVideoDriver *driver);
-

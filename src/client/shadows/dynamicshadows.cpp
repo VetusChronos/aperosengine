@@ -27,20 +27,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 using m4f = core::matrix4;
 
-static v3f quantizeDirection(v3f direction, float step)
-{
-
+static v3f quantizeDirection(v3f direction, float step) {
 	float yaw = std::atan2(direction.Z, direction.X);
 	float pitch = std::asin(direction.Y); // assume look is normalized
 
 	yaw = std::floor(yaw / step) * step;
 	pitch = std::floor(pitch / step) * step;
 
-	return v3f(std::cos(yaw)*std::cos(pitch), std::sin(pitch), std::sin(yaw)*std::cos(pitch));
+	return v3f(std::cos(yaw) * std::cos(pitch), std::sin(pitch), std::sin(yaw) * std::cos(pitch));
 }
 
-void DirectionalLight::createSplitMatrices(const Camera *cam)
-{
+void DirectionalLight::createSplitMatrices(const Camera *cam) {
 	static const float COS_15_DEG = 0.965926f;
 	v3f look = cam->getDirection().normalize();
 
@@ -107,11 +104,11 @@ DirectionalLight::DirectionalLight(const u32 shadowMapResolution,
 		const v3f &position, video::SColorf lightColor,
 		f32 farValue) :
 		diffuseColor(lightColor),
-		farPlane(farValue), mapRes(shadowMapResolution), pos(position)
-{}
+		farPlane(farValue),
+		mapRes(shadowMapResolution),
+		pos(position) {}
 
-void DirectionalLight::update_frustum(const Camera *cam, Client *client, bool force)
-{
+void DirectionalLight::update_frustum(const Camera *cam, Client *client, bool force) {
 	if (dirty && !force)
 		return;
 
@@ -144,8 +141,7 @@ void DirectionalLight::update_frustum(const Camera *cam, Client *client, bool fo
 	}
 }
 
-void DirectionalLight::commitFrustum()
-{
+void DirectionalLight::commitFrustum() {
 	if (!dirty)
 		return;
 
@@ -153,48 +149,39 @@ void DirectionalLight::commitFrustum()
 	dirty = false;
 }
 
-void DirectionalLight::setDirection(v3f dir)
-{
+void DirectionalLight::setDirection(v3f dir) {
 	direction = -dir;
 	direction.normalize();
 }
 
-v3f DirectionalLight::getPosition() const
-{
+v3f DirectionalLight::getPosition() const {
 	return shadow_frustum.position;
 }
 
-v3f DirectionalLight::getPlayerPos() const
-{
+v3f DirectionalLight::getPlayerPos() const {
 	return shadow_frustum.player;
 }
 
-v3f DirectionalLight::getFuturePlayerPos() const
-{
+v3f DirectionalLight::getFuturePlayerPos() const {
 	return future_frustum.player;
 }
 
-const m4f &DirectionalLight::getViewMatrix() const
-{
+const m4f &DirectionalLight::getViewMatrix() const {
 	return shadow_frustum.ViewMat;
 }
 
-const m4f &DirectionalLight::getProjectionMatrix() const
-{
+const m4f &DirectionalLight::getProjectionMatrix() const {
 	return shadow_frustum.ProjOrthMat;
 }
 
-const m4f &DirectionalLight::getFutureViewMatrix() const
-{
+const m4f &DirectionalLight::getFutureViewMatrix() const {
 	return future_frustum.ViewMat;
 }
 
-const m4f &DirectionalLight::getFutureProjectionMatrix() const
-{
+const m4f &DirectionalLight::getFutureProjectionMatrix() const {
 	return future_frustum.ProjOrthMat;
 }
 
-m4f DirectionalLight::getViewProjMatrix()
-{
+m4f DirectionalLight::getViewProjMatrix() {
 	return shadow_frustum.ProjOrthMat * shadow_frustum.ViewMat;
 }

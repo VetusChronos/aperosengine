@@ -40,15 +40,13 @@ public:
 
 static TestInventory g_test_instance;
 
-void TestInventory::runTests(IGameDef *gamedef)
-{
+void TestInventory::runTests(IGameDef *gamedef) {
 	TEST(testSerializeDeserialize, gamedef->getItemDefManager());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestInventory::testSerializeDeserialize(IItemDefManager *idef)
-{
+void TestInventory::testSerializeDeserialize(IItemDefManager *idef) {
 	Inventory inv(idef);
 	std::istringstream is(serialized_inventory_in, std::ios::binary);
 
@@ -81,46 +79,46 @@ void TestInventory::testSerializeDeserialize(IItemDefManager *idef)
 }
 
 const char *TestInventory::serialized_inventory_in =
-	"List 0 10\n"
-	"Width 3\n"
-	"Empty\n"
-	"Empty\n"
-	"Item default:cobble 61\n"
-	"Empty\n"
-	"Empty\n"
-	"Item default:dirt 71\n"
-	"Empty\n"
-	"Item default:dirt 99\n"
-	"Item default:cobble 38\n"
-	"Empty\n"
-	"EndInventoryList\n"
-	"List abc 1\n"
-	"Item default:stick 3\n"
-	"Width 0\n"
-	"EndInventoryList\n"
-	"EndInventory\n";
+		"List 0 10\n"
+		"Width 3\n"
+		"Empty\n"
+		"Empty\n"
+		"Item default:cobble 61\n"
+		"Empty\n"
+		"Empty\n"
+		"Item default:dirt 71\n"
+		"Empty\n"
+		"Item default:dirt 99\n"
+		"Item default:cobble 38\n"
+		"Empty\n"
+		"EndInventoryList\n"
+		"List abc 1\n"
+		"Item default:stick 3\n"
+		"Width 0\n"
+		"EndInventoryList\n"
+		"EndInventory\n";
 
 const char *TestInventory::serialized_inventory_out =
-	"List main 10\n"
-	"Width 5\n"
-	"Empty\n"
-	"Empty\n"
-	"Item default:cobble 61\n"
-	"Empty\n"
-	"Empty\n"
-	"Item default:dirt 71\n"
-	"Empty\n"
-	"Item default:dirt 99\n"
-	"Item default:cobble 38\n"
-	"Empty\n"
-	"EndInventoryList\n"
-	"List abc 1\n"
-	"Width 0\n"
-	"Item default:stick 3\n"
-	"EndInventoryList\n"
-	"EndInventory\n";
+		"List main 10\n"
+		"Width 5\n"
+		"Empty\n"
+		"Empty\n"
+		"Item default:cobble 61\n"
+		"Empty\n"
+		"Empty\n"
+		"Item default:dirt 71\n"
+		"Empty\n"
+		"Item default:dirt 99\n"
+		"Item default:cobble 38\n"
+		"Empty\n"
+		"EndInventoryList\n"
+		"List abc 1\n"
+		"Width 0\n"
+		"Item default:stick 3\n"
+		"EndInventoryList\n"
+		"EndInventory\n";
 
 const char *TestInventory::serialized_inventory_inc =
-	"KeepList main\n"
-	"KeepList abc\n"
-	"EndInventory\n";
+		"KeepList main\n"
+		"KeepList abc\n"
+		"EndInventory\n";

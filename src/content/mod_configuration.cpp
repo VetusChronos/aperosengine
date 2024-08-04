@@ -27,8 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <optional>
 #include <algorithm>
 
-std::string ModConfiguration::getUnsatisfiedModsError() const
-{
+std::string ModConfiguration::getUnsatisfiedModsError() const {
 	std::ostringstream error;
 	error << gettext("Some mods have unsatisfied dependencies:") << '\n';
 
@@ -41,19 +40,17 @@ std::string ModConfiguration::getUnsatisfiedModsError() const
 	}
 
 	error << "\n"
-		<< gettext("Install and enable the required mods, or disable the mods causing errors.") << "\n"
-		<< gettext("Note: this may be caused by a dependency cycle, in which case try updating the mods.");
+		  << gettext("Install and enable the required mods, or disable the mods causing errors.") << "\n"
+		  << gettext("Note: this may be caused by a dependency cycle, in which case try updating the mods.");
 
 	return error.str();
 }
 
-void ModConfiguration::addModsInPath(const std::string &path, const std::string &virtual_path)
-{
+void ModConfiguration::addModsInPath(const std::string &path, const std::string &virtual_path) {
 	addMods(flattenMods(getModsInPath(path, virtual_path)));
 }
 
-void ModConfiguration::addMods(const std::vector<ModSpec> &new_mods)
-{
+void ModConfiguration::addMods(const std::vector<ModSpec> &new_mods) {
 	// Maintain a map of all existing m_unsatisfied_mods.
 	// Keys are mod names and values are indices into m_unsatisfied_mods.
 	std::map<std::string, u32> existing_mods;
@@ -83,11 +80,11 @@ void ModConfiguration::addMods(const std::vector<ModSpec> &new_mods)
 				u32 oldindex = existing_mods[mod.name];
 				const ModSpec &oldmod = m_unsatisfied_mods[oldindex];
 				warningstream << "Mod name conflict detected: \""
-						<< mod.name << "\"" << '\n'
-						<< "Will not load: " << oldmod.path
-						<< '\n'
-						<< "Overridden by: " << mod.path
-						<< '\n';
+							  << mod.name << "\"" << '\n'
+							  << "Will not load: " << oldmod.path
+							  << '\n'
+							  << "Overridden by: " << mod.path
+							  << '\n';
 				m_unsatisfied_mods[oldindex] = mod;
 
 				// If there was a "VERY BAD CASE" name conflict
@@ -98,11 +95,11 @@ void ModConfiguration::addMods(const std::vector<ModSpec> &new_mods)
 				u32 oldindex = existing_mods[mod.name];
 				const ModSpec &oldmod = m_unsatisfied_mods[oldindex];
 				warningstream << "Mod name conflict detected: \""
-						<< mod.name << "\"" << '\n'
-						<< "Will not load: " << oldmod.path
-						<< '\n'
-						<< "Will not load: " << mod.path
-						<< '\n';
+							  << mod.name << "\"" << '\n'
+							  << "Will not load: " << oldmod.path
+							  << '\n'
+							  << "Will not load: " << mod.path
+							  << '\n';
 				m_unsatisfied_mods[oldindex] = mod;
 				m_name_conflicts.insert(mod.name);
 			}
@@ -112,8 +109,7 @@ void ModConfiguration::addMods(const std::vector<ModSpec> &new_mods)
 	}
 }
 
-void ModConfiguration::addGameMods(const SubgameSpec &gamespec)
-{
+void ModConfiguration::addGameMods(const SubgameSpec &gamespec) {
 	std::string game_virtual_path;
 	game_virtual_path.append("games/").append(gamespec.id).append("/mods");
 	addModsInPath(gamespec.gamemods_path, game_virtual_path);
@@ -124,8 +120,7 @@ void ModConfiguration::addGameMods(const SubgameSpec &gamespec)
 
 void ModConfiguration::addModsFromConfig(
 		const std::string &settings_path,
-		const std::unordered_map<std::string, std::string> &modPaths)
-{
+		const std::unordered_map<std::string, std::string> &modPaths) {
 	Settings conf;
 	std::unordered_map<std::string, std::string> load_mod_names;
 
@@ -201,14 +196,13 @@ void ModConfiguration::addModsFromConfig(
 	}
 }
 
-void ModConfiguration::checkConflictsAndDeps()
-{
+void ModConfiguration::checkConflictsAndDeps() {
 	// report on name conflicts
 	if (!m_name_conflicts.empty()) {
 		std::string s = "Unresolved name conflicts for mods ";
 
 		bool add_comma = false;
-		for (const auto& it : m_name_conflicts) {
+		for (const auto &it : m_name_conflicts) {
 			if (add_comma)
 				s.append(", ");
 			s.append("\"").append(it).append("\"");
@@ -223,8 +217,7 @@ void ModConfiguration::checkConflictsAndDeps()
 	resolveDependencies();
 }
 
-void ModConfiguration::resolveDependencies()
-{
+void ModConfiguration::resolveDependencies() {
 	// Compile a list of the mod names we're working with
 	std::set<std::string> modnames;
 	std::optional<ModSpec> first_mod_spec, last_mod_spec;
@@ -242,9 +235,8 @@ void ModConfiguration::resolveDependencies()
 	if (g_settings->getBool("random_mod_load_order")) {
 		MyRandGenerator rg;
 		std::shuffle(m_unsatisfied_mods.begin(),
-			m_unsatisfied_mods.end(),
-			rg
-		);
+				m_unsatisfied_mods.end(),
+				rg);
 	}
 
 	// Check for presence of first and last mod

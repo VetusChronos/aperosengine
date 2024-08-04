@@ -27,61 +27,52 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <cmath>
 #include <sstream>
 
-ScriptApiBase *ModApiBase::getScriptApiBase(lua_State *L)
-{
+ScriptApiBase *ModApiBase::getScriptApiBase(lua_State *L) {
 	// Get server from registry
 	lua_rawgeti(L, LUA_REGISTRYINDEX, CUSTOM_RIDX_SCRIPTAPI);
 	ScriptApiBase *sapi_ptr;
 #if INDIRECT_SCRIPTAPI_RIDX
-	sapi_ptr = (ScriptApiBase*) *(void**)(lua_touserdata(L, -1));
+	sapi_ptr = (ScriptApiBase *)*(void **)(lua_touserdata(L, -1));
 #else
-	sapi_ptr = (ScriptApiBase*) lua_touserdata(L, -1);
+	sapi_ptr = (ScriptApiBase *)lua_touserdata(L, -1);
 #endif
 	lua_pop(L, 1);
 	return sapi_ptr;
 }
 
-Server *ModApiBase::getServer(lua_State *L)
-{
+Server *ModApiBase::getServer(lua_State *L) {
 	return getScriptApiBase(L)->getServer();
 }
 
-ServerInventoryManager *ModApiBase::getServerInventoryMgr(lua_State *L)
-{
+ServerInventoryManager *ModApiBase::getServerInventoryMgr(lua_State *L) {
 	return getScriptApiBase(L)->getServer()->getInventoryMgr();
 }
 
 #ifndef SERVER
-Client *ModApiBase::getClient(lua_State *L)
-{
+Client *ModApiBase::getClient(lua_State *L) {
 	return getScriptApiBase(L)->getClient();
 }
 #endif
 
-IGameDef *ModApiBase::getGameDef(lua_State *L)
-{
+IGameDef *ModApiBase::getGameDef(lua_State *L) {
 	return getScriptApiBase(L)->getGameDef();
 }
 
-Environment *ModApiBase::getEnv(lua_State *L)
-{
+Environment *ModApiBase::getEnv(lua_State *L) {
 	return getScriptApiBase(L)->getEnv();
 }
 
 #ifndef SERVER
-GUIEngine *ModApiBase::getGuiEngine(lua_State *L)
-{
+GUIEngine *ModApiBase::getGuiEngine(lua_State *L) {
 	return getScriptApiBase(L)->getGuiEngine();
 }
 #endif
 
-EmergeThread *ModApiBase::getEmergeThread(lua_State *L)
-{
+EmergeThread *ModApiBase::getEmergeThread(lua_State *L) {
 	return getScriptApiBase(L)->getEmergeThread();
 }
 
-std::string ModApiBase::getCurrentModPath(lua_State *L)
-{
+std::string ModApiBase::getCurrentModPath(lua_State *L) {
 	std::string current_mod_name = ScriptApiBase::getCurrentModNameInsecure(L);
 	if (current_mod_name.empty())
 		return ".";
@@ -93,10 +84,8 @@ std::string ModApiBase::getCurrentModPath(lua_State *L)
 	return mod->path;
 }
 
-
 bool ModApiBase::registerFunction(lua_State *L, const char *name,
-		lua_CFunction func, int top)
-{
+		lua_CFunction func, int top) {
 	// TODO: Check presence first!
 
 	lua_pushcfunction(L, func);
@@ -107,8 +96,7 @@ bool ModApiBase::registerFunction(lua_State *L, const char *name,
 
 void ModApiBase::registerClass(lua_State *L, const char *name,
 		const luaL_Reg *methods,
-		const luaL_Reg *metamethods)
-{
+		const luaL_Reg *metamethods) {
 	luaL_newmetatable(L, name);
 	luaL_register(L, NULL, metamethods);
 	int metatable = lua_gettop(L);
@@ -128,8 +116,7 @@ void ModApiBase::registerClass(lua_State *L, const char *name,
 	lua_pop(L, 2);
 }
 
-int ModApiBase::l_deprecated_function(lua_State *L, const char *good, const char *bad, lua_CFunction func)
-{
+int ModApiBase::l_deprecated_function(lua_State *L, const char *good, const char *bad, lua_CFunction func) {
 	thread_local std::vector<u64> deprecated_logged;
 
 	DeprecatedHandlingMode dep_mode = get_deprecated_handling_mode();
@@ -148,13 +135,11 @@ int ModApiBase::l_deprecated_function(lua_State *L, const char *good, const char
 	backtrace.append(":").append(std::to_string(ar.currentline));
 	u64 hash = murmur_hash_64_ua(backtrace.data(), backtrace.length(), 0xBADBABE);
 
-	if (std::find(deprecated_logged.begin(), deprecated_logged.end(), hash)
-			== deprecated_logged.end()) {
-
+	if (std::find(deprecated_logged.begin(), deprecated_logged.end(), hash) == deprecated_logged.end()) {
 		deprecated_logged.emplace_back(hash);
 
 		std::stringstream msg;
-		msg << "Call to deprecated function '"  << bad << "', use '" << good << "' instead";
+		msg << "Call to deprecated function '" << bad << "', use '" << good << "' instead";
 
 		warningstream << msg.str() << " at " << backtrace << '\n';
 
@@ -167,4 +152,3 @@ int ModApiBase::l_deprecated_function(lua_State *L, const char *good, const char
 
 	return func(L);
 }
-

@@ -26,8 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "server.h"
 #include "util/basic_macros.h"
 
-MetaDataRef *MetaDataRef::checkAnyMetadata(lua_State *L, int narg)
-{
+MetaDataRef *MetaDataRef::checkAnyMetadata(lua_State *L, int narg) {
 	void *ud = lua_touserdata(L, narg);
 
 	bool ok = ud && luaL_getmetafield(L, narg, "metadata_class");
@@ -42,8 +41,7 @@ MetaDataRef *MetaDataRef::checkAnyMetadata(lua_State *L, int narg)
 	return *(MetaDataRef **)ud; // unbox pointer
 }
 
-int MetaDataRef::gc_object(lua_State *L)
-{
+int MetaDataRef::gc_object(lua_State *L) {
 	MetaDataRef *o = *(MetaDataRef **)lua_touserdata(L, 1);
 	delete o;
 	return 0;
@@ -52,8 +50,7 @@ int MetaDataRef::gc_object(lua_State *L)
 // Exported functions
 
 // contains(self, name)
-int MetaDataRef::l_contains(lua_State *L)
-{
+int MetaDataRef::l_contains(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -68,8 +65,7 @@ int MetaDataRef::l_contains(lua_State *L)
 }
 
 // get(self, name)
-int MetaDataRef::l_get(lua_State *L)
-{
+int MetaDataRef::l_get(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -89,8 +85,7 @@ int MetaDataRef::l_get(lua_State *L)
 }
 
 // get_string(self, name)
-int MetaDataRef::l_get_string(lua_State *L)
-{
+int MetaDataRef::l_get_string(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -109,8 +104,7 @@ int MetaDataRef::l_get_string(lua_State *L)
 }
 
 // set_string(self, name, var)
-int MetaDataRef::l_set_string(lua_State *L)
-{
+int MetaDataRef::l_set_string(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -120,7 +114,8 @@ int MetaDataRef::l_set_string(lua_State *L)
 		str = readParam<std::string_view>(L, 3);
 	} else {
 		log_deprecated(L, "Value passed to set_string is nil. This behaviour is"
-			" undocumented and will result in an error in the future.", 1, true);
+						  " undocumented and will result in an error in the future.",
+				1, true);
 	}
 
 	IMetadata *meta = ref->getmeta(!str.empty());
@@ -130,8 +125,7 @@ int MetaDataRef::l_set_string(lua_State *L)
 }
 
 // get_int(self, name)
-int MetaDataRef::l_get_int(lua_State *L)
-{
+int MetaDataRef::l_get_int(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -150,8 +144,7 @@ int MetaDataRef::l_get_int(lua_State *L)
 }
 
 // set_int(self, name, var)
-int MetaDataRef::l_set_int(lua_State *L)
-{
+int MetaDataRef::l_set_int(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -166,8 +159,7 @@ int MetaDataRef::l_set_int(lua_State *L)
 }
 
 // get_float(self, name)
-int MetaDataRef::l_get_float(lua_State *L)
-{
+int MetaDataRef::l_get_float(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -188,8 +180,7 @@ int MetaDataRef::l_get_float(lua_State *L)
 }
 
 // set_float(self, name, var)
-int MetaDataRef::l_set_float(lua_State *L)
-{
+int MetaDataRef::l_set_float(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -205,8 +196,7 @@ int MetaDataRef::l_set_float(lua_State *L)
 }
 
 // get_keys(self)
-int MetaDataRef::l_get_keys(lua_State *L)
-{
+int MetaDataRef::l_get_keys(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -230,8 +220,7 @@ int MetaDataRef::l_get_keys(lua_State *L)
 }
 
 // to_table(self)
-int MetaDataRef::l_to_table(lua_State *L)
-{
+int MetaDataRef::l_to_table(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -249,8 +238,7 @@ int MetaDataRef::l_to_table(lua_State *L)
 }
 
 // from_table(self, table)
-int MetaDataRef::l_from_table(lua_State *L)
-{
+int MetaDataRef::l_from_table(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	MetaDataRef *ref = checkAnyMetadata(L, 1);
@@ -277,8 +265,7 @@ int MetaDataRef::l_from_table(lua_State *L)
 	return 1;
 }
 
-void MetaDataRef::handleToTable(lua_State *L, IMetadata *meta)
-{
+void MetaDataRef::handleToTable(lua_State *L, IMetadata *meta) {
 	lua_newtable(L);
 	{
 		StringMap fields_;
@@ -294,8 +281,7 @@ void MetaDataRef::handleToTable(lua_State *L, IMetadata *meta)
 	lua_setfield(L, -2, "fields");
 }
 
-bool MetaDataRef::handleFromTable(lua_State *L, int table, IMetadata *meta)
-{
+bool MetaDataRef::handleFromTable(lua_State *L, int table, IMetadata *meta) {
 	// Set fields
 	lua_getfield(L, table, "fields");
 	if (lua_istable(L, -1)) {
@@ -315,8 +301,7 @@ bool MetaDataRef::handleFromTable(lua_State *L, int table, IMetadata *meta)
 }
 
 // equals(self, other)
-int MetaDataRef::l_equals(lua_State *L)
-{
+int MetaDataRef::l_equals(lua_State *L) {
 	MetaDataRef *ref1 = checkAnyMetadata(L, 1);
 	IMetadata *data1 = ref1->getmeta(false);
 	MetaDataRef *ref2 = checkAnyMetadata(L, 2);
@@ -329,12 +314,11 @@ int MetaDataRef::l_equals(lua_State *L)
 }
 
 void MetaDataRef::registerMetadataClass(lua_State *L, const char *name,
-		const luaL_Reg *methods)
-{
+		const luaL_Reg *methods) {
 	const luaL_Reg metamethods[] = {
-		{"__eq", l_equals},
-		{"__gc", gc_object},
-		{0, 0}
+		{ "__eq", l_equals },
+		{ "__gc", gc_object },
+		{ 0, 0 }
 	};
 	registerClass(L, name, methods, metamethods);
 

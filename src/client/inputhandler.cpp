@@ -25,13 +25,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "gui/touchscreengui.h"
 #include "hud.h"
 
-void KeyCache::populate_nonchanging()
-{
+void KeyCache::populate_nonchanging() {
 	key[KeyType::ESC] = EscapeKey;
 }
 
-void KeyCache::populate()
-{
+void KeyCache::populate() {
 	key[KeyType::FORWARD] = getKeySetting("keymap_forward");
 	key[KeyType::BACKWARD] = getKeySetting("keymap_backward");
 	key[KeyType::LEFT] = getKeySetting("keymap_left");
@@ -97,15 +95,14 @@ void KeyCache::populate()
 	}
 }
 
-bool MyEventReceiver::OnEvent(const SEvent &event)
-{
+bool MyEventReceiver::OnEvent(const SEvent &event) {
 	if (event.EventType == irr::EET_LOG_TEXT_EVENT) {
 		static const LogLevel irr_loglev_conv[] = {
 			LL_VERBOSE, // ELL_DEBUG
-			LL_INFO,    // ELL_INFORMATION
+			LL_INFO, // ELL_INFORMATION
 			LL_WARNING, // ELL_WARNING
-			LL_ERROR,   // ELL_ERROR
-			LL_NONE,    // ELL_NONE
+			LL_ERROR, // ELL_ERROR
+			LL_NONE, // ELL_NONE
 		};
 		assert(event.LogEvent.Level < ARRLEN(irr_loglev_conv));
 		g_logger.log(irr_loglev_conv[event.LogEvent.Level],
@@ -178,38 +175,38 @@ bool MyEventReceiver::OnEvent(const SEvent &event)
 	} else if (event.EventType == irr::EET_MOUSE_INPUT_EVENT) {
 		// Handle mouse events
 		switch (event.MouseInput.Event) {
-		case EMIE_LMOUSE_PRESSED_DOWN:
-			keyIsDown.set(LMBKey);
-			keyWasDown.set(LMBKey);
-			keyWasPressed.set(LMBKey);
-			break;
-		case EMIE_MMOUSE_PRESSED_DOWN:
-			keyIsDown.set(MMBKey);
-			keyWasDown.set(MMBKey);
-			keyWasPressed.set(MMBKey);
-			break;
-		case EMIE_RMOUSE_PRESSED_DOWN:
-			keyIsDown.set(RMBKey);
-			keyWasDown.set(RMBKey);
-			keyWasPressed.set(RMBKey);
-			break;
-		case EMIE_LMOUSE_LEFT_UP:
-			keyIsDown.unset(LMBKey);
-			keyWasReleased.set(LMBKey);
-			break;
-		case EMIE_MMOUSE_LEFT_UP:
-			keyIsDown.unset(MMBKey);
-			keyWasReleased.set(MMBKey);
-			break;
-		case EMIE_RMOUSE_LEFT_UP:
-			keyIsDown.unset(RMBKey);
-			keyWasReleased.set(RMBKey);
-			break;
-		case EMIE_MOUSE_WHEEL:
-			mouse_wheel += event.MouseInput.Wheel;
-			break;
-		default:
-			break;
+			case EMIE_LMOUSE_PRESSED_DOWN:
+				keyIsDown.set(LMBKey);
+				keyWasDown.set(LMBKey);
+				keyWasPressed.set(LMBKey);
+				break;
+			case EMIE_MMOUSE_PRESSED_DOWN:
+				keyIsDown.set(MMBKey);
+				keyWasDown.set(MMBKey);
+				keyWasPressed.set(MMBKey);
+				break;
+			case EMIE_RMOUSE_PRESSED_DOWN:
+				keyIsDown.set(RMBKey);
+				keyWasDown.set(RMBKey);
+				keyWasPressed.set(RMBKey);
+				break;
+			case EMIE_LMOUSE_LEFT_UP:
+				keyIsDown.unset(LMBKey);
+				keyWasReleased.set(LMBKey);
+				break;
+			case EMIE_MMOUSE_LEFT_UP:
+				keyIsDown.unset(MMBKey);
+				keyWasReleased.set(MMBKey);
+				break;
+			case EMIE_RMOUSE_LEFT_UP:
+				keyIsDown.unset(RMBKey);
+				keyWasReleased.set(RMBKey);
+				break;
+			case EMIE_MOUSE_WHEEL:
+				mouse_wheel += event.MouseInput.Wheel;
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -220,14 +217,12 @@ bool MyEventReceiver::OnEvent(const SEvent &event)
 /*
  * RealInputHandler
  */
-float RealInputHandler::getMovementSpeed()
-{
+float RealInputHandler::getMovementSpeed() {
 	bool f = m_receiver->IsKeyDown(keycache.key[KeyType::FORWARD]),
-		b = m_receiver->IsKeyDown(keycache.key[KeyType::BACKWARD]),
-		l = m_receiver->IsKeyDown(keycache.key[KeyType::LEFT]),
-		r = m_receiver->IsKeyDown(keycache.key[KeyType::RIGHT]);
-	if (f || b || l || r)
-	{
+		 b = m_receiver->IsKeyDown(keycache.key[KeyType::BACKWARD]),
+		 l = m_receiver->IsKeyDown(keycache.key[KeyType::LEFT]),
+		 r = m_receiver->IsKeyDown(keycache.key[KeyType::RIGHT]);
+	if (f || b || l || r) {
 		// if contradictory keys pressed, stay still
 		if (f && b && l && r)
 			return 0.0f;
@@ -242,8 +237,7 @@ float RealInputHandler::getMovementSpeed()
 	return joystick.getMovementSpeed();
 }
 
-float RealInputHandler::getMovementDirection()
-{
+float RealInputHandler::getMovementDirection() {
 	float x = 0, z = 0;
 
 	/* Check keyboard for input */
@@ -268,8 +262,7 @@ float RealInputHandler::getMovementDirection()
 /*
  * RandomInputHandler
  */
-s32 RandomInputHandler::Rand(s32 min, s32 max)
-{
+s32 RandomInputHandler::Rand(s32 min, s32 max) {
 	return (myrand() % (max - min + 1)) + min;
 }
 
@@ -279,8 +272,7 @@ struct RandomInputHandlerSimData {
 	int time_max;
 };
 
-void RandomInputHandler::step(float dtime)
-{
+void RandomInputHandler::step(float dtime) {
 	static RandomInputHandlerSimData rnd_data[] = {
 		{ "keymap_jump", 0.0f, 40 },
 		{ "keymap_aux1", 0.0f, 40 },
@@ -320,12 +312,12 @@ void RandomInputHandler::step(float dtime)
 		counterMovement -= dtime;
 		if (counterMovement < 0.0) {
 			counterMovement = 0.1 * Rand(1, 40);
-			movementSpeed = Rand(0,100)*0.01;
-			movementDirection = Rand(-100, 100)*0.01 * M_PI;
+			movementSpeed = Rand(0, 100) * 0.01;
+			movementDirection = Rand(-100, 100) * 0.01 * M_PI;
 		}
 	} else {
 		bool f = keydown[keycache.key[KeyType::FORWARD]],
-			l = keydown[keycache.key[KeyType::LEFT]];
+			 l = keydown[keycache.key[KeyType::LEFT]];
 		if (f || l) {
 			movementSpeed = 1.0f;
 			if (f && !l)

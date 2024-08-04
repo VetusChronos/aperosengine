@@ -25,30 +25,33 @@ Profiler *g_profiler = &main_profiler;
 
 ScopeProfiler::ScopeProfiler(Profiler *profiler, const std::string &name,
 		ScopeProfilerType type, TimePrecision prec) :
-	m_profiler(profiler),
-	m_name(name), m_type(type), m_precision(prec) {
+		m_profiler(profiler),
+		m_name(name),
+		m_type(type),
+		m_precision(prec) {
 	m_name.append(" [").append(TimePrecision_units[prec]).append("]");
 	m_time1 = porting::getTime(m_precision);
 }
 
 ScopeProfiler::~ScopeProfiler() {
-	if (!m_profiler) return;
+	if (!m_profiler)
+		return;
 
 	float duration = calculateDuration(m_time1, m_precision);
 
 	switch (m_type) {
-	case SPT_ADD:
-		m_profiler->add(m_name, duration);
-		break;
-	case SPT_AVG:
-		m_profiler->avg(m_name, duration);
-		break;
-	case SPT_GRAPH_ADD:
-		m_profiler->graphAdd(m_name, duration);
-		break;
-	case SPT_MAX:
-		m_profiler->max(m_name, duration);
-		break;
+		case SPT_ADD:
+			m_profiler->add(m_name, duration);
+			break;
+		case SPT_AVG:
+			m_profiler->avg(m_name, duration);
+			break;
+		case SPT_GRAPH_ADD:
+			m_profiler->graphAdd(m_name, duration);
+			break;
+		case SPT_MAX:
+			m_profiler->max(m_name, duration);
+			break;
 	}
 }
 
@@ -63,7 +66,7 @@ Profiler::Profiler() {
 void Profiler::add(const std::string &name, float value) {
 	std::scoped_lock lock(m_mutex);
 
-	auto[it, inserted] = m_data.try_emplace(name, DataPair{value, -SPT_ADD});
+	auto [it, inserted] = m_data.try_emplace(name, DataPair{ value, -SPT_ADD });
 	if (!inserted) {
 		assert(it->second.avgcount == -SPT_ADD);
 		it->second.value += value;
@@ -73,7 +76,7 @@ void Profiler::add(const std::string &name, float value) {
 void Profiler::max(const std::string &name, float value) {
 	std::scoped_lock lock(m_mutex);
 
-	auto[it, inserted] = m_data.try_emplace(name, DataPair{value, -SPT_MAX});
+	auto [it, inserted] = m_data.try_emplace(name, DataPair{ value, -SPT_MAX });
 	if (!inserted) {
 		assert(it->second.avgcount == -SPT_MAX);
 		it->second.value = std::max(value, it->second.value);
@@ -83,7 +86,7 @@ void Profiler::max(const std::string &name, float value) {
 void Profiler::avg(const std::string &name, float value) {
 	std::scoped_lock lock(m_mutex);
 
-	auto[it, inserted] = m_data.try_emplace(name, DataPair{value, 1});
+	auto [it, inserted] = m_data.try_emplace(name, DataPair{ value, 1 });
 	if (!inserted) {
 		assert(it->second.avgcount >= 0);
 		it->second.value += value;
@@ -155,7 +158,8 @@ void Profiler::getPage(GraphValues &o, u32 page, u32 pagecount) {
 	paging(m_data.size(), page, pagecount, minindex, maxindex);
 
 	for (const auto &i : m_data) {
-		if (maxindex == 0) break;
+		if (maxindex == 0)
+			break;
 		maxindex--;
 
 		if (minindex != 0) {

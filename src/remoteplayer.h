@@ -26,8 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class PlayerSAO;
 
-enum RemotePlayerChatResult
-{
+enum RemotePlayerChatResult {
 	RPLAYER_CHATRESULT_OK,
 	RPLAYER_CHATRESULT_FLOODING,
 	RPLAYER_CHATRESULT_KICK,
@@ -36,8 +35,7 @@ enum RemotePlayerChatResult
 /*
 	Player on the server
 */
-class RemotePlayer : public Player
-{
+class RemotePlayer : public Player {
 	friend class PlayerDatabaseFiles;
 
 public:
@@ -49,21 +47,18 @@ public:
 
 	RemotePlayerChatResult canSendChatMessage();
 
-	void setHotbarItemcount(s32 hotbar_itemcount)
-	{
+	void setHotbarItemcount(s32 hotbar_itemcount) {
 		hud_hotbar_itemcount = hotbar_itemcount;
 	}
 
 	s32 getHotbarItemcount() const { return hud_hotbar_itemcount; }
 
-	void overrideDayNightRatio(bool do_override, float ratio)
-	{
+	void overrideDayNightRatio(bool do_override, float ratio) {
 		m_day_night_ratio_do_override = do_override;
 		m_day_night_ratio = ratio;
 	}
 
-	void getDayNightRatio(bool *do_override, float *ratio)
-	{
+	void getDayNightRatio(bool *do_override, float *ratio) {
 		*do_override = m_day_night_ratio_do_override;
 		*ratio = m_day_night_ratio;
 	}
@@ -72,18 +67,15 @@ public:
 
 	const std::string &getHotbarImage() const { return hud_hotbar_image; }
 
-	void setHotbarSelectedImage(const std::string &name)
-	{
+	void setHotbarSelectedImage(const std::string &name) {
 		hud_hotbar_selected_image = name;
 	}
 
-	const std::string &getHotbarSelectedImage() const
-	{
+	const std::string &getHotbarSelectedImage() const {
 		return hud_hotbar_selected_image;
 	}
 
-	void setSky(const SkyboxParams &skybox_params)
-	{
+	void setSky(const SkyboxParams &skybox_params) {
 		m_skybox_params = skybox_params;
 	}
 
@@ -101,8 +93,7 @@ public:
 
 	const StarParams &getStarParams() const { return m_star_params; }
 
-	void setCloudParams(const CloudParams &cloud_params)
-	{
+	void setCloudParams(const CloudParams &cloud_params) {
 		m_cloud_params = cloud_params;
 	}
 
@@ -112,15 +103,13 @@ public:
 
 	inline void setModified(const bool x) { m_dirty = x; }
 
-	void setLocalAnimations(v2s32 frames[4], float frame_speed)
-	{
+	void setLocalAnimations(v2s32 frames[4], float frame_speed) {
 		for (int i = 0; i < 4; i++)
 			local_animations[i] = frames[i];
 		local_animation_speed = frame_speed;
 	}
 
-	void getLocalAnimations(v2s32 *frames, float *frame_speed)
-	{
+	void getLocalAnimations(v2s32 *frames, float *frame_speed) {
 		for (int i = 0; i < 4; i++)
 			frames[i] = local_animations[i];
 		*frame_speed = local_animation_speed;
@@ -128,7 +117,7 @@ public:
 
 	void setLighting(const Lighting &lighting) { m_lighting = lighting; }
 
-	const Lighting& getLighting() const { return m_lighting; }
+	const Lighting &getLighting() const { return m_lighting; }
 
 	void setDirty(bool dirty) { m_dirty = true; }
 

@@ -45,17 +45,17 @@ public:
 
 	static void Register(lua_State *L);
 
-	static ServerActiveObject* getobject(ObjectRef *ref);
+	static ServerActiveObject *getobject(ObjectRef *ref);
 
 	static const char className[];
+
 private:
 	ServerActiveObject *m_object = nullptr;
 	static luaL_Reg methods[];
 
+	static LuaEntitySAO *getluaobject(ObjectRef *ref);
 
-	static LuaEntitySAO* getluaobject(ObjectRef *ref);
-
-	static PlayerSAO* getplayersao(ObjectRef *ref);
+	static PlayerSAO *getplayersao(ObjectRef *ref);
 
 	static RemotePlayer *getplayer(ObjectRef *ref);
 
@@ -338,7 +338,7 @@ private:
 
 	// DEPRECATED
 	// get_sky_color(self)
-	static int l_get_sky_color(lua_State* L);
+	static int l_get_sky_color(lua_State *L);
 
 	// set_sun(self, sun_parameters)
 	static int l_set_sun(lua_State *L);

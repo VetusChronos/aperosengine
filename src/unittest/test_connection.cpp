@@ -29,8 +29,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class TestConnection : public TestBase {
 public:
-	TestConnection()
-	{
+	TestConnection() {
 		if (INTERNET_SIMULATOR == false)
 			TestManager::registerTestModule(this);
 	}
@@ -46,8 +45,7 @@ public:
 
 static TestConnection g_test_instance;
 
-void TestConnection::runTests(IGameDef *gamedef)
-{
+void TestConnection::runTests(IGameDef *gamedef) {
 	TEST(testNetworkPacketSerialize);
 	TEST(testHelpers);
 	TEST(testConnectSendReceive);
@@ -55,22 +53,22 @@ void TestConnection::runTests(IGameDef *gamedef)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct Handler : public con::PeerHandler
-{
-	Handler(const char *a_name) : name(a_name) {}
+struct Handler : public con::PeerHandler {
+	Handler(const char *a_name) :
+			name(a_name) {}
 
-	void peerAdded(con::Peer *peer)
-	{
+	void peerAdded(con::Peer *peer) {
 		infostream << "Handler(" << name << ")::peerAdded(): "
-			"id=" << peer->id << '\n';
+											"id="
+				   << peer->id << '\n';
 		last_id = peer->id;
 		count++;
 	}
 
-	void deletingPeer(con::Peer *peer, bool timeout)
-	{
+	void deletingPeer(con::Peer *peer, bool timeout) {
 		infostream << "Handler(" << name << ")::deletingPeer(): "
-			"id=" << peer->id << ", timeout=" << timeout << '\n';
+											"id="
+				   << peer->id << ", timeout=" << timeout << '\n';
 		last_id = peer->id;
 		count--;
 	}
@@ -80,8 +78,7 @@ struct Handler : public con::PeerHandler
 	const char *name;
 };
 
-void TestConnection::testNetworkPacketSerialize()
-{
+void TestConnection::testNetworkPacketSerialize() {
 	const static u8 expected[] = {
 		0x00, 0x7b,
 		0x00, 0x02, 0xd8, 0x42, 0xdf, 0x9a
@@ -113,15 +110,14 @@ void TestConnection::testNetworkPacketSerialize()
 	}
 }
 
-void TestConnection::testHelpers()
-{
+void TestConnection::testHelpers() {
 	// Some constants for testing
 	u32 proto_id = 0x12345678;
 	session_t peer_id = 123;
 	u8 channel = 2;
 	SharedBuffer<u8> data1(1);
 	data1[0] = 100;
-	Address a(127,0,0,1, 10);
+	Address a(127, 0, 0, 1, 10);
 	const u16 seqnum = 34352;
 
 	con::BufferedPacketPtr p1 = con::makePacket(a, data1,
@@ -156,9 +152,7 @@ void TestConnection::testHelpers()
 	UASSERT(readU8(&p2[3]) == data1[0]);
 }
 
-
-void TestConnection::testConnectSendReceive()
-{
+void TestConnection::testConnectSendReceive() {
 	/*
 		Test some real connections
 
@@ -216,7 +210,7 @@ void TestConnection::testConnectSendReceive()
 		infostream << "** running client.Receive()" << '\n';
 		client.Receive(&pkt);
 		infostream << "** Client received: peer_id=" << pkt.getPeerId()
-			<< ", size=" << pkt.getSize() << '\n';
+				   << ", size=" << pkt.getSize() << '\n';
 	} catch (con::NoIncomingDataException &e) {
 	}
 
@@ -233,8 +227,8 @@ void TestConnection::testConnectSendReceive()
 		infostream << "** running server.Receive()" << '\n';
 		server.Receive(&pkt);
 		infostream << "** Server received: peer_id=" << pkt.getPeerId()
-				<< ", size=" << pkt.getSize()
-				<< '\n';
+				   << ", size=" << pkt.getSize()
+				   << '\n';
 	} catch (con::NoIncomingDataException &e) {
 		// No actual data received, but the client has
 		// probably been connected
@@ -255,7 +249,7 @@ void TestConnection::testConnectSendReceive()
 			infostream << "** running client.Receive()" << '\n';
 			client.Receive(&pkt);
 			infostream << "** Client received: peer_id=" << pkt.getPeerId()
-				<< ", size=" << pkt.getSize() << '\n';
+					   << ", size=" << pkt.getSize() << '\n';
 		} catch (con::NoIncomingDataException &e) {
 		}
 		sleep_ms(50);
@@ -268,8 +262,8 @@ void TestConnection::testConnectSendReceive()
 		infostream << "** running server.Receive()" << '\n';
 		server.Receive(&pkt);
 		infostream << "** Server received: peer_id=" << pkt.getPeerId()
-				<< ", size=" << pkt.getSize()
-				<< '\n';
+				   << ", size=" << pkt.getSize()
+				   << '\n';
 	} catch (con::NoIncomingDataException &e) {
 	}
 
@@ -282,7 +276,7 @@ void TestConnection::testConnectSendReceive()
 
 		auto sentdata = pkt.oldForgePacket();
 
-		infostream<<"** running client.Send()"<<std::endl;
+		infostream << "** running client.Send()" << std::endl;
 		client.Send(PEER_ID_SERVER, 0, &pkt, true);
 
 		sleep_ms(50);
@@ -291,9 +285,9 @@ void TestConnection::testConnectSendReceive()
 		infostream << "** running server.Receive()" << '\n';
 		server.Receive(&recvpacket);
 		infostream << "** Server received: peer_id=" << pkt.getPeerId()
-				<< ", size=" << pkt.getSize()
-				<< ", data=" << (const char*)pkt.getU8Ptr(0)
-				<< '\n';
+				   << ", size=" << pkt.getSize()
+				   << ", data=" << (const char *)pkt.getU8Ptr(0)
+				   << '\n';
 
 		auto recvdata = pkt.oldForgePacket();
 
@@ -307,8 +301,8 @@ void TestConnection::testConnectSendReceive()
 	{
 		const int datasize = 30000;
 		NetworkPacket pkt(0xff, datasize);
-		for (u16 i=0; i<datasize; i++) {
-			pkt << static_cast<u8>(i/4);
+		for (u16 i = 0; i < datasize; i++) {
+			pkt << static_cast<u8>(i / 4);
 		}
 
 		infostream << "Sending data (size=" << datasize << "):";
@@ -317,8 +311,8 @@ void TestConnection::testConnectSendReceive()
 				infostream << " ";
 			char buf[10];
 			porting::mt_snprintf(buf, sizeof(buf), "%.2X",
-				((int)((const char *)pkt.getU8Ptr(0))[i]) & 0xff);
-			infostream<<buf;
+					((int)((const char *)pkt.getU8Ptr(0))[i]) & 0xff);
+			infostream << buf;
 		}
 		if (datasize > 20)
 			infostream << "...";
@@ -352,7 +346,7 @@ void TestConnection::testConnectSendReceive()
 		}
 		UASSERT(received);
 		infostream << "** Client received: peer_id=" << peer_id
-			<< ", size=" << size << '\n';
+				   << ", size=" << size << '\n';
 
 		infostream << "Received data (size=" << size << "): ";
 		for (int i = 0; i < size && i < 20; i++) {

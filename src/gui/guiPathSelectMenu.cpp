@@ -19,24 +19,21 @@
 
 #include "guiPathSelectMenu.h"
 
-GUIFileSelectMenu::GUIFileSelectMenu(gui::IGUIEnvironment* env,
-		gui::IGUIElement* parent, s32 id, IMenuManager *menumgr,
+GUIFileSelectMenu::GUIFileSelectMenu(gui::IGUIEnvironment *env,
+		gui::IGUIElement *parent, s32 id, IMenuManager *menumgr,
 		const std::string &title, const std::string &formname,
 		bool is_file_select) :
-	GUIModalMenu(env, parent, id, menumgr),
-	m_title(utf8_to_wide(title)),
-	m_formname(formname),
-	m_file_select_dialog(is_file_select)
-{
+		GUIModalMenu(env, parent, id, menumgr),
+		m_title(utf8_to_wide(title)),
+		m_formname(formname),
+		m_file_select_dialog(is_file_select) {
 }
 
-GUIFileSelectMenu::~GUIFileSelectMenu()
-{
+GUIFileSelectMenu::~GUIFileSelectMenu() {
 	setlocale(LC_NUMERIC, "C");
 }
 
-void GUIFileSelectMenu::regenerateGui(v2u32 screensize)
-{
+void GUIFileSelectMenu::regenerateGui(v2u32 screensize) {
 	removeAllChildren();
 	m_fileOpenDialog = 0;
 
@@ -55,8 +52,7 @@ void GUIFileSelectMenu::regenerateGui(v2u32 screensize)
 	m_fileOpenDialog->setMinSize(size);
 }
 
-void GUIFileSelectMenu::drawMenu()
-{
+void GUIFileSelectMenu::drawMenu() {
 	gui::IGUISkin *skin = Environment->getSkin();
 	if (!skin)
 		return;
@@ -64,8 +60,7 @@ void GUIFileSelectMenu::drawMenu()
 	gui::IGUIElement::draw();
 }
 
-void GUIFileSelectMenu::acceptInput()
-{
+void GUIFileSelectMenu::acceptInput() {
 	if (m_text_dst && !m_formname.empty()) {
 		StringMap fields;
 		if (m_accepted) {
@@ -86,26 +81,25 @@ void GUIFileSelectMenu::acceptInput()
 	quitMenu();
 }
 
-bool GUIFileSelectMenu::OnEvent(const SEvent &event)
-{
+bool GUIFileSelectMenu::OnEvent(const SEvent &event) {
 	if (event.EventType == irr::EET_GUI_EVENT) {
 		switch (event.GUIEvent.EventType) {
-		case gui::EGET_ELEMENT_CLOSED:
-		case gui::EGET_FILE_CHOOSE_DIALOG_CANCELLED:
-			m_accepted = false;
-			acceptInput();
-			return true;
-		case gui::EGET_DIRECTORY_SELECTED:
-			m_accepted = !m_file_select_dialog;
-			acceptInput();
-			return true;
-		case gui::EGET_FILE_SELECTED:
-			m_accepted = m_file_select_dialog;
-			acceptInput();
-			return true;
-		default:
-			// ignore this event
-			break;
+			case gui::EGET_ELEMENT_CLOSED:
+			case gui::EGET_FILE_CHOOSE_DIALOG_CANCELLED:
+				m_accepted = false;
+				acceptInput();
+				return true;
+			case gui::EGET_DIRECTORY_SELECTED:
+				m_accepted = !m_file_select_dialog;
+				acceptInput();
+				return true;
+			case gui::EGET_FILE_SELECTED:
+				m_accepted = m_file_select_dialog;
+				acceptInput();
+				return true;
+			default:
+				// ignore this event
+				break;
 		}
 	}
 	return Parent ? Parent->OnEvent(event) : false;

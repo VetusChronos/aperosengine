@@ -23,15 +23,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "nodedef.h"
 #include "util/timetaker.h"
 
-
 ReflowScan::ReflowScan(Map *map, const NodeDefManager *ndef) :
-	m_map(map),
-	m_ndef(ndef)
-{
+		m_map(map),
+		m_ndef(ndef) {
 }
 
-void ReflowScan::scan(MapBlock *block, UniqueQueue<v3s16> *liquid_queue)
-{
+void ReflowScan::scan(MapBlock *block, UniqueQueue<v3s16> *liquid_queue) {
 	m_block_pos = block->getPos();
 	m_rel_block_pos = block->getPosRelative();
 	m_liquid_queue = liquid_queue;
@@ -48,9 +45,9 @@ void ReflowScan::scan(MapBlock *block, UniqueQueue<v3s16> *liquid_queue)
 
 	// Scan the columns in the block
 	for (s16 z = 0; z < MAP_BLOCKSIZE; z++)
-	for (s16 x = 0; x < MAP_BLOCKSIZE; x++) {
-		scanColumn(x, z);
-	}
+		for (s16 x = 0; x < MAP_BLOCKSIZE; x++) {
+			scanColumn(x, z);
+		}
 
 	// Scan neighboring columns from the nearby blocks as they might contain
 	// liquid nodes that weren't allowed to flow to prevent gaps.
@@ -62,8 +59,7 @@ void ReflowScan::scan(MapBlock *block, UniqueQueue<v3s16> *liquid_queue)
 	}
 }
 
-inline MapBlock *ReflowScan::lookupBlock(int x, int y, int z)
-{
+inline MapBlock *ReflowScan::lookupBlock(int x, int y, int z) {
 	// Gets the block that contains (x,y,z) relativ to the scanned block.
 	// This uses a lookup as there might be many lookups into the same
 	// neighboring block which makes fetches from Map costly.
@@ -82,8 +78,7 @@ inline MapBlock *ReflowScan::lookupBlock(int x, int y, int z)
 	return result;
 }
 
-inline bool ReflowScan::isLiquidFlowableTo(int x, int y, int z)
-{
+inline bool ReflowScan::isLiquidFlowableTo(int x, int y, int z) {
 	// Tests whether (x,y,z) is a node to which liquid might flow.
 	MapBlock *block = lookupBlock(x, y, z);
 	if (block) {
@@ -102,18 +97,16 @@ inline bool ReflowScan::isLiquidFlowableTo(int x, int y, int z)
 	return false;
 }
 
-inline bool ReflowScan::isLiquidHorizontallyFlowable(int x, int y, int z)
-{
+inline bool ReflowScan::isLiquidHorizontallyFlowable(int x, int y, int z) {
 	// Check if the (x,y,z) might spread to one of the horizontally
 	// neighboring nodes
 	return isLiquidFlowableTo(x - 1, y, z) ||
-		isLiquidFlowableTo(x + 1, y, z) ||
-		isLiquidFlowableTo(x, y, z - 1) ||
-		isLiquidFlowableTo(x, y, z + 1);
+			isLiquidFlowableTo(x + 1, y, z) ||
+			isLiquidFlowableTo(x, y, z - 1) ||
+			isLiquidFlowableTo(x, y, z + 1);
 }
 
-void ReflowScan::scanColumn(int x, int z)
-{
+void ReflowScan::scanColumn(int x, int z) {
 	// Is the column inside a loaded block?
 	MapBlock *block = lookupBlock(x, 0, z);
 	if (!block)
@@ -161,8 +154,7 @@ void ReflowScan::scanColumn(int x, int z)
 			was_pushed = is_pushed;
 		} else {
 			// This is the topmost node below a liquid column
-			if (!was_pushed && (f.floodable ||
-					(!was_checked && isLiquidHorizontallyFlowable(x, y + 1, z)))) {
+			if (!was_pushed && (f.floodable || (!was_checked && isLiquidHorizontallyFlowable(x, y + 1, z)))) {
 				// Activate the lowest node in the column which is one
 				// node above this one
 				m_liquid_queue->push_back(m_rel_block_pos + v3s16(x, y + 1, z));
@@ -191,8 +183,7 @@ void ReflowScan::scanColumn(int x, int z)
 			}
 		} else {
 			// This is the topmost node below a liquid column
-			if (!was_pushed && (f.floodable ||
-					(!was_checked && isLiquidHorizontallyFlowable(x, 0, z)))) {
+			if (!was_pushed && (f.floodable || (!was_checked && isLiquidHorizontallyFlowable(x, 0, z)))) {
 				// Activate the lowest node in the column which is one
 				// node above this one
 				m_liquid_queue->push_back(m_rel_block_pos + v3s16(x, 0, z));

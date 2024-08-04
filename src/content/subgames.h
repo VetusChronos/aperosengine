@@ -26,8 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class Settings;
 
-struct SubgameSpec
-{
+struct SubgameSpec {
 	std::string id;
 	std::string title;
 	std::string author;
@@ -55,14 +54,15 @@ struct SubgameSpec
 			const std::string &first_mod = "",
 			const std::string &last_mod = "") :
 			id(id),
-			title(title), author(author), release(release),
+			title(title),
+			author(author),
+			release(release),
 			first_mod(first_mod),
 			last_mod(last_mod),
 			path(path),
 			gamemods_path(gamemods_path),
 			addon_mods_paths(addon_mods_paths),
-			menuicon_path(menuicon_path)
-	{
+			menuicon_path(menuicon_path) {
 	}
 
 	bool isValid() const { return (!id.empty() && !path.empty()); }
@@ -82,8 +82,7 @@ bool getWorldExists(const std::string &world_path);
 std::string getWorldName(const std::string &world_path, const std::string &default_name);
 std::string getWorldGameId(const std::string &world_path, bool can_be_legacy = false);
 
-struct WorldSpec
-{
+struct WorldSpec {
 	std::string path;
 	std::string name;
 	std::string gameid;
@@ -91,12 +90,11 @@ struct WorldSpec
 	WorldSpec(const std::string &path = "", const std::string &name = "",
 			const std::string &gameid = "") :
 			path(path),
-			name(name), gameid(gameid)
-	{
+			name(name),
+			gameid(gameid) {
 	}
 
-	bool isValid() const
-	{
+	bool isValid() const {
 		return (!name.empty() && !path.empty() && !gameid.empty());
 	}
 };

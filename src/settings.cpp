@@ -42,22 +42,17 @@ std::unordered_map<std::string, const FlagDesc *> Settings::s_flags;
 
 /* Settings hierarchy implementation */
 
-SettingsHierarchy::SettingsHierarchy(Settings *fallback)
-{
+SettingsHierarchy::SettingsHierarchy(Settings *fallback) {
 	layers.push_back(fallback);
 }
 
-
-Settings *SettingsHierarchy::getLayer(int layer) const
-{
+Settings *SettingsHierarchy::getLayer(int layer) const {
 	if (layer < 0 || layer >= (int)layers.size())
 		throw BaseException("Invalid settings layer");
 	return layers[layer];
 }
 
-
-Settings *SettingsHierarchy::getParent(int layer) const
-{
+Settings *SettingsHierarchy::getParent(int layer) const {
 	assert(layer >= 0 && layer < (int)layers.size());
 	// iterate towards the origin (0) to find the next fallback layer
 	for (int i = layer - 1; i >= 0; --i) {
@@ -68,9 +63,7 @@ Settings *SettingsHierarchy::getParent(int layer) const
 	return nullptr;
 }
 
-
-void SettingsHierarchy::onLayerCreated(int layer, Settings *obj)
-{
+void SettingsHierarchy::onLayerCreated(int layer, Settings *obj) {
 	if (layer < 0)
 		throw BaseException("Invalid settings layer");
 	if ((int)layers.size() < layer + 1)
@@ -86,9 +79,7 @@ void SettingsHierarchy::onLayerCreated(int layer, Settings *obj)
 		g_settings = obj;
 }
 
-
-void SettingsHierarchy::onLayerRemoved(int layer)
-{
+void SettingsHierarchy::onLayerRemoved(int layer) {
 	assert(layer >= 0 && layer < (int)layers.size());
 	layers[layer] = nullptr;
 	if (this == &g_hierarchy && layer == (int)SL_GLOBAL)
@@ -97,31 +88,24 @@ void SettingsHierarchy::onLayerRemoved(int layer)
 
 /* Settings implementation */
 
-Settings *Settings::createLayer(SettingsLayer sl, std::string_view end_tag)
-{
+Settings *Settings::createLayer(SettingsLayer sl, std::string_view end_tag) {
 	return new Settings(end_tag, &g_hierarchy, (int)sl);
 }
 
-
-Settings *Settings::getLayer(SettingsLayer sl)
-{
+Settings *Settings::getLayer(SettingsLayer sl) {
 	return g_hierarchy.getLayer(sl);
 }
 
-
 Settings::Settings(std::string_view end_tag, SettingsHierarchy *h,
 		int settings_layer) :
-	m_end_tag(end_tag),
-	m_hierarchy(h),
-	m_settingslayer(settings_layer)
-{
+		m_end_tag(end_tag),
+		m_hierarchy(h),
+		m_settingslayer(settings_layer) {
 	if (m_hierarchy)
 		m_hierarchy->onLayerCreated(m_settingslayer, this);
 }
 
-
-Settings::~Settings()
-{
+Settings::~Settings() {
 	MutexAutoLock lock(m_mutex);
 
 	if (m_hierarchy)
@@ -130,15 +114,13 @@ Settings::~Settings()
 	clearNoLock();
 }
 
-
-Settings & Settings::operator=(const Settings &other)
-{
+Settings &Settings::operator=(const Settings &other) {
 	if (&other == this)
 		return *this;
 
 	// TODO: Avoid copying Settings objects. Make this private.
 	FATAL_ERROR_IF(m_hierarchy || other.m_hierarchy,
-		"Cannot copy or overwrite Settings object that belongs to a hierarchy");
+			"Cannot copy or overwrite Settings object that belongs to a hierarchy");
 
 	MutexAutoLock lock(m_mutex);
 	MutexAutoLock lock2(other.m_mutex);
@@ -150,35 +132,31 @@ Settings & Settings::operator=(const Settings &other)
 	return *this;
 }
 
-
-bool Settings::checkNameValid(std::string_view name)
-{
+bool Settings::checkNameValid(std::string_view name) {
 	bool valid = name.find_first_of("=\"{}#") == std::string::npos;
 	if (valid)
 		valid = std::find_if(name.begin(), name.end(), ::isspace) == name.end();
 
 	if (!valid) {
 		errorstream << "Invalid setting name \"" << name << "\""
-			<< '\n';
+					<< '\n';
 		return false;
 	}
 	return true;
 }
 
-
-bool Settings::checkValueValid(std::string_view value)
-{
+bool Settings::checkValueValid(std::string_view value) {
 	if (value.substr(0, 3) == "\"\"\"" ||
-		value.find("\n\"\"\"") != std::string::npos) {
+			value.find("\n\"\"\"") != std::string::npos) {
 		errorstream << "Invalid character sequence '\"\"\"' found in"
-			" setting value!" << '\n';
+					   " setting value!"
+					<< '\n';
 		return false;
 	}
 	return true;
 }
 
-std::string Settings::getMultiline(std::istream &is, size_t *num_lines)
-{
+std::string Settings::getMultiline(std::istream &is, size_t *num_lines) {
 	size_t lines = 1;
 	std::string value;
 	std::string line;
@@ -202,9 +180,7 @@ std::string Settings::getMultiline(std::istream &is, size_t *num_lines)
 	return value;
 }
 
-
-bool Settings::readConfigFile(const char *filename)
-{
+bool Settings::readConfigFile(const char *filename) {
 	std::ifstream is(filename);
 	if (!is.good())
 		return false;
@@ -212,9 +188,7 @@ bool Settings::readConfigFile(const char *filename)
 	return parseConfigLines(is);
 }
 
-
-bool Settings::parseConfigLines(std::istream &is)
-{
+bool Settings::parseConfigLines(std::istream &is) {
 	MutexAutoLock lock(m_mutex);
 
 	std::string line, name, value;
@@ -224,27 +198,27 @@ bool Settings::parseConfigLines(std::istream &is)
 		SettingsParseEvent event = parseConfigObject(line, name, value);
 
 		switch (event) {
-		case SPE_NONE:
-		case SPE_INVALID:
-		case SPE_COMMENT:
-			break;
-		case SPE_KVPAIR:
-			m_settings[name] = SettingsEntry(value);
-			break;
-		case SPE_END:
-			return true;
-		case SPE_GROUP: {
-			Settings *group = new Settings("}");
-			if (!group->parseConfigLines(is)) {
-				delete group;
-				return false;
+			case SPE_NONE:
+			case SPE_INVALID:
+			case SPE_COMMENT:
+				break;
+			case SPE_KVPAIR:
+				m_settings[name] = SettingsEntry(value);
+				break;
+			case SPE_END:
+				return true;
+			case SPE_GROUP: {
+				Settings *group = new Settings("}");
+				if (!group->parseConfigLines(is)) {
+					delete group;
+					return false;
+				}
+				m_settings[name] = SettingsEntry(group);
+				break;
 			}
-			m_settings[name] = SettingsEntry(group);
-			break;
-		}
-		case SPE_MULTILINE:
-			m_settings[name] = SettingsEntry(getMultiline(is));
-			break;
+			case SPE_MULTILINE:
+				m_settings[name] = SettingsEntry(getMultiline(is));
+				break;
 		}
 	}
 
@@ -252,9 +226,7 @@ bool Settings::parseConfigLines(std::istream &is)
 	return m_end_tag.empty();
 }
 
-
-void Settings::writeLines(std::ostream &os, u32 tab_depth) const
-{
+void Settings::writeLines(std::ostream &os, u32 tab_depth) const {
 	MutexAutoLock lock(m_mutex);
 
 	for (const auto &setting_it : m_settings)
@@ -269,10 +241,8 @@ void Settings::writeLines(std::ostream &os, u32 tab_depth) const
 	}
 }
 
-
 void Settings::printEntry(std::ostream &os, const std::string &name,
-	const SettingsEntry &entry, u32 tab_depth)
-{
+		const SettingsEntry &entry, u32 tab_depth) {
 	for (u32 i = 0; i != tab_depth; i++)
 		os << "\t";
 
@@ -286,15 +256,14 @@ void Settings::printEntry(std::ostream &os, const std::string &name,
 		os << name << " = ";
 
 		if (entry.value.find('\n') != std::string::npos)
-			os << "\"\"\"\n" << entry.value << "\n\"\"\"\n";
+			os << "\"\"\"\n"
+			   << entry.value << "\n\"\"\"\n";
 		else
 			os << entry.value << "\n";
 	}
 }
 
-
-bool Settings::updateConfigObject(std::istream &is, std::ostream &os, u32 tab_depth)
-{
+bool Settings::updateConfigObject(std::istream &is, std::ostream &os, u32 tab_depth) {
 	SettingEntries::const_iterator it;
 	std::set<std::string> present_entries;
 	std::string line, name, value;
@@ -308,52 +277,52 @@ bool Settings::updateConfigObject(std::istream &is, std::ostream &os, u32 tab_de
 		SettingsParseEvent event = parseConfigObject(line, name, value);
 
 		switch (event) {
-		case SPE_END:
-			// Skip end tag. Append later.
-			end_found = true;
-			break;
-		case SPE_MULTILINE:
-			value = getMultiline(is);
-			/* FALLTHROUGH */
-		case SPE_KVPAIR:
-			it = m_settings.find(name);
-			if (it != m_settings.end() &&
-					(it->second.is_group || it->second.value != value)) {
-				printEntry(os, name, it->second, tab_depth);
-				was_modified = true;
-			} else if (it == m_settings.end()) {
-				// Remove by skipping
-				was_modified = true;
+			case SPE_END:
+				// Skip end tag. Append later.
+				end_found = true;
 				break;
-			} else {
-				os << line << "\n";
-				if (event == SPE_MULTILINE)
-					os << value << "\n\"\"\"\n";
-			}
-			present_entries.insert(name);
-			break;
-		case SPE_GROUP:
-			it = m_settings.find(name);
-			if (it != m_settings.end() && it->second.is_group) {
-				os << line << "\n";
-				sanity_check(it->second.group != NULL);
-				was_modified |= it->second.group->updateConfigObject(is, os, tab_depth + 1);
-			} else if (it == m_settings.end()) {
-				// Remove by skipping
-				was_modified = true;
-				Settings removed_group("}"); // Move 'is' to group end
-				std::stringstream ss;
-				removed_group.updateConfigObject(is, ss, tab_depth + 1);
+			case SPE_MULTILINE:
+				value = getMultiline(is);
+				/* FALLTHROUGH */
+			case SPE_KVPAIR:
+				it = m_settings.find(name);
+				if (it != m_settings.end() &&
+						(it->second.is_group || it->second.value != value)) {
+					printEntry(os, name, it->second, tab_depth);
+					was_modified = true;
+				} else if (it == m_settings.end()) {
+					// Remove by skipping
+					was_modified = true;
+					break;
+				} else {
+					os << line << "\n";
+					if (event == SPE_MULTILINE)
+						os << value << "\n\"\"\"\n";
+				}
+				present_entries.insert(name);
 				break;
-			} else {
-				printEntry(os, name, it->second, tab_depth);
-				was_modified = true;
-			}
-			present_entries.insert(name);
-			break;
-		default:
-			os << line << (is.eof() ? "" : "\n");
-			break;
+			case SPE_GROUP:
+				it = m_settings.find(name);
+				if (it != m_settings.end() && it->second.is_group) {
+					os << line << "\n";
+					sanity_check(it->second.group != NULL);
+					was_modified |= it->second.group->updateConfigObject(is, os, tab_depth + 1);
+				} else if (it == m_settings.end()) {
+					// Remove by skipping
+					was_modified = true;
+					Settings removed_group("}"); // Move 'is' to group end
+					std::stringstream ss;
+					removed_group.updateConfigObject(is, ss, tab_depth + 1);
+					break;
+				} else {
+					printEntry(os, name, it->second, tab_depth);
+					was_modified = true;
+				}
+				present_entries.insert(name);
+				break;
+			default:
+				os << line << (is.eof() ? "" : "\n");
+				break;
 		}
 	}
 
@@ -378,9 +347,7 @@ bool Settings::updateConfigObject(std::istream &is, std::ostream &os, u32 tab_de
 	return was_modified;
 }
 
-
-bool Settings::updateConfigFile(const char *filename)
-{
+bool Settings::updateConfigFile(const char *filename) {
 	MutexAutoLock lock(m_mutex);
 
 	std::ifstream is(filename);
@@ -398,10 +365,8 @@ bool Settings::updateConfigFile(const char *filename)
 	return true;
 }
 
-
 bool Settings::parseCommandLine(int argc, char *argv[],
-		const std::map<std::string, ValueSpec> &allowed_options)
-{
+		const std::map<std::string, ValueSpec> &allowed_options) {
 	int nonopt_index = 0;
 	for (int i = 1; i < argc; i++) {
 		std::string_view arg_name(argv[i]);
@@ -415,7 +380,7 @@ bool Settings::parseCommandLine(int argc, char *argv[],
 				continue;
 			}
 			errorstream << "Invalid command-line parameter \""
-					<< arg_name << "\": --<option> expected." << '\n';
+						<< arg_name << "\": --<option> expected." << '\n';
 			return false;
 		}
 
@@ -424,7 +389,7 @@ bool Settings::parseCommandLine(int argc, char *argv[],
 		auto n = allowed_options.find(name);
 		if (n == allowed_options.end()) {
 			errorstream << "Unknown command-line parameter \""
-					<< arg_name << "\"" << '\n';
+						<< arg_name << "\"" << '\n';
 			return false;
 		}
 
@@ -437,7 +402,7 @@ bool Settings::parseCommandLine(int argc, char *argv[],
 		} else {
 			if ((i + 1) >= argc) {
 				errorstream << "Invalid command-line parameter \""
-						<< name << "\": missing value" << '\n';
+							<< name << "\": missing value" << '\n';
 				return false;
 			}
 			value = argv[++i];
@@ -449,20 +414,15 @@ bool Settings::parseCommandLine(int argc, char *argv[],
 	return true;
 }
 
-
-
 /***********
  * Getters *
  ***********/
 
-Settings *Settings::getParent() const
-{
+Settings *Settings::getParent() const {
 	return m_hierarchy ? m_hierarchy->getParent(m_settingslayer) : nullptr;
 }
 
-
-const SettingsEntry &Settings::getEntry(const std::string &name) const
-{
+const SettingsEntry &Settings::getEntry(const std::string &name) const {
 	{
 		MutexAutoLock lock(m_mutex);
 
@@ -477,76 +437,55 @@ const SettingsEntry &Settings::getEntry(const std::string &name) const
 	throw SettingNotFoundException("Setting [" + name + "] not found.");
 }
 
-
-Settings *Settings::getGroup(const std::string &name) const
-{
+Settings *Settings::getGroup(const std::string &name) const {
 	const SettingsEntry &entry = getEntry(name);
 	if (!entry.is_group)
 		throw SettingNotFoundException("Setting [" + name + "] is not a group.");
 	return entry.group;
 }
 
-
-const std::string &Settings::get(const std::string &name) const
-{
+const std::string &Settings::get(const std::string &name) const {
 	const SettingsEntry &entry = getEntry(name);
 	if (entry.is_group)
 		throw SettingNotFoundException("Setting [" + name + "] is a group.");
 	return entry.value;
 }
 
-
-bool Settings::getBool(const std::string &name) const
-{
+bool Settings::getBool(const std::string &name) const {
 	return is_yes(get(name));
 }
 
-
-u16 Settings::getU16(const std::string &name) const
-{
+u16 Settings::getU16(const std::string &name) const {
 	return stoi(get(name), 0, 65535);
 }
 
-
-s16 Settings::getS16(const std::string &name) const
-{
+s16 Settings::getS16(const std::string &name) const {
 	return stoi(get(name), -32768, 32767);
 }
 
-
-u32 Settings::getU32(const std::string &name) const
-{
-	return (u32) stoi(get(name));
+u32 Settings::getU32(const std::string &name) const {
+	return (u32)stoi(get(name));
 }
 
-s32 Settings::getS32(const std::string &name) const
-{
+s32 Settings::getS32(const std::string &name) const {
 	return stoi(get(name));
 }
 
-
-float Settings::getFloat(const std::string &name) const
-{
+float Settings::getFloat(const std::string &name) const {
 	return stof(get(name));
 }
 
-
-float Settings::getFloat(const std::string &name, float min, float max) const
-{
+float Settings::getFloat(const std::string &name, float min, float max) const {
 	float val = stof(get(name));
 	return rangelim(val, min, max);
 }
 
-
-u64 Settings::getU64(const std::string &name) const
-{
+u64 Settings::getU64(const std::string &name) const {
 	std::string s = get(name);
 	return from_string<u64>(s);
 }
 
-
-v2f Settings::getV2F(const std::string &name) const
-{
+v2f Settings::getV2F(const std::string &name) const {
 	v2f value;
 	Strfnd f(get(name));
 	f.next("(");
@@ -555,16 +494,12 @@ v2f Settings::getV2F(const std::string &name) const
 	return value;
 }
 
-
-v3f Settings::getV3F(const std::string &name) const
-{
+v3f Settings::getV3F(const std::string &name) const {
 	return str_to_v3f(get(name));
 }
 
-
 u32 Settings::getFlagStr(const std::string &name, const FlagDesc *flagdesc,
-	u32 *flagmask) const
-{
+		u32 *flagmask) const {
 	u32 flags = 0;
 
 	// Read default value (if there is any)
@@ -577,11 +512,11 @@ u32 Settings::getFlagStr(const std::string &name, const FlagDesc *flagdesc,
 		u32 flags_user;
 		u32 mask_user = U32_MAX;
 		flags_user = std::isdigit(value[0])
-			? stoi(value) // Override default
-			: readFlagString(value, flagdesc, &mask_user);
+				? stoi(value) // Override default
+				: readFlagString(value, flagdesc, &mask_user);
 
 		flags &= ~mask_user;
-		flags |=  flags_user;
+		flags |= flags_user;
 		if (flagmask)
 			*flagmask |= mask_user;
 	}
@@ -589,9 +524,7 @@ u32 Settings::getFlagStr(const std::string &name, const FlagDesc *flagdesc,
 	return flags;
 }
 
-
-bool Settings::getNoiseParams(const std::string &name, NoiseParams &np) const
-{
+bool Settings::getNoiseParams(const std::string &name, NoiseParams &np) const {
 	if (getNoiseParamsFromGroup(name, np) || getNoiseParamsFromValue(name, np))
 		return true;
 	if (auto parent = getParent())
@@ -600,10 +533,8 @@ bool Settings::getNoiseParams(const std::string &name, NoiseParams &np) const
 	return false;
 }
 
-
 bool Settings::getNoiseParamsFromValue(const std::string &name,
-	NoiseParams &np) const
-{
+		NoiseParams &np) const {
 	std::string value;
 
 	if (!getNoEx(name, value))
@@ -612,16 +543,16 @@ bool Settings::getNoiseParamsFromValue(const std::string &name,
 	// Format: f32,f32,(f32,f32,f32),s32,s32,f32[,f32]
 	Strfnd f(value);
 
-	np.offset   = stof(f.next(","));
-	np.scale    = stof(f.next(","));
+	np.offset = stof(f.next(","));
+	np.scale = stof(f.next(","));
 	f.next("(");
 	np.spread.X = stof(f.next(","));
 	np.spread.Y = stof(f.next(","));
 	np.spread.Z = stof(f.next(")"));
 	f.next(",");
-	np.seed     = stoi(f.next(","));
-	np.octaves  = stoi(f.next(","));
-	np.persist  = stof(f.next(","));
+	np.seed = stoi(f.next(","));
+	np.octaves = stoi(f.next(","));
+	np.persist = stof(f.next(","));
 
 	std::string optional_params = f.next("");
 	if (!optional_params.empty())
@@ -630,22 +561,20 @@ bool Settings::getNoiseParamsFromValue(const std::string &name,
 	return true;
 }
 
-
 bool Settings::getNoiseParamsFromGroup(const std::string &name,
-	NoiseParams &np) const
-{
+		NoiseParams &np) const {
 	Settings *group = NULL;
 
 	if (!getGroupNoEx(name, group))
 		return false;
 
-	group->getFloatNoEx("offset",      np.offset);
-	group->getFloatNoEx("scale",       np.scale);
-	group->getV3FNoEx("spread",        np.spread);
-	group->getS32NoEx("seed",          np.seed);
-	group->getU16NoEx("octaves",       np.octaves);
+	group->getFloatNoEx("offset", np.offset);
+	group->getFloatNoEx("scale", np.scale);
+	group->getV3FNoEx("spread", np.spread);
+	group->getS32NoEx("seed", np.seed);
+	group->getU16NoEx("octaves", np.octaves);
 	group->getFloatNoEx("persistence", np.persist);
-	group->getFloatNoEx("lacunarity",  np.lacunarity);
+	group->getFloatNoEx("lacunarity", np.lacunarity);
 
 	np.flags = 0;
 	if (!group->getFlagStrNoEx("flags", np.flags, flagdesc_noiseparams))
@@ -654,9 +583,7 @@ bool Settings::getNoiseParamsFromGroup(const std::string &name,
 	return true;
 }
 
-
-bool Settings::exists(const std::string &name) const
-{
+bool Settings::exists(const std::string &name) const {
 	if (existsLocal(name))
 		return true;
 	if (auto parent = getParent())
@@ -664,17 +591,13 @@ bool Settings::exists(const std::string &name) const
 	return false;
 }
 
-
-bool Settings::existsLocal(const std::string &name) const
-{
+bool Settings::existsLocal(const std::string &name) const {
 	MutexAutoLock lock(m_mutex);
 
 	return m_settings.find(name) != m_settings.end();
 }
 
-
-std::vector<std::string> Settings::getNames() const
-{
+std::vector<std::string> Settings::getNames() const {
 	MutexAutoLock lock(m_mutex);
 
 	std::vector<std::string> names;
@@ -685,14 +608,11 @@ std::vector<std::string> Settings::getNames() const
 	return names;
 }
 
-
-
 /***************************************
  * Getters that don't throw exceptions *
  ***************************************/
 
-bool Settings::getGroupNoEx(const std::string &name, Settings *&val) const
-{
+bool Settings::getGroupNoEx(const std::string &name, Settings *&val) const {
 	try {
 		val = getGroup(name);
 		return true;
@@ -701,9 +621,7 @@ bool Settings::getGroupNoEx(const std::string &name, Settings *&val) const
 	}
 }
 
-
-bool Settings::getNoEx(const std::string &name, std::string &val) const
-{
+bool Settings::getNoEx(const std::string &name, std::string &val) const {
 	try {
 		val = get(name);
 		return true;
@@ -712,19 +630,15 @@ bool Settings::getNoEx(const std::string &name, std::string &val) const
 	}
 }
 
-
-bool Settings::getFlag(const std::string &name) const
-{
+bool Settings::getFlag(const std::string &name) const {
 	try {
 		return getBool(name);
-	} catch(SettingNotFoundException &e) {
+	} catch (SettingNotFoundException &e) {
 		return false;
 	}
 }
 
-
-bool Settings::getFloatNoEx(const std::string &name, float &val) const
-{
+bool Settings::getFloatNoEx(const std::string &name, float &val) const {
 	try {
 		val = getFloat(name);
 		return true;
@@ -733,9 +647,7 @@ bool Settings::getFloatNoEx(const std::string &name, float &val) const
 	}
 }
 
-
-bool Settings::getU16NoEx(const std::string &name, u16 &val) const
-{
+bool Settings::getU16NoEx(const std::string &name, u16 &val) const {
 	try {
 		val = getU16(name);
 		return true;
@@ -744,9 +656,7 @@ bool Settings::getU16NoEx(const std::string &name, u16 &val) const
 	}
 }
 
-
-bool Settings::getS16NoEx(const std::string &name, s16 &val) const
-{
+bool Settings::getS16NoEx(const std::string &name, s16 &val) const {
 	try {
 		val = getS16(name);
 		return true;
@@ -755,8 +665,7 @@ bool Settings::getS16NoEx(const std::string &name, s16 &val) const
 	}
 }
 
-bool Settings::getU32NoEx(const std::string &name, u32 &val) const
-{
+bool Settings::getU32NoEx(const std::string &name, u32 &val) const {
 	try {
 		val = getU32(name);
 		return true;
@@ -765,8 +674,7 @@ bool Settings::getU32NoEx(const std::string &name, u32 &val) const
 	}
 }
 
-bool Settings::getS32NoEx(const std::string &name, s32 &val) const
-{
+bool Settings::getS32NoEx(const std::string &name, s32 &val) const {
 	try {
 		val = getS32(name);
 		return true;
@@ -775,9 +683,7 @@ bool Settings::getS32NoEx(const std::string &name, s32 &val) const
 	}
 }
 
-
-bool Settings::getU64NoEx(const std::string &name, u64 &val) const
-{
+bool Settings::getU64NoEx(const std::string &name, u64 &val) const {
 	try {
 		val = getU64(name);
 		return true;
@@ -786,9 +692,7 @@ bool Settings::getU64NoEx(const std::string &name, u64 &val) const
 	}
 }
 
-
-bool Settings::getV2FNoEx(const std::string &name, v2f &val) const
-{
+bool Settings::getV2FNoEx(const std::string &name, v2f &val) const {
 	try {
 		val = getV2F(name);
 		return true;
@@ -797,9 +701,7 @@ bool Settings::getV2FNoEx(const std::string &name, v2f &val) const
 	}
 }
 
-
-bool Settings::getV3FNoEx(const std::string &name, v3f &val) const
-{
+bool Settings::getV3FNoEx(const std::string &name, v3f &val) const {
 	try {
 		val = getV3F(name);
 		return true;
@@ -808,10 +710,8 @@ bool Settings::getV3FNoEx(const std::string &name, v3f &val) const
 	}
 }
 
-
 bool Settings::getFlagStrNoEx(const std::string &name, u32 &val,
-	const FlagDesc *flagdesc) const
-{
+		const FlagDesc *flagdesc) const {
 	if (!flagdesc) {
 		if (!(flagdesc = getFlagDescFallback(name)))
 			return false; // Not found
@@ -826,14 +726,12 @@ bool Settings::getFlagStrNoEx(const std::string &name, u32 &val,
 	}
 }
 
-
 /***********
  * Setters *
  ***********/
 
 bool Settings::setEntry(const std::string &name, const void *data,
-	bool set_group)
-{
+		bool set_group) {
 	if (!checkNameValid(name))
 		return false;
 	if (!set_group && !checkValueValid(*(const std::string *)data))
@@ -846,8 +744,8 @@ bool Settings::setEntry(const std::string &name, const void *data,
 		SettingsEntry &entry = m_settings[name];
 		old_group = entry.group;
 
-		entry.value    = set_group ? "" : *(const std::string *)data;
-		entry.group    = set_group ? *(Settings **)data : NULL;
+		entry.value = set_group ? "" : *(const std::string *)data;
+		entry.group = set_group ? *(Settings **)data : NULL;
 		entry.is_group = set_group;
 		if (set_group)
 			entry.group->m_end_tag = "}";
@@ -858,9 +756,7 @@ bool Settings::setEntry(const std::string &name, const void *data,
 	return true;
 }
 
-
-bool Settings::set(const std::string &name, const std::string &value)
-{
+bool Settings::set(const std::string &name, const std::string &value) {
 	if (!setEntry(name, &value, false))
 		return false;
 
@@ -868,18 +764,14 @@ bool Settings::set(const std::string &name, const std::string &value)
 	return true;
 }
 
-
 // TODO: Remove this function
-bool Settings::setDefault(const std::string &name, const std::string &value)
-{
+bool Settings::setDefault(const std::string &name, const std::string &value) {
 	FATAL_ERROR_IF(m_hierarchy != &g_hierarchy, "setDefault is only valid on "
-		"global settings");
+												"global settings");
 	return getLayer(SL_DEFAULTS)->set(name, value);
 }
 
-
-bool Settings::setGroup(const std::string &name, const Settings &group)
-{
+bool Settings::setGroup(const std::string &name, const Settings &group) {
 	// Settings must own the group pointer
 	// avoid double-free by copying the source
 	Settings *copy = new Settings();
@@ -887,64 +779,46 @@ bool Settings::setGroup(const std::string &name, const Settings &group)
 	return setEntry(name, &copy, true);
 }
 
-
-bool Settings::setBool(const std::string &name, bool value)
-{
+bool Settings::setBool(const std::string &name, bool value) {
 	return set(name, value ? "true" : "false");
 }
 
-
-bool Settings::setS16(const std::string &name, s16 value)
-{
+bool Settings::setS16(const std::string &name, s16 value) {
 	return set(name, itos(value));
 }
 
-
-bool Settings::setU16(const std::string &name, u16 value)
-{
+bool Settings::setU16(const std::string &name, u16 value) {
 	return set(name, itos(value));
 }
 
-
-bool Settings::setS32(const std::string &name, s32 value)
-{
+bool Settings::setS32(const std::string &name, s32 value) {
 	return set(name, itos(value));
 }
 
-
-bool Settings::setU64(const std::string &name, u64 value)
-{
+bool Settings::setU64(const std::string &name, u64 value) {
 	std::ostringstream os;
 	os << value;
 	return set(name, os.str());
 }
 
-
-bool Settings::setFloat(const std::string &name, float value)
-{
+bool Settings::setFloat(const std::string &name, float value) {
 	return set(name, ftos(value));
 }
 
-
-bool Settings::setV2F(const std::string &name, v2f value)
-{
+bool Settings::setV2F(const std::string &name, v2f value) {
 	std::ostringstream os;
 	os << "(" << value.X << "," << value.Y << ")";
 	return set(name, os.str());
 }
 
-
-bool Settings::setV3F(const std::string &name, v3f value)
-{
+bool Settings::setV3F(const std::string &name, v3f value) {
 	std::ostringstream os;
 	os << "(" << value.X << "," << value.Y << "," << value.Z << ")";
 	return set(name, os.str());
 }
 
-
 bool Settings::setFlagStr(const std::string &name, u32 flags,
-	const FlagDesc *flagdesc, u32 flagmask)
-{
+		const FlagDesc *flagdesc, u32 flagmask) {
 	if (!flagdesc) {
 		if (!(flagdesc = getFlagDescFallback(name)))
 			return false; // Not found
@@ -953,26 +827,22 @@ bool Settings::setFlagStr(const std::string &name, u32 flags,
 	return set(name, writeFlagString(flags, flagdesc, flagmask));
 }
 
-
-bool Settings::setNoiseParams(const std::string &name, const NoiseParams &np)
-{
+bool Settings::setNoiseParams(const std::string &name, const NoiseParams &np) {
 	Settings *group = new Settings;
 
-	group->setFloat("offset",      np.offset);
-	group->setFloat("scale",       np.scale);
-	group->setV3F("spread",        np.spread);
-	group->setS32("seed",          np.seed);
-	group->setU16("octaves",       np.octaves);
+	group->setFloat("offset", np.offset);
+	group->setFloat("scale", np.scale);
+	group->setV3F("spread", np.spread);
+	group->setS32("seed", np.seed);
+	group->setU16("octaves", np.octaves);
 	group->setFloat("persistence", np.persist);
-	group->setFloat("lacunarity",  np.lacunarity);
-	group->setFlagStr("flags",     np.flags, flagdesc_noiseparams, np.flags);
+	group->setFloat("lacunarity", np.lacunarity);
+	group->setFlagStr("flags", np.flags, flagdesc_noiseparams, np.flags);
 
 	return setEntry(name, &group, true);
 }
 
-
-bool Settings::remove(const std::string &name)
-{
+bool Settings::remove(const std::string &name) {
 	// Lock as short as possible, unlock before doCallbacks()
 	m_mutex.lock();
 
@@ -990,10 +860,8 @@ bool Settings::remove(const std::string &name)
 	return false;
 }
 
-
 SettingsParseEvent Settings::parseConfigObject(const std::string &line,
-	std::string &name, std::string &value)
-{
+		std::string &name, std::string &value) {
 	auto trimmed_line = trim(line);
 
 	if (trimmed_line.empty())
@@ -1007,7 +875,7 @@ SettingsParseEvent Settings::parseConfigObject(const std::string &line,
 	if (pos == std::string::npos)
 		return SPE_INVALID;
 
-	name  = trim(trimmed_line.substr(0, pos));
+	name = trim(trimmed_line.substr(0, pos));
 	value = trim(trimmed_line.substr(pos + 1));
 
 	if (value == "{")
@@ -1018,39 +886,32 @@ SettingsParseEvent Settings::parseConfigObject(const std::string &line,
 	return SPE_KVPAIR;
 }
 
-
-void Settings::clearNoLock()
-{
+void Settings::clearNoLock() {
 	for (SettingEntries::const_iterator it = m_settings.begin();
 			it != m_settings.end(); ++it)
 		delete it->second.group;
 	m_settings.clear();
 }
 
-
 void Settings::setDefault(const std::string &name, const FlagDesc *flagdesc,
-	u32 flags)
-{
+		u32 flags) {
 	s_flags[name] = flagdesc;
 	setDefault(name, writeFlagString(flags, flagdesc, U32_MAX));
 }
 
-const FlagDesc *Settings::getFlagDescFallback(const std::string &name) const
-{
+const FlagDesc *Settings::getFlagDescFallback(const std::string &name) const {
 	auto it = s_flags.find(name);
 	return it == s_flags.end() ? nullptr : it->second;
 }
 
 void Settings::registerChangedCallback(const std::string &name,
-	SettingsChangedCallback cbf, void *userdata)
-{
+		SettingsChangedCallback cbf, void *userdata) {
 	MutexAutoLock lock(m_callback_mutex);
 	m_callbacks[name].emplace_back(cbf, userdata);
 }
 
 void Settings::deregisterChangedCallback(const std::string &name,
-	SettingsChangedCallback cbf, void *userdata)
-{
+		SettingsChangedCallback cbf, void *userdata) {
 	MutexAutoLock lock(m_callback_mutex);
 	SettingsCallbackMap::iterator it_cbks = m_callbacks.find(name);
 
@@ -1058,28 +919,26 @@ void Settings::deregisterChangedCallback(const std::string &name,
 		SettingsCallbackList &cbks = it_cbks->second;
 
 		SettingsCallbackList::iterator position =
-			std::find(cbks.begin(), cbks.end(), std::make_pair(cbf, userdata));
+				std::find(cbks.begin(), cbks.end(), std::make_pair(cbf, userdata));
 
 		if (position != cbks.end())
 			cbks.erase(position);
 	}
 }
 
-void Settings::removeSecureSettings()
-{
+void Settings::removeSecureSettings() {
 	for (const auto &name : getNames()) {
 		if (name.compare(0, 7, "secure.") != 0)
 			continue;
 
 		errorstream << "Secure setting " << name
-				<< " isn't allowed, so was ignored."
-				<< '\n';
+					<< " isn't allowed, so was ignored."
+					<< '\n';
 		remove(name);
 	}
 }
 
-void Settings::doCallbacks(const std::string &name) const
-{
+void Settings::doCallbacks(const std::string &name) const {
 	MutexAutoLock lock(m_callback_mutex);
 
 	SettingsCallbackMap::const_iterator it_cbks = m_callbacks.find(name);

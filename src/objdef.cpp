@@ -22,22 +22,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "log.h"
 #include "gamedef.h"
 
-ObjDefManager::ObjDefManager(IGameDef *gamedef, ObjDefType type)
-{
+ObjDefManager::ObjDefManager(IGameDef *gamedef, ObjDefType type) {
 	m_objtype = type;
 	m_ndef = gamedef ? gamedef->getNodeDefManager() : NULL;
 }
 
-
-ObjDefManager::~ObjDefManager()
-{
+ObjDefManager::~ObjDefManager() {
 	for (size_t i = 0; i != m_objects.size(); i++)
 		delete m_objects[i];
 }
 
-
-ObjDefHandle ObjDefManager::add(ObjDef *obj)
-{
+ObjDefHandle ObjDefManager::add(ObjDef *obj) {
 	assert(obj);
 
 	if (obj->name.length() && getByName(obj->name))
@@ -51,32 +46,26 @@ ObjDefHandle ObjDefManager::add(ObjDef *obj)
 	return obj->handle;
 }
 
-
-ObjDef *ObjDefManager::get(ObjDefHandle handle) const
-{
+ObjDef *ObjDefManager::get(ObjDefHandle handle) const {
 	u32 index = validateHandle(handle);
 	return (index != OBJDEF_INVALID_INDEX) ? getRaw(index) : NULL;
 }
 
-
-ObjDef *ObjDefManager::set(ObjDefHandle handle, ObjDef *obj)
-{
+ObjDef *ObjDefManager::set(ObjDefHandle handle, ObjDef *obj) {
 	u32 index = validateHandle(handle);
 	if (index == OBJDEF_INVALID_INDEX)
 		return NULL;
 
 	ObjDef *oldobj = setRaw(index, obj);
 
-	obj->uid    = oldobj->uid;
-	obj->index  = oldobj->index;
+	obj->uid = oldobj->uid;
+	obj->index = oldobj->index;
 	obj->handle = oldobj->handle;
 
 	return oldobj;
 }
 
-
-u32 ObjDefManager::addRaw(ObjDef *obj)
-{
+u32 ObjDefManager::addRaw(ObjDef *obj) {
 	size_t nobjects = m_objects.size();
 	if (nobjects >= OBJDEF_MAX_ITEMS)
 		return -1;
@@ -92,31 +81,25 @@ u32 ObjDefManager::addRaw(ObjDef *obj)
 	m_objects.push_back(obj);
 
 	infostream << "ObjDefManager: added " << getObjectTitle()
-		<< ": name=\"" << obj->name
-		<< "\" index=" << obj->index
-		<< " uid="     << obj->uid
-		<< '\n';
+			   << ": name=\"" << obj->name
+			   << "\" index=" << obj->index
+			   << " uid=" << obj->uid
+			   << '\n';
 
 	return nobjects;
 }
 
-
-ObjDef *ObjDefManager::getRaw(u32 index) const
-{
+ObjDef *ObjDefManager::getRaw(u32 index) const {
 	return m_objects[index];
 }
 
-
-ObjDef *ObjDefManager::setRaw(u32 index, ObjDef *obj)
-{
+ObjDef *ObjDefManager::setRaw(u32 index, ObjDef *obj) {
 	ObjDef *old_obj = m_objects[index];
 	m_objects[index] = obj;
 	return old_obj;
 }
 
-
-ObjDef *ObjDefManager::getByName(const std::string &name) const
-{
+ObjDef *ObjDefManager::getByName(const std::string &name) const {
 	for (size_t i = 0; i != m_objects.size(); i++) {
 		ObjDef *obj = m_objects[i];
 		if (obj && !strcasecmp(name.c_str(), obj->name.c_str()))
@@ -126,35 +109,29 @@ ObjDef *ObjDefManager::getByName(const std::string &name) const
 	return NULL;
 }
 
-
-void ObjDefManager::clear()
-{
+void ObjDefManager::clear() {
 	for (size_t i = 0; i != m_objects.size(); i++)
 		delete m_objects[i];
 
 	m_objects.clear();
 }
 
-
-u32 ObjDefManager::validateHandle(ObjDefHandle handle) const
-{
+u32 ObjDefManager::validateHandle(ObjDefHandle handle) const {
 	ObjDefType type;
 	u32 index;
 	u32 uid;
 
 	bool is_valid =
-		(handle != OBJDEF_INVALID_HANDLE)         &&
-		decodeHandle(handle, &index, &type, &uid) &&
-		(type == m_objtype)                       &&
-		(index < m_objects.size())                &&
-		(m_objects[index]->uid == uid);
+			(handle != OBJDEF_INVALID_HANDLE) &&
+			decodeHandle(handle, &index, &type, &uid) &&
+			(type == m_objtype) &&
+			(index < m_objects.size()) &&
+			(m_objects[index]->uid == uid);
 
 	return is_valid ? index : -1;
 }
 
-
-ObjDefHandle ObjDefManager::createHandle(u32 index, ObjDefType type, u32 uid)
-{
+ObjDefHandle ObjDefManager::createHandle(u32 index, ObjDefType type, u32 uid) {
 	ObjDefHandle handle = 0;
 	set_bits(&handle, 0, 18, index);
 	set_bits(&handle, 18, 6, type);
@@ -166,10 +143,8 @@ ObjDefHandle ObjDefManager::createHandle(u32 index, ObjDefType type, u32 uid)
 	return handle ^ OBJDEF_HANDLE_SALT;
 }
 
-
 bool ObjDefManager::decodeHandle(ObjDefHandle handle, u32 *index,
-	ObjDefType *type, u32 *uid)
-{
+		ObjDefType *type, u32 *uid) {
 	handle ^= OBJDEF_HANDLE_SALT;
 
 	u32 parity = get_bits(handle, 31, 1);
@@ -178,23 +153,21 @@ bool ObjDefManager::decodeHandle(ObjDefHandle handle, u32 *index,
 		return false;
 
 	*index = get_bits(handle, 0, 18);
-	*type  = (ObjDefType)get_bits(handle, 18, 6);
-	*uid   = get_bits(handle, 24, 7);
+	*type = (ObjDefType)get_bits(handle, 18, 6);
+	*uid = get_bits(handle, 24, 7);
 	return true;
 }
 
 // Cloning
 
-void ObjDef::cloneTo(ObjDef *def) const
-{
+void ObjDef::cloneTo(ObjDef *def) const {
 	def->index = index;
 	def->uid = uid;
 	def->handle = handle;
 	def->name = name;
 }
 
-void ObjDefManager::cloneTo(ObjDefManager *mgr) const
-{
+void ObjDefManager::cloneTo(ObjDefManager *mgr) const {
 	mgr->m_ndef = m_ndef;
 	mgr->m_objects.reserve(m_objects.size());
 	for (const auto &obj : m_objects)

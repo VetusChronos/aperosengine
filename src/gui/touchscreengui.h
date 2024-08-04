@@ -38,7 +38,6 @@ using namespace irr;
 using namespace irr::core;
 using namespace irr::gui;
 
-
 // We cannot use irr_ptr for Irrlicht GUI elements we own.
 // Option 1: Pass IGUIElement* returned by IGUIEnvironment::add* into irr_ptr
 //           constructor.
@@ -51,8 +50,7 @@ using namespace irr::gui;
 // To make IGUIEnvironment drop its reference to the IGUIElement, we have to call
 // IGUIElement::remove, so that's what we'll do.
 template <typename T>
-std::shared_ptr<T> grab_gui_element(T *element)
-{
+std::shared_ptr<T> grab_gui_element(T *element) {
 	static_assert(std::is_base_of_v<IGUIElement, T>,
 			"grab_gui_element only works for IGUIElement");
 	return std::shared_ptr<T>(element, [](T *e) {
@@ -60,16 +58,13 @@ std::shared_ptr<T> grab_gui_element(T *element)
 	});
 }
 
-
-enum class TapState
-{
+enum class TapState {
 	None,
 	ShortTap,
 	LongTap,
 };
 
-enum touch_gui_button_id
-{
+enum touch_gui_button_id {
 	jump_id = 0,
 	sneak_id,
 	zoom_id,
@@ -99,8 +94,7 @@ enum touch_gui_button_id
 	joystick_center_id,
 };
 
-enum autohide_button_bar_dir
-{
+enum autohide_button_bar_dir {
 	AHBB_Dir_Top_Bottom,
 	AHBB_Dir_Bottom_Top,
 	AHBB_Dir_Left_Right,
@@ -118,8 +112,7 @@ enum autohide_button_bar_dir
 // If you tap faster than this value, the simulated clicks are of course shorter.
 #define SIMULATED_CLICK_DURATION_MS 50
 
-struct button_info
-{
+struct button_info {
 	float repeat_counter;
 	EKEY_CODE keycode;
 	std::vector<size_t> pointer_ids;
@@ -136,8 +129,7 @@ struct button_info
 			IEventReceiver *receiver, ISimpleTextureSource *tsrc);
 };
 
-class AutoHideButtonBar
-{
+class AutoHideButtonBar {
 public:
 	AutoHideButtonBar(IrrlichtDevice *device, ISimpleTextureSource *tsrc,
 			touch_gui_button_id starter_id, const std::string &starter_image,
@@ -159,10 +151,8 @@ public:
 	void show();
 	void hide();
 
-	bool operator==(const AutoHideButtonBar &other)
-			{ return m_starter.get() == other.m_starter.get(); }
-	bool operator!=(const AutoHideButtonBar &other)
-			{ return m_starter.get() != other.m_starter.get(); }
+	bool operator==(const AutoHideButtonBar &other) { return m_starter.get() == other.m_starter.get(); }
+	bool operator!=(const AutoHideButtonBar &other) { return m_starter.get() != other.m_starter.get(); }
 
 private:
 	irr::video::IVideoDriver *m_driver = nullptr;
@@ -183,16 +173,14 @@ private:
 	void updateVisibility();
 };
 
-class TouchScreenGUI
-{
+class TouchScreenGUI {
 public:
 	TouchScreenGUI(IrrlichtDevice *device, ISimpleTextureSource *tsrc);
 
 	void translateEvent(const SEvent &event);
 	void applyContextControls(const TouchInteractionMode &mode);
 
-	double getYawChange()
-	{
+	double getYawChange() {
 		double res = m_camera_yaw_change;
 		m_camera_yaw_change = 0;
 		return res;

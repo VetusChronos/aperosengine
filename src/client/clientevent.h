@@ -29,8 +29,7 @@ struct SunParams;
 struct MoonParams;
 struct StarParams;
 
-enum ClientEventType : u8
-{
+enum ClientEventType : u8 {
 	CE_NONE,
 	CE_PLAYER_DAMAGE,
 	CE_PLAYER_FORCE_MOVE,
@@ -52,8 +51,7 @@ enum ClientEventType : u8
 	CLIENTEVENT_MAX,
 };
 
-struct ClientEventHudAdd
-{
+struct ClientEventHudAdd {
 	u32 server_id;
 	u8 type;
 	v2f pos, scale;
@@ -66,8 +64,7 @@ struct ClientEventHudAdd
 	s16 z_index;
 };
 
-struct ClientEventHudChange
-{
+struct ClientEventHudChange {
 	u32 id;
 	HudElementStat stat;
 	v2f v2fdata;
@@ -77,11 +74,9 @@ struct ClientEventHudChange
 	v2s32 v2s32data;
 };
 
-struct ClientEvent
-{
+struct ClientEvent {
 	ClientEventType type;
-	union
-	{
+	union {
 		// struct{
 		//} none;
 		struct

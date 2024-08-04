@@ -65,8 +65,7 @@ public:
 
 static TestUtilities g_test_instance;
 
-void TestUtilities::runTests(IGameDef *gamedef)
-{
+void TestUtilities::runTests(IGameDef *gamedef) {
 	TEST(testAngleWrapAround);
 	TEST(testWrapDegrees_0_360_v3f);
 	TEST(testLowercase);
@@ -99,8 +98,7 @@ void TestUtilities::runTests(IGameDef *gamedef)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-inline float ref_WrapDegrees180(float f)
-{
+inline float ref_WrapDegrees180(float f) {
 	// This is a slower alternative to the wrapDegrees_180() function;
 	// used as a reference for testing
 	float value = fmodf(f + 180, 360);
@@ -109,9 +107,7 @@ inline float ref_WrapDegrees180(float f)
 	return value - 180;
 }
 
-
-inline float ref_WrapDegrees_0_360(float f)
-{
+inline float ref_WrapDegrees_0_360(float f) {
 	// This is a slower alternative to the wrapDegrees_0_360() function;
 	// used as a reference for testing
 	float value = fmodf(f, 360);
@@ -119,7 +115,6 @@ inline float ref_WrapDegrees_0_360(float f)
 		value += 360;
 	return value < 0 ? value + 360 : value;
 }
-
 
 void TestUtilities::testAngleWrapAround() {
 	UASSERT(fabs(modulo360f(100.0) - 100.0) < 0.001);
@@ -136,13 +131,11 @@ void TestUtilities::testAngleWrapAround() {
 		UASSERT(std::fabs(wrapDegrees_180(f) - ref_WrapDegrees180(f)) < 0.001);
 		UASSERT(std::fabs(wrapDegrees_0_360(f) - ref_WrapDegrees_0_360(f)) < 0.001);
 		UASSERT(wrapDegrees_0_360(
-				std::fabs(wrapDegrees_180(f) - wrapDegrees_0_360(f))) < 0.001);
+						std::fabs(wrapDegrees_180(f) - wrapDegrees_0_360(f))) < 0.001);
 	}
-
 }
 
-void TestUtilities::testWrapDegrees_0_360_v3f()
-{
+void TestUtilities::testWrapDegrees_0_360_v3f() {
 	// only x test with little step
 	for (float x = -720.f; x <= 720; x += 0.05) {
 		v3f r = wrapDegrees_0_360_v3f(v3f(x, 0, 0));
@@ -180,9 +173,7 @@ void TestUtilities::testWrapDegrees_0_360_v3f()
 	}
 }
 
-
-void TestUtilities::testLowercase()
-{
+void TestUtilities::testLowercase() {
 	UASSERTEQ(auto, lowercase("Foo bAR"), "foo bar");
 	UASSERTEQ(auto, lowercase(u8"eeeeeeaaaaaaaaaaaààààà"), u8"eeeeeeaaaaaaaaaaaààààà");
 	// intentionally won't handle Unicode, regardless of locale
@@ -190,9 +181,7 @@ void TestUtilities::testLowercase()
 	UASSERTEQ(auto, lowercase("MINETEST-powa"), "minetest-powa");
 }
 
-
-void TestUtilities::testTrim()
-{
+void TestUtilities::testTrim() {
 	UASSERT(trim("") == "");
 	UASSERT(trim("dirt_with_grass") == "dirt_with_grass");
 	UASSERT(trim("\n \t\r  Foo bAR  \r\n\t\t  ") == "Foo bAR");
@@ -201,9 +190,7 @@ void TestUtilities::testTrim()
 	UASSERT(trim("a   ") == "a");
 }
 
-
-void TestUtilities::testIsYes()
-{
+void TestUtilities::testIsYes() {
 	UASSERT(is_yes("YeS") == true);
 	UASSERT(is_yes("") == false);
 	UASSERT(is_yes("FAlse") == false);
@@ -213,53 +200,41 @@ void TestUtilities::testIsYes()
 	UASSERT(is_yes("2") == true);
 }
 
-
-void TestUtilities::testRemoveStringEnd()
-{
-	const char *ends[] = {"abc", "c", "bc", "", NULL};
+void TestUtilities::testRemoveStringEnd() {
+	const char *ends[] = { "abc", "c", "bc", "", NULL };
 	UASSERT(removeStringEnd("abc", ends) == "");
 	UASSERT(removeStringEnd("bc", ends) == "b");
 	UASSERT(removeStringEnd("12c", ends) == "12");
 	UASSERT(removeStringEnd("foo", ends) == "");
 }
 
-
-void TestUtilities::testUrlEncode()
-{
-	UASSERT(urlencode("\"Aardvarks lurk, OK?\"")
-			== "%22Aardvarks%20lurk%2C%20OK%3F%22");
+void TestUtilities::testUrlEncode() {
+	UASSERT(urlencode("\"Aardvarks lurk, OK?\"") == "%22Aardvarks%20lurk%2C%20OK%3F%22");
 }
 
-
-void TestUtilities::testUrlDecode()
-{
-	UASSERT(urldecode("%22Aardvarks%20lurk%2C%20OK%3F%22")
-			== "\"Aardvarks lurk, OK?\"");
+void TestUtilities::testUrlDecode() {
+	UASSERT(urldecode("%22Aardvarks%20lurk%2C%20OK%3F%22") == "\"Aardvarks lurk, OK?\"");
 }
 
-
-void TestUtilities::testPadString()
-{
+void TestUtilities::testPadString() {
 	UASSERT(padStringRight("hello", 8) == "hello   ");
 }
 
-void TestUtilities::testStartsWith()
-{
+void TestUtilities::testStartsWith() {
 	std::string the("the");
 	UASSERT(str_starts_with(std::string(), "") == true);
 	UASSERT(str_starts_with(std::string("the sharp pickaxe"),
-		std::string()) == true);
+					std::string()) == true);
 	UASSERT(str_starts_with(std::string("the sharp pickaxe"),
-		std::string_view(the)) == true);
+					std::string_view(the)) == true);
 	UASSERT(str_starts_with(std::string("the sharp pickaxe"),
-		std::string("The")) == false);
+					std::string("The")) == false);
 	UASSERT(str_starts_with(std::string("the sharp pickaxe"),
-		std::string("The"), true) == true);
+					std::string("The"), true) == true);
 	UASSERT(str_starts_with(std::string("T"), "The") == false);
 }
 
-void TestUtilities::testStrEqual()
-{
+void TestUtilities::testStrEqual() {
 	std::string foo("foo");
 	UASSERT(str_equal(foo, std::string_view(foo)));
 	UASSERT(!str_equal(foo, std::string("bar")));
@@ -269,16 +244,12 @@ void TestUtilities::testStrEqual()
 	UASSERT(str_equal(utf8_to_wide("ABC"), utf8_to_wide("abc"), true));
 }
 
-
-void TestUtilities::testStrToIntConversion()
-{
+void TestUtilities::testStrToIntConversion() {
 	UASSERT(mystoi("123", 0, 1000) == 123);
 	UASSERT(mystoi("123", 0, 10) == 10);
 }
 
-
-void TestUtilities::testStringReplace()
-{
+void TestUtilities::testStringReplace() {
 	std::string test_str;
 	test_str = "Hello there";
 	str_replace(test_str, "there", "world");
@@ -288,17 +259,14 @@ void TestUtilities::testStringReplace()
 	UASSERT(test_str == "This is a test");
 }
 
-
-void TestUtilities::testStringAllowed()
-{
+void TestUtilities::testStringAllowed() {
 	UASSERT(string_allowed("hello", "abcdefghijklmno") == true);
 	UASSERT(string_allowed("123", "abcdefghijklmno") == false);
 	UASSERT(string_allowed_blacklist("hello", "123") == true);
 	UASSERT(string_allowed_blacklist("hello123", "123") == false);
 }
 
-void TestUtilities::testAsciiPrintableHelper()
-{
+void TestUtilities::testAsciiPrintableHelper() {
 	UASSERT(IS_ASCII_PRINTABLE_CHAR('e') == true);
 	UASSERT(IS_ASCII_PRINTABLE_CHAR('\0') == false);
 
@@ -309,23 +277,22 @@ void TestUtilities::testAsciiPrintableHelper()
 	UASSERT(IS_ASCII_PRINTABLE_CHAR(ch) == false);
 }
 
-void TestUtilities::testUTF8()
-{
+void TestUtilities::testUTF8() {
 	UASSERT(utf8_to_wide(u8"¤") == L"¤");
 
 	UASSERTEQ(std::string, wide_to_utf8(L"¤"), u8"¤");
 
 	UASSERTEQ(std::string, wide_to_utf8(utf8_to_wide("")), "");
 	UASSERTEQ(std::string, wide_to_utf8(utf8_to_wide("the shovel dug a crumbly node!")),
-		"the shovel dug a crumbly node!");
+			"the shovel dug a crumbly node!");
 
 	UASSERTEQ(std::string, wide_to_utf8(utf8_to_wide(u8"-ä-")),
-		u8"-ä-");
+			u8"-ä-");
 	UASSERTEQ(std::string, wide_to_utf8(utf8_to_wide(u8"-\U0002000b-")),
-		u8"-\U0002000b-");
+			u8"-\U0002000b-");
 	if constexpr (sizeof(wchar_t) == 4) {
 		const auto *literal = U"-\U0002000b-";
-		UASSERT(utf8_to_wide(u8"-\U0002000b-") == reinterpret_cast<const wchar_t*>(literal));
+		UASSERT(utf8_to_wide(u8"-\U0002000b-") == reinterpret_cast<const wchar_t *>(literal));
 	}
 
 	// try to check that the conversion function does not accidentally keep
@@ -335,33 +302,32 @@ void TestUtilities::testUTF8()
 	UASSERT(utf8_to_wide("\x81") != L"\u0101");
 }
 
-void TestUtilities::testRemoveEscapes()
-{
+void TestUtilities::testRemoveEscapes() {
 	UASSERT(unescape_enriched<wchar_t>(
-		L"abc\x1bXdef") == L"abcdef");
+					L"abc\x1bXdef") == L"abcdef");
 	UASSERT(unescape_enriched<wchar_t>(
-		L"abc\x1b(escaped)def") == L"abcdef");
+					L"abc\x1b(escaped)def") == L"abcdef");
 	UASSERT(unescape_enriched<wchar_t>(
-		L"abc\x1b((escaped with parenthesis\\))def") == L"abcdef");
+					L"abc\x1b((escaped with parenthesis\\))def") == L"abcdef");
 	UASSERT(unescape_enriched<wchar_t>(
-		L"abc\x1b(incomplete") == L"abc");
+					L"abc\x1b(incomplete") == L"abc");
 	UASSERT(unescape_enriched<wchar_t>(
-		L"escape at the end\x1b") == L"escape at the end");
+					L"escape at the end\x1b") == L"escape at the end");
 	// Nested escapes not supported
 	UASSERT(unescape_enriched<wchar_t>(
-		L"abc\x1b(outer \x1b(inner escape)escape)def") == L"abcescape)def");
+					L"abc\x1b(outer \x1b(inner escape)escape)def") == L"abcescape)def");
 }
 
-void TestUtilities::testWrapRows()
-{
-	UASSERT(wrap_rows("12345678",4) == "1234\n5678");
+void TestUtilities::testWrapRows() {
+	UASSERT(wrap_rows("12345678", 4) == "1234\n5678");
 	// test that wrap_rows doesn't wrap inside multibyte sequences
 	{
 		const unsigned char s[] = {
 			0x2f, 0x68, 0x6f, 0x6d, 0x65, 0x2f, 0x72, 0x61, 0x70, 0x74, 0x6f,
 			0x72, 0x2f, 0xd1, 0x82, 0xd0, 0xb5, 0xd1, 0x81, 0xd1, 0x82, 0x2f,
 			0x6d, 0x69, 0x6e, 0x65, 0x74, 0x65, 0x73, 0x74, 0x2f, 0x62, 0x69,
-			0x6e, 0x2f, 0x2e, 0x2e, 0};
+			0x6e, 0x2f, 0x2e, 0x2e, 0
+		};
 		std::string str((char *)s);
 		UASSERT(utf8_to_wide(wrap_rows(str, 20)) != L"<invalid UTF-8 string>");
 	};
@@ -369,14 +335,14 @@ void TestUtilities::testWrapRows()
 		const unsigned char s[] = {
 			0x74, 0x65, 0x73, 0x74, 0x20, 0xd1, 0x82, 0xd0, 0xb5, 0xd1, 0x81,
 			0xd1, 0x82, 0x20, 0xd1, 0x82, 0xd0, 0xb5, 0xd1, 0x81, 0xd1, 0x82,
-			0x20, 0xd1, 0x82, 0xd0, 0xb5, 0xd1, 0x81, 0xd1, 0x82, 0};
+			0x20, 0xd1, 0x82, 0xd0, 0xb5, 0xd1, 0x81, 0xd1, 0x82, 0
+		};
 		std::string str((char *)s);
 		UASSERT(utf8_to_wide(wrap_rows(str, 8)) != L"<invalid UTF-8 string>");
 	}
 }
 
-void TestUtilities::testEnrichedString()
-{
+void TestUtilities::testEnrichedString() {
 	EnrichedString str(L"Test bar");
 	irr::video::SColor color(0xFF, 0, 0, 0xFF);
 
@@ -393,16 +359,13 @@ void TestUtilities::testEnrichedString()
 	UASSERT(str.getBackground() == 0xFF00FF00); // Green background
 }
 
-void TestUtilities::testIsNumber()
-{
+void TestUtilities::testIsNumber() {
 	UASSERT(is_number("123") == true);
 	UASSERT(is_number("") == false);
 	UASSERT(is_number("123a") == false);
 }
 
-
-void TestUtilities::testIsPowerOfTwo()
-{
+void TestUtilities::testIsPowerOfTwo() {
 	UASSERT(is_power_of_two(0) == false);
 	UASSERT(is_power_of_two(1) == true);
 	UASSERT(is_power_of_two(2) == true);
@@ -415,16 +378,14 @@ void TestUtilities::testIsPowerOfTwo()
 	UASSERT(is_power_of_two(U32_MAX) == false);
 }
 
-void TestUtilities::testMyround()
-{
+void TestUtilities::testMyround() {
 	UASSERT(myround(4.6f) == 5);
 	UASSERT(myround(1.2f) == 1);
 	UASSERT(myround(-3.1f) == -3);
 	UASSERT(myround(-6.5f) == -7);
 }
 
-void TestUtilities::testStringJoin()
-{
+void TestUtilities::testStringJoin() {
 	std::vector<std::string> input;
 	UASSERT(str_join(input, ",") == "");
 
@@ -444,38 +405,31 @@ void TestUtilities::testStringJoin()
 	UASSERT(str_join(input, " and ") == "one and two and three");
 }
 
-
-static bool within(const f32 value1, const f32 value2, const f32 precision)
-{
+static bool within(const f32 value1, const f32 value2, const f32 precision) {
 	return std::fabs(value1 - value2) <= precision;
 }
 
-static bool within(const v3f &v1, const v3f &v2, const f32 precision)
-{
-	return within(v1.X, v2.X, precision) && within(v1.Y, v2.Y, precision)
-		&& within(v1.Z, v2.Z, precision);
+static bool within(const v3f &v1, const v3f &v2, const f32 precision) {
+	return within(v1.X, v2.X, precision) && within(v1.Y, v2.Y, precision) && within(v1.Z, v2.Z, precision);
 }
 
 static bool within(const core::matrix4 &m1, const core::matrix4 &m2,
-		const f32 precision)
-{
+		const f32 precision) {
 	const f32 *M1 = m1.pointer();
 	const f32 *M2 = m2.pointer();
 	for (int i = 0; i < 16; i++)
-		if (! within(M1[i], M2[i], precision))
+		if (!within(M1[i], M2[i], precision))
 			return false;
 	return true;
 }
 
-static bool roundTripsDeg(const v3f &v, const f32 precision)
-{
+static bool roundTripsDeg(const v3f &v, const f32 precision) {
 	core::matrix4 m;
 	setPitchYawRoll(m, v);
 	return within(v, getPitchYawRoll(m), precision);
 }
 
-void TestUtilities::testEulerConversion()
-{
+void TestUtilities::testEulerConversion() {
 	// This test may fail on non-IEEE systems.
 	// Low tolerance is 4 ulp(1.0) for binary floats with 24 bit mantissa.
 	// (ulp = unit in the last place; ulp(1.0) = 2^-23).
@@ -491,7 +445,7 @@ void TestUtilities::testEulerConversion()
 	// Check that the radians version and the degrees version
 	// produce the same results. Check also that the conversion
 	// works both ways for these values.
-	v1 = v3f(M_PI/3.0, M_PI/5.0, M_PI/4.0);
+	v1 = v3f(M_PI / 3.0, M_PI / 5.0, M_PI / 4.0);
 	v2 = v3f(60.0f, 36.0f, 45.0f);
 	setPitchYawRollRad(m1, v1);
 	setPitchYawRoll(m2, v2);
@@ -557,21 +511,20 @@ void TestUtilities::testEulerConversion()
 	UASSERT(within(m1, m2, tolL));
 }
 
-void TestUtilities::testBase64()
-{
+void TestUtilities::testBase64() {
 	// Test character set
 	UASSERT(base64_is_valid("ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		"abcdefghijklmnopqrstuvwxyz"
-		"0123456789+/") == true);
+							"abcdefghijklmnopqrstuvwxyz"
+							"0123456789+/") == true);
 	UASSERT(base64_is_valid("/+9876543210"
-		"zyxwvutsrqponmlkjihgfedcba"
-		"ZYXWVUTSRQPONMLKJIHGFEDCBA") == true);
+							"zyxwvutsrqponmlkjihgfedcba"
+							"ZYXWVUTSRQPONMLKJIHGFEDCBA") == true);
 	UASSERT(base64_is_valid("ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		"abcdefghijklmnopqrstuvwxyz"
-		"0123456789+.") == false);
+							"abcdefghijklmnopqrstuvwxyz"
+							"0123456789+.") == false);
 	UASSERT(base64_is_valid("ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		"abcdefghijklmnopqrstuvwxyz"
-		"0123456789 /") == false);
+							"abcdefghijklmnopqrstuvwxyz"
+							"0123456789 /") == false);
 
 	// Test empty string
 	UASSERT(base64_is_valid("") == true);
@@ -637,7 +590,8 @@ void TestUtilities::testBase64()
 	UASSERT(base64_is_valid("AAA.A") == false);
 	UASSERT(base64_is_valid("AAAA.A") == false);
 	UASSERT(base64_is_valid("AAAAA.A") == false);
-	UASSERT(base64_is_valid("\xE1""AAA") == false);
+	UASSERT(base64_is_valid("\xE1"
+							"AAA") == false);
 
 	// Padding in wrong position
 	UASSERT(base64_is_valid("A=A") == false);
@@ -647,9 +601,7 @@ void TestUtilities::testBase64()
 	UASSERT(base64_is_valid("AAAAA=A") == false);
 }
 
-
-void TestUtilities::testSanitizeDirName()
-{
+void TestUtilities::testSanitizeDirName() {
 	UASSERTEQ(auto, sanitizeDirName("a", "~"), "a");
 	UASSERTEQ(auto, sanitizeDirName("  ", "~"), "__");
 	UASSERTEQ(auto, sanitizeDirName(" a ", "~"), "_a_");
@@ -661,8 +613,7 @@ void TestUtilities::testSanitizeDirName()
 }
 
 template <typename F, typename C>
-C apply_all(const C &co, F functor)
-{
+C apply_all(const C &co, F functor) {
 	C ret;
 	for (auto it = co.begin(); it != co.end(); it++)
 		ret.push_back(functor(*it));
@@ -671,24 +622,23 @@ C apply_all(const C &co, F functor)
 
 #define cast_v3(T, other) T((other).X, (other).Y, (other).Z)
 
-void TestUtilities::testIsBlockInSight()
-{
+void TestUtilities::testIsBlockInSight() {
 	const std::vector<v3s16> testdata1 = {
-		{0, 1 * (int)BS, 0}, // camera_pos
-		{1, 0, 0},           // camera_dir
+		{ 0, 1 * (int)BS, 0 }, // camera_pos
+		{ 1, 0, 0 }, // camera_dir
 
-		{ 2, 0, 0},
-		{-2, 0, 0},
-		{0, 0,  3},
-		{0, 0, -3},
-		{0, 0, 0},
-		{6, 0, 0}
+		{ 2, 0, 0 },
+		{ -2, 0, 0 },
+		{ 0, 0, 3 },
+		{ 0, 0, -3 },
+		{ 0, 0, 0 },
+		{ 6, 0, 0 }
 	};
-	auto test1 = [] (const std::vector<v3s16> &data) {
+	auto test1 = [](const std::vector<v3s16> &data) {
 		float range = BS * MAP_BLOCKSIZE * 4;
 		float fov = 72 * core::DEGTORAD;
 		v3f cam_pos = cast_v3(v3f, data[0]), cam_dir = cast_v3(v3f, data[1]);
-		UASSERT( isBlockInSight(data[2], cam_pos, cam_dir, fov, range));
+		UASSERT(isBlockInSight(data[2], cam_pos, cam_dir, fov, range));
 		UASSERT(!isBlockInSight(data[3], cam_pos, cam_dir, fov, range));
 		UASSERT(!isBlockInSight(data[4], cam_pos, cam_dir, fov, range));
 		UASSERT(!isBlockInSight(data[5], cam_pos, cam_dir, fov, range));
@@ -701,16 +651,16 @@ void TestUtilities::testIsBlockInSight()
 	};
 	// XZ rotations
 	for (int j = 0; j < 4; j++) {
-		auto tmpdata = apply_all(testdata1, [&] (v3s16 v) -> v3s16 {
-			v.rotateXZBy(j*90);
+		auto tmpdata = apply_all(testdata1, [&](v3s16 v) -> v3s16 {
+			v.rotateXZBy(j * 90);
 			return v;
 		});
 		test1(tmpdata);
 	}
 	// just two for XY
 	for (int j = 0; j < 2; j++) {
-		auto tmpdata = apply_all(testdata1, [&] (v3s16 v) -> v3s16 {
-			v.rotateXYBy(90+j*180);
+		auto tmpdata = apply_all(testdata1, [&](v3s16 v) -> v3s16 {
+			v.rotateXYBy(90 + j * 180);
 			return v;
 		});
 		test1(tmpdata);
@@ -722,23 +672,22 @@ void TestUtilities::testIsBlockInSight()
 		v3f cam_pos(-(MAP_BLOCKSIZE - 1) * BS, 0, 0), cam_dir(1, 0, 0);
 		// we're looking at X+ but are so close to block (-1,0,0) that it
 		// should still be considered visible
-		UASSERT(isBlockInSight({-1, 0, 0}, cam_pos, cam_dir, fov, range));
+		UASSERT(isBlockInSight({ -1, 0, 0 }, cam_pos, cam_dir, fov, range));
 	}
 }
 
-void TestUtilities::testColorizeURL()
-{
+void TestUtilities::testColorizeURL() {
 #ifdef HAVE_COLORIZE_URL
-	#define RED COLOR_CODE("#faa")
-	#define GREY COLOR_CODE("#aaa")
-	#define WHITE COLOR_CODE("#fff")
+#define RED COLOR_CODE("#faa")
+#define GREY COLOR_CODE("#aaa")
+#define WHITE COLOR_CODE("#fff")
 
 	std::string result = colorize_url("http://example.com/");
 	UASSERTEQ(auto, result, (GREY "http://" WHITE "example.com" GREY "/"));
 
 	result = colorize_url(u8"https://u:p@wikipedi\u0430.org:1234/heIIoll?a=b#c");
 	UASSERTEQ(auto, result,
-		(GREY "https://u:p@" WHITE "wikipedi" RED "%d0%b0" WHITE ".org" GREY ":1234/heIIoll?a=b#c"));
+			(GREY "https://u:p@" WHITE "wikipedi" RED "%d0%b0" WHITE ".org" GREY ":1234/heIIoll?a=b#c"));
 #else
 	warningstream << "Test skipped." << '\n';
 #endif

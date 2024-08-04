@@ -8,7 +8,7 @@
 #include <catch_amalgamated.hpp>
 
 namespace Catch {
-	std::ostream& cout();
-	std::ostream& clog();
-	std::ostream& cerr();
-}
+std::ostream &cout();
+std::ostream &clog();
+std::ostream &cerr();
+} //namespace Catch

@@ -24,8 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "lua_api/l_base.h"
 #include "content/mods.h"
 
-class ModApiStorage : public ModApiBase
-{
+class ModApiStorage : public ModApiBase {
 protected:
 	static int l_get_mod_storage(lua_State *L);
 
@@ -33,8 +32,7 @@ public:
 	static void Initialize(lua_State *L, int top);
 };
 
-class StorageRef : public MetaDataRef
-{
+class StorageRef : public MetaDataRef {
 private:
 	ModStorage m_object;
 
@@ -44,7 +42,8 @@ private:
 	virtual void clearMeta();
 
 public:
-	StorageRef(const std::string &mod_name, ModStorageDatabase *db): m_object(mod_name, db) {}
+	StorageRef(const std::string &mod_name, ModStorageDatabase *db) :
+			m_object(mod_name, db) {}
 	~StorageRef() = default;
 
 	static void Register(lua_State *L);

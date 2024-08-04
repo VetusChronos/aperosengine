@@ -30,15 +30,13 @@ namespace sound {
  * RAIIALSoundBuffer
  */
 
-RAIIALSoundBuffer &RAIIALSoundBuffer::operator=(RAIIALSoundBuffer &&other) noexcept
-{
+RAIIALSoundBuffer &RAIIALSoundBuffer::operator=(RAIIALSoundBuffer &&other) noexcept {
 	if (&other != this)
 		reset(other.release());
 	return *this;
 }
 
-void RAIIALSoundBuffer::reset(ALuint buf) noexcept
-{
+void RAIIALSoundBuffer::reset(ALuint buf) noexcept {
 	if (m_buffer != 0) {
 		alDeleteBuffers(1, &m_buffer);
 		warn_if_al_error("Failed to free sound buffer");
@@ -47,8 +45,7 @@ void RAIIALSoundBuffer::reset(ALuint buf) noexcept
 	m_buffer = buf;
 }
 
-RAIIALSoundBuffer RAIIALSoundBuffer::generate() noexcept
-{
+RAIIALSoundBuffer RAIIALSoundBuffer::generate() noexcept {
 	ALuint buf;
 	alGenBuffers(1, &buf);
 	return RAIIALSoundBuffer(buf);

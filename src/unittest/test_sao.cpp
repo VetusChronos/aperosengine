@@ -28,8 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
  * See also test_serveractiveobjectmgr.cpp and test_activeobject.cpp for other tests.
  */
 
-class TestSAO : public TestBase
-{
+class TestSAO : public TestBase {
 public:
 	TestSAO() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestSAO"; }
@@ -59,8 +58,7 @@ core.register_entity(":test:non_static", {
 })
 )";
 
-void TestSAO::runTests(IGameDef *gamedef)
-{
+void TestSAO::runTests(IGameDef *gamedef) {
 	MockServer server(getTestTempDirectory());
 
 	const auto helper_lua = getTestTempFile();
@@ -68,7 +66,7 @@ void TestSAO::runTests(IGameDef *gamedef)
 		std::ofstream ofs(helper_lua, std::ios::out | std::ios::binary);
 		ofs << helper_lua_src;
 		std::ofstream ofs2(server.getWorldPath() + DIR_DELIM "world.apr",
-			std::ios::out | std::ios::binary);
+				std::ios::out | std::ios::binary);
 		ofs2 << "backend = dummy\n";
 	}
 
@@ -93,7 +91,8 @@ void TestSAO::runTests(IGameDef *gamedef)
 	env.loadMeta();
 
 	m_step_interval = std::max(
-		g_settings->getFloat("active_block_mgmt_interval"), 0.5f) + 0.1f;
+							  g_settings->getFloat("active_block_mgmt_interval"), 0.5f) +
+			0.1f;
 
 	TEST(testStaticSave, &env);
 	TEST(testNotSaved, &env);
@@ -104,8 +103,7 @@ void TestSAO::runTests(IGameDef *gamedef)
 	env.deactivateBlocksAndObjects();
 }
 
-static LuaEntitySAO *add_entity(ServerEnvironment *env, v3f pos, const char *name)
-{
+static LuaEntitySAO *add_entity(ServerEnvironment *env, v3f pos, const char *name) {
 	auto obj_u = std::make_unique<LuaEntitySAO>(env, pos, name, "");
 	auto obj = obj_u.get();
 	u16 id = env->addActiveObject(std::move(obj_u));
@@ -114,8 +112,7 @@ static LuaEntitySAO *add_entity(ServerEnvironment *env, v3f pos, const char *nam
 	return obj;
 }
 
-static u16 assert_active_in_block(MapBlock *block, u16 obj_id = 0)
-{
+static u16 assert_active_in_block(MapBlock *block, u16 obj_id = 0) {
 	const auto &so = block->m_static_objects;
 	UASSERTEQ(size_t, so.getStoredSize(), 0);
 	UASSERTEQ(size_t, so.getActiveSize(), 1);
@@ -128,8 +125,7 @@ static u16 assert_active_in_block(MapBlock *block, u16 obj_id = 0)
 	return obj_id;
 }
 
-void TestSAO::testStaticSave(ServerEnvironment *env)
-{
+void TestSAO::testStaticSave(ServerEnvironment *env) {
 	Map &map = env->getMap();
 
 	const v3f testpos(0, -66 * BS, 0);
@@ -157,8 +153,7 @@ void TestSAO::testStaticSave(ServerEnvironment *env)
 	UASSERTEQ(size_t, block->m_static_objects.getActiveSize(), 0);
 }
 
-void TestSAO::testNotSaved(ServerEnvironment *env)
-{
+void TestSAO::testNotSaved(ServerEnvironment *env) {
 	Map &map = env->getMap();
 
 	const v3f testpos(0, 4 * BS, 0);
@@ -194,8 +189,7 @@ void TestSAO::testNotSaved(ServerEnvironment *env)
 		UASSERTEQ(size_t, block->m_static_objects.size(), 0);
 }
 
-void TestSAO::testActivate(ServerEnvironment *env)
-{
+void TestSAO::testActivate(ServerEnvironment *env) {
 	Map &map = env->getMap();
 
 	const v3f testpos(0, 0, 100 * BS);
@@ -229,8 +223,7 @@ void TestSAO::testActivate(ServerEnvironment *env)
 	env->step(m_step_interval);
 }
 
-void TestSAO::testStaticToFalse(ServerEnvironment *env)
-{
+void TestSAO::testStaticToFalse(ServerEnvironment *env) {
 	Map &map = env->getMap();
 
 	const v3f testpos(0, 0, -22 * BS);
@@ -288,8 +281,7 @@ void TestSAO::testStaticToFalse(ServerEnvironment *env)
 		UASSERTEQ(size_t, block->m_static_objects.size(), 0);
 }
 
-void TestSAO::testStaticToTrue(ServerEnvironment *env)
-{
+void TestSAO::testStaticToTrue(ServerEnvironment *env) {
 	Map &map = env->getMap();
 
 	const v3f testpos(123 * BS, 5 * BS, 0);

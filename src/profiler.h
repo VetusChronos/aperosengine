@@ -29,7 +29,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "threading/mutex_auto_lock.h"
 #include "util/timetaker.h"
-#include "util/numeric.h"      // paging()
+#include "util/numeric.h" // paging()
 
 // Global profiler
 class Profiler;
@@ -56,14 +56,13 @@ public:
 	int print(std::ostream &o, u32 page = 1, u32 pagecount = 1);
 	void getPage(GraphValues &o, u32 page, u32 pagecount);
 
-
 	void graphSet(const std::string &id, float value) {
 		std::scoped_lock lock(m_mutex);
 		m_graphvalues[id] = value;
 	}
 	void graphAdd(const std::string &id, float value) {
 		std::scoped_lock lock(m_mutex);
-		auto[it, inserted] = m_graphvalues.try_emplace(id, value);
+		auto [it, inserted] = m_graphvalues.try_emplace(id, value);
 		if (!inserted) {
 			it->second += value;
 		}
@@ -74,7 +73,7 @@ public:
 		std::swap(result, m_graphvalues);
 	}
 
-	void remove(const std::string& name) {
+	void remove(const std::string &name) {
 		std::scoped_lock lock(m_mutex);
 		m_data.erase(name);
 	}

@@ -25,16 +25,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <sstream>
 #include <memory>
 
-void fastWriteJson(const Json::Value &value, std::ostream &to)
-{
+void fastWriteJson(const Json::Value &value, std::ostream &to) {
 	Json::StreamWriterBuilder builder;
 	builder["indentation"] = "";
 	std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
 	writer->write(value, &to);
 }
 
-std::string fastWriteJson(const Json::Value &value)
-{
+std::string fastWriteJson(const Json::Value &value) {
 	std::ostringstream oss;
 	fastWriteJson(value, oss);
 	return oss.str();

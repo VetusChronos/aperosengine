@@ -32,11 +32,9 @@ class InventoryList;
 class LocalPlayer;
 struct ItemStack;
 
-class Hud
-{
+class Hud {
 public:
-	enum BlockBoundsMode
-	{
+	enum BlockBoundsMode {
 		BLOCK_BOUNDS_OFF,
 		BLOCK_BOUNDS_CURRENT,
 		BLOCK_BOUNDS_NEAR,
@@ -79,13 +77,11 @@ public:
 
 	v3f getSelectionRotation() const { return m_selection_rotation; }
 
-	void setSelectionMeshColor(const video::SColor &color)
-	{
+	void setSelectionMeshColor(const video::SColor &color) {
 		m_selection_mesh_color = color;
 	}
 
-	void setSelectedFaceNormal(const v3f &face_normal)
-	{
+	void setSelectedFaceNormal(const v3f &face_normal) {
 		m_selected_face_normal = face_normal;
 	}
 
@@ -96,7 +92,7 @@ public:
 private:
 	bool calculateScreenPos(const v3s16 &camera_offset, HudElement *e, v2s32 *pos);
 	void drawStatbar(v2s32 pos, u16 corner, u16 drawdir,
-			const std::string &texture, const std::string& bgtexture,
+			const std::string &texture, const std::string &bgtexture,
 			s32 count, s32 maxcount, v2s32 offset, v2s32 size = v2s32());
 
 	void drawItems(v2s32 upperleftpos, v2s32 screen_offset, s32 itemcount,
@@ -140,16 +136,14 @@ private:
 
 	scene::SMeshBuffer m_rotation_mesh_buffer;
 
-	enum
-	{
+	enum {
 		HIGHLIGHT_BOX,
 		HIGHLIGHT_HALO,
 		HIGHLIGHT_NONE
 	} m_mode;
 };
 
-enum ItemRotationKind
-{
+enum ItemRotationKind {
 	IT_ROT_SELECTED,
 	IT_ROT_HOVERED,
 	IT_ROT_DRAGGED,
@@ -175,4 +169,3 @@ void drawItemStack(
 		ItemRotationKind rotation_kind,
 		const v3s16 &angle,
 		const v3s16 &rotation_speed);
-

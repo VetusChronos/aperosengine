@@ -45,8 +45,7 @@ struct PointedThing;
 class RaycastState;
 struct Pointabilities;
 
-class Environment
-{
+class Environment {
 public:
 	// Environment will delete the map passed to the constructor
 	Environment(IGameDef *gamedef);

@@ -25,16 +25,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class ServerEnvironment;
 
-class MockInventoryManager : public ServerInventoryManager
-{
+class MockInventoryManager : public ServerInventoryManager {
 public:
 	MockInventoryManager(IGameDef *gamedef) :
-		p1(gamedef->getItemDefManager()),
-		p2(gamedef->getItemDefManager())
-	{};
+			p1(gamedef->getItemDefManager()),
+			p2(gamedef->getItemDefManager()){};
 
-	Inventory *getInventory(const InventoryLocation &loc) override
-	{
+	Inventory *getInventory(const InventoryLocation &loc) override {
 		if (loc.type == InventoryLocation::PLAYER && loc.name == "p1")
 			return &p1;
 		if (loc.type == InventoryLocation::PLAYER && loc.name == "p2")
@@ -45,5 +42,4 @@ public:
 
 	Inventory p1;
 	Inventory p2;
-
 };

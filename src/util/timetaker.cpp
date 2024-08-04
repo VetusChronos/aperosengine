@@ -23,13 +23,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "log.h"
 #include <ostream>
 
-void TimeTaker::start()
-{
+void TimeTaker::start() {
 	m_time1 = porting::getTime(m_precision);
 }
 
-u64 TimeTaker::stop(bool quiet)
-{
+u64 TimeTaker::stop(bool quiet) {
 	if (m_running) {
 		u64 dtime = porting::getTime(m_precision) - m_time1;
 		if (m_result != nullptr) {
@@ -37,7 +35,7 @@ u64 TimeTaker::stop(bool quiet)
 		} else {
 			if (!quiet) {
 				infostream << m_name << " took "
-					<< dtime << TimePrecision_units[m_precision] << '\n';
+						   << dtime << TimePrecision_units[m_precision] << '\n';
 			}
 		}
 		m_running = false;
@@ -46,8 +44,6 @@ u64 TimeTaker::stop(bool quiet)
 	return 0;
 }
 
-u64 TimeTaker::getTimerTime()
-{
+u64 TimeTaker::getTimerTime() {
 	return porting::getTime(m_precision) - m_time1;
 }
-

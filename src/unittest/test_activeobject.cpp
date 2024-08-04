@@ -21,8 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "mock_activeobject.h"
 
-class TestActiveObject : public TestBase
-{
+class TestActiveObject : public TestBase {
 public:
 	TestActiveObject() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestActiveObject"; }
@@ -34,13 +33,11 @@ public:
 
 static TestActiveObject g_test_instance;
 
-void TestActiveObject::runTests(IGameDef *gamedef)
-{
+void TestActiveObject::runTests(IGameDef *gamedef) {
 	TEST(testAOAttributes);
 }
 
-void TestActiveObject::testAOAttributes()
-{
+void TestActiveObject::testAOAttributes() {
 	MockActiveObject ao(44);
 	UASSERT(ao.getId() == 44);
 

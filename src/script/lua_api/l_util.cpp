@@ -57,8 +57,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // The two-argument version accepts a log level.
 // Either the special case "deprecated" for deprecation notices, or any specified in
 // Logger::stringToLevel(name).
-int ModApiUtil::l_log(lua_State *L)
-{
+int ModApiUtil::l_log(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	std::string text;
 	LogLevel level = LL_NONE;
@@ -74,7 +73,7 @@ int ModApiUtil::l_log(lua_State *L)
 		level = Logger::stringToLevel(name);
 		if (level == LL_MAX) {
 			warningstream << "Tried to log at unknown level '" << name
-				<< "'.  Defaulting to \"none\"." << '\n';
+						  << "'.  Defaulting to \"none\"." << '\n';
 			level = LL_NONE;
 		}
 	}
@@ -83,16 +82,14 @@ int ModApiUtil::l_log(lua_State *L)
 }
 
 // get_us_time()
-int ModApiUtil::l_get_us_time(lua_State *L)
-{
+int ModApiUtil::l_get_us_time(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	lua_pushnumber(L, porting::getTimeUs());
 	return 1;
 }
 
 // parse_json(str[, nullvalue])
-int ModApiUtil::l_parse_json(lua_State *L)
-{
+int ModApiUtil::l_parse_json(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	const char *jsonstr = luaL_checkstring(L, 1);
@@ -118,7 +115,7 @@ int ModApiUtil::l_parse_json(lua_State *L)
 			size_t jlen = strlen(jsonstr);
 			if (jlen > 100) {
 				errorstream << "Data (" << jlen
-					<< " bytes) printed to warningstream." << '\n';
+							<< " bytes) printed to warningstream." << '\n';
 				warningstream << "data: \"" << jsonstr << "\"" << '\n';
 			} else {
 				errorstream << "data: \"" << jsonstr << "\"" << '\n';
@@ -130,7 +127,7 @@ int ModApiUtil::l_parse_json(lua_State *L)
 
 	if (!push_json_value(L, root, nullindex)) {
 		errorstream << "Failed to parse json data, "
-			<< "depth exceeds lua stack limit" << '\n';
+					<< "depth exceeds lua stack limit" << '\n';
 		errorstream << "data: \"" << jsonstr << "\"" << '\n';
 		lua_pushnil(L);
 	}
@@ -138,8 +135,7 @@ int ModApiUtil::l_parse_json(lua_State *L)
 }
 
 // write_json(data[, styled]) -> string or nil and error message
-int ModApiUtil::l_write_json(lua_State *L)
-{
+int ModApiUtil::l_write_json(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	bool styled = false;
@@ -168,8 +164,7 @@ int ModApiUtil::l_write_json(lua_State *L)
 }
 
 // get_tool_wear_after_use(uses[, initial_wear])
-int ModApiUtil::l_get_tool_wear_after_use(lua_State *L)
-{
+int ModApiUtil::l_get_tool_wear_after_use(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	u32 uses = readParam<int>(L, 1);
 	u16 initial_wear = readParam<int>(L, 2, 0);
@@ -179,8 +174,7 @@ int ModApiUtil::l_get_tool_wear_after_use(lua_State *L)
 }
 
 // get_dig_params(groups, tool_capabilities[, wear])
-int ModApiUtil::l_get_dig_params(lua_State *L)
-{
+int ModApiUtil::l_get_dig_params(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	ItemGroupList groups;
 	read_groups(L, 1, groups);
@@ -195,22 +189,19 @@ int ModApiUtil::l_get_dig_params(lua_State *L)
 }
 
 // get_hit_params(groups, tool_capabilities[, time_from_last_punch, [, wear]])
-int ModApiUtil::l_get_hit_params(lua_State *L)
-{
+int ModApiUtil::l_get_hit_params(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	std::unordered_map<std::string, int> groups;
 	read_groups(L, 1, groups);
 	ToolCapabilities tp = read_tool_capabilities(L, 2);
 	float time_from_last_punch = readParam<float>(L, 3, 1000000);
 	int wear = readParam<int>(L, 4, 0);
-	push_hit_params(L, getHitParams(groups, &tp,
-		time_from_last_punch, wear));
+	push_hit_params(L, getHitParams(groups, &tp, time_from_last_punch, wear));
 	return 1;
 }
 
 // check_password_entry(name, entry, password)
-int ModApiUtil::l_check_password_entry(lua_State *L)
-{
+int ModApiUtil::l_check_password_entry(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	std::string name = luaL_checkstring(L, 1);
 	std::string entry = luaL_checkstring(L, 2);
@@ -238,8 +229,7 @@ int ModApiUtil::l_check_password_entry(lua_State *L)
 }
 
 // get_password_hash(name, raw_password)
-int ModApiUtil::l_get_password_hash(lua_State *L)
-{
+int ModApiUtil::l_get_password_hash(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	std::string name = luaL_checkstring(L, 1);
 	std::string raw_password = luaL_checkstring(L, 2);
@@ -249,8 +239,7 @@ int ModApiUtil::l_get_password_hash(lua_State *L)
 }
 
 // is_yes(arg)
-int ModApiUtil::l_is_yes(lua_State *L)
-{
+int ModApiUtil::l_is_yes(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	lua_getglobal(L, "tostring"); // function to be called
@@ -265,8 +254,7 @@ int ModApiUtil::l_is_yes(lua_State *L)
 }
 
 // get_builtin_path()
-int ModApiUtil::l_get_builtin_path(lua_State *L)
-{
+int ModApiUtil::l_get_builtin_path(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	std::string path = porting::path_share + DIR_DELIM + "builtin" + DIR_DELIM;
@@ -276,8 +264,7 @@ int ModApiUtil::l_get_builtin_path(lua_State *L)
 }
 
 // get_user_path()
-int ModApiUtil::l_get_user_path(lua_State *L)
-{
+int ModApiUtil::l_get_user_path(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	std::string path = porting::path_user;
@@ -286,37 +273,32 @@ int ModApiUtil::l_get_user_path(lua_State *L)
 	return 1;
 }
 
-enum LuaCompressMethod
-{
+enum LuaCompressMethod {
 	LUA_COMPRESS_METHOD_DEFLATE,
 	LUA_COMPRESS_METHOD_ZSTD,
 };
 
-static const struct EnumString es_LuaCompressMethod[] =
-{
-	{LUA_COMPRESS_METHOD_DEFLATE, "deflate"},
-	{LUA_COMPRESS_METHOD_ZSTD, "zstd"},
-	{0, nullptr},
+static const struct EnumString es_LuaCompressMethod[] = {
+	{ LUA_COMPRESS_METHOD_DEFLATE, "deflate" },
+	{ LUA_COMPRESS_METHOD_ZSTD, "zstd" },
+	{ 0, nullptr },
 };
 
-static LuaCompressMethod get_compress_method(lua_State *L, int index)
-{
+static LuaCompressMethod get_compress_method(lua_State *L, int index) {
 	if (lua_isnoneornil(L, index))
 		return LUA_COMPRESS_METHOD_DEFLATE;
 	const char *name = luaL_checkstring(L, index);
 	int value;
 	if (!string_to_enum(es_LuaCompressMethod, value, name)) {
 		// Pretend it's deflate if we don't know, for compatibility reasons.
-		log_deprecated(L, "Unknown compression method \"" + std::string(name)
-			+ "\", defaulting to \"deflate\". You should pass a valid value.");
+		log_deprecated(L, "Unknown compression method \"" + std::string(name) + "\", defaulting to \"deflate\". You should pass a valid value.");
 		return LUA_COMPRESS_METHOD_DEFLATE;
 	}
-	return (LuaCompressMethod) value;
+	return (LuaCompressMethod)value;
 }
 
 // compress(data, method, level)
-int ModApiUtil::l_compress(lua_State *L)
-{
+int ModApiUtil::l_compress(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	auto data = readParam<std::string_view>(L, 1);
@@ -346,8 +328,7 @@ int ModApiUtil::l_compress(lua_State *L)
 }
 
 // decompress(data, method)
-int ModApiUtil::l_decompress(lua_State *L)
-{
+int ModApiUtil::l_decompress(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	auto data = readParam<std::string_view>(L, 1);
@@ -371,8 +352,7 @@ int ModApiUtil::l_decompress(lua_State *L)
 }
 
 // encode_base64(string)
-int ModApiUtil::l_encode_base64(lua_State *L)
-{
+int ModApiUtil::l_encode_base64(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	auto data = readParam<std::string_view>(L, 1);
@@ -384,8 +364,7 @@ int ModApiUtil::l_encode_base64(lua_State *L)
 }
 
 // decode_base64(string)
-int ModApiUtil::l_decode_base64(lua_State *L)
-{
+int ModApiUtil::l_decode_base64(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	auto data = readParam<std::string_view>(L, 1);
@@ -402,8 +381,7 @@ int ModApiUtil::l_decode_base64(lua_State *L)
 }
 
 // mkdir(path)
-int ModApiUtil::l_mkdir(lua_State *L)
-{
+int ModApiUtil::l_mkdir(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	const char *path = luaL_checkstring(L, 1);
 	CHECK_SECURE_PATH(L, path, true);
@@ -412,8 +390,7 @@ int ModApiUtil::l_mkdir(lua_State *L)
 }
 
 // rmdir(path, recursive)
-int ModApiUtil::l_rmdir(lua_State *L)
-{
+int ModApiUtil::l_rmdir(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	const char *path = luaL_checkstring(L, 1);
 	CHECK_SECURE_PATH(L, path, true);
@@ -429,8 +406,7 @@ int ModApiUtil::l_rmdir(lua_State *L)
 }
 
 // cpdir(source, destination)
-int ModApiUtil::l_cpdir(lua_State *L)
-{
+int ModApiUtil::l_cpdir(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	const char *source = luaL_checkstring(L, 1);
 	const char *destination = luaL_checkstring(L, 2);
@@ -442,8 +418,7 @@ int ModApiUtil::l_cpdir(lua_State *L)
 }
 
 // mpdir(source, destination)
-int ModApiUtil::l_mvdir(lua_State *L)
-{
+int ModApiUtil::l_mvdir(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	const char *source = luaL_checkstring(L, 1);
 	const char *destination = luaL_checkstring(L, 2);
@@ -455,8 +430,7 @@ int ModApiUtil::l_mvdir(lua_State *L)
 }
 
 // get_dir_list(path, is_dir)
-int ModApiUtil::l_get_dir_list(lua_State *L)
-{
+int ModApiUtil::l_get_dir_list(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	const char *path = luaL_checkstring(L, 1);
 	bool list_all = !lua_isboolean(L, 2); // if its not a boolean list all
@@ -480,8 +454,7 @@ int ModApiUtil::l_get_dir_list(lua_State *L)
 }
 
 // safe_file_write(path, content)
-int ModApiUtil::l_safe_file_write(lua_State *L)
-{
+int ModApiUtil::l_safe_file_write(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 	const char *path = luaL_checkstring(L, 1);
 	auto content = readParam<std::string_view>(L, 2);
@@ -495,8 +468,7 @@ int ModApiUtil::l_safe_file_write(lua_State *L)
 }
 
 // request_insecure_environment()
-int ModApiUtil::l_request_insecure_environment(lua_State *L)
-{
+int ModApiUtil::l_request_insecure_environment(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	// Just return _G if security is disabled
@@ -515,8 +487,7 @@ int ModApiUtil::l_request_insecure_environment(lua_State *L)
 }
 
 // get_version()
-int ModApiUtil::l_get_version(lua_State *L)
-{
+int ModApiUtil::l_get_version(lua_State *L) {
 	lua_createtable(L, 0, 3);
 	int table = lua_gettop(L);
 
@@ -542,8 +513,7 @@ int ModApiUtil::l_get_version(lua_State *L)
 	return 1;
 }
 
-int ModApiUtil::l_sha1(lua_State *L)
-{
+int ModApiUtil::l_sha1(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	auto data = readParam<std::string_view>(L, 1);
@@ -567,8 +537,7 @@ int ModApiUtil::l_sha1(lua_State *L)
 	return 1;
 }
 
-int ModApiUtil::l_sha256(lua_State *L)
-{
+int ModApiUtil::l_sha256(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	auto data = readParam<std::string_view>(L, 1);
@@ -576,8 +545,8 @@ int ModApiUtil::l_sha256(lua_State *L)
 
 	std::string data_sha256;
 	data_sha256.resize(SHA256_DIGEST_LENGTH);
-	SHA256(reinterpret_cast<const unsigned char*>(data.data()), data.size(),
-		reinterpret_cast<unsigned char *>(data_sha256.data()));
+	SHA256(reinterpret_cast<const unsigned char *>(data.data()), data.size(),
+			reinterpret_cast<unsigned char *>(data_sha256.data()));
 
 	if (hex) {
 		lua_pushstring(L, hex_encode(data_sha256).c_str());
@@ -589,15 +558,14 @@ int ModApiUtil::l_sha256(lua_State *L)
 }
 
 // colorspec_to_colorstring(colorspec)
-int ModApiUtil::l_colorspec_to_colorstring(lua_State *L)
-{
+int ModApiUtil::l_colorspec_to_colorstring(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	video::SColor color(0);
 	if (read_color(L, 1, &color)) {
 		char colorstring[10];
 		snprintf(colorstring, 10, "#%02X%02X%02X%02X",
-			color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+				color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
 		lua_pushstring(L, colorstring);
 		return 1;
 	}
@@ -606,19 +574,18 @@ int ModApiUtil::l_colorspec_to_colorstring(lua_State *L)
 }
 
 // colorspec_to_bytes(colorspec)
-int ModApiUtil::l_colorspec_to_bytes(lua_State *L)
-{
+int ModApiUtil::l_colorspec_to_bytes(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	video::SColor color(0);
 	if (read_color(L, 1, &color)) {
 		u8 colorbytes[4] = {
-			(u8) color.getRed(),
-			(u8) color.getGreen(),
-			(u8) color.getBlue(),
-			(u8) color.getAlpha(),
+			(u8)color.getRed(),
+			(u8)color.getGreen(),
+			(u8)color.getBlue(),
+			(u8)color.getAlpha(),
 		};
-		lua_pushlstring(L, (const char*) colorbytes, 4);
+		lua_pushlstring(L, (const char *)colorbytes, 4);
 		return 1;
 	}
 
@@ -626,8 +593,7 @@ int ModApiUtil::l_colorspec_to_bytes(lua_State *L)
 }
 
 // encode_png(w, h, data, level)
-int ModApiUtil::l_encode_png(lua_State *L)
-{
+int ModApiUtil::l_encode_png(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	// The args are already pre-validated on the lua side.
@@ -636,15 +602,14 @@ int ModApiUtil::l_encode_png(lua_State *L)
 	const char *data = luaL_checklstring(L, 3, NULL);
 	s32 compression = readParam<int>(L, 4);
 
-	std::string out = encodePNG((const u8*)data, width, height, compression);
+	std::string out = encodePNG((const u8 *)data, width, height, compression);
 
 	lua_pushlstring(L, out.data(), out.size());
 	return 1;
 }
 
 // get_last_run_mod()
-int ModApiUtil::l_get_last_run_mod(lua_State *L)
-{
+int ModApiUtil::l_get_last_run_mod(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	std::string current_mod = ScriptApiBase::getCurrentModNameInsecure(L);
@@ -655,8 +620,7 @@ int ModApiUtil::l_get_last_run_mod(lua_State *L)
 }
 
 // set_last_run_mod(modname)
-int ModApiUtil::l_set_last_run_mod(lua_State *L)
-{
+int ModApiUtil::l_set_last_run_mod(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	const char *mod = luaL_checkstring(L, 1);
@@ -665,8 +629,7 @@ int ModApiUtil::l_set_last_run_mod(lua_State *L)
 }
 
 // urlencode(value)
-int ModApiUtil::l_urlencode(lua_State *L)
-{
+int ModApiUtil::l_urlencode(lua_State *L) {
 	NO_MAP_LOCK_REQUIRED;
 
 	auto s = readParam<std::string_view>(L, 1);
@@ -674,8 +637,7 @@ int ModApiUtil::l_urlencode(lua_State *L)
 	return 1;
 }
 
-void ModApiUtil::Initialize(lua_State *L, int top)
-{
+void ModApiUtil::Initialize(lua_State *L, int top) {
 	API_FCT(log);
 
 	API_FCT(get_us_time);
@@ -727,8 +689,7 @@ void ModApiUtil::Initialize(lua_State *L, int top)
 	lua_setfield(L, top, "settings");
 }
 
-void ModApiUtil::InitializeClient(lua_State *L, int top)
-{
+void ModApiUtil::InitializeClient(lua_State *L, int top) {
 	API_FCT(log);
 
 	API_FCT(get_us_time);
@@ -759,8 +720,7 @@ void ModApiUtil::InitializeClient(lua_State *L, int top)
 	lua_setfield(L, top, "settings");
 }
 
-void ModApiUtil::InitializeAsync(lua_State *L, int top)
-{
+void ModApiUtil::InitializeAsync(lua_State *L, int top) {
 	API_FCT(log);
 
 	API_FCT(get_us_time);

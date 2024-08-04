@@ -29,10 +29,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class MainMenuScripting
 		: virtual public ScriptApiBase,
-		  public ScriptApiMainMenu
-{
+		  public ScriptApiMainMenu {
 public:
-	MainMenuScripting(GUIEngine* guiengine);
+	MainMenuScripting(GUIEngine *guiengine);
 
 	// Global step handler to pass back async events
 	void step();
@@ -42,7 +41,7 @@ public:
 
 	// Pass async events from engine to async threads
 	u32 queueAsync(std::string &&serialized_func,
-		std::string &&serialized_param);
+			std::string &&serialized_param);
 
 private:
 	void initializeModApi(lua_State *L, int top);

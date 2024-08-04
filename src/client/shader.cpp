@@ -58,15 +58,14 @@ static MutexedMap<std::string, std::string> g_shadername_to_path_cache;
 	Utilizes a thread-safe cache.
 */
 std::string getShaderPath(const std::string &name_of_shader,
-		const std::string &filename)
-{
+		const std::string &filename) {
 	std::string combined = name_of_shader + DIR_DELIM + filename;
 	std::string fullpath;
 	/*
 		Check from cache
 	*/
 	bool incache = g_shadername_to_path_cache.get(combined, &fullpath);
-	if(incache)
+	if (incache)
 		return fullpath;
 
 	/*
@@ -75,7 +74,7 @@ std::string getShaderPath(const std::string &name_of_shader,
 	std::string shader_path = g_settings->get("shader_path");
 	if (!shader_path.empty()) {
 		std::string testpath = shader_path + DIR_DELIM + combined;
-		if(fs::PathExists(testpath))
+		if (fs::PathExists(testpath))
 			fullpath = testpath;
 	}
 
@@ -83,12 +82,9 @@ std::string getShaderPath(const std::string &name_of_shader,
 		Check from default data directory
 	*/
 	if (fullpath.empty()) {
-		std::string rel_path = std::string("client") + DIR_DELIM
-				+ "shaders" + DIR_DELIM
-				+ name_of_shader + DIR_DELIM
-				+ filename;
+		std::string rel_path = std::string("client") + DIR_DELIM + "shaders" + DIR_DELIM + name_of_shader + DIR_DELIM + filename;
 		std::string testpath = porting::path_share + DIR_DELIM + rel_path;
-		if(fs::PathExists(testpath))
+		if (fs::PathExists(testpath))
 			fullpath = testpath;
 	}
 
@@ -103,17 +99,15 @@ std::string getShaderPath(const std::string &name_of_shader,
 	SourceShaderCache: A cache used for storing source shaders.
 */
 
-class SourceShaderCache
-{
+class SourceShaderCache {
 public:
 	void insert(const std::string &name_of_shader, const std::string &filename,
-		const std::string &program, bool prefer_local)
-	{
+			const std::string &program, bool prefer_local) {
 		std::string combined = name_of_shader + DIR_DELIM + filename;
 		// Try to use local shader instead if asked to
-		if(prefer_local){
+		if (prefer_local) {
 			std::string path = getShaderPath(name_of_shader, filename);
-			if(!path.empty()){
+			if (!path.empty()) {
 				std::string p = readFile(path);
 				if (!p.empty()) {
 					m_programs[combined] = p;
@@ -125,8 +119,7 @@ public:
 	}
 
 	std::string get(const std::string &name_of_shader,
-		const std::string &filename)
-	{
+			const std::string &filename) {
 		std::string combined = name_of_shader + DIR_DELIM + filename;
 		StringMap::iterator n = m_programs.find(combined);
 		if (n != m_programs.end())
@@ -136,8 +129,7 @@ public:
 
 	// Primarily fetches from cache, secondarily tries to read from filesystem
 	std::string getOrLoad(const std::string &name_of_shader,
-		const std::string &filename)
-	{
+			const std::string &filename) {
 		std::string combined = name_of_shader + DIR_DELIM + filename;
 		StringMap::iterator n = m_programs.find(combined);
 		if (n != m_programs.end())
@@ -145,11 +137,11 @@ public:
 		std::string path = getShaderPath(name_of_shader, filename);
 		if (path.empty()) {
 			infostream << "SourceShaderCache::getOrLoad(): No path found for \""
-				<< combined << "\"" << '\n';
+					   << combined << "\"" << '\n';
 			return "";
 		}
 		infostream << "SourceShaderCache::getOrLoad(): Loading path \""
-			<< path << "\"" << '\n';
+				   << path << "\"" << '\n';
 		std::string p = readFile(path);
 		if (!p.empty()) {
 			m_programs[combined] = p;
@@ -157,11 +149,11 @@ public:
 		}
 		return "";
 	}
+
 private:
 	StringMap m_programs;
 
-	inline std::string readFile(const std::string &path)
-	{
+	inline std::string readFile(const std::string &path) {
 		std::string ret;
 		if (!fs::ReadFile(path, ret, true))
 			ret.clear();
@@ -169,19 +161,16 @@ private:
 	}
 };
 
-
 /*
 	ShaderCallback: Sets constants that can be used in shaders
 */
 
-class ShaderCallback : public video::IShaderConstantSetCallBack
-{
+class ShaderCallback : public video::IShaderConstantSetCallBack {
 	std::vector<std::unique_ptr<IShaderConstantSetter>> m_setters;
 
 public:
 	template <typename Factories>
-	ShaderCallback(const Factories &factories)
-	{
+	ShaderCallback(const Factories &factories) {
 		for (auto &&factory : factories) {
 			auto *setter = factory->create();
 			if (setter)
@@ -189,48 +178,42 @@ public:
 		}
 	}
 
-	virtual void OnSetConstants(video::IMaterialRendererServices *services, s32 userData) override
-	{
+	virtual void OnSetConstants(video::IMaterialRendererServices *services, s32 userData) override {
 		for (auto &&setter : m_setters)
 			setter->onSetConstants(services);
 	}
 
-	virtual void OnSetMaterial(const video::SMaterial& material) override
-	{
+	virtual void OnSetMaterial(const video::SMaterial &material) override {
 		for (auto &&setter : m_setters)
 			setter->onSetMaterial(material);
 	}
 };
 
-
 /*
 	MainShaderConstantSetter: Set basic constants required for almost everything
 */
 
-class MainShaderConstantSetter : public IShaderConstantSetter
-{
-	CachedVertexShaderSetting<f32, 16> m_world_view_proj{"mWorldViewProj"};
-	CachedVertexShaderSetting<f32, 16> m_world{"mWorld"};
+class MainShaderConstantSetter : public IShaderConstantSetter {
+	CachedVertexShaderSetting<f32, 16> m_world_view_proj{ "mWorldViewProj" };
+	CachedVertexShaderSetting<f32, 16> m_world{ "mWorld" };
 
 	// Modelview matrix
-	CachedVertexShaderSetting<float, 16> m_world_view{"mWorldView"};
+	CachedVertexShaderSetting<float, 16> m_world_view{ "mWorldView" };
 	// Texture matrix
-	CachedVertexShaderSetting<float, 16> m_texture{"mTexture"};
+	CachedVertexShaderSetting<float, 16> m_texture{ "mTexture" };
 
 	// commonly used way to pass material color to shader
 	video::SColor m_emissive_color;
-	CachedPixelShaderSetting<float, 4> m_emissive_color_setting{"emissiveColor"};
+	CachedPixelShaderSetting<float, 4> m_emissive_color_setting{ "emissiveColor" };
 
 public:
 	~MainShaderConstantSetter() = default;
 
-	virtual void onSetMaterial(const video::SMaterial& material) override
-	{
+	virtual void onSetMaterial(const video::SMaterial &material) override {
 		m_emissive_color = material.EmissiveColor;
 	}
 
-	virtual void onSetConstants(video::IMaterialRendererServices *services) override
-	{
+	virtual void onSetConstants(video::IMaterialRendererServices *services) override {
 		video::IVideoDriver *driver = services->getVideoDriver();
 		assert(driver);
 
@@ -259,21 +242,16 @@ public:
 	}
 };
 
-
-class MainShaderConstantSetterFactory : public IShaderConstantSetterFactory
-{
+class MainShaderConstantSetterFactory : public IShaderConstantSetterFactory {
 public:
-	virtual IShaderConstantSetter* create()
-		{ return new MainShaderConstantSetter(); }
+	virtual IShaderConstantSetter *create() { return new MainShaderConstantSetter(); }
 };
-
 
 /*
 	ShaderSource
 */
 
-class ShaderSource : public IWritableShaderSource
-{
+class ShaderSource : public IWritableShaderSource {
 public:
 	ShaderSource();
 	~ShaderSource() override;
@@ -286,7 +264,7 @@ public:
 		The id 0 points to a null shader. Its material is EMT_SOLID.
 	*/
 	u32 getShaderIdDirect(const std::string &name,
-		MaterialType material_type, NodeDrawType drawtype) override;
+			MaterialType material_type, NodeDrawType drawtype) override;
 
 	/*
 		If shader specified by the name pointed by the id doesn't
@@ -298,7 +276,7 @@ public:
 	*/
 
 	u32 getShader(const std::string &name,
-		MaterialType material_type, NodeDrawType drawtype) override;
+			MaterialType material_type, NodeDrawType drawtype) override;
 
 	ShaderInfo getShaderInfo(u32 id) override;
 
@@ -309,19 +287,17 @@ public:
 	// Insert a shader program into the cache without touching the
 	// filesystem. Shall be called from the main thread.
 	void insertSourceShader(const std::string &name_of_shader,
-		const std::string &filename, const std::string &program) override;
+			const std::string &filename, const std::string &program) override;
 
 	// Rebuild shaders from the current set of source shaders
 	// Shall be called from the main thread.
 	void rebuildShaders() override;
 
-	void addShaderConstantSetterFactory(IShaderConstantSetterFactory *setter) override
-	{
+	void addShaderConstantSetterFactory(IShaderConstantSetterFactory *setter) override {
 		m_setter_factories.emplace_back(setter);
 	}
 
 private:
-
 	// The id of the thread that is allowed to use irrlicht directly
 	std::thread::id m_main_thread;
 
@@ -348,13 +324,11 @@ private:
 			MaterialType material_type, NodeDrawType drawtype);
 };
 
-IWritableShaderSource *createShaderSource()
-{
+IWritableShaderSource *createShaderSource() {
 	return new ShaderSource();
 }
 
-ShaderSource::ShaderSource()
-{
+ShaderSource::ShaderSource() {
 	m_main_thread = std::this_thread::get_id();
 
 	// Add a dummy ShaderInfo as the first index, named ""
@@ -364,13 +338,11 @@ ShaderSource::ShaderSource()
 	addShaderConstantSetterFactory(new MainShaderConstantSetterFactory());
 }
 
-ShaderSource::~ShaderSource()
-{
+ShaderSource::~ShaderSource() {
 	MutexAutoLock lock(m_shaderinfo_cache_mutex);
 
 	// Delete materials
-	video::IGPUProgrammingServices *gpu = RenderingEngine::get_video_driver()->
-		getGPUProgrammingServices();
+	video::IGPUProgrammingServices *gpu = RenderingEngine::get_video_driver()->getGPUProgrammingServices();
 	for (ShaderInfo &i : m_shaderinfo_cache) {
 		if (!i.name.empty())
 			gpu->deleteShaderMaterial(i.material);
@@ -379,8 +351,7 @@ ShaderSource::~ShaderSource()
 }
 
 u32 ShaderSource::getShader(const std::string &name,
-		MaterialType material_type, NodeDrawType drawtype)
-{
+		MaterialType material_type, NodeDrawType drawtype) {
 	/*
 		Get shader
 	*/
@@ -390,7 +361,8 @@ u32 ShaderSource::getShader(const std::string &name,
 	}
 
 	errorstream << "ShaderSource::getShader(): getting from "
-		"other thread not implemented" << '\n';
+				   "other thread not implemented"
+				<< '\n';
 
 #if 0
 	// We're gonna ask the result to be put into here
@@ -424,19 +396,18 @@ u32 ShaderSource::getShader(const std::string &name,
 	This method generates all the shaders
 */
 u32 ShaderSource::getShaderIdDirect(const std::string &name,
-		MaterialType material_type, NodeDrawType drawtype)
-{
+		MaterialType material_type, NodeDrawType drawtype) {
 	// Empty name means shader 0
 	if (name.empty()) {
-		infostream<<"getShaderIdDirect(): name is empty"<<std::endl;
+		infostream << "getShaderIdDirect(): name is empty" << std::endl;
 		return 0;
 	}
 
 	// Check if already have such instance
-	for(u32 i=0; i<m_shaderinfo_cache.size(); i++){
+	for (u32 i = 0; i < m_shaderinfo_cache.size(); i++) {
 		ShaderInfo *info = &m_shaderinfo_cache[i];
-		if(info->name == name && info->material_type == material_type &&
-			info->drawtype == drawtype)
+		if (info->name == name && info->material_type == material_type &&
+				info->drawtype == drawtype)
 			return i;
 	}
 
@@ -444,8 +415,9 @@ u32 ShaderSource::getShaderIdDirect(const std::string &name,
 		Calling only allowed from main thread
 	*/
 	if (std::this_thread::get_id() != m_main_thread) {
-		errorstream<<"ShaderSource::getShaderIdDirect() "
-				"called not from main thread"<<std::endl;
+		errorstream << "ShaderSource::getShaderIdDirect() "
+					   "called not from main thread"
+					<< std::endl;
 		return 0;
 	}
 
@@ -460,32 +432,26 @@ u32 ShaderSource::getShaderIdDirect(const std::string &name,
 	u32 id = m_shaderinfo_cache.size();
 	m_shaderinfo_cache.push_back(info);
 
-	infostream<<"getShaderIdDirect(): "
-			<<"Returning id="<<id<<" for name \""<<name<<"\""<<std::endl;
+	infostream << "getShaderIdDirect(): "
+			   << "Returning id=" << id << " for name \"" << name << "\"" << std::endl;
 
 	return id;
 }
 
-
-ShaderInfo ShaderSource::getShaderInfo(u32 id)
-{
+ShaderInfo ShaderSource::getShaderInfo(u32 id) {
 	MutexAutoLock lock(m_shaderinfo_cache_mutex);
 
-	if(id >= m_shaderinfo_cache.size())
+	if (id >= m_shaderinfo_cache.size())
 		return ShaderInfo();
 
 	return m_shaderinfo_cache[id];
 }
 
-void ShaderSource::processQueue()
-{
-
-
+void ShaderSource::processQueue() {
 }
 
 void ShaderSource::insertSourceShader(const std::string &name_of_shader,
-		const std::string &filename, const std::string &program)
-{
+		const std::string &filename, const std::string &program) {
 	/*infostream<<"ShaderSource::insertSourceShader(): "
 			"name_of_shader=\""<<name_of_shader<<"\", "
 			"filename=\""<<filename<<"\""<<std::endl;*/
@@ -495,13 +461,11 @@ void ShaderSource::insertSourceShader(const std::string &name_of_shader,
 	m_sourcecache.insert(name_of_shader, filename, program, true);
 }
 
-void ShaderSource::rebuildShaders()
-{
+void ShaderSource::rebuildShaders() {
 	MutexAutoLock lock(m_shaderinfo_cache_mutex);
 
 	// Delete materials
-	video::IGPUProgrammingServices *gpu = RenderingEngine::get_video_driver()->
-		getGPUProgrammingServices();
+	video::IGPUProgrammingServices *gpu = RenderingEngine::get_video_driver()->getGPUProgrammingServices();
 	for (ShaderInfo &i : m_shaderinfo_cache) {
 		if (!i.name.empty()) {
 			gpu->deleteShaderMaterial(i.material);
@@ -518,33 +482,31 @@ void ShaderSource::rebuildShaders()
 	}
 }
 
-
 ShaderInfo ShaderSource::generateShader(const std::string &name,
-		MaterialType material_type, NodeDrawType drawtype)
-{
+		MaterialType material_type, NodeDrawType drawtype) {
 	ShaderInfo shaderinfo;
 	shaderinfo.name = name;
 	shaderinfo.material_type = material_type;
 	shaderinfo.drawtype = drawtype;
 	switch (material_type) {
-	case TILE_MATERIAL_OPAQUE:
-	case TILE_MATERIAL_LIQUID_OPAQUE:
-	case TILE_MATERIAL_WAVING_LIQUID_OPAQUE:
-		shaderinfo.base_material = video::EMT_SOLID;
-		break;
-	case TILE_MATERIAL_ALPHA:
-	case TILE_MATERIAL_PLAIN_ALPHA:
-	case TILE_MATERIAL_LIQUID_TRANSPARENT:
-	case TILE_MATERIAL_WAVING_LIQUID_TRANSPARENT:
-		shaderinfo.base_material = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-		break;
-	case TILE_MATERIAL_BASIC:
-	case TILE_MATERIAL_PLAIN:
-	case TILE_MATERIAL_WAVING_LEAVES:
-	case TILE_MATERIAL_WAVING_PLANTS:
-	case TILE_MATERIAL_WAVING_LIQUID_BASIC:
-		shaderinfo.base_material = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-		break;
+		case TILE_MATERIAL_OPAQUE:
+		case TILE_MATERIAL_LIQUID_OPAQUE:
+		case TILE_MATERIAL_WAVING_LIQUID_OPAQUE:
+			shaderinfo.base_material = video::EMT_SOLID;
+			break;
+		case TILE_MATERIAL_ALPHA:
+		case TILE_MATERIAL_PLAIN_ALPHA:
+		case TILE_MATERIAL_LIQUID_TRANSPARENT:
+		case TILE_MATERIAL_WAVING_LIQUID_TRANSPARENT:
+			shaderinfo.base_material = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+			break;
+		case TILE_MATERIAL_BASIC:
+		case TILE_MATERIAL_PLAIN:
+		case TILE_MATERIAL_WAVING_LEAVES:
+		case TILE_MATERIAL_WAVING_PLANTS:
+		case TILE_MATERIAL_WAVING_LIQUID_BASIC:
+			shaderinfo.base_material = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+			break;
 	}
 	shaderinfo.material = shaderinfo.base_material;
 
@@ -556,16 +518,16 @@ ShaderInfo ShaderSource::generateShader(const std::string &name,
 	video::IGPUProgrammingServices *gpu = driver->getGPUProgrammingServices();
 	if (!driver->queryFeature(video::EVDF_ARB_GLSL) || !gpu) {
 		throw ShaderException(gettext("Shaders are enabled but GLSL is not "
-			"supported by the driver."));
+									  "supported by the driver."));
 	}
 
 	// Create shaders header
 	bool fully_programmable = driver->getDriverType() == video::EDT_OGLES2 || driver->getDriverType() == video::EDT_OPENGL3;
 	std::stringstream shaders_header;
 	shaders_header
-		<< std::noboolalpha
-		<< std::showpoint // for GLSL ES
-		;
+			<< std::noboolalpha
+			<< std::showpoint // for GLSL ES
+			;
 	std::string vertex_header, fragment_header, geometry_header;
 	if (fully_programmable) {
 		if (driver->getDriverType() == video::EDT_OPENGL3) {
@@ -620,7 +582,7 @@ ShaderInfo ShaderSource::generateShader(const std::string &name,
 
 	bool use_discard = fully_programmable;
 	// For renderers that should use discard instead of GL_ALPHA_TEST
-	const char *renderer = reinterpret_cast<const char*>(GL.GetString(GL.RENDERER));
+	const char *renderer = reinterpret_cast<const char *>(GL.GetString(GL.RENDERER));
 	if (strstr(renderer, "GC7000"))
 		use_discard = true;
 	if (use_discard) {
@@ -735,45 +697,44 @@ ShaderInfo ShaderSource::generateShader(const std::string &name,
 		geometry_shader_ptr = geometry_shader.c_str();
 	}
 
-	irr_ptr<ShaderCallback> cb{new ShaderCallback(m_setter_factories)};
-	infostream<<"Compiling high level shaders for "<<name<<std::endl;
+	irr_ptr<ShaderCallback> cb{ new ShaderCallback(m_setter_factories) };
+	infostream << "Compiling high level shaders for " << name << std::endl;
 	s32 shadermat = gpu->addHighLevelShaderMaterial(
-		vertex_shader.c_str(), nullptr, video::EVST_VS_1_1,
-		fragment_shader.c_str(), nullptr, video::EPST_PS_1_1,
-		geometry_shader_ptr, nullptr, video::EGST_GS_4_0, scene::EPT_TRIANGLES, scene::EPT_TRIANGLES, 0,
-		cb.get(), shaderinfo.base_material,  1);
+			vertex_shader.c_str(), nullptr, video::EVST_VS_1_1,
+			fragment_shader.c_str(), nullptr, video::EPST_PS_1_1,
+			geometry_shader_ptr, nullptr, video::EGST_GS_4_0, scene::EPT_TRIANGLES, scene::EPT_TRIANGLES, 0,
+			cb.get(), shaderinfo.base_material, 1);
 	if (shadermat == -1) {
-		errorstream<<"generate_shader(): "
-				"failed to generate \""<<name<<"\", "
-				"addHighLevelShaderMaterial failed."
-				<<std::endl;
+		errorstream << "generate_shader(): "
+					   "failed to generate \""
+					<< name << "\", "
+							   "addHighLevelShaderMaterial failed."
+					<< std::endl;
 		dumpShaderProgram(warningstream, "Vertex", vertex_shader);
 		dumpShaderProgram(warningstream, "Fragment", fragment_shader);
 		dumpShaderProgram(warningstream, "Geometry", geometry_shader);
 		throw ShaderException(
-			fmtgettext("Failed to compile the \"%s\" shader.", name.c_str()) +
-			strgettext("\nCheck debug.txt for details."));
+				fmtgettext("Failed to compile the \"%s\" shader.", name.c_str()) +
+				strgettext("\nCheck debug.txt for details."));
 	}
 
 	// Apply the newly created material type
-	shaderinfo.material = (video::E_MATERIAL_TYPE) shadermat;
+	shaderinfo.material = (video::E_MATERIAL_TYPE)shadermat;
 	return shaderinfo;
 }
 
 void dumpShaderProgram(std::ostream &output_stream,
-		const std::string &program_type, std::string_view program)
-{
-	output_stream << program_type << " shader program:" << '\n' <<
-		"----------------------------------" << '\n';
+		const std::string &program_type, std::string_view program) {
+	output_stream << program_type << " shader program:" << '\n'
+				  << "----------------------------------" << '\n';
 	size_t pos = 0;
 	size_t prev = 0;
 	s16 line = 1;
 	while ((pos = program.find('\n', prev)) != std::string::npos) {
-		output_stream << line++ << ": "<< program.substr(prev, pos - prev) <<
-			std::endl;
+		output_stream << line++ << ": " << program.substr(prev, pos - prev) << std::endl;
 		prev = pos + 1;
 	}
-	output_stream << line << ": " << program.substr(prev) << '\n' <<
-		"End of " << program_type << " shader program." << '\n' <<
-		" " << '\n';
+	output_stream << line << ": " << program.substr(prev) << '\n'
+				  << "End of " << program_type << " shader program." << '\n'
+				  << " " << '\n';
 }

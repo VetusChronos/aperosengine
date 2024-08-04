@@ -25,8 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 /**
  * Implements a pipeline step that renders the 3D scene
  */
-class Draw3D : public RenderStep
-{
+class Draw3D : public RenderStep {
 public:
 	virtual void setRenderSource(RenderSource *) override {}
 	virtual void setRenderTarget(RenderTarget *target) override { m_target = target; }
@@ -35,11 +34,10 @@ public:
 	virtual void run(PipelineContext &context) override;
 
 private:
-	RenderTarget *m_target {nullptr};
+	RenderTarget *m_target{ nullptr };
 };
 
-class DrawWield : public RenderStep
-{
+class DrawWield : public RenderStep {
 public:
 	virtual void setRenderSource(RenderSource *) override {}
 	virtual void setRenderTarget(RenderTarget *target) override { m_target = target; }
@@ -48,14 +46,13 @@ public:
 	virtual void run(PipelineContext &context) override;
 
 private:
-	RenderTarget *m_target {nullptr};
+	RenderTarget *m_target{ nullptr };
 };
 
 /**
  * Implements a pipeline step that renders the game HUD
  */
-class DrawHUD : public RenderStep
-{
+class DrawHUD : public RenderStep {
 public:
 	virtual void setRenderSource(RenderSource *) override {}
 	virtual void setRenderTarget(RenderTarget *) override {}
@@ -64,17 +61,16 @@ public:
 	virtual void run(PipelineContext &context) override;
 };
 
-class MapPostFxStep : public TrivialRenderStep
-{
+class MapPostFxStep : public TrivialRenderStep {
 public:
 	virtual void setRenderTarget(RenderTarget *) override;
 	virtual void run(PipelineContext &context) override;
+
 private:
 	RenderTarget *target;
 };
 
-class RenderShadowMapStep : public TrivialRenderStep
-{
+class RenderShadowMapStep : public TrivialRenderStep {
 public:
 	virtual void run(PipelineContext &context) override;
 };
@@ -83,20 +79,19 @@ public:
  * UpscaleStep step performs rescaling of the image
  * in the source texture 0 to the size of the target.
  */
-class UpscaleStep : public RenderStep
-{
+class UpscaleStep : public RenderStep {
 public:
-
 	virtual void setRenderSource(RenderSource *source) override { m_source = source; }
 	virtual void setRenderTarget(RenderTarget *target) override { m_target = target; }
-	virtual void reset(PipelineContext &context) override {};
+	virtual void reset(PipelineContext &context) override{};
 	virtual void run(PipelineContext &context) override;
+
 private:
 	RenderSource *m_source;
 	RenderTarget *m_target;
 };
 
 std::unique_ptr<RenderStep> create3DStage(Client *client, v2f scale);
-RenderStep* addUpscaling(RenderPipeline *pipeline, RenderStep *previousStep, v2f downscale_factor);
+RenderStep *addUpscaling(RenderPipeline *pipeline, RenderStep *previousStep, v2f downscale_factor);
 
 void populatePlainPipeline(RenderPipeline *pipeline, Client *client);

@@ -29,24 +29,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	ItemStackMetaRef
 */
 
-IMetadata* ItemStackMetaRef::getmeta(bool auto_create)
-{
+IMetadata *ItemStackMetaRef::getmeta(bool auto_create) {
 	return &istack->getItem().metadata;
 }
 
-void ItemStackMetaRef::clearMeta()
-{
+void ItemStackMetaRef::clearMeta() {
 	istack->getItem().metadata.clear();
 }
 
-void ItemStackMetaRef::reportMetadataChange(const std::string *name)
-{
+void ItemStackMetaRef::reportMetadataChange(const std::string *name) {
 	// TODO
 }
 
 // Exported functions
-int ItemStackMetaRef::l_set_tool_capabilities(lua_State *L)
-{
+int ItemStackMetaRef::l_set_tool_capabilities(lua_State *L) {
 	ItemStackMetaRef *metaref = checkObject<ItemStackMetaRef>(L, 1);
 	if (lua_isnoneornil(L, 2)) {
 		metaref->clearToolCapabilities();
@@ -60,8 +56,7 @@ int ItemStackMetaRef::l_set_tool_capabilities(lua_State *L)
 	return 0;
 }
 
-int ItemStackMetaRef::l_set_wear_bar_params(lua_State *L)
-{
+int ItemStackMetaRef::l_set_wear_bar_params(lua_State *L) {
 	ItemStackMetaRef *metaref = checkObject<ItemStackMetaRef>(L, 1);
 	if (lua_isnoneornil(L, 2)) {
 		metaref->clearWearBarParams();
@@ -74,20 +69,18 @@ int ItemStackMetaRef::l_set_wear_bar_params(lua_State *L)
 	return 0;
 }
 
-ItemStackMetaRef::ItemStackMetaRef(LuaItemStack *istack): istack(istack)
-{
+ItemStackMetaRef::ItemStackMetaRef(LuaItemStack *istack) :
+		istack(istack) {
 	istack->grab();
 }
 
-ItemStackMetaRef::~ItemStackMetaRef()
-{
+ItemStackMetaRef::~ItemStackMetaRef() {
 	istack->drop();
 }
 
 // Creates an NodeMetaRef and leaves it on top of stack
 // Not callable from Lua; all references are created on the C side.
-void ItemStackMetaRef::create(lua_State *L, LuaItemStack *istack)
-{
+void ItemStackMetaRef::create(lua_State *L, LuaItemStack *istack) {
 	ItemStackMetaRef *o = new ItemStackMetaRef(istack);
 	//infostream<<"NodeMetaRef::create: o="<<o<<std::endl;
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;
@@ -95,8 +88,7 @@ void ItemStackMetaRef::create(lua_State *L, LuaItemStack *istack)
 	lua_setmetatable(L, -2);
 }
 
-void ItemStackMetaRef::Register(lua_State *L)
-{
+void ItemStackMetaRef::Register(lua_State *L) {
 	registerMetadataClass(L, className, methods);
 
 	// Cannot be created from Lua
@@ -119,5 +111,5 @@ const luaL_Reg ItemStackMetaRef::methods[] = {
 	luamethod(MetaDataRef, equals),
 	luamethod(ItemStackMetaRef, set_tool_capabilities),
 	luamethod(ItemStackMetaRef, set_wear_bar_params),
-	{0,0}
+	{ 0, 0 }
 };

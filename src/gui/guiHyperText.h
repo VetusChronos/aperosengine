@@ -31,43 +31,37 @@ class ISimpleTextureSource;
 class Client;
 class GUIScrollBar;
 
-class ParsedText
-{
+class ParsedText {
 public:
 	ParsedText(const wchar_t *text);
 	~ParsedText();
 
-	enum ElementType
-	{
+	enum ElementType {
 		ELEMENT_TEXT,
 		ELEMENT_SEPARATOR,
 		ELEMENT_IMAGE,
 		ELEMENT_ITEM
 	};
 
-	enum BackgroundType
-	{
+	enum BackgroundType {
 		BACKGROUND_NONE,
 		BACKGROUND_COLOR
 	};
 
-	enum FloatType
-	{
+	enum FloatType {
 		FLOAT_NONE,
 		FLOAT_RIGHT,
 		FLOAT_LEFT
 	};
 
-	enum HalignType
-	{
+	enum HalignType {
 		HALIGN_CENTER,
 		HALIGN_LEFT,
 		HALIGN_RIGHT,
 		HALIGN_JUSTIFY
 	};
 
-	enum ValignType
-	{
+	enum ValignType {
 		VALIGN_MIDDLE,
 		VALIGN_TOP,
 		VALIGN_BOTTOM
@@ -76,15 +70,13 @@ public:
 	typedef std::unordered_map<std::string, std::string> StyleList;
 	typedef std::unordered_map<std::string, std::string> AttrsList;
 
-	struct Tag
-	{
+	struct Tag {
 		std::string name;
 		AttrsList attrs;
 		StyleList style;
 	};
 
-	struct Element
-	{
+	struct Element {
 		std::list<Tag *> tags;
 		ElementType type;
 		core::stringw text = "";
@@ -107,16 +99,15 @@ public:
 
 		// img & item specific attributes
 		std::string name;
-		v3s16 angle{0, 0, 0};
-		v3s16 rotation{0, 0, 0};
+		v3s16 angle{ 0, 0, 0 };
+		v3s16 rotation{ 0, 0, 0 };
 
 		s32 margin = 10;
 
 		void setStyle(StyleList &style);
 	};
 
-	struct Paragraph
-	{
+	struct Paragraph {
 		std::vector<Element> elements;
 		HalignType halign;
 		s32 margin = 10;
@@ -135,7 +126,9 @@ public:
 	Tag m_root_tag;
 
 protected:
-	typedef enum { ER_NONE, ER_TAG, ER_NEWLINE } EndReason;
+	typedef enum { ER_NONE,
+		ER_TAG,
+		ER_NEWLINE } EndReason;
 
 	// Parser functions
 	void enterElement(ElementType type);
@@ -167,8 +160,7 @@ protected:
 	EndReason m_end_paragraph_reason;
 };
 
-class TextDrawer
-{
+class TextDrawer {
 public:
 	TextDrawer(const wchar_t *text, Client *client, gui::IGUIEnvironment *environment,
 			ISimpleTextureSource *tsrc);
@@ -181,8 +173,7 @@ public:
 	ParsedText::Tag *m_hovertag;
 
 protected:
-	struct RectWithMargin
-	{
+	struct RectWithMargin {
 		core::rect<s32> rect;
 		s32 margin;
 	};
@@ -196,8 +187,7 @@ protected:
 	std::vector<RectWithMargin> m_floating;
 };
 
-class GUIHyperText : public gui::IGUIElement
-{
+class GUIHyperText : public gui::IGUIElement {
 public:
 	//! constructor
 	GUIHyperText(const wchar_t *text, gui::IGUIEnvironment *environment,

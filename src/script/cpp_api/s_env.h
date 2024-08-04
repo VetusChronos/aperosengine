@@ -28,8 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class ServerEnvironment;
 struct ScriptCallbackState;
 
-class ScriptApiEnv : virtual public ScriptApiBase
-{
+class ScriptApiEnv : virtual public ScriptApiBase {
 public:
 	// Called on environment step
 	void environment_Step(float dtime);
@@ -42,7 +41,7 @@ public:
 
 	// Called after emerge of a block queued from core.emerge_area()
 	void on_emerge_area_completion(v3s16 blockpos, int action,
-		ScriptCallbackState *state);
+			ScriptCallbackState *state);
 
 	void check_for_falling(v3s16 p);
 

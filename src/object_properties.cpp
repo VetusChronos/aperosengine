@@ -25,16 +25,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/serialize.h"
 #include <sstream>
 
-static const video::SColor NULL_BGCOLOR{0, 1, 1, 1};
+static const video::SColor NULL_BGCOLOR{ 0, 1, 1, 1 };
 
-ObjectProperties::ObjectProperties()
-{
+ObjectProperties::ObjectProperties() {
 	textures.emplace_back("no_texture.png");
-	colors.emplace_back(255,255,255,255);
+	colors.emplace_back(255, 255, 255, 255);
 }
 
-std::string ObjectProperties::dump() const
-{
+std::string ObjectProperties::dump() const {
 	std::ostringstream os(std::ios::binary);
 	os << "hp_max=" << hp_max;
 	os << ", breath_max=" << breath_max;
@@ -52,22 +50,24 @@ std::string ObjectProperties::dump() const
 	os << ", colors=[";
 	for (const video::SColor &color : colors) {
 		os << "\"" << color.getAlpha() << "," << color.getRed() << ","
-			<< color.getGreen() << "," << color.getBlue() << "\" ";
+		   << color.getGreen() << "," << color.getBlue() << "\" ";
 	}
 	os << "]";
 	os << ", spritediv=" << spritediv;
 	os << ", initial_sprite_basepos=" << initial_sprite_basepos;
 	os << ", is_visible=" << is_visible;
 	os << ", makes_footstep_sound=" << makes_footstep_sound;
-	os << ", automatic_rotate="<< automatic_rotate;
-	os << ", backface_culling="<< backface_culling;
+	os << ", automatic_rotate=" << automatic_rotate;
+	os << ", backface_culling=" << backface_culling;
 	os << ", glow=" << glow;
 	os << ", nametag=" << nametag;
-	os << ", nametag_color=" << "\"" << nametag_color.getAlpha() << "," << nametag_color.getRed()
-			<< "," << nametag_color.getGreen() << "," << nametag_color.getBlue() << "\" ";
+	os << ", nametag_color="
+	   << "\"" << nametag_color.getAlpha() << "," << nametag_color.getRed()
+	   << "," << nametag_color.getGreen() << "," << nametag_color.getBlue() << "\" ";
 
 	if (nametag_bgcolor)
-		os << ", nametag_bgcolor=" << "\"" << nametag_color.getAlpha() << "," << nametag_color.getRed()
+		os << ", nametag_bgcolor="
+		   << "\"" << nametag_color.getAlpha() << "," << nametag_color.getRed()
 		   << "," << nametag_color.getGreen() << "," << nametag_color.getBlue() << "\" ";
 	else
 		os << ", nametag_bgcolor=null ";
@@ -85,16 +85,16 @@ std::string ObjectProperties::dump() const
 	return os.str();
 }
 
-bool ObjectProperties::validate()
-{
+bool ObjectProperties::validate() {
 	const char *func = "ObjectProperties::validate(): ";
 	bool ret = true;
 
 	// cf. where serializeString16 is used below
 	for (u32 i = 0; i < textures.size(); i++) {
 		if (textures[i].size() > U16_MAX) {
-			warningstream << func << "texture " << (i+1) << " has excessive length, "
-				"clearing it." << '\n';
+			warningstream << func << "texture " << (i + 1) << " has excessive length, "
+															  "clearing it."
+						  << '\n';
 			textures[i].clear();
 			ret = false;
 		}
@@ -118,8 +118,7 @@ bool ObjectProperties::validate()
 	return ret;
 }
 
-void ObjectProperties::serialize(std::ostream &os) const
-{
+void ObjectProperties::serialize(std::ostream &os) const {
 	writeU8(os, 4); // PROTOCOL_VERSION >= 37
 	writeU16(os, hp_max);
 	writeU8(os, physical);
@@ -176,8 +175,7 @@ void ObjectProperties::serialize(std::ostream &os) const
 	// Never remove anything, because we don't want new versions of this
 }
 
-void ObjectProperties::deSerialize(std::istream &is)
-{
+void ObjectProperties::deSerialize(std::istream &is) {
 	int version = readU8(is);
 	if (version != 4)
 		throw SerializationError("unsupported ObjectProperties version");
@@ -194,7 +192,7 @@ void ObjectProperties::deSerialize(std::istream &is)
 	visual_size = readV3F32(is);
 	textures.clear();
 	u32 texture_count = readU16(is);
-	for (u32 i = 0; i < texture_count; i++){
+	for (u32 i = 0; i < texture_count; i++) {
 		textures.push_back(deSerializeString16(is));
 	}
 	spritediv = readV2S16(is);
@@ -205,7 +203,7 @@ void ObjectProperties::deSerialize(std::istream &is)
 	mesh = deSerializeString16(is);
 	colors.clear();
 	u32 color_count = readU16(is);
-	for (u32 i = 0; i < color_count; i++){
+	for (u32 i = 0; i < color_count; i++) {
 		colors.push_back(readARGB8(is));
 	}
 	collideWithObjects = readU8(is);
@@ -244,5 +242,6 @@ void ObjectProperties::deSerialize(std::istream &is)
 		if (is.eof())
 			return;
 		rotate_selectionbox = tmp;
-	} catch (SerializationError &e) {}
+	} catch (SerializationError &e) {
+	}
 }

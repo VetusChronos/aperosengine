@@ -19,8 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "tileanimation.h"
 #include "util/serialize.h"
 
-void TileAnimationParams::serialize(std::ostream &os, u16 protocol_ver) const
-{
+void TileAnimationParams::serialize(std::ostream &os, u16 protocol_ver) const {
 	// The particle code overloads the length parameter so that negative numbers
 	// indicate an extra feature which old clients don't understand (crash).
 	// In hindsight it would have been better to use an extra parameter for this
@@ -39,10 +38,9 @@ void TileAnimationParams::serialize(std::ostream &os, u16 protocol_ver) const
 	}
 }
 
-void TileAnimationParams::deSerialize(std::istream &is, u16 protocol_ver)
-{
+void TileAnimationParams::deSerialize(std::istream &is, u16 protocol_ver) {
 	type = static_cast<TileAnimationType>(readU8(is));
-	switch(type) {
+	switch (type) {
 		case TAT_NONE:
 			break;
 		case TAT_VERTICAL_FRAMES:
@@ -62,8 +60,7 @@ void TileAnimationParams::deSerialize(std::istream &is, u16 protocol_ver)
 }
 
 void TileAnimationParams::determineParams(v2u32 texture_size, int *frame_count,
-		int *frame_length_ms, v2u32 *frame_size) const
-{
+		int *frame_length_ms, v2u32 *frame_size) const {
 	if (type == TAT_VERTICAL_FRAMES) {
 		int frame_height = (float)texture_size.X /
 				(float)vertical_frames.aspect_w *
@@ -86,8 +83,7 @@ void TileAnimationParams::determineParams(v2u32 texture_size, int *frame_count,
 	// caller should check for TAT_NONE
 }
 
-void TileAnimationParams::getTextureModifer(std::ostream &os, v2u32 texture_size, int frame) const
-{
+void TileAnimationParams::getTextureModifer(std::ostream &os, v2u32 texture_size, int frame) const {
 	if (type == TAT_NONE)
 		return;
 	if (type == TAT_VERTICAL_FRAMES) {
@@ -99,12 +95,11 @@ void TileAnimationParams::getTextureModifer(std::ostream &os, v2u32 texture_size
 		q = frame / sheet_2d.frames_w;
 		r = frame % sheet_2d.frames_w;
 		os << "^[sheet:" << sheet_2d.frames_w << "x" << sheet_2d.frames_h
-			<< ":" << r << "," << q;
+		   << ":" << r << "," << q;
 	}
 }
 
-v2f TileAnimationParams::getTextureCoords(v2u32 texture_size, int frame) const
-{
+v2f TileAnimationParams::getTextureCoords(v2u32 texture_size, int frame) const {
 	v2u32 ret(0, 0);
 	if (type == TAT_VERTICAL_FRAMES) {
 		int frame_height = (float)texture_size.X /
@@ -119,5 +114,5 @@ v2f TileAnimationParams::getTextureCoords(v2u32 texture_size, int frame) const
 		r = frame % sheet_2d.frames_w;
 		ret = v2u32(r * frame_size.X, q * frame_size.Y);
 	}
-	return v2f(ret.X / (float) texture_size.X, ret.Y / (float) texture_size.Y);
+	return v2f(ret.X / (float)texture_size.X, ret.Y / (float)texture_size.Y);
 }

@@ -33,14 +33,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "irrlichttypes.h"
 #include "networkexceptions.h"
 
-struct IPv6AddressBytes
-{
+struct IPv6AddressBytes {
 	u8 bytes[16];
 	IPv6AddressBytes() { memset(bytes, 0, 16); }
 };
 
-class Address
-{
+class Address {
 public:
 	Address();
 	Address(u32 address, u16 port);
@@ -78,8 +76,7 @@ public:
 
 private:
 	unsigned short m_addr_family = 0;
-	union
-	{
+	union {
 		struct in_addr ipv4;
 		struct in6_addr ipv6;
 	} m_address;

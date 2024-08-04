@@ -6,13 +6,13 @@
 #include "log.h"
 
 namespace Catch {
-	std::ostream& cout() {
-		return rawstream;
-	}
-	std::ostream& clog() {
-		return rawstream;
-	}
-	std::ostream& cerr() {
-		return rawstream;
-	}
+std::ostream &cout() {
+	return rawstream;
 }
+std::ostream &clog() {
+	return rawstream;
+}
+std::ostream &cerr() {
+	return rawstream;
+}
+} //namespace Catch

@@ -33,16 +33,14 @@ class ClientEnvironment;
 class IGameDef;
 struct collisionMoveResult;
 
-enum class LocalPlayerAnimation
-{
+enum class LocalPlayerAnimation {
 	NO_ANIM,
 	WALK_ANIM,
 	DIG_ANIM,
 	WD_ANIM // walking + digging
 };
 
-struct PlayerSettings
-{
+struct PlayerSettings {
 	bool free_move = false;
 	bool pitch_move = false;
 	bool fast_move = false;
@@ -60,8 +58,7 @@ private:
 	static void settingsChangedCallback(const std::string &name, void *data);
 };
 
-class LocalPlayer : public Player
-{
+class LocalPlayer : public Player {
 public:
 	LocalPlayer(Client *client, const char *name);
 	virtual ~LocalPlayer();
@@ -123,8 +120,7 @@ public:
 
 	ClientActiveObject *getParent() const;
 
-	void setCAO(GenericCAO *toset)
-	{
+	void setCAO(GenericCAO *toset) {
 		assert(!m_cao); // Pre-condition
 		m_cao = toset;
 	}
@@ -142,13 +138,11 @@ public:
 	void setPitch(f32 pitch) { m_pitch = pitch; }
 	f32 getPitch() const { return m_pitch; }
 
-	inline void setPosition(const v3f &position)
-	{
+	inline void setPosition(const v3f &position) {
 		m_position = position;
 		m_sneak_node_exists = false;
 	}
-	inline void addPosition(const v3f &added_pos)
-	{
+	inline void addPosition(const v3f &added_pos) {
 		m_position += added_pos;
 		m_sneak_node_exists = false;
 	}
@@ -163,7 +157,7 @@ public:
 
 	void setCollisionbox(const aabb3f &box) { m_collisionbox = box; }
 
-	const aabb3f& getCollisionbox() const { return m_collisionbox; }
+	const aabb3f &getCollisionbox() const { return m_collisionbox; }
 
 	float getZoomFOV() const { return m_zoom_fov; }
 	void setZoomFOV(float zoom_fov) { m_zoom_fov = zoom_fov; }
@@ -172,24 +166,23 @@ public:
 
 	bool isDead() const;
 
-	inline void addVelocity(const v3f &vel)
-	{
+	inline void addVelocity(const v3f &vel) {
 		m_added_velocity += vel;
 	}
 
-	inline Lighting& getLighting() { return m_lighting; }
+	inline Lighting &getLighting() { return m_lighting; }
 
 	inline PlayerSettings &getPlayerSettings() { return m_player_settings; }
 
 private:
 	void accelerate(const v3f &target_speed, const f32 max_increase_H,
-		const f32 max_increase_V, const bool use_pitch);
+			const f32 max_increase_V, const bool use_pitch);
 	bool updateSneakNode(Map *map, const v3f &position, const v3f &sneak_max);
 	float getSlipFactor(Environment *env, const v3f &speedH);
 	void handleAutojump(f32 dtime, Environment *env,
-		const collisionMoveResult &result,
-		const v3f &position_before_move, const v3f &speed_before_move,
-		f32 pos_max_d);
+			const collisionMoveResult &result,
+			const v3f &position_before_move, const v3f &speed_before_move,
+			f32 pos_max_d);
 
 	v3f m_position;
 	v3s16 m_standing_node;
@@ -221,7 +214,7 @@ private:
 	f32 m_yaw = 0.0f;
 	f32 m_pitch = 0.0f;
 	aabb3f m_collisionbox = aabb3f(-BS * 0.30f, 0.0f, -BS * 0.30f, BS * 0.30f,
-		BS * 1.75f, BS * 0.30f);
+			BS * 1.75f, BS * 0.30f);
 	float m_eye_height = 1.625f;
 	float m_zoom_fov = 0.0f;
 	bool m_autojump = false;

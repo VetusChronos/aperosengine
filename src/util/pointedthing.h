@@ -25,16 +25,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <string>
 #include "pointabilities.h"
 
-enum PointedThingType :u8
-{
+enum PointedThingType : u8 {
 	POINTEDTHING_NOTHING,
 	POINTEDTHING_NODE,
 	POINTEDTHING_OBJECT
 };
 
 //! An active object or node which is selected by a ray on the map.
-struct PointedThing
-{
+struct PointedThing {
 	//! The type of the pointed object.
 	PointedThingType type = POINTEDTHING_NOTHING;
 	//! How the object or node can be pointed at.
@@ -98,29 +96,27 @@ struct PointedThing
 	PointedThing() = default;
 	//! Constructor for POINTEDTHING_NODE
 	inline PointedThing(const v3s16 under, const v3s16 above,
-		const v3s16 real_under, const v3f point, const v3f normal,
-		u16 box_id, f32 distSq, PointabilityType pointab) :
-		type(POINTEDTHING_NODE),
-		pointability(pointab),
-		node_undersurface(under),
-		node_abovesurface(above),
-		node_real_undersurface(real_under),
-		box_id(box_id),
-		intersection_point(point),
-		intersection_normal(normal),
-		distanceSq(distSq)
-	{}
+			const v3s16 real_under, const v3f point, const v3f normal,
+			u16 box_id, f32 distSq, PointabilityType pointab) :
+			type(POINTEDTHING_NODE),
+			pointability(pointab),
+			node_undersurface(under),
+			node_abovesurface(above),
+			node_real_undersurface(real_under),
+			box_id(box_id),
+			intersection_point(point),
+			intersection_normal(normal),
+			distanceSq(distSq) {}
 	//! Constructor for POINTEDTHING_OBJECT
 	inline PointedThing(u16 id, const v3f point, const v3f normal,
-		const v3f raw_normal, f32 distSq, PointabilityType pointab) :
-		type(POINTEDTHING_OBJECT),
-		pointability(pointab),
-		object_id(id),
-		intersection_point(point),
-		intersection_normal(normal),
-		raw_intersection_normal(raw_normal),
-		distanceSq(distSq)
-	{}
+			const v3f raw_normal, f32 distSq, PointabilityType pointab) :
+			type(POINTEDTHING_OBJECT),
+			pointability(pointab),
+			object_id(id),
+			intersection_point(point),
+			intersection_normal(normal),
+			raw_intersection_normal(raw_normal),
+			distanceSq(distSq) {}
 
 	std::string dump() const;
 	void serialize(std::ostream &os) const;

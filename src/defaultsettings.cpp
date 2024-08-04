@@ -26,14 +26,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "mapgen/mapgen.h" // Mapgen::setDefaultSettings
 #include "util/string.h"
 
-
 /*
  * inspired by https://github.com/systemd/systemd/blob/7aed43437175623e0f3ae8b071bbc500c13ce893/src/hostname/hostnamed.c#L406
  * this could be done in future with D-Bus using query:
  * busctl get-property org.freedesktop.hostname1 /org/freedesktop/hostname1 org.freedesktop.hostname1 Chassis
  */
-static bool detect_touch()
-{
+static bool detect_touch() {
 #if defined(__ANDROID__)
 	return true;
 #elif defined(__linux__)
@@ -46,8 +44,8 @@ static bool detect_touch()
 		chassis_type.pop_back();
 
 		if (chassis_type == "tablet" ||
-		    chassis_type == "handset" ||
-		    chassis_type == "watch")
+				chassis_type == "handset" ||
+				chassis_type == "watch")
 			return true;
 
 		if (!chassis_type.empty())
@@ -59,7 +57,7 @@ static bool detect_touch()
 		std::getline(dmi_file, chassis_type);
 
 		if (chassis_type == "11" /* Handheld */ ||
-		    chassis_type == "30" /* Tablet */)
+				chassis_type == "30" /* Tablet */)
 			return true;
 
 		return false;
@@ -90,8 +88,7 @@ static bool detect_touch()
 #endif
 }
 
-void set_default_settings()
-{
+void set_default_settings() {
 	Settings *settings = Settings::createLayer(SL_DEFAULTS);
 	bool has_touch = detect_touch();
 
@@ -573,7 +570,7 @@ void set_default_settings()
 	settings->setDefault("curl_verify_cert", "false");
 
 	// Apply settings according to screen size
-	float x_inches = (float) porting::getDisplaySize().X /
+	float x_inches = (float)porting::getDisplaySize().X /
 			(160.f * porting::getDisplayDensity());
 
 	if (x_inches < 3.7f) {

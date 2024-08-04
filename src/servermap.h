@@ -42,8 +42,7 @@ class MetricsBackend;
 	This is the only map class that is able to generate map.
 */
 
-class ServerMap : public Map
-{
+class ServerMap : public Map {
 public:
 	/*
 		savedir: directory to which map data should be saved
@@ -65,7 +64,7 @@ public:
 	bool blockpos_over_mapgen_limit(v3s16 p);
 	bool initBlockMake(v3s16 blockpos, BlockMakeData *data);
 	void finishBlockMake(BlockMakeData *data,
-		std::map<v3s16, MapBlock*> *changed_blocks);
+			std::map<v3s16, MapBlock *> *changed_blocks);
 
 	/*
 		Get a block from somewhere.
@@ -81,7 +80,7 @@ public:
 		- Create blank filled with CONTENT_IGNORE
 
 	*/
-	MapBlock *emergeBlock(v3s16 p, bool create_blank=true) override;
+	MapBlock *emergeBlock(v3s16 p, bool create_blank = true) override;
 
 	/*
 		Try to get a block.
@@ -94,7 +93,7 @@ public:
 	bool isBlockInQueue(v3s16 pos);
 
 	void addNodeAndUpdate(v3s16 p, MapNode n,
-			std::map<v3s16, MapBlock*> &modified_blocks,
+			std::map<v3s16, MapBlock *> &modified_blocks,
 			bool remove_metadata) override;
 
 	/*
@@ -114,9 +113,9 @@ public:
 
 	bool saveBlock(MapBlock *block) override;
 	static bool saveBlock(MapBlock *block, MapDatabase *db, int compression_level = -1);
-	MapBlock* loadBlock(v3s16 p);
+	MapBlock *loadBlock(v3s16 p);
 	// Database version
-	void loadBlock(std::string *blob, v3s16 p3d, MapSector *sector, bool save_after_load=false);
+	void loadBlock(std::string *blob, v3s16 p3d, MapSector *sector, bool save_after_load = false);
 
 	// Blocks are removed from the map but not deleted from memory until
 	// deleteDetachedBlocks() is called, since pointers to them may still exist
@@ -132,7 +131,7 @@ public:
 	// For debug printing
 	void PrintInfo(std::ostream &out) override;
 
-	bool isSavingEnabled(){ return m_map_saving_enabled; }
+	bool isSavingEnabled() { return m_map_saving_enabled; }
 
 	u64 getSeed();
 
@@ -144,9 +143,9 @@ public:
 	 * changed), true otherwise.
 	 */
 	bool repairBlockLight(v3s16 blockpos,
-		std::map<v3s16, MapBlock *> *modified_blocks);
+			std::map<v3s16, MapBlock *> *modified_blocks);
 
-	void transformLiquids(std::map<v3s16, MapBlock*> & modified_blocks,
+	void transformLiquids(std::map<v3s16, MapBlock *> &modified_blocks,
 			ServerEnvironment *env);
 
 	void transforming_liquid_add(v3s16 p);
@@ -154,7 +153,6 @@ public:
 	MapSettingsManager settings_mgr;
 
 protected:
-
 	void reportMetrics(u64 save_time_us, u32 saved_blocks, u32 all_blocks) override;
 
 private:

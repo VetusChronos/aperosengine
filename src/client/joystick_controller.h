@@ -41,22 +41,18 @@ struct JoystickAxisLayout {
 	int invert;
 };
 
-
 struct JoystickCombination {
-
-	virtual bool isTriggered(const irr::SEvent::SJoystickEvent &ev) const=0;
+	virtual bool isTriggered(const irr::SEvent::SJoystickEvent &ev) const = 0;
 
 	GameKeyType key;
 };
 
 struct JoystickButtonCmb : public JoystickCombination {
-
 	JoystickButtonCmb() = default;
 
 	JoystickButtonCmb(GameKeyType key, u32 filter_mask, u32 compare_mask) :
-		filter_mask(filter_mask),
-		compare_mask(compare_mask)
-	{
+			filter_mask(filter_mask),
+			compare_mask(compare_mask) {
 		this->key = key;
 	}
 
@@ -69,14 +65,12 @@ struct JoystickButtonCmb : public JoystickCombination {
 };
 
 struct JoystickAxisCmb : public JoystickCombination {
-
 	JoystickAxisCmb() = default;
 
 	JoystickAxisCmb(GameKeyType key, u16 axis_to_compare, int direction, s16 thresh) :
-		axis_to_compare(axis_to_compare),
-		direction(direction),
-		thresh(thresh)
-	{
+			axis_to_compare(axis_to_compare),
+			direction(direction),
+			thresh(thresh) {
 		this->key = key;
 	}
 
@@ -100,7 +94,6 @@ struct JoystickLayout {
 };
 
 class JoystickController {
-
 public:
 	JoystickController();
 
@@ -109,44 +102,36 @@ public:
 	bool handleEvent(const irr::SEvent::SJoystickEvent &ev);
 	void clear();
 
-	void releaseAllKeys()
-	{
+	void releaseAllKeys() {
 		m_keys_released |= m_keys_down;
 		m_keys_down.reset();
 	}
 
-	bool wasKeyDown(GameKeyType b)
-	{
+	bool wasKeyDown(GameKeyType b) {
 		bool r = m_past_keys_pressed[b];
 		m_past_keys_pressed[b] = false;
 		return r;
 	}
 
-	bool wasKeyReleased(GameKeyType b)
-	{
+	bool wasKeyReleased(GameKeyType b) {
 		return m_keys_released[b];
 	}
-	void clearWasKeyReleased(GameKeyType b)
-	{
+	void clearWasKeyReleased(GameKeyType b) {
 		m_keys_released[b] = false;
 	}
 
-	bool wasKeyPressed(GameKeyType b)
-	{
+	bool wasKeyPressed(GameKeyType b) {
 		return m_keys_pressed[b];
 	}
-	void clearWasKeyPressed(GameKeyType b)
-	{
+	void clearWasKeyPressed(GameKeyType b) {
 		m_keys_pressed[b] = false;
 	}
 
-	bool isKeyDown(GameKeyType b)
-	{
+	bool isKeyDown(GameKeyType b) {
 		return m_keys_down[b];
 	}
 
-	s16 getAxis(JoystickAxis axis)
-	{
+	s16 getAxis(JoystickAxis axis) {
 		return m_axes_vals[axis];
 	}
 

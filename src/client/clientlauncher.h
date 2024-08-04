@@ -25,8 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class RenderingEngine;
 
-class ClientLauncher
-{
+class ClientLauncher {
 public:
 	ClientLauncher() = default;
 
@@ -43,7 +42,7 @@ private:
 	void config_guienv();
 
 	bool launch_game(std::string &error_message, bool reconnect_requested,
-		GameStartData &start_data, const Settings &cmd_args);
+			GameStartData &start_data, const Settings &cmd_args);
 
 	void main_menu(MainMenuData *menudata);
 

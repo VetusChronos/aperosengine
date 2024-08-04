@@ -54,7 +54,8 @@ class RenderingCore;
 /* Helpers */
 
 struct FpsControl {
-	FpsControl() : last_time(0), busy_time(0), sleep_time(0) {}
+	FpsControl() :
+			last_time(0), busy_time(0), sleep_time(0) {}
 
 	void reset();
 
@@ -67,17 +68,15 @@ struct FpsControl {
 };
 
 // Populates fogColor, fogDistance, fogShadingParameter with values from Irrlicht
-class FogShaderConstantSetterFactory : public IShaderConstantSetterFactory
-{
+class FogShaderConstantSetterFactory : public IShaderConstantSetterFactory {
 public:
-	FogShaderConstantSetterFactory() {};
+	FogShaderConstantSetterFactory(){};
 	virtual IShaderConstantSetter *create();
 };
 
 /* Rendering engine class */
 
-class RenderingEngine
-{
+class RenderingEngine {
 public:
 	static const video::SColor MENU_SKY_COLOR;
 	static const float BASE_BLOOM_STRENGTH;
@@ -96,7 +95,7 @@ public:
 	bool setWindowIcon();
 	void cleanupMeshCache();
 
-	void removeMesh(const scene::IMesh* mesh);
+	void removeMesh(const scene::IMesh *mesh);
 
 	/**
 	 * This takes 3d_mode into account - side-by-side will return a
@@ -104,36 +103,30 @@ public:
 	 *
 	 * @return "window" size
 	 */
-	static v2u32 getWindowSize()
-	{
+	static v2u32 getWindowSize() {
 		sanity_check(s_singleton);
 		return s_singleton->_getWindowSize();
 	}
 
-	io::IFileSystem *get_filesystem()
-	{
+	io::IFileSystem *get_filesystem() {
 		return m_device->getFileSystem();
 	}
 
-	static video::IVideoDriver *get_video_driver()
-	{
+	static video::IVideoDriver *get_video_driver() {
 		sanity_check(s_singleton && s_singleton->m_device);
 		return s_singleton->m_device->getVideoDriver();
 	}
 
-	scene::ISceneManager *get_scene_manager()
-	{
+	scene::ISceneManager *get_scene_manager() {
 		return m_device->getSceneManager();
 	}
 
-	static irr::IrrlichtDevice *get_raw_device()
-	{
+	static irr::IrrlichtDevice *get_raw_device() {
 		sanity_check(s_singleton && s_singleton->m_device);
 		return s_singleton->m_device;
 	}
 
-	gui::IGUIEnvironment *get_gui_env()
-	{
+	gui::IGUIEnvironment *get_gui_env() {
 		return m_device->getGUIEnvironment();
 	}
 
@@ -149,14 +142,12 @@ public:
 	void initialize(Client *client, Hud *hud);
 	void finalize();
 
-	bool run()
-	{
+	bool run() {
 		return m_device->run();
 	}
 
 	// FIXME: this is still global when it shouldn't be
-	static ShadowRenderer *get_shadow_renderer()
-	{
+	static ShadowRenderer *get_shadow_renderer() {
 		if (s_singleton && s_singleton->core)
 			return s_singleton->core->get_shadow_renderer();
 		return nullptr;

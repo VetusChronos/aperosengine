@@ -36,7 +36,7 @@ void applyFacesShading(video::SColor &color, const v3f &normal);
 	The resulting mesh has 6 materials (up, down, right, left, back, front)
 	which must be defined by the caller.
 */
-scene::IAnimatedMesh* createCubeMesh(const v3f &scale);
+scene::IAnimatedMesh *createCubeMesh(const v3f &scale);
 
 /*
 	Multiplies each vertex coordinate by the specified scaling factors
@@ -58,7 +58,6 @@ void setMeshBufferColor(scene::IMeshBuffer *buf, const video::SColor &color);
 	Set a constant color for all vertices in the mesh
 */
 void setMeshColor(scene::IMesh *mesh, const video::SColor &color);
-
 
 /*
 	Sets texture coords for vertices in the mesh buffer.
@@ -99,20 +98,20 @@ void rotateMeshBy6dFacedir(scene::IMesh *mesh, int facedir);
 /*
 	Rotate the mesh around the axis and given angle in degrees.
 */
-void rotateMeshXYby (scene::IMesh *mesh, f64 degrees);
-void rotateMeshXZby (scene::IMesh *mesh, f64 degrees);
-void rotateMeshYZby (scene::IMesh *mesh, f64 degrees);
+void rotateMeshXYby(scene::IMesh *mesh, f64 degrees);
+void rotateMeshXZby(scene::IMesh *mesh, f64 degrees);
+void rotateMeshYZby(scene::IMesh *mesh, f64 degrees);
 
 /*
  *  Clone the mesh buffer.
  *  The returned pointer should be dropped.
  */
-scene::IMeshBuffer* cloneMeshBuffer(scene::IMeshBuffer *mesh_buffer);
+scene::IMeshBuffer *cloneMeshBuffer(scene::IMeshBuffer *mesh_buffer);
 
 /*
 	Clone the mesh.
 */
-scene::SMesh* cloneMesh(scene::IMesh *srcMesh);
+scene::SMesh *cloneMesh(scene::IMesh *srcMesh);
 
 /*
 	Convert nodeboxes to mesh. Each tile goes into a different buffer.
@@ -120,7 +119,7 @@ scene::SMesh* cloneMesh(scene::IMesh *srcMesh);
 	uv_coords[24] - table of texture uv coords for each cuboid face
 	expand - factor by which cuboids will be resized
 */
-scene::IMesh* convertNodeboxesToMesh(const std::vector<aabb3f> &boxes,
+scene::IMesh *convertNodeboxesToMesh(const std::vector<aabb3f> &boxes,
 		const f32 *uv_coords = NULL, float expand = 0);
 
 /*
@@ -138,5 +137,5 @@ bool checkMeshNormals(scene::IMesh *mesh);
 	Set the MinFilter, MagFilter and AnisotropicFilter properties of a texture
 	layer according to the three relevant boolean values found in the Minetest
 	settings.
-*/ 
+*/
 void setMaterialFilters(video::SMaterialLayer &tex, bool bilinear, bool trilinear, bool anisotropic);

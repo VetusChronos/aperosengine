@@ -23,14 +23,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "serverenvironment.h"
 #include "util/serialize.h"
 
-UnitSAO::UnitSAO(ServerEnvironment *env, v3f pos) : ServerActiveObject(env, pos)
-{
+UnitSAO::UnitSAO(ServerEnvironment *env, v3f pos) :
+		ServerActiveObject(env, pos) {
 	// Initialize something to armor groups
 	m_armor_groups["fleshy"] = 100;
 }
 
-ServerActiveObject *UnitSAO::getParent() const
-{
+ServerActiveObject *UnitSAO::getParent() const {
 	if (!m_attachment_parent_id)
 		return nullptr;
 	// Check if the parent still exists
@@ -39,24 +38,21 @@ ServerActiveObject *UnitSAO::getParent() const
 	return obj;
 }
 
-void UnitSAO::setArmorGroups(const ItemGroupList &armor_groups)
-{
+void UnitSAO::setArmorGroups(const ItemGroupList &armor_groups) {
 	if (m_armor_groups == armor_groups)
 		return;
 	m_armor_groups = armor_groups;
 	m_armor_groups_sent = false;
 }
 
-const ItemGroupList &UnitSAO::getArmorGroups() const
-{
+const ItemGroupList &UnitSAO::getArmorGroups() const {
 	return m_armor_groups;
 }
 
 void UnitSAO::setAnimation(
-		v2f frame_range, float frame_speed, float frame_blend, bool frame_loop)
-{
+		v2f frame_range, float frame_speed, float frame_blend, bool frame_loop) {
 	if (std::tie(m_animation_range, m_animation_speed, m_animation_blend,
-			m_animation_loop) ==
+				m_animation_loop) ==
 			std::tie(frame_range, frame_speed, frame_blend, frame_loop))
 		return; // no change
 	m_animation_range = frame_range;
@@ -67,31 +63,27 @@ void UnitSAO::setAnimation(
 }
 
 void UnitSAO::getAnimation(v2f *frame_range, float *frame_speed, float *frame_blend,
-		bool *frame_loop)
-{
+		bool *frame_loop) {
 	*frame_range = m_animation_range;
 	*frame_speed = m_animation_speed;
 	*frame_blend = m_animation_blend;
 	*frame_loop = m_animation_loop;
 }
 
-void UnitSAO::setAnimationSpeed(float frame_speed)
-{
+void UnitSAO::setAnimationSpeed(float frame_speed) {
 	if (m_animation_speed == frame_speed)
 		return;
 	m_animation_speed = frame_speed;
 	m_animation_speed_sent = false;
 }
 
-void UnitSAO::setBoneOverride(const std::string &bone, const BoneOverride &props)
-{
+void UnitSAO::setBoneOverride(const std::string &bone, const BoneOverride &props) {
 	// store these so they can be updated to clients
 	m_bone_override[bone] = props;
 	m_bone_override_sent = false;
 }
 
-BoneOverride UnitSAO::getBoneOverride(const std::string &bone)
-{
+BoneOverride UnitSAO::getBoneOverride(const std::string &bone) {
 	auto it = m_bone_override.find(bone);
 	BoneOverride props;
 	if (it != m_bone_override.end())
@@ -99,8 +91,7 @@ BoneOverride UnitSAO::getBoneOverride(const std::string &bone)
 	return props;
 }
 
-void UnitSAO::sendOutdatedData()
-{
+void UnitSAO::sendOutdatedData() {
 	if (!m_armor_groups_sent) {
 		m_armor_groups_sent = true;
 		m_messages_out.emplace(getId(), true, generateUpdateArmorGroupsCommand());
@@ -119,8 +110,7 @@ void UnitSAO::sendOutdatedData()
 	if (!m_bone_override_sent) {
 		m_bone_override_sent = true;
 		for (const auto &bone_pos : m_bone_override) {
-			m_messages_out.emplace(getId(), true, generateUpdateBoneOverrideCommand(
-				bone_pos.first, bone_pos.second));
+			m_messages_out.emplace(getId(), true, generateUpdateBoneOverrideCommand(bone_pos.first, bone_pos.second));
 		}
 	}
 
@@ -131,8 +121,7 @@ void UnitSAO::sendOutdatedData()
 }
 
 void UnitSAO::setAttachment(int parent_id, const std::string &bone, v3f position,
-		v3f rotation, bool force_visible)
-{
+		v3f rotation, bool force_visible) {
 	auto *obj = parent_id ? m_env->getActiveObject(parent_id) : nullptr;
 	if (obj) {
 		// Do checks to avoid circular references
@@ -140,7 +129,7 @@ void UnitSAO::setAttachment(int parent_id, const std::string &bone, v3f position
 		for (obj = obj->getParent(); obj; obj = obj->getParent()) {
 			if (obj == this) {
 				warningstream << "Mod bug: Attempted to attach object " << m_id << " to parent "
-					<< parent_id << " but former is an (in)direct parent of latter." << '\n';
+							  << parent_id << " but former is an (in)direct parent of latter." << '\n';
 				return;
 			}
 		}
@@ -174,8 +163,7 @@ void UnitSAO::setAttachment(int parent_id, const std::string &bone, v3f position
 }
 
 void UnitSAO::getAttachment(int *parent_id, std::string *bone, v3f *position,
-		v3f *rotation, bool *force_visible) const
-{
+		v3f *rotation, bool *force_visible) const {
 	*parent_id = m_attachment_parent_id;
 	*bone = m_attachment_bone;
 	*position = m_attachment_position;
@@ -183,8 +171,7 @@ void UnitSAO::getAttachment(int *parent_id, std::string *bone, v3f *position,
 	*force_visible = m_force_visible;
 }
 
-void UnitSAO::clearChildAttachments()
-{
+void UnitSAO::clearChildAttachments() {
 	// Cannot use for-loop here: setAttachment() modifies 'm_attachment_child_ids'!
 	while (!m_attachment_child_ids.empty()) {
 		int child_id = *m_attachment_child_ids.begin();
@@ -197,8 +184,7 @@ void UnitSAO::clearChildAttachments()
 	}
 }
 
-void UnitSAO::clearParentAttachment()
-{
+void UnitSAO::clearParentAttachment() {
 	ServerActiveObject *parent = nullptr;
 	if (m_attachment_parent_id) {
 		parent = m_env->getActiveObject(m_attachment_parent_id);
@@ -211,23 +197,19 @@ void UnitSAO::clearParentAttachment()
 		parent->removeAttachmentChild(m_id);
 }
 
-void UnitSAO::addAttachmentChild(int child_id)
-{
+void UnitSAO::addAttachmentChild(int child_id) {
 	m_attachment_child_ids.insert(child_id);
 }
 
-void UnitSAO::removeAttachmentChild(int child_id)
-{
+void UnitSAO::removeAttachmentChild(int child_id) {
 	m_attachment_child_ids.erase(child_id);
 }
 
-const std::unordered_set<int> &UnitSAO::getAttachmentChildIds() const
-{
+const std::unordered_set<int> &UnitSAO::getAttachmentChildIds() const {
 	return m_attachment_child_ids;
 }
 
-void UnitSAO::onAttach(int parent_id)
-{
+void UnitSAO::onAttach(int parent_id) {
 	if (!parent_id)
 		return;
 
@@ -242,8 +224,7 @@ void UnitSAO::onAttach(int parent_id)
 	}
 }
 
-void UnitSAO::onDetach(int parent_id)
-{
+void UnitSAO::onDetach(int parent_id) {
 	if (!parent_id)
 		return;
 
@@ -258,18 +239,15 @@ void UnitSAO::onDetach(int parent_id)
 		m_env->getScriptIface()->luaentity_on_detach_child(parent_id, this);
 }
 
-ObjectProperties *UnitSAO::accessObjectProperties()
-{
+ObjectProperties *UnitSAO::accessObjectProperties() {
 	return &m_prop;
 }
 
-void UnitSAO::notifyObjectPropertiesModified()
-{
+void UnitSAO::notifyObjectPropertiesModified() {
 	m_properties_sent = false;
 }
 
-std::string UnitSAO::generateUpdateAttachmentCommand() const
-{
+std::string UnitSAO::generateUpdateAttachmentCommand() const {
 	std::ostringstream os(std::ios::binary);
 	// command
 	writeU8(os, AO_CMD_ATTACH_TO);
@@ -283,8 +261,7 @@ std::string UnitSAO::generateUpdateAttachmentCommand() const
 }
 
 std::string UnitSAO::generateUpdateBoneOverrideCommand(
-		const std::string &bone, const BoneOverride &props)
-{
+		const std::string &bone, const BoneOverride &props) {
 	std::ostringstream os(std::ios::binary);
 	// command
 	writeU8(os, AO_CMD_SET_BONE_POSITION);
@@ -298,14 +275,11 @@ std::string UnitSAO::generateUpdateBoneOverrideCommand(
 	writeF32(os, props.position.interp_timer);
 	writeF32(os, props.rotation.interp_timer);
 	writeF32(os, props.scale.interp_timer);
-	writeU8(os, (props.position.absolute & 1) << 0
-	          | (props.rotation.absolute & 1) << 1
-	          | (props.scale.absolute & 1) << 2);
+	writeU8(os, (props.position.absolute & 1) << 0 | (props.rotation.absolute & 1) << 1 | (props.scale.absolute & 1) << 2);
 	return os.str();
 }
 
-std::string UnitSAO::generateUpdateAnimationSpeedCommand() const
-{
+std::string UnitSAO::generateUpdateAnimationSpeedCommand() const {
 	std::ostringstream os(std::ios::binary);
 	// command
 	writeU8(os, AO_CMD_SET_ANIMATION_SPEED);
@@ -314,8 +288,7 @@ std::string UnitSAO::generateUpdateAnimationSpeedCommand() const
 	return os.str();
 }
 
-std::string UnitSAO::generateUpdateAnimationCommand() const
-{
+std::string UnitSAO::generateUpdateAnimationCommand() const {
 	std::ostringstream os(std::ios::binary);
 	// command
 	writeU8(os, AO_CMD_SET_ANIMATION);
@@ -328,8 +301,7 @@ std::string UnitSAO::generateUpdateAnimationCommand() const
 	return os.str();
 }
 
-std::string UnitSAO::generateUpdateArmorGroupsCommand() const
-{
+std::string UnitSAO::generateUpdateArmorGroupsCommand() const {
 	std::ostringstream os(std::ios::binary);
 	writeU8(os, AO_CMD_UPDATE_ARMOR_GROUPS);
 	writeU16(os, m_armor_groups.size());
@@ -342,8 +314,7 @@ std::string UnitSAO::generateUpdateArmorGroupsCommand() const
 
 std::string UnitSAO::generateUpdatePositionCommand(const v3f &position,
 		const v3f &velocity, const v3f &acceleration, const v3f &rotation,
-		bool do_interpolate, bool is_movement_end, f32 update_interval)
-{
+		bool do_interpolate, bool is_movement_end, f32 update_interval) {
 	std::ostringstream os(std::ios::binary);
 	// command
 	writeU8(os, AO_CMD_UPDATE_POSITION);
@@ -364,16 +335,14 @@ std::string UnitSAO::generateUpdatePositionCommand(const v3f &position,
 	return os.str();
 }
 
-std::string UnitSAO::generateSetPropertiesCommand(const ObjectProperties &prop) const
-{
+std::string UnitSAO::generateSetPropertiesCommand(const ObjectProperties &prop) const {
 	std::ostringstream os(std::ios::binary);
 	writeU8(os, AO_CMD_SET_PROPERTIES);
 	prop.serialize(os);
 	return os.str();
 }
 
-std::string UnitSAO::generatePunchCommand(u16 result_hp) const
-{
+std::string UnitSAO::generatePunchCommand(u16 result_hp) const {
 	std::ostringstream os(std::ios::binary);
 	// command
 	writeU8(os, AO_CMD_PUNCHED);
@@ -382,7 +351,6 @@ std::string UnitSAO::generatePunchCommand(u16 result_hp) const
 	return os.str();
 }
 
-void UnitSAO::sendPunchCommand()
-{
+void UnitSAO::sendPunchCommand() {
 	m_messages_out.emplace(getId(), true, generatePunchCommand(getHP()));
 }

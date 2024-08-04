@@ -22,8 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "unit_sao.h"
 
-class LuaEntitySAO : public UnitSAO
-{
+class LuaEntitySAO : public UnitSAO {
 public:
 	LuaEntitySAO() = delete;
 	// Used by the environment to load SAO
@@ -32,8 +31,8 @@ public:
 	LuaEntitySAO(ServerEnvironment *env, v3f pos, const std::string &name,
 			const std::string &state) :
 			UnitSAO(env, pos),
-			m_init_name(name), m_init_state(state)
-	{
+			m_init_name(name),
+			m_init_state(state) {
 	}
 	~LuaEntitySAO();
 

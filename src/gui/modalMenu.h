@@ -23,7 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "irr_ptr.h"
 #include "util/string.h"
 #ifdef __ANDROID__
-	#include <porting_android.h>
+#include <porting_android.h>
 #endif
 
 enum class PointerType {
@@ -41,8 +41,7 @@ struct PointerAction {
 
 class GUIModalMenu;
 
-class IMenuManager
-{
+class IMenuManager {
 public:
 	// A GUIModalMenu calls these when this class is passed as a parameter
 	virtual void createdMenu(gui::IGUIElement *menu) = 0;
@@ -52,11 +51,10 @@ public:
 // Remember to drop() the menu after creating, so that it can
 // remove itself when it wants to.
 
-class GUIModalMenu : public gui::IGUIElement
-{
+class GUIModalMenu : public gui::IGUIElement {
 public:
-	GUIModalMenu(gui::IGUIEnvironment* env, gui::IGUIElement* parent, s32 id,
-		IMenuManager *menumgr, bool remap_dbl_click = true);
+	GUIModalMenu(gui::IGUIEnvironment *env, gui::IGUIElement *parent, s32 id,
+			IMenuManager *menumgr, bool remap_dbl_click = true);
 	virtual ~GUIModalMenu();
 
 	void allowFocusRemoval(bool allow);
@@ -70,7 +68,7 @@ public:
 	virtual bool OnEvent(const SEvent &event) { return false; };
 	virtual bool pausesGame() { return false; } // Used for pause menu
 #ifdef __ANDROID__
-	virtual void getAndroidUIInput() {};
+	virtual void getAndroidUIInput(){};
 	porting::AndroidDialogState getAndroidUIInputState();
 #endif
 
@@ -86,7 +84,7 @@ protected:
 	// If the last input event was a mouse event, it's the cursor position.
 	// If the last input event was a touch event, it's the finger position.
 	v2s32 m_pointer;
-	v2s32 m_old_pointer;  // Mouse position after previous mouse event
+	v2s32 m_old_pointer; // Mouse position after previous mouse event
 
 	v2u32 m_screensize_old;
 	float m_gui_scale;
@@ -126,7 +124,7 @@ private:
 	irr_ptr<gui::IGUIElement> m_touch_hovered;
 
 	// Converts touches into clicks.
-	bool simulateMouseEvent(ETOUCH_INPUT_EVENT touch_event, bool second_try=false);
+	bool simulateMouseEvent(ETOUCH_INPUT_EVENT touch_event, bool second_try = false);
 	void enter(gui::IGUIElement *element);
 	void leave();
 

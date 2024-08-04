@@ -51,10 +51,9 @@ extern "C" {
 #include <lualib.h>
 }
 
-ServerScripting::ServerScripting(Server* server):
+ServerScripting::ServerScripting(Server *server) :
 		ScriptApiBase(ScriptingType::Server),
-		asyncEngine(server)
-{
+		asyncEngine(server) {
 	setGameDef(server);
 
 	// setEnv(env) is called by ScriptApiEnv::initializeEnvironment()
@@ -66,8 +65,8 @@ ServerScripting::ServerScripting(Server* server):
 		initializeSecurity();
 	} else {
 		warningstream << "\\!/ Mod security should never be disabled, as it allows any mod to "
-				<< "access the host machine."
-				<< "Mods should use aperosengine.request_insecure_environment() instead \\!/" << '\n';
+					  << "access the host machine."
+					  << "Mods should use aperosengine.request_insecure_environment() instead \\!/" << '\n';
 	}
 
 	lua_getglobal(L, "core");
@@ -90,14 +89,12 @@ ServerScripting::ServerScripting(Server* server):
 	infostream << "SCRIPTAPI: Initialized game modules" << '\n';
 }
 
-void ServerScripting::loadBuiltin()
-{
+void ServerScripting::loadBuiltin() {
 	loadMod(Server::getBuiltinLuaPath() + DIR_DELIM "init.lua", BUILTIN_MOD_NAME);
 	checkSetByBuiltin();
 }
 
-void ServerScripting::saveGlobals()
-{
+void ServerScripting::saveGlobals() {
 	SCRIPTAPI_PRECHECKHEADER
 
 	lua_getglobal(L, "core");
@@ -113,8 +110,7 @@ void ServerScripting::saveGlobals()
 	lua_pop(L, 2); // pop 'core', return value
 }
 
-void ServerScripting::initAsync()
-{
+void ServerScripting::initAsync() {
 	infostream << "SCRIPTAPI: Initializing async engine" << '\n';
 	asyncEngine.registerStateInitializer(InitializeAsync);
 	asyncEngine.registerStateInitializer(ModApiUtil::InitializeAsync);
@@ -128,20 +124,17 @@ void ServerScripting::initAsync()
 	asyncEngine.initialize(0);
 }
 
-void ServerScripting::stepAsync()
-{
+void ServerScripting::stepAsync() {
 	asyncEngine.step(getStack());
 }
 
 u32 ServerScripting::queueAsync(std::string &&serialized_func,
-	PackedValue *param, const std::string &mod_origin)
-{
+		PackedValue *param, const std::string &mod_origin) {
 	return asyncEngine.queueAsyncJob(std::move(serialized_func),
 			param, mod_origin);
 }
 
-void ServerScripting::InitializeModApi(lua_State *L, int top)
-{
+void ServerScripting::InitializeModApi(lua_State *L, int top) {
 	// Register reference classes (userdata)
 	InvRef::Register(L);
 	ItemStackMetaRef::Register(L);
@@ -178,8 +171,7 @@ void ServerScripting::InitializeModApi(lua_State *L, int top)
 	ModApiChannels::Initialize(L, top);
 }
 
-void ServerScripting::InitializeAsync(lua_State *L, int top)
-{
+void ServerScripting::InitializeAsync(lua_State *L, int top) {
 	// classes
 	ItemStackMetaRef::Register(L);
 	LuaAreaStore::Register(L);

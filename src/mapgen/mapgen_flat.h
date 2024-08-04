@@ -31,8 +31,7 @@ class BiomeManager;
 
 extern FlagDesc flagdesc_mapgen_flat[];
 
-struct MapgenFlatParams : public MapgenParams
-{
+struct MapgenFlatParams : public MapgenParams {
 	s16 ground_level = 8;
 	float lake_threshold = -0.45f;
 	float lake_steepness = 48.0f;
@@ -67,8 +66,7 @@ struct MapgenFlatParams : public MapgenParams
 	void setDefaultSettings(Settings *settings);
 };
 
-class MapgenFlat : public MapgenBasic
-{
+class MapgenFlat : public MapgenBasic {
 public:
 	MapgenFlat(MapgenFlatParams *params, EmergeParams *emerge);
 	~MapgenFlat();

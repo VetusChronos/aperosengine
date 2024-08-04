@@ -26,33 +26,28 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	PlayerMetaRef
 */
 
-IMetadata *PlayerMetaRef::getmeta(bool auto_create)
-{
+IMetadata *PlayerMetaRef::getmeta(bool auto_create) {
 	return metadata;
 }
 
-void PlayerMetaRef::clearMeta()
-{
+void PlayerMetaRef::clearMeta() {
 	metadata->clear();
 }
 
-void PlayerMetaRef::reportMetadataChange(const std::string *name)
-{
+void PlayerMetaRef::reportMetadataChange(const std::string *name) {
 	// TODO
 }
 
 // Creates an PlayerMetaRef and leaves it on top of stack
 // Not callable from Lua; all references are created on the C side.
-void PlayerMetaRef::create(lua_State *L, IMetadata *metadata)
-{
+void PlayerMetaRef::create(lua_State *L, IMetadata *metadata) {
 	PlayerMetaRef *o = new PlayerMetaRef(metadata);
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;
 	luaL_getmetatable(L, className);
 	lua_setmetatable(L, -2);
 }
 
-void PlayerMetaRef::Register(lua_State *L)
-{
+void PlayerMetaRef::Register(lua_State *L) {
 	registerMetadataClass(L, className, methods);
 
 	// Cannot be created from Lua
@@ -73,5 +68,5 @@ const luaL_Reg PlayerMetaRef::methods[] = {
 	luamethod(MetaDataRef, to_table),
 	luamethod(MetaDataRef, from_table),
 	luamethod(MetaDataRef, equals),
-	{0,0}
+	{ 0, 0 }
 };

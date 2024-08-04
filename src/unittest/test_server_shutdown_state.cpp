@@ -24,8 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/string.h"
 #include "util/serialize.h"
 
-class TestServerShutdownState : public TestBase
-{
+class TestServerShutdownState : public TestBase {
 public:
 	TestServerShutdownState() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestServerShutdownState"; }
@@ -40,16 +39,14 @@ public:
 
 static TestServerShutdownState g_test_instance;
 
-void TestServerShutdownState::runTests(IGameDef *gamedef)
-{
+void TestServerShutdownState::runTests(IGameDef *gamedef) {
 	TEST(testInit);
 	TEST(testReset);
 	TEST(testTrigger);
 	TEST(testTick);
 }
 
-void TestServerShutdownState::testInit()
-{
+void TestServerShutdownState::testInit() {
 	Server::ShutdownState ss;
 	UASSERT(!ss.is_requested);
 	UASSERT(!ss.should_reconnect);
@@ -57,8 +54,7 @@ void TestServerShutdownState::testInit()
 	UASSERT(ss.m_timer == 0.0f);
 }
 
-void TestServerShutdownState::testReset()
-{
+void TestServerShutdownState::testReset() {
 	Server::ShutdownState ss;
 	ss.reset();
 	UASSERT(!ss.is_requested);
@@ -67,8 +63,7 @@ void TestServerShutdownState::testReset()
 	UASSERT(ss.m_timer == 0.0f);
 }
 
-void TestServerShutdownState::testTrigger()
-{
+void TestServerShutdownState::testTrigger() {
 	Server::ShutdownState ss;
 	ss.trigger(3.0f, "testtrigger", true);
 	UASSERT(!ss.is_requested);
@@ -77,8 +72,7 @@ void TestServerShutdownState::testTrigger()
 	UASSERT(ss.m_timer == 3.0f);
 }
 
-void TestServerShutdownState::testTick()
-{
+void TestServerShutdownState::testTick() {
 	auto server = std::make_unique<MockServer>();
 	Server::ShutdownState ss;
 	ss.trigger(28.0f, "testtrigger", true);

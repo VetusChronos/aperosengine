@@ -34,8 +34,7 @@ struct ItemStack;
 class Inventory;
 struct ItemDefinition;
 
-class ScriptApiClient : virtual public ScriptApiBase
-{
+class ScriptApiClient : virtual public ScriptApiBase {
 public:
 	// Calls when mods are loaded
 	void on_mods_loaded();

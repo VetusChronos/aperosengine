@@ -30,8 +30,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	NodeMetaRef
 */
 
-IMetadata* NodeMetaRef::getmeta(bool auto_create)
-{
+IMetadata *NodeMetaRef::getmeta(bool auto_create) {
 	if (m_is_local)
 		return m_local_meta;
 
@@ -46,17 +45,15 @@ IMetadata* NodeMetaRef::getmeta(bool auto_create)
 	return meta;
 }
 
-void NodeMetaRef::clearMeta()
-{
+void NodeMetaRef::clearMeta() {
 	SANITY_CHECK(!m_is_local);
 	m_env->getMap().removeNodeMetadata(m_p);
 }
 
-void NodeMetaRef::reportMetadataChange(const std::string *name)
-{
+void NodeMetaRef::reportMetadataChange(const std::string *name) {
 	SANITY_CHECK(!m_is_local);
 	// Inform other things that the metadata has changed
-	NodeMetadata *meta = dynamic_cast<NodeMetadata*>(getmeta(false));
+	NodeMetadata *meta = dynamic_cast<NodeMetadata *>(getmeta(false));
 
 	// If the metadata is now empty, get rid of it
 	if (meta && meta->empty()) {
@@ -74,12 +71,11 @@ void NodeMetaRef::reportMetadataChange(const std::string *name)
 // Exported functions
 
 // get_inventory(self)
-int NodeMetaRef::l_get_inventory(lua_State *L)
-{
+int NodeMetaRef::l_get_inventory(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	NodeMetaRef *ref = checkObject<NodeMetaRef>(L, 1);
-	ref->getmeta(true);  // try to ensure the metadata exists
+	ref->getmeta(true); // try to ensure the metadata exists
 
 	InventoryLocation loc;
 	loc.setNodeMeta(ref->m_p);
@@ -88,12 +84,11 @@ int NodeMetaRef::l_get_inventory(lua_State *L)
 }
 
 // mark_as_private(self, <string> or {<string>, <string>, ...})
-int NodeMetaRef::l_mark_as_private(lua_State *L)
-{
+int NodeMetaRef::l_mark_as_private(lua_State *L) {
 	MAP_LOCK_REQUIRED;
 
 	NodeMetaRef *ref = checkObject<NodeMetaRef>(L, 1);
-	NodeMetadata *meta = dynamic_cast<NodeMetadata*>(ref->getmeta(true));
+	NodeMetadata *meta = dynamic_cast<NodeMetadata *>(ref->getmeta(true));
 	assert(meta);
 
 	if (lua_istable(L, 2)) {
@@ -113,12 +108,11 @@ int NodeMetaRef::l_mark_as_private(lua_State *L)
 	return 0;
 }
 
-void NodeMetaRef::handleToTable(lua_State *L, IMetadata *_meta)
-{
+void NodeMetaRef::handleToTable(lua_State *L, IMetadata *_meta) {
 	// fields
 	MetaDataRef::handleToTable(L, _meta);
 
-	NodeMetadata *meta = dynamic_cast<NodeMetadata*>(_meta);
+	NodeMetadata *meta = dynamic_cast<NodeMetadata *>(_meta);
 	assert(meta);
 
 	// inventory
@@ -132,13 +126,12 @@ void NodeMetaRef::handleToTable(lua_State *L, IMetadata *_meta)
 }
 
 // from_table(self, table)
-bool NodeMetaRef::handleFromTable(lua_State *L, int table, IMetadata *_meta)
-{
+bool NodeMetaRef::handleFromTable(lua_State *L, int table, IMetadata *_meta) {
 	// fields
 	if (!MetaDataRef::handleFromTable(L, table, _meta))
 		return false;
 
-	NodeMetadata *meta = dynamic_cast<NodeMetadata*>(_meta);
+	NodeMetadata *meta = dynamic_cast<NodeMetadata *>(_meta);
 	assert(meta);
 
 	// inventory
@@ -159,23 +152,19 @@ bool NodeMetaRef::handleFromTable(lua_State *L, int table, IMetadata *_meta)
 	return true;
 }
 
-
-NodeMetaRef::NodeMetaRef(v3s16 p, ServerEnvironment *env):
-	m_p(p),
-	m_env(env)
-{
+NodeMetaRef::NodeMetaRef(v3s16 p, ServerEnvironment *env) :
+		m_p(p),
+		m_env(env) {
 }
 
-NodeMetaRef::NodeMetaRef(IMetadata *meta):
-	m_is_local(true),
-	m_local_meta(meta)
-{
+NodeMetaRef::NodeMetaRef(IMetadata *meta) :
+		m_is_local(true),
+		m_local_meta(meta) {
 }
 
 // Creates an NodeMetaRef and leaves it on top of stack
 // Not callable from Lua; all references are created on the C side.
-void NodeMetaRef::create(lua_State *L, v3s16 p, ServerEnvironment *env)
-{
+void NodeMetaRef::create(lua_State *L, v3s16 p, ServerEnvironment *env) {
 	NodeMetaRef *o = new NodeMetaRef(p, env);
 	//infostream<<"NodeMetaRef::create: o="<<o<<std::endl;
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;
@@ -184,8 +173,7 @@ void NodeMetaRef::create(lua_State *L, v3s16 p, ServerEnvironment *env)
 }
 
 // Client-sided version of the above
-void NodeMetaRef::createClient(lua_State *L, IMetadata *meta)
-{
+void NodeMetaRef::createClient(lua_State *L, IMetadata *meta) {
 	NodeMetaRef *o = new NodeMetaRef(meta);
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;
 	luaL_getmetatable(L, className);
@@ -194,11 +182,9 @@ void NodeMetaRef::createClient(lua_State *L, IMetadata *meta)
 
 const char NodeMetaRef::className[] = "NodeMetaRef";
 
-void NodeMetaRef::Register(lua_State *L)
-{
+void NodeMetaRef::Register(lua_State *L) {
 	registerMetadataClass(L, className, methodsServer);
 }
-
 
 const luaL_Reg NodeMetaRef::methodsServer[] = {
 	luamethod(MetaDataRef, contains),
@@ -215,15 +201,12 @@ const luaL_Reg NodeMetaRef::methodsServer[] = {
 	luamethod(NodeMetaRef, get_inventory),
 	luamethod(NodeMetaRef, mark_as_private),
 	luamethod(MetaDataRef, equals),
-	{0,0}
+	{ 0, 0 }
 };
 
-
-void NodeMetaRef::RegisterClient(lua_State *L)
-{
+void NodeMetaRef::RegisterClient(lua_State *L) {
 	registerMetadataClass(L, className, methodsClient);
 }
-
 
 const luaL_Reg NodeMetaRef::methodsClient[] = {
 	luamethod(MetaDataRef, contains),
@@ -233,5 +216,5 @@ const luaL_Reg NodeMetaRef::methodsClient[] = {
 	luamethod(MetaDataRef, get_float),
 	luamethod(MetaDataRef, get_keys),
 	luamethod(MetaDataRef, to_table),
-	{0,0}
+	{ 0, 0 }
 };

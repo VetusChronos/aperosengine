@@ -23,8 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/string.h"
 #include "guiScrollBar.h"
 
-class GUIScrollContainer : public gui::IGUIElement
-{
+class GUIScrollContainer : public gui::IGUIElement {
 public:
 	GUIScrollContainer(gui::IGUIEnvironment *env, gui::IGUIElement *parent, s32 id,
 			const core::rect<s32> &rectangle, const std::string &orientation,
@@ -34,21 +33,18 @@ public:
 
 	virtual void draw() override;
 
-	inline void onScrollEvent(gui::IGUIElement *caller)
-	{
+	inline void onScrollEvent(gui::IGUIElement *caller) {
 		if (caller == m_scrollbar)
 			updateScrolling();
 	}
 
-	inline void setScrollBar(GUIScrollBar *scrollbar)
-	{
+	inline void setScrollBar(GUIScrollBar *scrollbar) {
 		m_scrollbar = scrollbar;
 		updateScrolling();
 	}
 
 private:
-	enum OrientationEnum
-	{
+	enum OrientationEnum {
 		VERTICAL,
 		HORIZONTAL,
 		UNDEFINED

@@ -25,8 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <quaternion.h>
 #include "util/numeric.h"
 
-class UnitSAO : public ServerActiveObject
-{
+class UnitSAO : public ServerActiveObject {
 public:
 	UnitSAO(ServerEnvironment *env, v3f pos);
 	virtual ~UnitSAO() = default;
@@ -44,8 +43,7 @@ public:
 		setPitchYawRoll(rot, -m_rotation);
 		v3f res;
 		// First rotate by m_rotation, then rotate by the automatic rotate yaw
-		(core::quaternion(v3f(0, -m_rotation_add_yaw * core::DEGTORAD, 0))
-				* core::quaternion(rot.getRotationDegrees() * core::DEGTORAD))
+		(core::quaternion(v3f(0, -m_rotation_add_yaw * core::DEGTORAD, 0)) * core::quaternion(rot.getRotationDegrees() * core::DEGTORAD))
 				.toEuler(res);
 		return res * core::RADTODEG;
 	}
@@ -55,8 +53,7 @@ public:
 	f32 getRadYawDep() const { return (m_rotation.Y + 90.) * core::DEGTORAD; }
 
 	// Armor groups
-	inline bool isImmortal() const
-	{
+	inline bool isImmortal() const {
 		return itemgroup_get(getArmorGroups(), "immortal");
 	}
 	void setArmorGroups(const ItemGroupList &armor_groups);
@@ -72,8 +69,7 @@ public:
 	// Bone position
 	void setBoneOverride(const std::string &bone, const BoneOverride &props);
 	BoneOverride getBoneOverride(const std::string &bone);
-	const std::unordered_map<std::string, BoneOverride>
-			&getBoneOverrides() const { return m_bone_override; };
+	const std::unordered_map<std::string, BoneOverride> &getBoneOverrides() const { return m_bone_override; };
 
 	// Attachments
 	ServerActiveObject *getParent() const;

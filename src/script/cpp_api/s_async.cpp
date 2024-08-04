@@ -36,8 +36,7 @@ extern "C" {
 #include "lua_api/l_base.h"
 
 /******************************************************************************/
-AsyncEngine::~AsyncEngine()
-{
+AsyncEngine::~AsyncEngine() {
 	// Request all threads to stop
 	for (AsyncWorkerThread *workerThread : workerThreads) {
 		workerThread->stop();
@@ -66,15 +65,13 @@ AsyncEngine::~AsyncEngine()
 }
 
 /******************************************************************************/
-void AsyncEngine::registerStateInitializer(StateInitializer func)
-{
+void AsyncEngine::registerStateInitializer(StateInitializer func) {
 	FATAL_ERROR_IF(initDone, "Initializer may not be registered after init");
 	stateInitializers.push_back(func);
 }
 
 /******************************************************************************/
-void AsyncEngine::initialize(unsigned int numEngines)
-{
+void AsyncEngine::initialize(unsigned int numEngines) {
 	initDone = true;
 
 	if (numEngines == 0) {
@@ -83,7 +80,7 @@ void AsyncEngine::initialize(unsigned int numEngines)
 		if (autoscaleMaxWorkers >= 2)
 			autoscaleMaxWorkers -= 2;
 		infostream << "AsyncEngine: using at most " << autoscaleMaxWorkers
-			<< " threads with automatic scaling" << '\n';
+				   << " threads with automatic scaling" << '\n';
 
 		addWorkerThread();
 	} else {
@@ -92,18 +89,16 @@ void AsyncEngine::initialize(unsigned int numEngines)
 	}
 }
 
-void AsyncEngine::addWorkerThread()
-{
+void AsyncEngine::addWorkerThread() {
 	AsyncWorkerThread *toAdd = new AsyncWorkerThread(this,
-		std::string("AsyncWorker-") + itos(workerThreads.size()));
+			std::string("AsyncWorker-") + itos(workerThreads.size()));
 	workerThreads.push_back(toAdd);
 	toAdd->start();
 }
 
 /******************************************************************************/
 u32 AsyncEngine::queueAsyncJob(std::string &&func, std::string &&params,
-		const std::string &mod_origin)
-{
+		const std::string &mod_origin) {
 	MutexAutoLock autolock(jobQueueMutex);
 	u32 jobId = jobIdCounter++;
 
@@ -119,8 +114,7 @@ u32 AsyncEngine::queueAsyncJob(std::string &&func, std::string &&params,
 }
 
 u32 AsyncEngine::queueAsyncJob(std::string &&func, PackedValue *params,
-		const std::string &mod_origin)
-{
+		const std::string &mod_origin) {
 	MutexAutoLock autolock(jobQueueMutex);
 	u32 jobId = jobIdCounter++;
 
@@ -136,8 +130,7 @@ u32 AsyncEngine::queueAsyncJob(std::string &&func, PackedValue *params,
 }
 
 /******************************************************************************/
-bool AsyncEngine::getJob(LuaJobInfo *job)
-{
+bool AsyncEngine::getJob(LuaJobInfo *job) {
 	jobQueueCounter.wait();
 	jobQueueMutex.lock();
 
@@ -154,22 +147,19 @@ bool AsyncEngine::getJob(LuaJobInfo *job)
 }
 
 /******************************************************************************/
-void AsyncEngine::putJobResult(LuaJobInfo &&result)
-{
+void AsyncEngine::putJobResult(LuaJobInfo &&result) {
 	resultQueueMutex.lock();
 	resultQueue.emplace_back(std::move(result));
 	resultQueueMutex.unlock();
 }
 
 /******************************************************************************/
-void AsyncEngine::step(lua_State *L)
-{
+void AsyncEngine::step(lua_State *L) {
 	stepJobResults(L);
 	stepAutoscale();
 }
 
-void AsyncEngine::stepJobResults(lua_State *L)
-{
+void AsyncEngine::stepJobResults(lua_State *L) {
 	int error_handler = PUSH_ERROR_HANDLER(L);
 	lua_getglobal(L, "core");
 
@@ -202,8 +192,7 @@ void AsyncEngine::stepJobResults(lua_State *L)
 	lua_pop(L, 2); // Pop core and error handler
 }
 
-void AsyncEngine::stepAutoscale()
-{
+void AsyncEngine::stepAutoscale() {
 	if (workerThreads.size() >= autoscaleMaxWorkers)
 		return;
 
@@ -237,8 +226,7 @@ void AsyncEngine::stepAutoscale()
 }
 
 /******************************************************************************/
-bool AsyncEngine::prepareEnvironment(lua_State* L, int top)
-{
+bool AsyncEngine::prepareEnvironment(lua_State *L, int top) {
 	for (StateInitializer &stateInitializer : stateInitializers) {
 		stateInitializer(L, top);
 	}
@@ -246,11 +234,11 @@ bool AsyncEngine::prepareEnvironment(lua_State* L, int top)
 	auto *script = ModApiBase::getScriptApiBase(L);
 	try {
 		script->loadMod(Server::getBuiltinLuaPath() + DIR_DELIM + "init.lua",
-			BUILTIN_MOD_NAME);
+				BUILTIN_MOD_NAME);
 		script->checkSetByBuiltin();
 	} catch (const ModError &e) {
 		errorstream << "Execution of async base environment failed: "
-			<< e.what() << '\n';
+					<< e.what() << '\n';
 		FATAL_ERROR("Execution of async base environment failed");
 	}
 
@@ -271,12 +259,11 @@ bool AsyncEngine::prepareEnvironment(lua_State* L, int top)
 }
 
 /******************************************************************************/
-AsyncWorkerThread::AsyncWorkerThread(AsyncEngine* jobDispatcher,
+AsyncWorkerThread::AsyncWorkerThread(AsyncEngine *jobDispatcher,
 		const std::string &name) :
-	ScriptApiBase(ScriptingType::Async),
-	Thread(name),
-	jobDispatcher(jobDispatcher)
-{
+		ScriptApiBase(ScriptingType::Async),
+		Thread(name),
+		jobDispatcher(jobDispatcher) {
 	lua_State *L = getStack();
 
 	if (jobDispatcher->server) {
@@ -302,14 +289,12 @@ AsyncWorkerThread::AsyncWorkerThread(AsyncEngine* jobDispatcher,
 }
 
 /******************************************************************************/
-AsyncWorkerThread::~AsyncWorkerThread()
-{
+AsyncWorkerThread::~AsyncWorkerThread() {
 	sanity_check(!isRunning());
 }
 
 /******************************************************************************/
-void* AsyncWorkerThread::run()
-{
+void *AsyncWorkerThread::run() {
 	if (isErrored)
 		return nullptr;
 
@@ -317,7 +302,7 @@ void* AsyncWorkerThread::run()
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
 
-	auto report_error = [this] (const ModError &e) {
+	auto report_error = [this](const ModError &e) {
 		if (jobDispatcher->server)
 			jobDispatcher->server->setAsyncFatalError(e.what());
 		else
@@ -377,15 +362,14 @@ void* AsyncWorkerThread::run()
 			}
 		}
 
-		lua_pop(L, 1);  // Pop retval
+		lua_pop(L, 1); // Pop retval
 
 		// Put job result
 		if (result == 0)
 			jobDispatcher->putJobResult(std::move(j));
 	}
 
-	lua_pop(L, 2);  // Pop core and error handler
+	lua_pop(L, 2); // Pop core and error handler
 
 	return 0;
 }
-

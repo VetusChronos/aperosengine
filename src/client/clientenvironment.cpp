@@ -44,16 +44,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 ClientEnvironment::ClientEnvironment(ClientMap *map,
-	ITextureSource *texturesource, Client *client):
-	Environment(client),
-	m_map(map),
-	m_texturesource(texturesource),
-	m_client(client)
-{
+		ITextureSource *texturesource, Client *client) :
+		Environment(client),
+		m_map(map),
+		m_texturesource(texturesource),
+		m_client(client) {
 }
 
-ClientEnvironment::~ClientEnvironment()
-{
+ClientEnvironment::~ClientEnvironment() {
 	m_ao_manager.clear();
 
 	for (auto &simple_object : m_simple_objects) {
@@ -66,29 +64,25 @@ ClientEnvironment::~ClientEnvironment()
 	delete m_local_player;
 }
 
-Map & ClientEnvironment::getMap()
-{
+Map &ClientEnvironment::getMap() {
 	return *m_map;
 }
 
-ClientMap & ClientEnvironment::getClientMap()
-{
+ClientMap &ClientEnvironment::getClientMap() {
 	return *m_map;
 }
 
-void ClientEnvironment::setLocalPlayer(LocalPlayer *player)
-{
+void ClientEnvironment::setLocalPlayer(LocalPlayer *player) {
 	/*
 		It is a failure if already is a local player
 	*/
 	FATAL_ERROR_IF(m_local_player != NULL,
-		"Local player already allocated");
+			"Local player already allocated");
 
 	m_local_player = player;
 }
 
-void ClientEnvironment::step(float dtime)
-{
+void ClientEnvironment::step(float dtime) {
 	/* Step time of day */
 	stepTimeOfDay(dtime);
 
@@ -113,20 +107,20 @@ void ClientEnvironment::step(float dtime)
 		Maximum position increment
 	*/
 	//f32 position_max_increment = 0.05*BS;
-	f32 position_max_increment = 0.1*BS;
+	f32 position_max_increment = 0.1 * BS;
 
 	// Maximum time increment (for collision detection etc)
 	// time = distance / speed
 	f32 dtime_max_increment = 1;
-	if(player_speed > 0.001)
+	if (player_speed > 0.001)
 		dtime_max_increment = position_max_increment / player_speed;
 
 	// Maximum time increment is 10ms or lower
-	if(dtime_max_increment > 0.01)
+	if (dtime_max_increment > 0.01)
 		dtime_max_increment = 0.01;
 
 	// Don't allow overly huge dtime
-	if(dtime > 0.5)
+	if (dtime > 0.5)
 		dtime = 0.5;
 
 	/*
@@ -183,7 +177,7 @@ void ClientEnvironment::step(float dtime)
 				if (in_liquid_stable)
 					dl = MYMIN(dl, fluidity_smooth);
 				dl *= (lplayer->move_resistance * resistance_factor) +
-					(1 - resistance_factor);
+						(1 - resistance_factor);
 				v3f d = d_wanted.normalize() * (dl * dtime_part * 100.0f);
 				speed += d;
 
@@ -197,7 +191,7 @@ void ClientEnvironment::step(float dtime)
 		*/
 
 		lplayer->move(dtime_part, this, position_max_increment,
-			&player_collisions);
+				&player_collisions);
 	}
 
 	bool player_immortal = false;
@@ -206,13 +200,14 @@ void ClientEnvironment::step(float dtime)
 	if (playercao) {
 		player_immortal = playercao->isImmortal();
 		int addp_p = itemgroup_get(playercao->getGroups(),
-			"fall_damage_add_percent");
+				"fall_damage_add_percent");
 		// convert armor group into an usable fall damage factor
 		player_fall_factor = 1.0f + (float)addp_p / 100.0f;
 	}
 
 	for (const CollisionInfo &info : player_collisions) {
-		v3f speed_diff = info.new_speed - info.old_speed;;
+		v3f speed_diff = info.new_speed - info.old_speed;
+		;
 		// Handle only fall damage
 		// (because otherwise walking against something in fast_move kills you)
 		if (speed_diff.Y < 0 || info.old_speed.Y >= 0)
@@ -221,10 +216,9 @@ void ClientEnvironment::step(float dtime)
 		speed_diff.X = 0;
 		speed_diff.Z = 0;
 		f32 pre_factor = 1; // 1 hp per node/s
-		f32 tolerance = BS*14; // 5 without damage
+		f32 tolerance = BS * 14; // 5 without damage
 		if (info.type == COLLISION_NODE) {
-			const ContentFeatures &f = m_client->ndef()->
-				get(m_map->getNode(info.node_p));
+			const ContentFeatures &f = m_client->ndef()->get(m_map->getNode(info.node_p));
 			// Determine fall damage modifier
 			int addp_n = itemgroup_get(f.groups, "fall_damage_add_percent");
 			// convert node group to an usable fall damage factor
@@ -240,7 +234,7 @@ void ClientEnvironment::step(float dtime)
 			if (damage != 0) {
 				damageLocalPlayer(damage, true);
 				m_client->getEventManager()->put(
-					new SimpleTriggerEvent(MtEvent::PLAYER_FALLING_DAMAGE));
+						new SimpleTriggerEvent(MtEvent::PLAYER_FALLING_DAMAGE));
 			}
 		}
 	}
@@ -270,7 +264,7 @@ void ClientEnvironment::step(float dtime)
 	*/
 
 	bool update_lighting = m_active_object_light_update_interval.step(dtime, 0.21);
-	auto cb_state = [this, dtime, update_lighting, day_night_ratio] (ClientActiveObject *cao) {
+	auto cb_state = [this, dtime, update_lighting, day_night_ratio](ClientActiveObject *cao) {
 		// Step object
 		cao->step(dtime, this);
 
@@ -288,32 +282,28 @@ void ClientEnvironment::step(float dtime)
 		ClientSimpleObject *simple = *i;
 
 		simple->step(dtime);
-		if(simple->m_to_be_removed) {
+		if (simple->m_to_be_removed) {
 			delete simple;
 			i = m_simple_objects.erase(i);
-		}
-		else {
+		} else {
 			++i;
 		}
 	}
 }
 
-void ClientEnvironment::addSimpleObject(ClientSimpleObject *simple)
-{
+void ClientEnvironment::addSimpleObject(ClientSimpleObject *simple) {
 	m_simple_objects.push_back(simple);
 }
 
-GenericCAO* ClientEnvironment::getGenericCAO(u16 id)
-{
+GenericCAO *ClientEnvironment::getGenericCAO(u16 id) {
 	ClientActiveObject *obj = getActiveObject(id);
 	if (obj && obj->getType() == ACTIVEOBJECT_TYPE_GENERIC)
-		return (GenericCAO*) obj;
+		return (GenericCAO *)obj;
 
 	return NULL;
 }
 
-u16 ClientEnvironment::addActiveObject(std::unique_ptr<ClientActiveObject> object)
-{
+u16 ClientEnvironment::addActiveObject(std::unique_ptr<ClientActiveObject> object) {
 	auto obj = object.get();
 	// Register object. If failed return zero id
 	if (!m_ao_manager.registerObject(std::move(object)))
@@ -327,14 +317,13 @@ u16 ClientEnvironment::addActiveObject(std::unique_ptr<ClientActiveObject> objec
 }
 
 void ClientEnvironment::addActiveObject(u16 id, u8 type,
-	const std::string &init_data)
-{
+		const std::string &init_data) {
 	std::unique_ptr<ClientActiveObject> obj =
-		ClientActiveObject::create((ActiveObjectType) type, m_client, this);
+			ClientActiveObject::create((ActiveObjectType)type, m_client, this);
 	if (!obj) {
-		infostream<<"ClientEnvironment::addActiveObject(): "
-			<<"id="<<id<<" type="<<type<<": Couldn't create object"
-			<<std::endl;
+		infostream << "ClientEnvironment::addActiveObject(): "
+				   << "id=" << id << " type=" << type << ": Couldn't create object"
+				   << std::endl;
 		return;
 	}
 
@@ -342,13 +331,13 @@ void ClientEnvironment::addActiveObject(u16 id, u8 type,
 
 	try {
 		obj->initialize(init_data);
-	} catch(SerializationError &e) {
-		errorstream<<"ClientEnvironment::addActiveObject():"
-			<<" id="<<id<<" type="<<type
-			<<": SerializationError in initialize(): "
-			<<e.what()
-			<<": init_data="<<serializeJsonString(init_data)
-			<<std::endl;
+	} catch (SerializationError &e) {
+		errorstream << "ClientEnvironment::addActiveObject():"
+					<< " id=" << id << " type=" << type
+					<< ": SerializationError in initialize(): "
+					<< e.what()
+					<< ": init_data=" << serializeJsonString(init_data)
+					<< std::endl;
 	}
 
 	u16 new_id = addActiveObject(std::move(obj));
@@ -364,9 +353,7 @@ void ClientEnvironment::addActiveObject(u16 id, u8 type,
 	}
 }
 
-
-void ClientEnvironment::removeActiveObject(u16 id)
-{
+void ClientEnvironment::removeActiveObject(u16 id) {
 	// Get current attachment childs to detach them visually
 	std::unordered_set<int> attachment_childs;
 	if (auto *obj = getActiveObject(id))
@@ -381,23 +368,22 @@ void ClientEnvironment::removeActiveObject(u16 id)
 	}
 }
 
-void ClientEnvironment::processActiveObjectMessage(u16 id, const std::string &data)
-{
+void ClientEnvironment::processActiveObjectMessage(u16 id, const std::string &data) {
 	ClientActiveObject *obj = getActiveObject(id);
 	if (obj == NULL) {
 		infostream << "ClientEnvironment::processActiveObjectMessage():"
-			<< " got message for id=" << id << ", which doesn't exist."
-			<< '\n';
+				   << " got message for id=" << id << ", which doesn't exist."
+				   << '\n';
 		return;
 	}
 
 	try {
 		obj->processMessage(data);
 	} catch (SerializationError &e) {
-		errorstream<<"ClientEnvironment::processActiveObjectMessage():"
-			<< " id=" << id << " type=" << obj->getType()
-			<< " SerializationError in processMessage(): " << e.what()
-			<< '\n';
+		errorstream << "ClientEnvironment::processActiveObjectMessage():"
+					<< " id=" << id << " type=" << obj->getType()
+					<< " SerializationError in processMessage(): " << e.what()
+					<< '\n';
 	}
 }
 
@@ -405,8 +391,7 @@ void ClientEnvironment::processActiveObjectMessage(u16 id, const std::string &da
 	Callbacks for activeobjects
 */
 
-void ClientEnvironment::damageLocalPlayer(u16 damage, bool handle_hp)
-{
+void ClientEnvironment::damageLocalPlayer(u16 damage, bool handle_hp) {
 	LocalPlayer *lplayer = getLocalPlayer();
 	assert(lplayer);
 
@@ -428,8 +413,7 @@ void ClientEnvironment::damageLocalPlayer(u16 damage, bool handle_hp)
 	Client likes to call these
 */
 
-ClientEnvEvent ClientEnvironment::getClientEnvEvent()
-{
+ClientEnvEvent ClientEnvironment::getClientEnvEvent() {
 	FATAL_ERROR_IF(m_client_event_queue.empty(),
 			"ClientEnvironment::getClientEnvEvent(): queue is empty");
 
@@ -439,10 +423,9 @@ ClientEnvEvent ClientEnvironment::getClientEnvEvent()
 }
 
 void ClientEnvironment::getSelectedActiveObjects(
-	const core::line3d<f32> &shootline_on_map,
-	std::vector<PointedThing> &objects,
-	const std::optional<Pointabilities> &pointabilities)
-{
+		const core::line3d<f32> &shootline_on_map,
+		std::vector<PointedThing> &objects,
+		const std::optional<Pointabilities> &pointabilities) {
 	auto allObjects = m_ao_manager.getActiveSelectableObjects(shootline_on_map);
 	const v3f line_vector = shootline_on_map.getVector();
 
@@ -456,26 +439,26 @@ void ClientEnvironment::getSelectedActiveObjects(
 		v3f current_normal, current_raw_normal;
 		const v3f rel_pos = shootline_on_map.start - obj->getPosition();
 		bool collision;
-		GenericCAO* gcao = dynamic_cast<GenericCAO*>(obj);
+		GenericCAO *gcao = dynamic_cast<GenericCAO *>(obj);
 		if (gcao != nullptr && gcao->getProperties().rotate_selectionbox) {
 			gcao->getSceneNode()->updateAbsolutePosition();
 			const v3f deg = obj->getSceneNode()->getAbsoluteTransformation().getRotationDegrees();
 			collision = boxLineCollision(selection_box, deg,
-				rel_pos, line_vector, &current_intersection, &current_normal, &current_raw_normal);
+					rel_pos, line_vector, &current_intersection, &current_normal, &current_raw_normal);
 		} else {
 			collision = boxLineCollision(selection_box, rel_pos, line_vector,
-				&current_intersection, &current_normal);
+					&current_intersection, &current_normal);
 			current_raw_normal = current_normal;
 		}
 		if (collision) {
 			PointabilityType pointable;
 			if (pointabilities) {
 				if (gcao->isPlayer()) {
-					pointable = pointabilities->matchPlayer(gcao->getGroups()).value_or(
-							gcao->getProperties().pointable);
+					pointable = pointabilities->matchPlayer(gcao->getGroups()).value_or(gcao->getProperties().pointable);
 				} else {
 					pointable = pointabilities->matchObject(gcao->getName(),
-							gcao->getGroups()).value_or(gcao->getProperties().pointable);
+													  gcao->getGroups())
+										.value_or(gcao->getProperties().pointable);
 				}
 			} else {
 				pointable = gcao->getProperties().pointable;
@@ -483,21 +466,19 @@ void ClientEnvironment::getSelectedActiveObjects(
 			if (pointable != PointabilityType::POINTABLE_NOT) {
 				current_intersection += obj->getPosition();
 				objects.emplace_back(obj->getId(), current_intersection, current_normal, current_raw_normal,
-					(current_intersection - shootline_on_map.start).getLengthSQ(), pointable);
+						(current_intersection - shootline_on_map.start).getLengthSQ(), pointable);
 			}
 		}
 	}
 }
 
-void ClientEnvironment::updateFrameTime(bool is_paused)
-{
+void ClientEnvironment::updateFrameTime(bool is_paused) {
 	// if paused, m_frame_time_pause_accumulator increases by dtime,
 	// otherwise, m_frame_time increases by dtime
 	if (is_paused) {
 		m_frame_dtime = 0;
 		m_frame_time_pause_accumulator = porting::getTimeMs() - m_frame_time;
-	}
-	else {
+	} else {
 		auto new_frame_time = porting::getTimeMs() - m_frame_time_pause_accumulator;
 		m_frame_dtime = new_frame_time - MYMAX(m_frame_time, m_frame_time_pause_accumulator);
 		m_frame_time = new_frame_time;

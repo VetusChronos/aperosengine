@@ -73,7 +73,6 @@ public:
 	virtual void resolveNodeNames();
 };
 
-
 ////
 //// BiomeGen
 ////
@@ -101,8 +100,7 @@ public:
 	virtual BiomeGen *clone(BiomeManager *biomemgr) const = 0;
 
 	// Check that the internal chunk size is what the mapgen expects, just to be sure.
-	inline void assertChunkSize(v3s16 expect) const
-	{
+	inline void assertChunkSize(v3s16 expect) const {
 		FATAL_ERROR_IF(m_csize != expect, "Chunk size mismatches");
 	}
 
@@ -140,7 +138,6 @@ protected:
 	v3s16 m_csize;
 };
 
-
 ////
 //// BiomeGen implementations
 ////
@@ -151,11 +148,10 @@ protected:
 
 struct BiomeParamsOriginal : public BiomeParams {
 	BiomeParamsOriginal() :
-		np_heat(50, 50, v3f(1000.0, 1000.0, 1000.0), 5349, 3, 0.5, 2.0),
-		np_humidity(50, 50, v3f(1000.0, 1000.0, 1000.0), 842, 3, 0.5, 2.0),
-		np_heat_blend(0, 1.5, v3f(8.0, 8.0, 8.0), 13, 2, 1.0, 2.0),
-		np_humidity_blend(0, 1.5, v3f(8.0, 8.0, 8.0), 90003, 2, 1.0, 2.0)
-	{
+			np_heat(50, 50, v3f(1000.0, 1000.0, 1000.0), 5349, 3, 0.5, 2.0),
+			np_humidity(50, 50, v3f(1000.0, 1000.0, 1000.0), 842, 3, 0.5, 2.0),
+			np_heat_blend(0, 1.5, v3f(8.0, 8.0, 8.0), 13, 2, 1.0, 2.0),
+			np_humidity_blend(0, 1.5, v3f(8.0, 8.0, 8.0), 90003, 2, 1.0, 2.0) {
 	}
 
 	virtual void readParams(const Settings *settings);
@@ -170,7 +166,7 @@ struct BiomeParamsOriginal : public BiomeParams {
 class BiomeGenOriginal : public BiomeGen {
 public:
 	BiomeGenOriginal(BiomeManager *biomemgr,
-		const BiomeParamsOriginal *params, v3s16 chunksize);
+			const BiomeParamsOriginal *params, v3s16 chunksize);
 	virtual ~BiomeGenOriginal();
 
 	BiomeGenType getType() const { return BIOMEGEN_ORIGINAL; }
@@ -203,7 +199,6 @@ private:
 	Noise *noise_humidity_blend;
 };
 
-
 ////
 //// BiomeManager
 ////
@@ -215,42 +210,37 @@ public:
 
 	BiomeManager *clone() const;
 
-	const char *getObjectTitle() const
-	{
+	const char *getObjectTitle() const {
 		return "biome";
 	}
 
-	static Biome *create(BiomeType type)
-	{
+	static Biome *create(BiomeType type) {
 		return new Biome;
 	}
 
-	BiomeGen *createBiomeGen(BiomeGenType type, BiomeParams *params, v3s16 chunksize)
-	{
+	BiomeGen *createBiomeGen(BiomeGenType type, BiomeParams *params, v3s16 chunksize) {
 		switch (type) {
-		case BIOMEGEN_ORIGINAL:
-			return new BiomeGenOriginal(this,
-				(BiomeParamsOriginal *)params, chunksize);
-		default:
-			return NULL;
+			case BIOMEGEN_ORIGINAL:
+				return new BiomeGenOriginal(this,
+						(BiomeParamsOriginal *)params, chunksize);
+			default:
+				return NULL;
 		}
 	}
 
-	static BiomeParams *createBiomeParams(BiomeGenType type)
-	{
+	static BiomeParams *createBiomeParams(BiomeGenType type) {
 		switch (type) {
-		case BIOMEGEN_ORIGINAL:
-			return new BiomeParamsOriginal;
-		default:
-			return NULL;
+			case BIOMEGEN_ORIGINAL:
+				return new BiomeParamsOriginal;
+			default:
+				return NULL;
 		}
 	}
 
 	virtual void clear();
 
 private:
-	BiomeManager() {};
+	BiomeManager(){};
 
 	Server *m_server;
-
 };

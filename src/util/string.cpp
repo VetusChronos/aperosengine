@@ -34,40 +34,41 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <unordered_map>
 
 #ifndef _WIN32
-	#include <iconv.h>
+#include <iconv.h>
 #else
-	#include <windows.h>
+#include <windows.h>
 #endif
 
 #ifndef _WIN32
 
 namespace {
-	class IconvSmartPointer {
-		iconv_t m_cd;
-		static const iconv_t null_value;
-	public:
-		IconvSmartPointer() : m_cd(null_value) {}
-		~IconvSmartPointer() { reset(); }
+class IconvSmartPointer {
+	iconv_t m_cd;
+	static const iconv_t null_value;
 
-		DISABLE_CLASS_COPY(IconvSmartPointer)
-		ALLOW_CLASS_MOVE(IconvSmartPointer)
+public:
+	IconvSmartPointer() :
+			m_cd(null_value) {}
+	~IconvSmartPointer() { reset(); }
 
-		iconv_t get() const { return m_cd; }
-		operator bool() const { return m_cd != null_value; }
-		void reset(iconv_t cd = null_value) {
-			if (m_cd != null_value)
-				iconv_close(m_cd);
-			m_cd = cd;
-		}
-	};
+	DISABLE_CLASS_COPY(IconvSmartPointer)
+	ALLOW_CLASS_MOVE(IconvSmartPointer)
 
-	// note that this can't be constexpr if iconv_t is a pointer
-	const iconv_t IconvSmartPointer::null_value = (iconv_t) -1;
-}
+	iconv_t get() const { return m_cd; }
+	operator bool() const { return m_cd != null_value; }
+	void reset(iconv_t cd = null_value) {
+		if (m_cd != null_value)
+			iconv_close(m_cd);
+		m_cd = cd;
+	}
+};
+
+// note that this can't be constexpr if iconv_t is a pointer
+const iconv_t IconvSmartPointer::null_value = (iconv_t)-1;
+} //namespace
 
 static bool convert(iconv_t cd, char *outbuf, size_t *outbuf_size,
-	char *inbuf, size_t inbuf_size)
-{
+		char *inbuf, size_t inbuf_size) {
 	// reset conversion state
 	iconv(cd, nullptr, nullptr, nullptr, nullptr);
 
@@ -89,7 +90,7 @@ static bool convert(iconv_t cd, char *outbuf, size_t *outbuf_size,
 }
 
 // select right encoding for wchar_t size
-constexpr auto DEFAULT_ENCODING = ([] () -> const char* {
+constexpr auto DEFAULT_ENCODING = ([]() -> const char * {
 	constexpr auto sz = sizeof(wchar_t);
 	static_assert(sz == 2 || sz == 4, "Unexpected wide char size");
 	if constexpr (sz == 2) {
@@ -99,8 +100,7 @@ constexpr auto DEFAULT_ENCODING = ([] () -> const char* {
 	}
 })();
 
-std::wstring utf8_to_wide(std::string_view input)
-{
+std::wstring utf8_to_wide(std::string_view input) {
 	thread_local IconvSmartPointer cd;
 	if (!cd)
 		cd.reset(iconv_open(DEFAULT_ENCODING, "UTF-8"));
@@ -114,10 +114,10 @@ std::wstring utf8_to_wide(std::string_view input)
 	std::wstring out;
 	out.resize(outbuf_size / sizeof(wchar_t));
 
-	char *outbuf = reinterpret_cast<char*>(&out[0]);
+	char *outbuf = reinterpret_cast<char *>(&out[0]);
 	if (!convert(cd.get(), outbuf, &outbuf_size, inbuf, inbuf_size)) {
 		infostream << "Couldn't convert UTF-8 string 0x" << hex_encode(input)
-			<< " into wstring" << '\n';
+				   << " into wstring" << '\n';
 		delete[] inbuf;
 		return L"<invalid UTF-8 string>";
 	}
@@ -127,8 +127,7 @@ std::wstring utf8_to_wide(std::string_view input)
 	return out;
 }
 
-std::string wide_to_utf8(std::wstring_view input)
-{
+std::string wide_to_utf8(std::wstring_view input) {
 	thread_local IconvSmartPointer cd;
 	if (!cd)
 		cd.reset(iconv_open("UTF-8", DEFAULT_ENCODING));
@@ -144,7 +143,7 @@ std::string wide_to_utf8(std::wstring_view input)
 
 	if (!convert(cd.get(), &out[0], &outbuf_size, inbuf, inbuf_size)) {
 		infostream << "Couldn't convert wstring 0x" << hex_encode(inbuf, inbuf_size)
-			<< " into UTF-8 string" << '\n';
+				   << " into UTF-8 string" << '\n';
 		delete[] inbuf;
 		return "<invalid wide string>";
 	}
@@ -156,25 +155,23 @@ std::string wide_to_utf8(std::wstring_view input)
 
 #else // _WIN32
 
-std::wstring utf8_to_wide(std::string_view input)
-{
+std::wstring utf8_to_wide(std::string_view input) {
 	size_t outbuf_size = input.size() + 1;
 	wchar_t *outbuf = new wchar_t[outbuf_size];
 	memset(outbuf, 0, outbuf_size * sizeof(wchar_t));
 	MultiByteToWideChar(CP_UTF8, 0, input.data(), input.size(),
-		outbuf, outbuf_size);
+			outbuf, outbuf_size);
 	std::wstring out(outbuf);
 	delete[] outbuf;
 	return out;
 }
 
-std::string wide_to_utf8(std::wstring_view input)
-{
+std::string wide_to_utf8(std::wstring_view input) {
 	size_t outbuf_size = (input.size() + 1) * 6;
 	char *outbuf = new char[outbuf_size];
 	memset(outbuf, 0, outbuf_size);
 	WideCharToMultiByte(CP_UTF8, 0, input.data(), input.size(),
-		outbuf, outbuf_size, NULL, NULL);
+			outbuf, outbuf_size, NULL, NULL);
 	std::string out(outbuf);
 	delete[] outbuf;
 	return out;
@@ -182,9 +179,7 @@ std::string wide_to_utf8(std::wstring_view input)
 
 #endif // _WIN32
 
-
-std::string urlencode(std::string_view str)
-{
+std::string urlencode(std::string_view str) {
 	// Encodes reserved URI characters by a percent sign
 	// followed by two hex digits. See RFC 3986, section 2.3.
 	static const char url_hex_chars[] = "0123456789ABCDEF";
@@ -201,16 +196,15 @@ std::string urlencode(std::string_view str)
 	return oss.str();
 }
 
-std::string urldecode(std::string_view str)
-{
+std::string urldecode(std::string_view str) {
 	// Inverse of urlencode
 	std::ostringstream oss(std::ios::binary);
 	for (u32 i = 0; i < str.size(); i++) {
 		unsigned char highvalue, lowvalue;
 		if (str[i] == '%' &&
-				hex_digit_decode(str[i+1], highvalue) &&
-				hex_digit_decode(str[i+2], lowvalue)) {
-			oss << (char) ((highvalue << 4) | lowvalue);
+				hex_digit_decode(str[i + 1], highvalue) &&
+				hex_digit_decode(str[i + 2], lowvalue)) {
+			oss << (char)((highvalue << 4) | lowvalue);
 			i += 2;
 		} else {
 			oss << str[i];
@@ -219,8 +213,7 @@ std::string urldecode(std::string_view str)
 	return oss.str();
 }
 
-u32 readFlagString(std::string str, const FlagDesc *flagdesc, u32 *flagmask)
-{
+u32 readFlagString(std::string str, const FlagDesc *flagdesc, u32 *flagmask) {
 	u32 result = 0;
 	u32 mask = 0;
 	char *s = &str[0];
@@ -255,8 +248,7 @@ u32 readFlagString(std::string str, const FlagDesc *flagdesc, u32 *flagmask)
 	return result;
 }
 
-std::string writeFlagString(u32 flags, const FlagDesc *flagdesc, u32 flagmask)
-{
+std::string writeFlagString(u32 flags, const FlagDesc *flagdesc, u32 flagmask) {
 	std::string result;
 
 	for (int i = 0; flagdesc[i].name; i++) {
@@ -276,9 +268,8 @@ std::string writeFlagString(u32 flags, const FlagDesc *flagdesc, u32 flagmask)
 	return result;
 }
 
-size_t mystrlcpy(char *dst, const char *src, size_t size) noexcept
-{
-	size_t srclen  = strlen(src) + 1;
+size_t mystrlcpy(char *dst, const char *src, size_t size) noexcept {
+	size_t srclen = strlen(src) + 1;
 	size_t copylen = MYMIN(srclen, size);
 
 	if (copylen > 0) {
@@ -289,8 +280,7 @@ size_t mystrlcpy(char *dst, const char *src, size_t size) noexcept
 	return srclen;
 }
 
-char *mystrtok_r(char *s, const char *sep, char **lasts) noexcept
-{
+char *mystrtok_r(char *s, const char *sep, char **lasts) noexcept {
 	char *t;
 
 	if (!s)
@@ -315,8 +305,7 @@ char *mystrtok_r(char *s, const char *sep, char **lasts) noexcept
 	return s;
 }
 
-u64 read_seed(const char *str)
-{
+u64 read_seed(const char *str) {
 	char *endptr;
 	u64 num;
 
@@ -332,9 +321,8 @@ u64 read_seed(const char *str)
 }
 
 static bool parseHexColorString(const std::string &value, video::SColor &color,
-		unsigned char default_alpha)
-{
-	u8 components[] = {0x00, 0x00, 0x00, default_alpha}; // R,G,B,A
+		unsigned char default_alpha) {
+	u8 components[] = { 0x00, 0x00, 0x00, default_alpha }; // R,G,B,A
 
 	size_t len = value.size();
 	bool short_form;
@@ -356,7 +344,7 @@ static bool parseHexColorString(const std::string &value, video::SColor &color,
 		} else {
 			u8 d1, d2;
 			if (!hex_digit_decode(value[pos], d1) ||
-					!hex_digit_decode(value[pos+1], d2))
+					!hex_digit_decode(value[pos + 1], d2))
 				return false;
 
 			components[cc] = (d1 & 0xf) << 4 | (d2 & 0xf);
@@ -373,158 +361,157 @@ static bool parseHexColorString(const std::string &value, video::SColor &color,
 }
 
 const static std::unordered_map<std::string, u32> s_named_colors = {
-	{"aliceblue",            0xf0f8ff},
-	{"antiquewhite",         0xfaebd7},
-	{"aqua",                 0x00ffff},
-	{"aquamarine",           0x7fffd4},
-	{"azure",                0xf0ffff},
-	{"beige",                0xf5f5dc},
-	{"bisque",               0xffe4c4},
-	{"black",                00000000},
-	{"blanchedalmond",       0xffebcd},
-	{"blue",                 0x0000ff},
-	{"blueviolet",           0x8a2be2},
-	{"brown",                0xa52a2a},
-	{"burlywood",            0xdeb887},
-	{"cadetblue",            0x5f9ea0},
-	{"chartreuse",           0x7fff00},
-	{"chocolate",            0xd2691e},
-	{"coral",                0xff7f50},
-	{"cornflowerblue",       0x6495ed},
-	{"cornsilk",             0xfff8dc},
-	{"crimson",              0xdc143c},
-	{"cyan",                 0x00ffff},
-	{"darkblue",             0x00008b},
-	{"darkcyan",             0x008b8b},
-	{"darkgoldenrod",        0xb8860b},
-	{"darkgray",             0xa9a9a9},
-	{"darkgreen",            0x006400},
-	{"darkgrey",             0xa9a9a9},
-	{"darkkhaki",            0xbdb76b},
-	{"darkmagenta",          0x8b008b},
-	{"darkolivegreen",       0x556b2f},
-	{"darkorange",           0xff8c00},
-	{"darkorchid",           0x9932cc},
-	{"darkred",              0x8b0000},
-	{"darksalmon",           0xe9967a},
-	{"darkseagreen",         0x8fbc8f},
-	{"darkslateblue",        0x483d8b},
-	{"darkslategray",        0x2f4f4f},
-	{"darkslategrey",        0x2f4f4f},
-	{"darkturquoise",        0x00ced1},
-	{"darkviolet",           0x9400d3},
-	{"deeppink",             0xff1493},
-	{"deepskyblue",          0x00bfff},
-	{"dimgray",              0x696969},
-	{"dimgrey",              0x696969},
-	{"dodgerblue",           0x1e90ff},
-	{"firebrick",            0xb22222},
-	{"floralwhite",          0xfffaf0},
-	{"forestgreen",          0x228b22},
-	{"fuchsia",              0xff00ff},
-	{"gainsboro",            0xdcdcdc},
-	{"ghostwhite",           0xf8f8ff},
-	{"gold",                 0xffd700},
-	{"goldenrod",            0xdaa520},
-	{"gray",                 0x808080},
-	{"green",                0x008000},
-	{"greenyellow",          0xadff2f},
-	{"grey",                 0x808080},
-	{"honeydew",             0xf0fff0},
-	{"hotpink",              0xff69b4},
-	{"indianred",            0xcd5c5c},
-	{"indigo",               0x4b0082},
-	{"ivory",                0xfffff0},
-	{"khaki",                0xf0e68c},
-	{"lavender",             0xe6e6fa},
-	{"lavenderblush",        0xfff0f5},
-	{"lawngreen",            0x7cfc00},
-	{"lemonchiffon",         0xfffacd},
-	{"lightblue",            0xadd8e6},
-	{"lightcoral",           0xf08080},
-	{"lightcyan",            0xe0ffff},
-	{"lightgoldenrodyellow", 0xfafad2},
-	{"lightgray",            0xd3d3d3},
-	{"lightgreen",           0x90ee90},
-	{"lightgrey",            0xd3d3d3},
-	{"lightpink",            0xffb6c1},
-	{"lightsalmon",          0xffa07a},
-	{"lightseagreen",        0x20b2aa},
-	{"lightskyblue",         0x87cefa},
-	{"lightslategray",       0x778899},
-	{"lightslategrey",       0x778899},
-	{"lightsteelblue",       0xb0c4de},
-	{"lightyellow",          0xffffe0},
-	{"lime",                 0x00ff00},
-	{"limegreen",            0x32cd32},
-	{"linen",                0xfaf0e6},
-	{"magenta",              0xff00ff},
-	{"maroon",               0x800000},
-	{"mediumaquamarine",     0x66cdaa},
-	{"mediumblue",           0x0000cd},
-	{"mediumorchid",         0xba55d3},
-	{"mediumpurple",         0x9370db},
-	{"mediumseagreen",       0x3cb371},
-	{"mediumslateblue",      0x7b68ee},
-	{"mediumspringgreen",    0x00fa9a},
-	{"mediumturquoise",      0x48d1cc},
-	{"mediumvioletred",      0xc71585},
-	{"midnightblue",         0x191970},
-	{"mintcream",            0xf5fffa},
-	{"mistyrose",            0xffe4e1},
-	{"moccasin",             0xffe4b5},
-	{"navajowhite",          0xffdead},
-	{"navy",                 0x000080},
-	{"oldlace",              0xfdf5e6},
-	{"olive",                0x808000},
-	{"olivedrab",            0x6b8e23},
-	{"orange",               0xffa500},
-	{"orangered",            0xff4500},
-	{"orchid",               0xda70d6},
-	{"palegoldenrod",        0xeee8aa},
-	{"palegreen",            0x98fb98},
-	{"paleturquoise",        0xafeeee},
-	{"palevioletred",        0xdb7093},
-	{"papayawhip",           0xffefd5},
-	{"peachpuff",            0xffdab9},
-	{"peru",                 0xcd853f},
-	{"pink",                 0xffc0cb},
-	{"plum",                 0xdda0dd},
-	{"powderblue",           0xb0e0e6},
-	{"purple",               0x800080},
-	{"rebeccapurple",        0x663399},
-	{"red",                  0xff0000},
-	{"rosybrown",            0xbc8f8f},
-	{"royalblue",            0x4169e1},
-	{"saddlebrown",          0x8b4513},
-	{"salmon",               0xfa8072},
-	{"sandybrown",           0xf4a460},
-	{"seagreen",             0x2e8b57},
-	{"seashell",             0xfff5ee},
-	{"sienna",               0xa0522d},
-	{"silver",               0xc0c0c0},
-	{"skyblue",              0x87ceeb},
-	{"slateblue",            0x6a5acd},
-	{"slategray",            0x708090},
-	{"slategrey",            0x708090},
-	{"snow",                 0xfffafa},
-	{"springgreen",          0x00ff7f},
-	{"steelblue",            0x4682b4},
-	{"tan",                  0xd2b48c},
-	{"teal",                 0x008080},
-	{"thistle",              0xd8bfd8},
-	{"tomato",               0xff6347},
-	{"turquoise",            0x40e0d0},
-	{"violet",               0xee82ee},
-	{"wheat",                0xf5deb3},
-	{"white",                0xffffff},
-	{"whitesmoke",           0xf5f5f5},
-	{"yellow",               0xffff00},
-	{"yellowgreen",          0x9acd32}
+	{ "aliceblue", 0xf0f8ff },
+	{ "antiquewhite", 0xfaebd7 },
+	{ "aqua", 0x00ffff },
+	{ "aquamarine", 0x7fffd4 },
+	{ "azure", 0xf0ffff },
+	{ "beige", 0xf5f5dc },
+	{ "bisque", 0xffe4c4 },
+	{ "black", 00000000 },
+	{ "blanchedalmond", 0xffebcd },
+	{ "blue", 0x0000ff },
+	{ "blueviolet", 0x8a2be2 },
+	{ "brown", 0xa52a2a },
+	{ "burlywood", 0xdeb887 },
+	{ "cadetblue", 0x5f9ea0 },
+	{ "chartreuse", 0x7fff00 },
+	{ "chocolate", 0xd2691e },
+	{ "coral", 0xff7f50 },
+	{ "cornflowerblue", 0x6495ed },
+	{ "cornsilk", 0xfff8dc },
+	{ "crimson", 0xdc143c },
+	{ "cyan", 0x00ffff },
+	{ "darkblue", 0x00008b },
+	{ "darkcyan", 0x008b8b },
+	{ "darkgoldenrod", 0xb8860b },
+	{ "darkgray", 0xa9a9a9 },
+	{ "darkgreen", 0x006400 },
+	{ "darkgrey", 0xa9a9a9 },
+	{ "darkkhaki", 0xbdb76b },
+	{ "darkmagenta", 0x8b008b },
+	{ "darkolivegreen", 0x556b2f },
+	{ "darkorange", 0xff8c00 },
+	{ "darkorchid", 0x9932cc },
+	{ "darkred", 0x8b0000 },
+	{ "darksalmon", 0xe9967a },
+	{ "darkseagreen", 0x8fbc8f },
+	{ "darkslateblue", 0x483d8b },
+	{ "darkslategray", 0x2f4f4f },
+	{ "darkslategrey", 0x2f4f4f },
+	{ "darkturquoise", 0x00ced1 },
+	{ "darkviolet", 0x9400d3 },
+	{ "deeppink", 0xff1493 },
+	{ "deepskyblue", 0x00bfff },
+	{ "dimgray", 0x696969 },
+	{ "dimgrey", 0x696969 },
+	{ "dodgerblue", 0x1e90ff },
+	{ "firebrick", 0xb22222 },
+	{ "floralwhite", 0xfffaf0 },
+	{ "forestgreen", 0x228b22 },
+	{ "fuchsia", 0xff00ff },
+	{ "gainsboro", 0xdcdcdc },
+	{ "ghostwhite", 0xf8f8ff },
+	{ "gold", 0xffd700 },
+	{ "goldenrod", 0xdaa520 },
+	{ "gray", 0x808080 },
+	{ "green", 0x008000 },
+	{ "greenyellow", 0xadff2f },
+	{ "grey", 0x808080 },
+	{ "honeydew", 0xf0fff0 },
+	{ "hotpink", 0xff69b4 },
+	{ "indianred", 0xcd5c5c },
+	{ "indigo", 0x4b0082 },
+	{ "ivory", 0xfffff0 },
+	{ "khaki", 0xf0e68c },
+	{ "lavender", 0xe6e6fa },
+	{ "lavenderblush", 0xfff0f5 },
+	{ "lawngreen", 0x7cfc00 },
+	{ "lemonchiffon", 0xfffacd },
+	{ "lightblue", 0xadd8e6 },
+	{ "lightcoral", 0xf08080 },
+	{ "lightcyan", 0xe0ffff },
+	{ "lightgoldenrodyellow", 0xfafad2 },
+	{ "lightgray", 0xd3d3d3 },
+	{ "lightgreen", 0x90ee90 },
+	{ "lightgrey", 0xd3d3d3 },
+	{ "lightpink", 0xffb6c1 },
+	{ "lightsalmon", 0xffa07a },
+	{ "lightseagreen", 0x20b2aa },
+	{ "lightskyblue", 0x87cefa },
+	{ "lightslategray", 0x778899 },
+	{ "lightslategrey", 0x778899 },
+	{ "lightsteelblue", 0xb0c4de },
+	{ "lightyellow", 0xffffe0 },
+	{ "lime", 0x00ff00 },
+	{ "limegreen", 0x32cd32 },
+	{ "linen", 0xfaf0e6 },
+	{ "magenta", 0xff00ff },
+	{ "maroon", 0x800000 },
+	{ "mediumaquamarine", 0x66cdaa },
+	{ "mediumblue", 0x0000cd },
+	{ "mediumorchid", 0xba55d3 },
+	{ "mediumpurple", 0x9370db },
+	{ "mediumseagreen", 0x3cb371 },
+	{ "mediumslateblue", 0x7b68ee },
+	{ "mediumspringgreen", 0x00fa9a },
+	{ "mediumturquoise", 0x48d1cc },
+	{ "mediumvioletred", 0xc71585 },
+	{ "midnightblue", 0x191970 },
+	{ "mintcream", 0xf5fffa },
+	{ "mistyrose", 0xffe4e1 },
+	{ "moccasin", 0xffe4b5 },
+	{ "navajowhite", 0xffdead },
+	{ "navy", 0x000080 },
+	{ "oldlace", 0xfdf5e6 },
+	{ "olive", 0x808000 },
+	{ "olivedrab", 0x6b8e23 },
+	{ "orange", 0xffa500 },
+	{ "orangered", 0xff4500 },
+	{ "orchid", 0xda70d6 },
+	{ "palegoldenrod", 0xeee8aa },
+	{ "palegreen", 0x98fb98 },
+	{ "paleturquoise", 0xafeeee },
+	{ "palevioletred", 0xdb7093 },
+	{ "papayawhip", 0xffefd5 },
+	{ "peachpuff", 0xffdab9 },
+	{ "peru", 0xcd853f },
+	{ "pink", 0xffc0cb },
+	{ "plum", 0xdda0dd },
+	{ "powderblue", 0xb0e0e6 },
+	{ "purple", 0x800080 },
+	{ "rebeccapurple", 0x663399 },
+	{ "red", 0xff0000 },
+	{ "rosybrown", 0xbc8f8f },
+	{ "royalblue", 0x4169e1 },
+	{ "saddlebrown", 0x8b4513 },
+	{ "salmon", 0xfa8072 },
+	{ "sandybrown", 0xf4a460 },
+	{ "seagreen", 0x2e8b57 },
+	{ "seashell", 0xfff5ee },
+	{ "sienna", 0xa0522d },
+	{ "silver", 0xc0c0c0 },
+	{ "skyblue", 0x87ceeb },
+	{ "slateblue", 0x6a5acd },
+	{ "slategray", 0x708090 },
+	{ "slategrey", 0x708090 },
+	{ "snow", 0xfffafa },
+	{ "springgreen", 0x00ff7f },
+	{ "steelblue", 0x4682b4 },
+	{ "tan", 0xd2b48c },
+	{ "teal", 0x008080 },
+	{ "thistle", 0xd8bfd8 },
+	{ "tomato", 0xff6347 },
+	{ "turquoise", 0x40e0d0 },
+	{ "violet", 0xee82ee },
+	{ "wheat", 0xf5deb3 },
+	{ "white", 0xffffff },
+	{ "whitesmoke", 0xf5f5f5 },
+	{ "yellow", 0xffff00 },
+	{ "yellowgreen", 0x9acd32 }
 };
 
-static bool parseNamedColorString(const std::string &value, video::SColor &color)
-{
+static bool parseNamedColorString(const std::string &value, video::SColor &color) {
 	std::string color_name;
 	std::string alpha_string;
 
@@ -562,8 +549,7 @@ static bool parseNamedColorString(const std::string &value, video::SColor &color
 			color_temp |= ((d & 0xf) << 4 | (d & 0xf)) << 24;
 		} else if (alpha_string.size() == 2) {
 			u8 d1, d2;
-			if (!hex_digit_decode(alpha_string[0], d1)
-					|| !hex_digit_decode(alpha_string[1], d2))
+			if (!hex_digit_decode(alpha_string[0], d1) || !hex_digit_decode(alpha_string[1], d2))
 				return false;
 
 			color_temp |= ((d1 & 0xf) << 4 | (d2 & 0xf)) << 24;
@@ -580,8 +566,7 @@ static bool parseNamedColorString(const std::string &value, video::SColor &color
 }
 
 bool parseColorString(const std::string &value, video::SColor &color, bool quiet,
-		unsigned char default_alpha)
-{
+		unsigned char default_alpha) {
 	bool success;
 
 	if (value[0] == '#')
@@ -595,8 +580,7 @@ bool parseColorString(const std::string &value, video::SColor &color, bool quiet
 	return success;
 }
 
-std::string encodeHexColorString(video::SColor color)
-{
+std::string encodeHexColorString(video::SColor color) {
 	std::string color_string = "#";
 	const char red = color.getRed();
 	const char green = color.getGreen();
@@ -609,13 +593,11 @@ std::string encodeHexColorString(video::SColor color)
 	return color_string;
 }
 
-void str_replace(std::string &str, char from, char to)
-{
+void str_replace(std::string &str, char from, char to) {
 	std::replace(str.begin(), str.end(), from, to);
 }
 
-std::string wrap_rows(std::string_view from, unsigned row_len, bool has_color_codes)
-{
+std::string wrap_rows(std::string_view from, unsigned row_len, bool has_color_codes) {
 	std::string to;
 	to.reserve(from.size());
 	std::string last_color_code;
@@ -674,8 +656,7 @@ static void translate_all(const std::wstring &s, size_t &i,
 		Translations *translations, std::wstring &res);
 
 static void translate_string(const std::wstring &s, Translations *translations,
-		const std::wstring &textdomain, size_t &i, std::wstring &res)
-{
+		const std::wstring &textdomain, size_t &i, std::wstring &res) {
 	std::wostringstream output;
 	std::vector<std::wstring> args;
 	int arg_number = 1;
@@ -743,7 +724,7 @@ static void translate_string(const std::wstring &s, Translations *translations,
 			// This is an escape sequence *inside* the template string to translate itself.
 			// This should not happen, show an error message.
 			errorstream << "Ignoring escape sequence '"
-				<< wide_to_utf8(escape_sequence) << "' in translation" << '\n';
+						<< wide_to_utf8(escape_sequence) << "' in translation" << '\n';
 		}
 	}
 
@@ -788,8 +769,7 @@ static void translate_string(const std::wstring &s, Translations *translations,
 }
 
 static void translate_all(const std::wstring &s, size_t &i,
-		Translations *translations, std::wstring &res)
-{
+		Translations *translations, std::wstring &res) {
 	res.clear();
 	res.reserve(s.length());
 	while (i < s.length()) {
@@ -849,8 +829,7 @@ static void translate_all(const std::wstring &s, size_t &i,
 }
 
 // Translate string server side
-std::wstring translate_string(const std::wstring &s, Translations *translations)
-{
+std::wstring translate_string(const std::wstring &s, Translations *translations) {
 	size_t i = 0;
 	std::wstring res;
 	translate_all(s, i, translations, res);
@@ -858,8 +837,7 @@ std::wstring translate_string(const std::wstring &s, Translations *translations)
 }
 
 // Translate string client side
-std::wstring translate_string(const std::wstring &s)
-{
+std::wstring translate_string(const std::wstring &s) {
 #ifdef SERVER
 	return translate_string(s, nullptr);
 #else
@@ -909,9 +887,7 @@ static const std::array<std::wstring_view, 30> disallowed_dir_names = {
  */
 static const std::wstring_view disallowed_path_chars = L"<>:\"/\\|?*.";
 
-
-std::string sanitizeDirName(std::string_view str, std::string_view optional_prefix)
-{
+std::string sanitizeDirName(std::string_view str, std::string_view optional_prefix) {
 	std::wstring safe_name = utf8_to_wide(str);
 
 	for (auto &disallowed_name : disallowed_dir_names) {
@@ -939,8 +915,7 @@ std::string sanitizeDirName(std::string_view str, std::string_view optional_pref
 		if (safe_name[i] < 32) {
 			is_valid = false;
 		} else if (safe_name[i] < 128) {
-			is_valid = disallowed_path_chars.find_first_of(safe_name[i])
-					== std::wstring::npos;
+			is_valid = disallowed_path_chars.find_first_of(safe_name[i]) == std::wstring::npos;
 		}
 
 		if (!is_valid)
@@ -950,9 +925,7 @@ std::string sanitizeDirName(std::string_view str, std::string_view optional_pref
 	return wide_to_utf8(safe_name);
 }
 
-
-void safe_print_string(std::ostream &os, std::string_view str)
-{
+void safe_print_string(std::ostream &os, std::string_view str) {
 	std::ostream::fmtflags flags = os.flags();
 	os << std::hex;
 	for (const char c : str) {
@@ -966,9 +939,7 @@ void safe_print_string(std::ostream &os, std::string_view str)
 	os.setf(flags);
 }
 
-
-v3f str_to_v3f(std::string_view str)
-{
+v3f str_to_v3f(std::string_view str) {
 	v3f value;
 	Strfnd f(str);
 	f.next("(");

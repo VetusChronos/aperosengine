@@ -34,13 +34,11 @@ extern Clouds *g_menuclouds;
 // Scene manager used for menu clouds
 extern scene::ISceneManager *g_menucloudsmgr;
 
-class Clouds : public scene::ISceneNode
-{
+class Clouds : public scene::ISceneNode {
 public:
-	Clouds(scene::ISceneManager* mgr, IShaderSource *ssrc,
+	Clouds(scene::ISceneManager *mgr, IShaderSource *ssrc,
 			s32 id,
-			u32 seed
-	);
+			u32 seed);
 
 	~Clouds();
 
@@ -52,18 +50,15 @@ public:
 
 	virtual void render();
 
-	virtual const aabb3f &getBoundingBox() const
-	{
+	virtual const aabb3f &getBoundingBox() const {
 		return m_box;
 	}
 
-	virtual u32 getMaterialCount() const
-	{
+	virtual u32 getMaterialCount() const {
 		return 1;
 	}
 
-	virtual video::SMaterial& getMaterial(u32 i)
-	{
+	virtual video::SMaterial &getMaterial(u32 i) {
 		return m_material;
 	}
 
@@ -75,34 +70,29 @@ public:
 
 	void update(const v3f &camera_p, const video::SColorf &color);
 
-	void updateCameraOffset(v3s16 camera_offset)
-	{
+	void updateCameraOffset(v3s16 camera_offset) {
 		m_camera_offset = camera_offset;
 		updateBox();
 	}
 
 	void readSettings();
 
-	void setDensity(float density)
-	{
+	void setDensity(float density) {
 		if (m_params.density == density)
 			return;
 		m_params.density = density;
 		invalidateMesh();
 	}
 
-	void setColorBright(video::SColor color_bright)
-	{
+	void setColorBright(video::SColor color_bright) {
 		m_params.color_bright = color_bright;
 	}
 
-	void setColorAmbient(video::SColor color_ambient)
-	{
+	void setColorAmbient(video::SColor color_ambient) {
 		m_params.color_ambient = color_ambient;
 	}
 
-	void setHeight(float height)
-	{
+	void setHeight(float height) {
 		if (m_params.height == height)
 			return;
 		m_params.height = height;
@@ -110,13 +100,11 @@ public:
 		invalidateMesh();
 	}
 
-	void setSpeed(v2f speed)
-	{
+	void setSpeed(v2f speed) {
 		m_params.speed = speed;
 	}
 
-	void setThickness(float thickness)
-	{
+	void setThickness(float thickness) {
 		if (m_params.thickness == thickness)
 			return;
 		m_params.thickness = thickness;
@@ -129,17 +117,15 @@ public:
 	const video::SColor getColor() const { return m_color.toSColor(); }
 
 private:
-	void updateBox()
-	{
-		float height_bs    = m_params.height    * BS;
+	void updateBox() {
+		float height_bs = m_params.height * BS;
 		float thickness_bs = m_params.thickness * BS;
 		m_box = aabb3f(-BS * 1000000.0f, height_bs - BS * m_camera_offset.Y, -BS * 1000000.0f,
 				BS * 1000000.0f, height_bs + thickness_bs - BS * m_camera_offset.Y, BS * 1000000.0f);
 	}
 
 	void updateMesh();
-	void invalidateMesh()
-	{
+	void invalidateMesh() {
 		m_mesh_valid = false;
 	}
 

@@ -28,14 +28,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class IItemDefManager;
 class ServerEnvironment;
 
-class ServerInventoryManager : public InventoryManager
-{
+class ServerInventoryManager : public InventoryManager {
 public:
 	ServerInventoryManager();
 	virtual ~ServerInventoryManager() = default;
 
-	void setEnv(ServerEnvironment *env)
-	{
+	void setEnv(ServerEnvironment *env) {
 		assert(!m_env);
 		m_env = env;
 	}
@@ -54,8 +52,7 @@ public:
 			std::function<void(const std::string &, Inventory *)> apply_cb);
 
 protected:
-	struct DetachedInventory
-	{
+	struct DetachedInventory {
 		std::unique_ptr<Inventory> inventory;
 		std::string owner;
 	};

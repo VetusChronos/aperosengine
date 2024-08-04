@@ -27,12 +27,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class Inventory;
 class IItemDefManager;
 
-class ItemStackMetadata : public SimpleMetadata
-{
+class ItemStackMetadata : public SimpleMetadata {
 public:
-	ItemStackMetadata():
-			toolcaps_overridden(false)
-	{}
+	ItemStackMetadata() :
+			toolcaps_overridden(false) {}
 
 	// Overrides
 	void clear() override;
@@ -42,19 +40,16 @@ public:
 	void deSerialize(std::istream &is);
 
 	const ToolCapabilities &getToolCapabilities(
-			const ToolCapabilities &default_caps) const
-	{
+			const ToolCapabilities &default_caps) const {
 		return toolcaps_overridden ? toolcaps_override : default_caps;
 	}
 
 	void setToolCapabilities(const ToolCapabilities &caps);
 	void clearToolCapabilities();
 
-	const std::optional<WearBarParams> &getWearBarParamOverride() const
-	{
+	const std::optional<WearBarParams> &getWearBarParamOverride() const {
 		return wear_bar_override;
 	}
-
 
 	void setWearBarParams(const WearBarParams &params);
 	void clearWearBarParams();

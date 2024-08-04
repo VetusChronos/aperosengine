@@ -27,10 +27,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "server.h"
 #include "script/common/c_content.h"
 
-
 void ScriptApiEnv::environment_OnGenerated(v3s16 minp, v3s16 maxp,
-	u32 blockseed)
-{
+		u32 blockseed) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_generateds
@@ -43,8 +41,7 @@ void ScriptApiEnv::environment_OnGenerated(v3s16 minp, v3s16 maxp,
 	runCallbacks(3, RUN_CALLBACKS_MODE_FIRST);
 }
 
-void ScriptApiEnv::environment_Step(float dtime)
-{
+void ScriptApiEnv::environment_Step(float dtime) {
 	SCRIPTAPI_PRECHECKHEADER
 	//infostream << "scriptapi_environment_step" << '\n';
 
@@ -56,8 +53,7 @@ void ScriptApiEnv::environment_Step(float dtime)
 	runCallbacks(1, RUN_CALLBACKS_MODE_FIRST);
 }
 
-void ScriptApiEnv::player_event(ServerActiveObject *player, const std::string &type)
-{
+void ScriptApiEnv::player_event(ServerActiveObject *player, const std::string &type) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	if (player == NULL)
@@ -68,13 +64,12 @@ void ScriptApiEnv::player_event(ServerActiveObject *player, const std::string &t
 	lua_getfield(L, -1, "registered_playerevents");
 
 	// Call callbacks
-	objectrefGetOrCreate(L, player);   // player
-	lua_pushstring(L,type.c_str()); // event type
+	objectrefGetOrCreate(L, player); // player
+	lua_pushstring(L, type.c_str()); // event type
 	runCallbacks(2, RUN_CALLBACKS_MODE_FIRST);
 }
 
-void ScriptApiEnv::initializeEnvironment(ServerEnvironment *env)
-{
+void ScriptApiEnv::initializeEnvironment(ServerEnvironment *env) {
 	SCRIPTAPI_PRECHECKHEADER
 	verbosestream << "ScriptApiEnv: Environment initialized" << '\n';
 	setEnv(env);
@@ -152,7 +147,7 @@ void ScriptApiEnv::initializeEnvironment(ServerEnvironment *env)
 		lua_pop(L, 1);
 
 		LuaABM *abm = new LuaABM(L, id, trigger_contents, required_neighbors,
-			trigger_interval, trigger_chance, simple_catch_up, min_y, max_y);
+				trigger_interval, trigger_chance, simple_catch_up, min_y, max_y);
 
 		env->addActiveBlockModifier(abm);
 
@@ -197,15 +192,15 @@ void ScriptApiEnv::initializeEnvironment(ServerEnvironment *env)
 		std::string name;
 		getstringfield(L, current_lbm, "name", name);
 
-		bool run_at_every_load = getboolfield_default(L, current_lbm, "run_at_every_load", 
-			false);
+		bool run_at_every_load = getboolfield_default(L, current_lbm, "run_at_every_load",
+				false);
 
 		lua_getfield(L, current_lbm, "action");
 		luaL_checktype(L, current_lbm + 1, LUA_TFUNCTION);
 		lua_pop(L, 1);
 
 		LuaLBM *lbm = new LuaLBM(L, id, trigger_contents, name,
-			run_at_every_load);
+				run_at_every_load);
 
 		env->addLoadingBlockModifierDef(lbm);
 
@@ -216,8 +211,7 @@ void ScriptApiEnv::initializeEnvironment(ServerEnvironment *env)
 }
 
 void ScriptApiEnv::on_emerge_area_completion(
-	v3s16 blockpos, int action, ScriptCallbackState *state)
-{
+		v3s16 blockpos, int action, ScriptCallbackState *state) {
 	Server *server = getServer();
 
 	// This function should be executed with envlock held.
@@ -257,8 +251,7 @@ void ScriptApiEnv::on_emerge_area_completion(
 	}
 }
 
-void ScriptApiEnv::check_for_falling(v3s16 p)
-{
+void ScriptApiEnv::check_for_falling(v3s16 p) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -270,8 +263,7 @@ void ScriptApiEnv::check_for_falling(v3s16 p)
 }
 
 void ScriptApiEnv::on_liquid_transformed(
-	const std::vector<std::pair<v3s16, MapNode>> &list)
-{
+		const std::vector<std::pair<v3s16, MapNode>> &list) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_liquid_transformed
@@ -282,13 +274,14 @@ void ScriptApiEnv::on_liquid_transformed(
 
 	// Skip converting list and calling hook if there are
 	// no registered callbacks.
-	if(lua_objlen(L, -1) < 1) return;
+	if (lua_objlen(L, -1) < 1)
+		return;
 
 	// Convert the list to a pos array and a node array for lua
 	int index = 1;
 	lua_createtable(L, list.size(), 0);
 	lua_createtable(L, list.size(), 0);
-	for(std::pair<v3s16, MapNode> p : list) {
+	for (std::pair<v3s16, MapNode> p : list) {
 		lua_pushnumber(L, index);
 		push_v3s16(L, p.first);
 		lua_rawset(L, -4);
@@ -300,8 +293,7 @@ void ScriptApiEnv::on_liquid_transformed(
 	runCallbacks(2, RUN_CALLBACKS_MODE_FIRST);
 }
 
-void ScriptApiEnv::on_mapblocks_changed(const std::unordered_set<v3s16> &set)
-{
+void ScriptApiEnv::on_mapblocks_changed(const std::unordered_set<v3s16> &set) {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_mapblocks_changed
@@ -312,7 +304,7 @@ void ScriptApiEnv::on_mapblocks_changed(const std::unordered_set<v3s16> &set)
 
 	// Convert the set to a set of position hashes
 	lua_createtable(L, 0, set.size());
-	for(const v3s16 &p : set) {
+	for (const v3s16 &p : set) {
 		lua_pushnumber(L, hash_node_position(p));
 		lua_pushboolean(L, true);
 		lua_rawset(L, -3);
@@ -322,8 +314,7 @@ void ScriptApiEnv::on_mapblocks_changed(const std::unordered_set<v3s16> &set)
 	runCallbacks(2, RUN_CALLBACKS_MODE_FIRST);
 }
 
-bool ScriptApiEnv::has_on_mapblocks_changed()
-{
+bool ScriptApiEnv::has_on_mapblocks_changed() {
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_mapblocks_changed

@@ -24,13 +24,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/shader.h"
 #include "client/camera.h"
 
-InitInterlacedMaskStep::InitInterlacedMaskStep(TextureBuffer *_buffer, u8 _index)	:
-	buffer(_buffer), index(_index)
-{
+InitInterlacedMaskStep::InitInterlacedMaskStep(TextureBuffer *_buffer, u8 _index) :
+		buffer(_buffer), index(_index) {
 }
 
-void InitInterlacedMaskStep::run(PipelineContext &context)
-{
+void InitInterlacedMaskStep::run(PipelineContext &context) {
 	video::ITexture *mask = buffer->getTexture(index);
 	if (!mask)
 		return;
@@ -48,8 +46,7 @@ void InitInterlacedMaskStep::run(PipelineContext &context)
 	mask->unlock();
 }
 
-void populateInterlacedPipeline(RenderPipeline *pipeline, Client *client)
-{
+void populateInterlacedPipeline(RenderPipeline *pipeline, Client *client) {
 	static const u8 TEXTURE_LEFT = 0;
 	static const u8 TEXTURE_RIGHT = 1;
 	static const u8 TEXTURE_MASK = 2;

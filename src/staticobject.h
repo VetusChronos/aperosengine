@@ -28,8 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class ServerActiveObject;
 
-struct StaticObject
-{
+struct StaticObject {
 	u8 type = 0;
 	v3f pos;
 	std::string data;
@@ -41,15 +40,13 @@ struct StaticObject
 	void deSerialize(std::istream &is, u8 version);
 };
 
-class StaticObjectList
-{
+class StaticObjectList {
 public:
 	/*
 		Inserts an object to the container.
 		Id must be unique (active) or 0 (stored).
 	*/
-	void insert(u16 id, const StaticObject &obj)
-	{
+	void insert(u16 id, const StaticObject &obj) {
 		if (id == 0) {
 			m_stored.push_back(obj);
 		} else {
@@ -62,8 +59,7 @@ public:
 		}
 	}
 
-	void remove(u16 id)
-	{
+	void remove(u16 id) {
 		assert(id != 0); // Pre-condition
 		if (m_active.find(id) == m_active.end()) {
 			warningstream << "StaticObjectList::remove(): id=" << id << " not found"
@@ -77,7 +73,7 @@ public:
 	void deSerialize(std::istream &is);
 
 	// Never permit to modify outside of here. Only this object is responsible of m_stored and m_active modifications
-	const std::vector<StaticObject>& getAllStored() const { return m_stored; }
+	const std::vector<StaticObject> &getAllStored() const { return m_stored; }
 	const std::map<u16, StaticObject> &getAllActives() const { return m_active; }
 
 	inline void setActive(u16 id, const StaticObject &obj) { m_active[id] = obj; }
@@ -88,14 +84,12 @@ public:
 
 	bool storeActiveObject(u16 id);
 
-	inline void clear()
-	{
+	inline void clear() {
 		m_active.clear();
 		m_stored.clear();
 	}
 
-	inline size_t size()
-	{
+	inline size_t size() {
 		return m_active.size() + m_stored.size();
 	}
 

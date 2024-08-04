@@ -27,36 +27,32 @@ extern "C" {
 
 #include "exceptions.h"
 
-struct EnumString
-{
+struct EnumString {
 	int num;
 	const char *str;
 };
 
-class StackUnroller
-{
+class StackUnroller {
 private:
 	lua_State *m_lua;
 	int m_original_top;
+
 public:
-	StackUnroller(lua_State *L):
-		m_lua(L),
-		m_original_top(-1)
-	{
+	StackUnroller(lua_State *L) :
+			m_lua(L),
+			m_original_top(-1) {
 		m_original_top = lua_gettop(m_lua); // store stack height
 	}
-	~StackUnroller()
-	{
+	~StackUnroller() {
 		lua_settop(m_lua, m_original_top); // restore stack height
 	}
 };
 
-class LuaError : public ModError
-{
+class LuaError : public ModError {
 public:
-	LuaError(const std::string &s) : ModError(s) {}
+	LuaError(const std::string &s) :
+			ModError(s) {}
 };
-
 
 extern EnumString es_ItemType[];
 extern EnumString es_TouchInteractionMode[];

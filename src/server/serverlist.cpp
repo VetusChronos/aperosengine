@@ -29,8 +29,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "httpfetch.h"
 #include "server.h"
 
-namespace ServerList
-{
+namespace ServerList {
 #if USE_CURL
 void sendAnnounce(AnnounceAction action,
 		const u16 port,
@@ -41,9 +40,8 @@ void sendAnnounce(AnnounceAction action,
 		const std::string &gameid,
 		const std::string &mg_name,
 		const std::vector<ModSpec> &mods,
-		bool dedicated)
-{
-	static const char *aa_names[] = {"start", "update", "delete"};
+		bool dedicated) {
+	static const char *aa_names[] = { "start", "update", "delete" };
 	Json::Value server;
 	server["action"] = aa_names[action];
 	server["port"] = port;
@@ -51,20 +49,20 @@ void sendAnnounce(AnnounceAction action,
 		server["address"] = g_settings->get("server_address");
 	}
 	if (action != AA_DELETE) {
-		server["name"]         = g_settings->get("server_name");
-		server["description"]  = g_settings->get("server_description");
-		server["version"]      = g_version_string;
-		server["proto_min"]    = Server::getProtocolVersionMin();
-		server["proto_max"]    = Server::getProtocolVersionMax();
-		server["url"]          = g_settings->get("server_url");
-		server["creative"]     = g_settings->getBool("creative_mode");
-		server["damage"]       = g_settings->getBool("enable_damage");
-		server["password"]     = g_settings->getBool("disallow_empty_password");
-		server["pvp"]          = g_settings->getBool("enable_pvp");
-		server["uptime"]       = (int) uptime;
-		server["game_time"]    = game_time;
-		server["clients"]      = (int) clients_names.size();
-		server["clients_max"]  = g_settings->getU16("max_users");
+		server["name"] = g_settings->get("server_name");
+		server["description"] = g_settings->get("server_description");
+		server["version"] = g_version_string;
+		server["proto_min"] = Server::getProtocolVersionMin();
+		server["proto_max"] = Server::getProtocolVersionMax();
+		server["url"] = g_settings->get("server_url");
+		server["creative"] = g_settings->getBool("creative_mode");
+		server["damage"] = g_settings->getBool("enable_damage");
+		server["password"] = g_settings->getBool("disallow_empty_password");
+		server["pvp"] = g_settings->getBool("enable_pvp");
+		server["uptime"] = (int)uptime;
+		server["game_time"] = game_time;
+		server["clients"] = (int)clients_names.size();
+		server["clients_max"] = g_settings->getU16("max_users");
 		server["clients_list"] = Json::Value(Json::arrayValue);
 		for (const std::string &clients_name : clients_names) {
 			server["clients_list"].append(clients_name);
@@ -74,12 +72,12 @@ void sendAnnounce(AnnounceAction action,
 	}
 
 	if (action == AA_START) {
-		server["dedicated"]         = dedicated;
-		server["rollback"]          = g_settings->getBool("enable_rollback_recording");
-		server["mapgen"]            = mg_name;
-		server["privs"]             = g_settings->get("default_privs");
+		server["dedicated"] = dedicated;
+		server["rollback"] = g_settings->getBool("enable_rollback_recording");
+		server["mapgen"] = mg_name;
+		server["privs"] = g_settings->get("default_privs");
 		server["can_see_far_names"] = g_settings->getS16("player_transfer_distance") <= 0;
-		server["mods"]              = Json::Value(Json::arrayValue);
+		server["mods"] = Json::Value(Json::arrayValue);
 		for (const ModSpec &mod : mods) {
 			server["mods"].append(mod.name);
 		}
@@ -89,11 +87,9 @@ void sendAnnounce(AnnounceAction action,
 	}
 
 	if (action == AA_START) {
-		actionstream << "Announcing " << aa_names[action] << " to " <<
-			g_settings->get("serverlist_url") << '\n';
+		actionstream << "Announcing " << aa_names[action] << " to " << g_settings->get("serverlist_url") << '\n';
 	} else {
-		infostream << "Announcing " << aa_names[action] << " to " <<
-			g_settings->get("serverlist_url") << '\n';
+		infostream << "Announcing " << aa_names[action] << " to " << g_settings->get("serverlist_url") << '\n';
 	}
 
 	HTTPFetchRequest fetch_request;

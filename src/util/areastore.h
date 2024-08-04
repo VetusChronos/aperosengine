@@ -28,20 +28,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/container.h"
 #include "util/numeric.h"
 #ifndef ANDROID
-	#include "cmake_config.h"
+#include "cmake_config.h"
 #endif
 #if USE_SPATIAL
-	#include <spatialindex/SpatialIndex.h>
-	#include "util/serialize.h"
+#include <spatialindex/SpatialIndex.h>
+#include "util/serialize.h"
 #endif
 
-
 struct Area {
-	Area(u32 area_id) : id(area_id) {}
+	Area(u32 area_id) :
+			id(area_id) {}
 
 	Area(const v3s16 &mine, const v3s16 &maxe, u32 area_id = U32_MAX) :
-		id(area_id), minedge(mine), maxedge(maxe)
-	{
+			id(area_id), minedge(mine), maxedge(maxe) {
 		sortBoxVerticies(minedge, maxedge);
 	}
 
@@ -50,18 +49,16 @@ struct Area {
 	std::string data;
 };
 
-
 class AreaStore {
 public:
 	AreaStore() :
-		m_res_cache(1000, &cacheMiss, this)
-	{}
+			m_res_cache(1000, &cacheMiss, this) {}
 
 	virtual ~AreaStore() = default;
 
 	static AreaStore *getOptimalImplementation();
 
-	virtual void reserve(size_t count) {};
+	virtual void reserve(size_t count){};
 	size_t size() const { return areas_map.size(); }
 
 	/// Add an area to the store.
@@ -81,7 +78,7 @@ public:
 	/// by the passed edges.  If @p accept_overlap is true this finds any
 	/// areas that intersect with the passed area at any point.
 	virtual void getAreasInArea(std::vector<Area *> *result,
-		v3s16 minedge, v3s16 maxedge, bool accept_overlap) = 0;
+			v3s16 minedge, v3s16 maxedge, bool accept_overlap) = 0;
 
 	/// Sets cache parameters.
 	void setCacheParams(bool enabled, u8 block_radius, size_t limit);
@@ -124,9 +121,8 @@ private:
 	/// Range, in nodes, of the getAreasForPos cache.
 	/// If you modify this, call invalidateCache()
 	u8 m_cacheblock_radius = 64;
-	LRUCache<v3s16, std::vector<Area *> > m_res_cache;
+	LRUCache<v3s16, std::vector<Area *>> m_res_cache;
 };
-
 
 class VectorAreaStore : public AreaStore {
 public:
@@ -134,7 +130,7 @@ public:
 	virtual bool insertArea(Area *a);
 	virtual bool removeArea(u32 id);
 	virtual void getAreasInArea(std::vector<Area *> *result,
-		v3s16 minedge, v3s16 maxedge, bool accept_overlap);
+			v3s16 minedge, v3s16 maxedge, bool accept_overlap);
 
 protected:
 	virtual void getAreasForPosImpl(std::vector<Area *> *result, v3s16 pos);
@@ -142,7 +138,6 @@ protected:
 private:
 	std::vector<Area *> m_areas;
 };
-
 
 #if USE_SPATIAL
 
@@ -154,7 +149,7 @@ public:
 	virtual bool insertArea(Area *a);
 	virtual bool removeArea(u32 id);
 	virtual void getAreasInArea(std::vector<Area *> *result,
-		v3s16 minedge, v3s16 maxedge, bool accept_overlap);
+			v3s16 minedge, v3s16 maxedge, bool accept_overlap);
 
 protected:
 	virtual void getAreasForPosImpl(std::vector<Area *> *result, v3s16 pos);
@@ -166,15 +161,13 @@ private:
 	class VectorResultVisitor : public SpatialIndex::IVisitor {
 	public:
 		VectorResultVisitor(std::vector<Area *> *result, SpatialAreaStore *store) :
-			m_store(store),
-			m_result(result)
-		{}
+				m_store(store),
+				m_result(result) {}
 		~VectorResultVisitor() {}
 
 		virtual void visitNode(const SpatialIndex::INode &in) {}
 
-		virtual void visitData(const SpatialIndex::IData &in)
-		{
+		virtual void visitData(const SpatialIndex::IData &in) {
 			u32 id = in.getIdentifier();
 
 			std::map<u32, Area>::iterator itr = m_store->areas_map.find(id);
@@ -182,8 +175,7 @@ private:
 			m_result->push_back(&itr->second);
 		}
 
-		virtual void visitData(std::vector<const SpatialIndex::IData *> &v)
-		{
+		virtual void visitData(std::vector<const SpatialIndex::IData *> &v) {
 			for (size_t i = 0; i < v.size(); i++)
 				visitData(*(v[i]));
 		}
