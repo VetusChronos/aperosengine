@@ -99,7 +99,7 @@ static void print_modified_quicktune_values();
 
 static void list_game_ids();
 static void list_worlds(bool print_name, bool print_path);
-static bool setup_log_params(const Settings &cmd_args);
+static bool setup_log_params(const Settings &cmd_args, UDPSocket &udp_socket);
 static bool create_userdata_path();
 static bool use_debugger(int argc, char *argv[]);
 static bool init_common(const Settings &cmd_args, int argc, char *argv[]);
@@ -157,10 +157,16 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
+	UDPSocket udp_socket;
+    if (!setup_log_params(cmd_args, udp_socket)) {
+        errorstream << "Failed to setup log parameters" << '\n';
+        return 1;
+    }
+
 	// Debug handler
 	BEGIN_DEBUG_EXCEPTION_HANDLER
 
-	if (!setup_log_params(cmd_args))
+	if (!setup_log_params(cmd_args, udp_socket))
 		return 1;
 
 	if (cmd_args.getFlag("debugger")) {
@@ -442,47 +448,47 @@ static void print_modified_quicktune_values() {
 	}
 }
 
-static bool setup_log_params(const Settings &cmd_args) {
-	// Quiet mode, print errors only
-	if (cmd_args.getFlag("quiet")) {
-		g_logger.removeOutput(&stderr_output);
-		g_logger.addOutputMaxLevel(&stderr_output, LL_ERROR);
-	}
+static bool setup_log_params(const Settings &cmd_args, UDPSocket &udp_socket) {
+    // Quiet mode, print errors only
+    if (cmd_args.getFlag("quiet")) {
+        g_logger.removeOutput(&stderr_output);
+        g_logger.addOutputMaxLevel(&stderr_output, LL_ERROR);
+    }
 
-	// Coloured log messages (see log.h)
-	std::string color_mode;
-	if (cmd_args.exists("color")) {
-		color_mode = cmd_args.get("color");
-	}
-	if (!color_mode.empty()) {
-		if (color_mode == "auto") {
-			Logger::color_mode = LOG_COLOR_AUTO;
-		} else if (color_mode == "always") {
-			Logger::color_mode = LOG_COLOR_ALWAYS;
-		} else if (color_mode == "never") {
-			Logger::color_mode = LOG_COLOR_NEVER;
-		} else {
-			errorstream << "Invalid color mode: " << color_mode << '\n';
-			return false;
-		}
-	}
+    // Coloured log messages (see log.h)
+    std::string color_mode;
+    if (cmd_args.exists("color")) {
+        color_mode = cmd_args.get("color");
+    }
+    if (!color_mode.empty()) {
+        if (color_mode == "auto") {
+            Logger::color_mode = LOG_COLOR_AUTO;
+        } else if (color_mode == "always") {
+            Logger::color_mode = LOG_COLOR_ALWAYS;
+        } else if (color_mode == "never") {
+            Logger::color_mode = LOG_COLOR_NEVER;
+        } else {
+            errorstream << "Invalid color mode: " << color_mode << '\n';
+            return false;
+        }
+    }
 
-	// In certain cases, output info level on stderr
-	if (cmd_args.getFlag("info") || cmd_args.getFlag("verbose") ||
-			cmd_args.getFlag("trace") || cmd_args.getFlag("speedtests"))
-		g_logger.addOutput(&stderr_output, LL_INFO);
+    // In certain cases, output info level on stderr
+    if (cmd_args.getFlag("info") || cmd_args.getFlag("verbose") ||
+            cmd_args.getFlag("trace") || cmd_args.getFlag("speedtests"))
+        g_logger.addOutput(&stderr_output, LL_INFO);
 
-	// In certain cases, output verbose level on stderr
-	if (cmd_args.getFlag("verbose") || cmd_args.getFlag("trace"))
-		g_logger.addOutput(&stderr_output, LL_VERBOSE);
+    // In certain cases, output verbose level on stderr
+    if (cmd_args.getFlag("verbose") || cmd_args.getFlag("trace"))
+        g_logger.addOutput(&stderr_output, LL_VERBOSE);
 
-	if (cmd_args.getFlag("trace")) {
-		dstream << _("Enabling trace level debug output") << '\n';
-		g_logger.addOutput(&stderr_output, LL_TRACE);
-		socket_enable_debug_output = true;
-	}
+    if (cmd_args.getFlag("trace")) {
+        dstream << _("Enabling trace level debug output") << '\n';
+        g_logger.addOutput(&stderr_output, LL_TRACE);
+        udp_socket.enableDebugOutput(true);
+    }
 
-	return true;
+    return true;
 }
 
 static bool create_userdata_path() {
