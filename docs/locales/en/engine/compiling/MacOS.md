@@ -16,8 +16,8 @@ brew install cmake freetype gettext gmp hiredis jpeg-turbo jsoncpp leveldb libog
 Download source (this is the URL to the latest of source repository, which might not work at all times) using Git:
 
 ```bash
-git clone --depth 1 https://github.com/minetest/minetest.git
-cd minetest
+git clone --depth 1 https://github.com/yunasatoy/aperosengine.git
+cd aperosengine
 ```
 
 ## Build
@@ -35,11 +35,11 @@ make -j$(sysctl -n hw.logicalcpu)
 make install
 
 # M1 Macs w/ MacOS >= BigSur
-codesign --force --deep -s - macos/minetest.app
+codesign --force --deep -s - macos/aperosengine.app
 ```
 
 ## Run
 
 ```
-open ./build/macos/minetest.app
+open ./build/macos/aperosengine.app
 ```

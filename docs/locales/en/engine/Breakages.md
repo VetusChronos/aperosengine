@@ -1,4 +1,4 @@
-# Minetest Major Breakages List
+# Minetest Major Breakages List (will possibly be ported to the AperosEngine)
 
 This document contains a list of breaking changes to be made in the next major version.
 This list is largely advisory and items may be reevaluated once the time comes.

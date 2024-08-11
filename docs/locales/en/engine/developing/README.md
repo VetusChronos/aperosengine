@@ -6,7 +6,7 @@ Some important development docs are found in the wiki: https://dev.aperosvoxel.d
 
 Notable pages:
 
-- [Releasing Minetest](https://dev.aperosvoxel.domain/Releasing_Minetest)
+- [Releasing AperosEngine](https://dev.aperosvoxel.domain/Releasing_AperosEngine)
 - [Engine translations](https://dev.aperosvoxel.domain/Translation#Maintaining_engine_translations)
 - [Changelog](https://dev.aperosvoxel.domain/Changelog)
 - [Organisation](https://dev.aperosvoxel.domain/Organisation)
@@ -14,13 +14,13 @@ Notable pages:
 
 ## In this folder
 
-- [Developing minetestserver with Docker](docker.md)
-- [Android tips & tricks](android.md)
-- [OS/library compatibility policy](os-compatibility.md)
-- [Miscellaneous](misc.md)
+- [Developing aperosengineserver with Docker](developing/docker.md)
+- [Android tips & tricks](developing/android_tips_tricks.md)
+- [OS/library compatibility policy](developing/os_compatibility.md)
+- [Miscellaneous](developing/misc.md)
 
-## IRC
+## Discord
 
 Oftentimes knowledge hasn't been written down (yet) and your best bet is to ask someone experienced and/or the core developers.
 
-Feel free to join the [#minetest-dev IRC](https://wiki.aperosvoxel.domain/IRC) and ask questions related to **engine development**.
+Feel free to join the [Discord](https://discord.gg/sag6QEN69K) and ask questions related to **engine development**.

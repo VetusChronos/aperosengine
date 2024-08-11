@@ -21,12 +21,12 @@ After that installing it will work:
 adb install -r -d ./app-arm64-v8a-release-unsigned.apk
 ```
 
-## How to get debug output from Minetest on Android
+## How to get debug output from AperosEngine on Android
 
 In case debug.txt isn't enough (e.g. when debugging a crash), you can get debug
 output using logcat:
 
-`adb logcat -s 'Minetest:*' '*:F'`
+`adb logcat -s 'AperosEngine:*' '*:F'`
 
 Note that you can do this even *after* the app has crashed,
 since Android keeps an internal buffer.
@@ -34,13 +34,13 @@ since Android keeps an internal buffer.
 A segmentation fault for example looks like this:
 
 ```
-01-10 17:20:22.215 19308 20560 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 20560 (MinetestNativeT), pid 19308 (netest.minetest)
+01-10 17:20:22.215 19308 20560 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 20560 (AperosEngineNativeT), pid 19308 (netest.minetest)
 01-10 17:20:22.287 20576 20576 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
 01-10 17:20:22.287 20576 20576 F DEBUG   : Build fingerprint: '...'
 01-10 17:20:22.287 20576 20576 F DEBUG   : Revision: '4'
 01-10 17:20:22.287 20576 20576 F DEBUG   : ABI: 'arm64'
 01-10 17:20:22.288 20576 20576 F DEBUG   : Timestamp: 2024-01-10 17:20:22+0100
-01-10 17:20:22.288 20576 20576 F DEBUG   : pid: 19308, tid: 20560, name: MinetestNativeT  >>> net.minetest.minetest <<<
+01-10 17:20:22.288 20576 20576 F DEBUG   : pid: 19308, tid: 20560, name: AperosEngineNativeT  >>> org.aperosengine.aperosengine <<<
 01-10 17:20:22.288 20576 20576 F DEBUG   : uid: 10385
 01-10 17:20:22.288 20576 20576 F DEBUG   : signal 6 (SIGABRT), code -1 (SI_QUEUE), fault addr --------
 [ ... more information follows ... ]
@@ -56,8 +56,8 @@ You're probably hitting two problems:
 
 Force regenerating the assets: `./gradlew app:clean`
 
-Erase the app's memory of which version was installed: `adb shell run-as net.minetest.minetest rm shared_prefs/MinetestSettings.xml`
+Erase the app's memory of which version was installed: `adb shell run-as org.aperosengine.aperosengine rm shared_prefs/AperosEngineSettings.xml`
 
-If this doesn't work you can also uninstall it using `adb shell pm uninstall net.minetest.minetest`. You will obviously lose your data.
+If this doesn't work you can also uninstall it using `adb shell pm uninstall org.aperosengine.aperosengine`. You will obviously lose your data.
 
 Then build and install as normal and your changes should be applied.

@@ -9,7 +9,7 @@ AperosVoxel is based on [Minetest](https://minetest.net):
 
 > Copyright (C) 2010-2024 Perttu Ahola <celeron55@gmail.com>
 and contributors of the Minetest (see source file comments). 
-Thanks you all!
+Thanks to the contributors!
 
 Locales
 -------

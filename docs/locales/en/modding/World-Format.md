@@ -1,4 +1,5 @@
-# Minetest World Format 22...29
+AperosEngine World Format 22...29
+===================================
 
 This applies to a world format carrying the block serialization version
 22...27, used at least in
@@ -159,15 +160,15 @@ For `load_mod_<mod>`, the possible values are:
 * `true` - Load the mod from wherever it is found (may cause conflicts if the same mod appears also in some other place).
 * `mods/modpack/moddir` - Relative path to the mod
     * Must be one of the following:
-        * `mods/`: mods in the user path's mods folder (ex. `/home/user/.minetest/mods`)
-        * `share/`: mods in the share's mods folder (ex. `/usr/share/minetest/mods`)
-        * `/path/to/env`: you can use absolute paths to mods inside folders specified with the `MINETEST_MOD_PATH` `env` variable.
+        * `mods/`: mods in the user path's mods folder (ex. `/home/user/.aperosengine/mods`)
+        * `share/`: mods in the share's mods folder (ex. `/usr/share/aperosengine/mods`)
+        * `/path/to/env`: you can use absolute paths to mods inside folders specified with the `APEROSENGINE_MOD_PATH` `env` variable.
     * Other locations and absolute paths are not supported.
     * Note that `moddir` is the directory name, not the mod name specified in mod.conf.
 
 `PostgreSQL` backend specific settings:
 
-    pgsql_connection = host=127.0.0.1 port=5432 user=mt_user password=mt_password dbname=minetest
+    pgsql_connection = host=127.0.0.1 port=5432 user=mt_user password=mt_password dbname=aperosengine
     pgsql_player_connection = (same parameters as above)
     pgsql_readonly_connection = (same parameters as above)
     pgsql_auth_connection = (same parameters as above)
@@ -249,14 +250,14 @@ Example content:
 
 # Map File Format
 
-Minetest maps consist of `MapBlock`s, chunks of 16x16x16 nodes.
+AperosEngine maps consist of `MapBlock`s, chunks of 16x16x16 nodes.
 
 In addition to the bulk node data, `MapBlock`s stored on disk also contain
 other things.
 
 ## History
 
-Initially, Minetest stored maps in a format called the "sectors" format.
+Initially, AperosEngine stored maps in a format called the "sectors" format.
 It was a directory/file structure like this:
 
     sectors2/XXX/ZZZ/YYYY
@@ -265,7 +266,7 @@ For example, the `MapBlock` at `(0, 1, -2)` was this file:
 
     sectors2/000/ffd/0001
 
-Eventually Minetest outgrew this directory structure, as filesystems were
+Eventually AperosEngine outgrew this directory structure, as filesystems were
 struggling under the number of files and directories.
 
 Large servers seriously needed a new format, and thus the base of the
@@ -370,7 +371,7 @@ See below for description.
 * Indicates if the light is correct at the sides of a map block.
   Lighting may not be correct if the light changed, but a neighbor
   block was not loaded at that time.
-  If these flags are false, Minetest will automatically recompute light
+  If these flags are false, AperosEngine will automatically recompute light
   when both this block and its required neighbor are loaded.
 
 * The bit order is:
@@ -383,7 +384,7 @@ See below for description.
   to indicate if direct sunlight spreading is finished.
 
 * Example: if the block at `(0, 0, 0)` has `lighting_complete = 0b1111111111111110`,
-  Minetest will correct lighting in the day light bank when the block at
+  AperosEngine will correct lighting in the day light bank when the block at
   `(1, 0, 0)` is also loaded.
 
 Timestamp and node ID mappings were introduced in map format version 29.

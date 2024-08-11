@@ -45,9 +45,11 @@ Initialization:
 		u8 controltype = CONTROLTYPE_DISCO = 3
 
 - Here's a quick untested connect-disconnect done in PHP:
+
+```php
 # host: ip of server (use gethostbyname(hostname) to get from a dns name)
 # port: port of server
-function check_if_minetestserver_up($host, $port)
+function check_if_aperosengineserver_up($host, $port)
 {
 	$socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 	$timeout = array("sec" => 1, "usec" => 0);
@@ -69,9 +71,11 @@ function check_if_minetestserver_up($host, $port)
 	}
 	return false;
 }
+```
 
 - Here's a Python script for checking if a aperosengine server is up, confirmed working
 
+```py
 #!/usr/bin/env python3
 import sys, time, socket
 
@@ -108,3 +112,4 @@ try:
         print("%s seems to be down " % sys.argv[1])
 except Exception as err:
     print("%s seems to be down (%s) " % (sys.argv[1], str(err)))
+```
