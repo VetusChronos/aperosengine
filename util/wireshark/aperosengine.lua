@@ -65,7 +65,7 @@ aperosengine_client_obsolete = {}
 -- TOSERVER_INIT
 
 do
-	local abbr = "minetest.client.init_"
+	local abbr = "aperosengine.client.init_"
 
 	local f_ser_fmt = ProtoField.uint8(abbr.."ser_version",
 		"Maximum serialization format version", base.DEC)
@@ -104,7 +104,7 @@ aperosengine_client_obsolete[0x10] = true
 
 do
 	local f_langlen, f_lang =
-		aperosengine_field_helper("uint16", "minetest.client.init2_language", "Language Code")
+		aperosengine_field_helper("uint16", "aperosengine.client.init2_language", "Language Code")
 
 	aperosengine_client_commands[0x11] = {
 		"INIT2",
@@ -147,7 +147,7 @@ aperosengine_client_obsolete[0x22] = true
 -- TOSERVER_PLAYERPOS
 
 do
-	local abbr = "minetest.client.playerpos_"
+	local abbr = "aperosengine.client.playerpos_"
 
 	local f_x = ProtoField.int32(abbr.."x", "Position X", base.DEC)
 	local f_y = ProtoField.int32(abbr.."y", "Position Y", base.DEC)
@@ -184,11 +184,11 @@ end
 -- TOSERVER_GOTBLOCKS
 
 do
-	local f_count = ProtoField.uint8("minetest.client.gotblocks_count", "Count", base.DEC)
-	local f_block = ProtoField.bytes("minetest.client.gotblocks_block", "Block", base.NONE)
-	local f_x = ProtoField.int16("minetest.client.gotblocks_x", "Block position X", base.DEC)
-	local f_y = ProtoField.int16("minetest.client.gotblocks_y", "Block position Y", base.DEC)
-	local f_z = ProtoField.int16("minetest.client.gotblocks_z", "Block position Z", base.DEC)
+	local f_count = ProtoField.uint8("aperosengine.client.gotblocks_count", "Count", base.DEC)
+	local f_block = ProtoField.bytes("aperosengine.client.gotblocks_block", "Block", base.NONE)
+	local f_x = ProtoField.int16("aperosengine.client.gotblocks_x", "Block position X", base.DEC)
+	local f_y = ProtoField.int16("aperosengine.client.gotblocks_y", "Block position Y", base.DEC)
+	local f_z = ProtoField.int16("aperosengine.client.gotblocks_z", "Block position Z", base.DEC)
 
 	aperosengine_client_commands[0x24] = {
 		"GOTBLOCKS", 3,
@@ -217,11 +217,11 @@ end
 -- TOSERVER_DELETEDBLOCKS
 
 do
-	local f_count = ProtoField.uint8("minetest.client.deletedblocks_count", "Count", base.DEC)
-	local f_block = ProtoField.bytes("minetest.client.deletedblocks_block", "Block", base.NONE)
-	local f_x = ProtoField.int16("minetest.client.deletedblocks_x", "Block position X", base.DEC)
-	local f_y = ProtoField.int16("minetest.client.deletedblocks_y", "Block position Y", base.DEC)
-	local f_z = ProtoField.int16("minetest.client.deletedblocks_z", "Block position Z", base.DEC)
+	local f_count = ProtoField.uint8("aperosengine.client.deletedblocks_count", "Count", base.DEC)
+	local f_block = ProtoField.bytes("aperosengine.client.deletedblocks_block", "Block", base.NONE)
+	local f_x = ProtoField.int16("aperosengine.client.deletedblocks_x", "Block position X", base.DEC)
+	local f_y = ProtoField.int16("aperosengine.client.deletedblocks_y", "Block position Y", base.DEC)
+	local f_z = ProtoField.int16("aperosengine.client.deletedblocks_z", "Block position Z", base.DEC)
 
 	aperosengine_client_commands[0x25] = {
 		"DELETEDBLOCKS", 3,
@@ -275,7 +275,7 @@ aperosengine_client_obsolete[0x30] = true
 -- TOSERVER_INVENTORY_ACTION
 
 do
-	local f_action = ProtoField.string("minetest.client.inventory_action", "Action")
+	local f_action = ProtoField.string("aperosengine.client.inventory_action", "Action")
 
 	aperosengine_client_commands[0x31] = {
 		"INVENTORY_ACTION", 2,
@@ -289,8 +289,8 @@ end
 -- TOSERVER_CHAT_MESSAGE
 
 do
-	local f_length = ProtoField.uint16("minetest.client.chat_message_length", "Length", base.DEC)
-	local f_message = ProtoField.string("minetest.client.chat_message", "Message")
+	local f_length = ProtoField.uint16("aperosengine.client.chat_message_length", "Length", base.DEC)
+	local f_message = ProtoField.string("aperosengine.client.chat_message", "Message")
 
 	aperosengine_client_commands[0x32] = {
 		"CHAT_MESSAGE", 4,
@@ -319,7 +319,7 @@ aperosengine_client_obsolete[0x34] = true
 -- TOSERVER_DAMAGE
 
 do
-	local f_amount = ProtoField.uint8("minetest.client.damage_amount", "Amount", base.DEC)
+	local f_amount = ProtoField.uint8("aperosengine.client.damage_amount", "Amount", base.DEC)
 
 	aperosengine_client_commands[0x35] = {
 		"DAMAGE", 3,
@@ -338,7 +338,7 @@ aperosengine_client_obsolete[0x36] = true
 -- TOSERVER_PLAYERITEM
 
 do
-	local f_item = ProtoField.uint16("minetest.client.playeritem_item", "Wielded item")
+	local f_item = ProtoField.uint16("aperosengine.client.playeritem_item", "Wielded item")
 
 	aperosengine_client_commands[0x37] = {
 		"PLAYERITEM", 4,
@@ -356,7 +356,7 @@ aperosengine_client_commands[0x38] = { "RESPAWN", 2 }
 -- TOSERVER_INTERACT
 
 do
-	local abbr = "minetest.client.interact_"
+	local abbr = "aperosengine.client.interact_"
 	local vs_action = {
 		[0] = "Start digging",
 		[1] = "Stop digging",
@@ -448,7 +448,7 @@ aperosengine_client_obsolete[0x42] = true
 -- TOSERVER_CLIENT_READY
 
 do
-	local abbr = "minetest.client.client_ready_"
+	local abbr = "aperosengine.client.client_ready_"
 	local f_major = ProtoField.uint8(abbr.."major","Version Major")
 	local f_minor = ProtoField.uint8(abbr.."minor","Version Minor")
 	local f_patch = ProtoField.uint8(abbr.."patch","Version Patch")
@@ -496,7 +496,7 @@ aperosengine_server_obsolete = {}
 -- TOCLIENT_HELLO
 
 do
-	local abbr = "minetest.server.hello_"
+	local abbr = "aperosengine.server.hello_"
 
 	local f_ser_fmt = ProtoField.uint8(abbr.."ser_version",
 		"Deployed serialization format version", base.DEC)
@@ -527,7 +527,7 @@ end
 -- TOCLIENT_AUTH_ACCEPT
 
 do
-	local abbr = "minetest.server.auth_accept_"
+	local abbr = "aperosengine.server.auth_accept_"
 
 	local f_player_x = ProtoField.float(abbr.."player_x", "Player position X")
 	local f_player_y = ProtoField.float(abbr.."player_y", "Player position Y")
@@ -568,10 +568,10 @@ aperosengine_server_obsolete[0x10] = true
 -- TOCLIENT_BLOCKDATA
 
 do
-	local f_x = ProtoField.int16("minetest.server.blockdata_x", "Block position X", base.DEC)
-	local f_y = ProtoField.int16("minetest.server.blockdata_y", "Block position Y", base.DEC)
-	local f_z = ProtoField.int16("minetest.server.blockdata_z", "Block position Z", base.DEC)
-	local f_data = ProtoField.bytes("minetest.server.blockdata_block", "Serialized MapBlock")
+	local f_x = ProtoField.int16("aperosengine.server.blockdata_x", "Block position X", base.DEC)
+	local f_y = ProtoField.int16("aperosengine.server.blockdata_y", "Block position Y", base.DEC)
+	local f_z = ProtoField.int16("aperosengine.server.blockdata_z", "Block position Z", base.DEC)
+	local f_data = ProtoField.bytes("aperosengine.server.blockdata_block", "Serialized MapBlock")
 
 	aperosengine_server_commands[0x20] = {
 		"BLOCKDATA", 8,
@@ -588,10 +588,10 @@ end
 -- TOCLIENT_ADDNODE
 
 do
-	local f_x = ProtoField.int16("minetest.server.addnode_x", "Position X", base.DEC)
-	local f_y = ProtoField.int16("minetest.server.addnode_y", "Position Y", base.DEC)
-	local f_z = ProtoField.int16("minetest.server.addnode_z", "Position Z", base.DEC)
-	local f_data = ProtoField.bytes("minetest.server.addnode_node", "Serialized MapNode")
+	local f_x = ProtoField.int16("aperosengine.server.addnode_x", "Position X", base.DEC)
+	local f_y = ProtoField.int16("aperosengine.server.addnode_y", "Position Y", base.DEC)
+	local f_z = ProtoField.int16("aperosengine.server.addnode_z", "Position Z", base.DEC)
+	local f_data = ProtoField.bytes("aperosengine.server.addnode_node", "Serialized MapNode")
 
 	aperosengine_server_commands[0x21] = {
 		"ADDNODE", 8,
@@ -608,9 +608,9 @@ end
 -- TOCLIENT_REMOVENODE
 
 do
-	local f_x = ProtoField.int16("minetest.server.removenode_x", "Position X", base.DEC)
-	local f_y = ProtoField.int16("minetest.server.removenode_y", "Position Y", base.DEC)
-	local f_z = ProtoField.int16("minetest.server.removenode_z", "Position Z", base.DEC)
+	local f_x = ProtoField.int16("aperosengine.server.removenode_x", "Position X", base.DEC)
+	local f_y = ProtoField.int16("aperosengine.server.removenode_y", "Position Y", base.DEC)
+	local f_z = ProtoField.int16("aperosengine.server.removenode_z", "Position Z", base.DEC)
 
 	aperosengine_server_commands[0x22] = {
 		"REMOVENODE", 8,
@@ -646,7 +646,7 @@ aperosengine_server_obsolete[0x26] = true
 -- TOCLIENT_INVENTORY
 
 do
-	local f_inventory = ProtoField.string("minetest.server.inventory", "Inventory")
+	local f_inventory = ProtoField.string("aperosengine.server.inventory", "Inventory")
 
 	aperosengine_server_commands[0x27] = {
 		"INVENTORY", 2,
@@ -665,8 +665,8 @@ aperosengine_server_obsolete[0x28] = true
 -- TOCLIENT_TIME_OF_DAY
 
 do
-	local f_time = ProtoField.uint16("minetest.server.time_of_day", "Time", base.DEC)
-	local f_time_speed = ProtoField.float("minetest.server.time_speed", "Time Speed", base.DEC)
+	local f_time = ProtoField.uint16("aperosengine.server.time_of_day", "Time", base.DEC)
+	local f_time_speed = ProtoField.float("aperosengine.server.time_speed", "Time Speed", base.DEC)
 
 	aperosengine_server_commands[0x29] = {
 		"TIME_OF_DAY", 4,
@@ -689,7 +689,7 @@ aperosengine_server_commands[0x2b] = { "PLAYER_SPEED", 2 }
 -- TOCLIENT_CHAT_MESSAGE
 
 do
-	local abbr = "minetest.server.chat_message_"
+	local abbr = "aperosengine.server.chat_message_"
 	local vs_type = {
 		[0] = "Raw",
 		[1] = "Normal",
@@ -729,32 +729,32 @@ aperosengine_server_obsolete[0x30] = true
 
 do
 	local f_removed_count = ProtoField.uint16(
-		"minetest.server.active_object_remove_add_removed_count",
+		"aperosengine.server.active_object_remove_add_removed_count",
 		"Count of removed objects", base.DEC)
 	local f_removed = ProtoField.bytes(
-		"minetest.server.active_object_remove_add_removed",
+		"aperosengine.server.active_object_remove_add_removed",
 		"Removed object")
 	local f_removed_id = ProtoField.uint16(
-		"minetest.server.active_object_remove_add_removed_id",
+		"aperosengine.server.active_object_remove_add_removed_id",
 		"ID", base.DEC)
 
 	local f_added_count = ProtoField.uint16(
-		"minetest.server.active_object_remove_add_added_count",
+		"aperosengine.server.active_object_remove_add_added_count",
 		"Count of added objects", base.DEC)
 	local f_added = ProtoField.bytes(
-		"minetest.server.active_object_remove_add_added",
+		"aperosengine.server.active_object_remove_add_added",
 		"Added object")
 	local f_added_id = ProtoField.uint16(
-		"minetest.server.active_object_remove_add_added_id",
+		"aperosengine.server.active_object_remove_add_added_id",
 		"ID", base.DEC)
 	local f_added_type = ProtoField.uint8(
-		"minetest.server.active_object_remove_add_added_type",
+		"aperosengine.server.active_object_remove_add_added_type",
 		"Type", base.DEC)
 	local f_added_init_length = ProtoField.uint32(
-		"minetest.server.active_object_remove_add_added_init_length",
+		"aperosengine.server.active_object_remove_add_added_init_length",
 		"Initialization data length", base.DEC)
 	local f_added_init_data = ProtoField.bytes(
-		"minetest.server.active_object_remove_add_added_init_data",
+		"aperosengine.server.active_object_remove_add_added_init_data",
 		"Initialization data")
 
 	aperosengine_server_commands[0x31] = {
@@ -816,19 +816,19 @@ end
 
 do
 	local f_object_count = ProtoField.uint16(
-		"minetest.server.active_object_messages_object_count",
+		"aperosengine.server.active_object_messages_object_count",
 		"Count of objects", base.DEC)
 	local f_object = ProtoField.bytes(
-		"minetest.server.active_object_messages_object",
+		"aperosengine.server.active_object_messages_object",
 		"Object")
 	local f_object_id = ProtoField.uint16(
-		"minetest.server.active_object_messages_id",
+		"aperosengine.server.active_object_messages_id",
 		"ID", base.DEC)
 	local f_message_length = ProtoField.uint16(
-		"minetest.server.active_object_messages_message_length",
+		"aperosengine.server.active_object_messages_message_length",
 		"Message length", base.DEC)
 	local f_message = ProtoField.bytes(
-		"minetest.server.active_object_messages_message",
+		"aperosengine.server.active_object_messages_message",
 		"Message")
 
 	aperosengine_server_commands[0x32] = {
@@ -873,7 +873,7 @@ end
 -- TOCLIENT_HP
 
 do
-	local f_hp = ProtoField.uint16("minetest.server.hp", "Health points", base.DEC)
+	local f_hp = ProtoField.uint16("aperosengine.server.hp", "Health points", base.DEC)
 
 	aperosengine_server_commands[0x33] = {
 		"HP", 4,
@@ -887,7 +887,7 @@ end
 -- TOCLIENT_MOVE_PLAYER
 
 do
-	local abbr = "minetest.server.move_player_"
+	local abbr = "aperosengine.server.move_player_"
 
 	local f_x = ProtoField.float(abbr.."x", "Position X")
 	local f_y = ProtoField.float(abbr.."y", "Position Y")
@@ -911,8 +911,8 @@ end
 -- TOCLIENT_ACCESS_DENIED_LEGACY
 
 do
-	local f_reason_length = ProtoField.uint16("minetest.server.access_denied_reason_length", "Reason length", base.DEC)
-	local f_reason = ProtoField.string("minetest.server.access_denied_reason", "Reason")
+	local f_reason_length = ProtoField.uint16("aperosengine.server.access_denied_reason_length", "Reason length", base.DEC)
+	local f_reason = ProtoField.string("aperosengine.server.access_denied_reason", "Reason")
 
 	aperosengine_server_commands[0x35] = {
 		"ACCESS_DENIED_LEGACY", 4,
@@ -935,16 +935,16 @@ aperosengine_server_commands[0x36] = { "FOV", 2 }
 
 do
 	local f_set_camera_point_target = ProtoField.bool(
-		"minetest.server.deathscreen_set_camera_point_target",
+		"aperosengine.server.deathscreen_set_camera_point_target",
 		"Set camera point target")
 	local f_camera_point_target_x = ProtoField.int32(
-		"minetest.server.deathscreen_camera_point_target_x",
+		"aperosengine.server.deathscreen_camera_point_target_x",
 		"Camera point target X", base.DEC)
 	local f_camera_point_target_y = ProtoField.int32(
-		"minetest.server.deathscreen_camera_point_target_y",
+		"aperosengine.server.deathscreen_camera_point_target_y",
 		"Camera point target Y", base.DEC)
 	local f_camera_point_target_z = ProtoField.int32(
-		"minetest.server.deathscreen_camera_point_target_z",
+		"aperosengine.server.deathscreen_camera_point_target_z",
 		"Camera point target Z", base.DEC)
 
 	aperosengine_server_commands[0x37] = {
@@ -1016,7 +1016,7 @@ aperosengine_server_commands[0x55] = {"FADE_SOUND", 2}
 -- TOCLIENT_UPDATE_PLAYER_LIST
 
 do
-	local abbr = "minetest.server.update_player_list_"
+	local abbr = "aperosengine.server.update_player_list_"
 	local vs_type = {
 		[0] = "Init",
 		[1] = "Add",
@@ -1066,10 +1066,10 @@ aperosengine_server_commands[0x61] = {"FORMSPEC_PREPEND", 2}
 -- Wrapper protocol subdissectors --
 ------------------------------------
 
--- minetest.control dissector
+-- aperosengine.control dissector
 
 do
-	local p_control = Proto("minetest.control", "Minetest Control")
+	local p_control = Proto("aperosengine.control", "AperosEngine Control")
 
 	local vs_control_type = {
 		[0] = "Ack",
@@ -1078,9 +1078,9 @@ do
 		[3] = "Disco"
 	}
 
-	local f_control_type = ProtoField.uint8("minetest.control.type", "Control Type", base.DEC, vs_control_type)
-	local f_control_ack = ProtoField.uint16("minetest.control.ack", "ACK sequence number", base.DEC)
-	local f_control_peerid = ProtoField.uint8("minetest.control.peerid", "New peer ID", base.DEC)
+	local f_control_type = ProtoField.uint8("aperosengine.control.type", "Control Type", base.DEC, vs_control_type)
+	local f_control_ack = ProtoField.uint16("aperosengine.control.ack", "ACK sequence number", base.DEC)
+	local f_control_peerid = ProtoField.uint8("aperosengine.control.peerid", "New peer ID", base.DEC)
 	p_control.fields = { f_control_type, f_control_ack, f_control_peerid }
 
 	local data_dissector = Dissector.get("data")
@@ -1112,10 +1112,10 @@ do
 	end
 end
 
--- minetest.client dissector
--- minetest.server dissector
+-- aperosengine.client dissector
+-- aperosengine.server dissector
 
--- Defines the minetest.client or minetest.server Proto. These two protocols
+-- Defines the aperosengine.client or aperosengine.server Proto. These two protocols
 -- are created by the same function because they are so similar.
 -- Parameter: proto: the Proto object
 -- Parameter: this_peer: "Client" or "Server"
@@ -1123,18 +1123,18 @@ end
 -- Parameter: commands: table of command information, built above
 -- Parameter: obsolete: table of obsolete commands, built above
 function aperosengine_define_client_or_server_proto(is_client)
-	-- Differences between minetest.client and minetest.server
+	-- Differences between aperosengine.client and aperosengine.server
 	local proto_name, this_peer, other_peer, empty_message_info
 	local commands, obsolete
 	if is_client then
-		proto_name = "minetest.client"
+		proto_name = "aperosengine.client"
 		this_peer = "Client"
 		other_peer = "Server"
 		empty_message_info = "Empty message / Connect"
 		commands = aperosengine_client_commands  -- defined in Part 2
 		obsolete = aperosengine_client_obsolete  -- defined in Part 2
 	else
-		proto_name = "minetest.server"
+		proto_name = "aperosengine.server"
 		this_peer = "Server"
 		other_peer = "Client"
 		empty_message_info = "Empty message"
@@ -1143,7 +1143,7 @@ function aperosengine_define_client_or_server_proto(is_client)
 	end
 
 	-- Create the protocol object.
-	local proto = Proto(proto_name, "Minetest " .. this_peer .. " to " .. other_peer)
+	local proto = Proto(proto_name, "AperosEngine " .. this_peer .. " to " .. other_peer)
 
 	-- Create a table vs_command that maps command codes to command names.
 	local vs_command = {}
@@ -1169,7 +1169,7 @@ function aperosengine_define_client_or_server_proto(is_client)
 		end
 	end
 
-	-- minetest.client or minetest.server dissector function
+	-- aperosengine.client or aperosengine.server dissector function
 	function proto.dissector(buffer, pinfo, tree)
 		local t = tree:add(proto, buffer)
 
@@ -1209,18 +1209,18 @@ function aperosengine_define_client_or_server_proto(is_client)
 	end
 end
 
-aperosengine_define_client_or_server_proto(true)  -- minetest.client
-aperosengine_define_client_or_server_proto(false) -- minetest.server
+aperosengine_define_client_or_server_proto(true)  -- aperosengine.client
+aperosengine_define_client_or_server_proto(false) -- aperosengine.server
 
--- minetest.split dissector
+-- aperosengine.split dissector
 
 do
-	local p_split = Proto("minetest.split", "Minetest Split Message")
+	local p_split = Proto("aperosengine.split", "AperosEngine Split Message")
 
-	local f_split_seq = ProtoField.uint16("minetest.split.seq", "Sequence number", base.DEC)
-	local f_split_chunkcount = ProtoField.uint16("minetest.split.chunkcount", "Chunk count", base.DEC)
-	local f_split_chunknum = ProtoField.uint16("minetest.split.chunknum", "Chunk number", base.DEC)
-	local f_split_data = ProtoField.bytes("minetest.split.data", "Split message data")
+	local f_split_seq = ProtoField.uint16("aperosengine.split.seq", "Sequence number", base.DEC)
+	local f_split_chunkcount = ProtoField.uint16("aperosengine.split.chunkcount", "Chunk count", base.DEC)
+	local f_split_chunknum = ProtoField.uint16("aperosengine.split.chunknum", "Chunk number", base.DEC)
+	local f_split_data = ProtoField.bytes("aperosengine.split.data", "Split message data")
 	p_split.fields = { f_split_seq, f_split_chunkcount, f_split_chunknum, f_split_data }
 
 	function p_split.dissector(buffer, pinfo, tree)
@@ -1241,7 +1241,7 @@ end
 -- Wrapper protocol main dissector --
 -------------------------------------
 
--- minetest dissector
+-- aperosengine dissector
 
 do
 	local p_aperosengine = Proto("aperosvoxel", "AperosVoxel")
@@ -1263,41 +1263,41 @@ do
 		[3] = "Reliable"
 	}
 
-	local f_id = ProtoField.uint32("minetest.id", "ID", base.HEX, vs_id)
-	local f_peer = ProtoField.uint16("minetest.peer", "Peer", base.DEC, vs_peer)
-	local f_channel = ProtoField.uint8("minetest.channel", "Channel", base.DEC)
-	local f_type = ProtoField.uint8("minetest.type", "Type", base.DEC, vs_type)
-	local f_seq = ProtoField.uint16("minetest.seq", "Sequence number", base.DEC)
-	local f_subtype = ProtoField.uint8("minetest.subtype", "Subtype", base.DEC, vs_type)
+	local f_id = ProtoField.uint32("aperosengine.id", "ID", base.HEX, vs_id)
+	local f_peer = ProtoField.uint16("aperosengine.peer", "Peer", base.DEC, vs_peer)
+	local f_channel = ProtoField.uint8("aperosengine.channel", "Channel", base.DEC)
+	local f_type = ProtoField.uint8("aperosengine.type", "Type", base.DEC, vs_type)
+	local f_seq = ProtoField.uint16("aperosengine.seq", "Sequence number", base.DEC)
+	local f_subtype = ProtoField.uint8("aperosengine.subtype", "Subtype", base.DEC, vs_type)
 
-	p_minetest.fields = { f_id, f_peer, f_channel, f_type, f_seq, f_subtype }
+	p_aperosengine.fields = { f_id, f_peer, f_channel, f_type, f_seq, f_subtype }
 
 	local data_dissector = Dissector.get("data")
-	local control_dissector = Dissector.get("minetest.control")
-	local client_dissector = Dissector.get("minetest.client")
-	local server_dissector = Dissector.get("minetest.server")
-	local split_dissector = Dissector.get("minetest.split")
+	local control_dissector = Dissector.get("aperosengine.control")
+	local client_dissector = Dissector.get("aperosengine.client")
+	local server_dissector = Dissector.get("aperosengine.server")
+	local split_dissector = Dissector.get("aperosengine.split")
 
-	function p_minetest.dissector(buffer, pinfo, tree)
+	function p_aperosengine.dissector(buffer, pinfo, tree)
 
-		-- Defer if payload doesn't have Minetest's magic number
+		-- Defer if payload doesn't have AperosEngine's magic number
 		if buffer(0,4):uint() ~= aperosengine_id then
 			return false
 		end
 
-		-- Add Minetest tree item
-		local t = tree:add(p_minetest, buffer(0,8))
+		-- Add AperosEngine tree item
+		local t = tree:add(p_aperosengine, buffer(0,8))
 		t:add(f_id, buffer(0,4))
 
 		-- ID is valid, so replace packet's shown protocol
-		pinfo.cols.protocol = "Minetest"
-		pinfo.cols.info = "Minetest"
+		pinfo.cols.protocol = "AperosEngine"
+		pinfo.cols.info = "AperosEngine"
 
 		-- Set the other header fields
 		t:add(f_peer, buffer(4,2))
 		t:add(f_channel, buffer(6,1))
 		t:add(f_type, buffer(7,1))
-		t:set_text("Minetest, Peer: " .. buffer(4,2):uint() .. ", Channel: " .. buffer(6,1):uint())
+		t:set_text("AperosEngine, Peer: " .. buffer(4,2):uint() .. ", Channel: " .. buffer(6,1):uint())
 
 		local reliability_info
 		local pos
@@ -1344,7 +1344,7 @@ do
 
 	end
 
-	p_minetest:register_heuristic("udp", p_minetest.dissector)
+	p_aperosengine:register_heuristic("udp", p_aperosengine.dissector)
 end
 
 

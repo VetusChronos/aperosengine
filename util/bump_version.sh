@@ -38,7 +38,7 @@ read_versions() {
 	fi
 	CURRENT_VERSION="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
 
-	echo "Current Minetest version: $CURRENT_VERSION"
+	echo "Current AperosEngine version: $CURRENT_VERSION"
 	echo "Current Android version code: $ANDROID_VERSION_CODE"
 }
 

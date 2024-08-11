@@ -13,13 +13,13 @@ install_linux_deps() {
 	sudo apt-get install -y --no-install-recommends "${pkgs[@]}" "$@"
 
 	# set up Postgres for unit tests
-	if [ -n "$MINETEST_POSTGRESQL_CONNECT_STRING" ]; then
+	if [ -n "$APEROSENGINE_POSTGRESQL_CONNECT_STRING" ]; then
 		sudo systemctl start postgresql.service
 		sudo -u postgres psql <<<"
-			CREATE USER minetest WITH PASSWORD 'minetest';
-			CREATE DATABASE minetest;
-			\c minetest
-			GRANT ALL ON SCHEMA public TO minetest;
+			CREATE USER aperosengine WITH PASSWORD 'aperosengine';
+			CREATE DATABASE aperosengine;
+			\c aperosengine
+			GRANT ALL ON SCHEMA public TO aperosengine;
 		"
 	fi
 }
