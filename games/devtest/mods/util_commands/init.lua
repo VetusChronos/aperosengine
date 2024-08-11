@@ -241,3 +241,23 @@ core.register_chatcommand("set_saturation", {
         aperosengine.get_player_by_name(player_name):set_lighting({saturation = saturation })
     end
 })
+
+-- Test OOP arrays acess in find_nodes_near
+-- Issue: https://github.com/minetest/minetest/issues/14946
+aperosengine.register_chatcommand("p", {
+	func = function(name, param)
+		local pos = aperosengine.get_player_by_name(name):get_pos()
+		local minp = vector.add(pos, -5)
+		local maxp = vector.add(pos,  5)
+
+		--local groupname = "group:stone"
+		local groupname = "group:invalidgroupname"
+		local names_positions = aperosengine.find_nodes_in_area(minp, maxp, groupname, true)
+		for name, pos in pairs(names_positions) do
+			print(name, #pos)
+		end
+		local positions, counts = aperosengine.find_nodes_in_area(minp, maxp, groupname, false)
+		print(#positions, dump(counts))
+		return true, "OK!"
+	end
+})

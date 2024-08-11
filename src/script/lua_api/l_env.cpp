@@ -899,15 +899,16 @@ template <typename F>
 int ModApiEnvBase::findNodesInArea(lua_State *L, const NodeDefManager *ndef,
 		const std::vector<content_t> &filter, bool grouped, F &&iterate) {
 	if (grouped) {
-		// create the table we will be returning
+		// Create the table we will be returning
 		lua_createtable(L, 0, filter.size());
 		int base = lua_gettop(L);
 
-		// create one table for each filter
+		// Create one table for each filter
 		std::vector<u32> idx;
 		idx.resize(filter.size());
-		for (u32 i = 0; i < filter.size(); i++)
+		for (u32 i = 0; i < filter.size(); i++) {
 			lua_newtable(L);
+		}
 
 		iterate([&](v3s16 p, MapNode n) -> bool {
 			content_t c = n.getContent();
@@ -923,19 +924,22 @@ int ModApiEnvBase::findNodesInArea(lua_State *L, const NodeDefManager *ndef,
 			return true;
 		});
 
-		// last filter table is at top of stack
-		u32 i = filter.size() - 1;
-		do {
-			if (idx[i] == 0) {
-				// No such node found -> drop the empty table
+		// Last filter table is at top of stack
+		for (std::size_t i = filter.size(); i-- > 0;) {
+			// Optional check for out-of-bounds or non-existent group
+			std::optional<std::string> group_name = ndef->get(filter[i]).name;
+			
+			if (idx[i] == 0 || !group_name) {
+				// No such node found or invalid group -> drop the empty table
 				lua_pop(L, 1);
 			} else {
 				// This node was found -> put table into the return table
-				lua_setfield(L, base, ndef->get(filter[i]).name.c_str());
+				lua_setfield(L, base, group_name->c_str());
 			}
-		} while (i-- != 0);
+		}
 
 		assert(lua_gettop(L) == base);
+
 		return 1;
 	} else {
 		std::vector<u32> individual_count;
@@ -963,6 +967,7 @@ int ModApiEnvBase::findNodesInArea(lua_State *L, const NodeDefManager *ndef,
 			lua_pushinteger(L, individual_count[i]);
 			lua_setfield(L, -2, ndef->get(filter[i]).name.c_str());
 		}
+		
 		return 2;
 	}
 }
