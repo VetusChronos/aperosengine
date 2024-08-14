@@ -399,7 +399,7 @@ u32 ShaderSource::getShaderIdDirect(const std::string &name,
 		MaterialType material_type, NodeDrawType drawtype) {
 	// Empty name means shader 0
 	if (name.empty()) {
-		infostream << "getShaderIdDirect(): name is empty" << std::endl;
+		infostream << "getShaderIdDirect(): name is empty" << '\n';
 		return 0;
 	}
 
@@ -417,7 +417,7 @@ u32 ShaderSource::getShaderIdDirect(const std::string &name,
 	if (std::this_thread::get_id() != m_main_thread) {
 		errorstream << "ShaderSource::getShaderIdDirect() "
 					   "called not from main thread"
-					<< std::endl;
+					<< '\n';
 		return 0;
 	}
 
@@ -433,7 +433,7 @@ u32 ShaderSource::getShaderIdDirect(const std::string &name,
 	m_shaderinfo_cache.push_back(info);
 
 	infostream << "getShaderIdDirect(): "
-			   << "Returning id=" << id << " for name \"" << name << "\"" << std::endl;
+			   << "Returning id=" << id << " for name \"" << name << "\"" << '\n';
 
 	return id;
 }
@@ -698,7 +698,7 @@ ShaderInfo ShaderSource::generateShader(const std::string &name,
 	}
 
 	irr_ptr<ShaderCallback> cb{ new ShaderCallback(m_setter_factories) };
-	infostream << "Compiling high level shaders for " << name << std::endl;
+	infostream << "Compiling high level shaders for " << name << '\n';
 	s32 shadermat = gpu->addHighLevelShaderMaterial(
 			vertex_shader.c_str(), nullptr, video::EVST_VS_1_1,
 			fragment_shader.c_str(), nullptr, video::EPST_PS_1_1,
@@ -709,7 +709,7 @@ ShaderInfo ShaderSource::generateShader(const std::string &name,
 					   "failed to generate \""
 					<< name << "\", "
 							   "addHighLevelShaderMaterial failed."
-					<< std::endl;
+					<< '\n';
 		dumpShaderProgram(warningstream, "Vertex", vertex_shader);
 		dumpShaderProgram(warningstream, "Fragment", fragment_shader);
 		dumpShaderProgram(warningstream, "Geometry", geometry_shader);
@@ -731,7 +731,7 @@ void dumpShaderProgram(std::ostream &output_stream,
 	size_t prev = 0;
 	s16 line = 1;
 	while ((pos = program.find('\n', prev)) != std::string::npos) {
-		output_stream << line++ << ": " << program.substr(prev, pos - prev) << std::endl;
+		output_stream << line++ << ": " << program.substr(prev, pos - prev) << '\n';
 		prev = pos + 1;
 	}
 	output_stream << line << ": " << program.substr(prev) << '\n'

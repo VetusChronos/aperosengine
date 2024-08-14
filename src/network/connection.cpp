@@ -218,7 +218,7 @@ BufferedPacketPtr ReliablePacketBuffer::popSeqnum(u16 seqnum) {
 	auto r = findPacketNoLock(seqnum);
 	if (r == m_list.end()) {
 		LOG(dout_con << "Sequence number: " << seqnum
-					 << " not found in reliable buffer" << std::endl);
+					 << " not found in reliable buffer" << '\n');
 		throw NotFoundException("seqnum not found in buffer");
 	}
 
@@ -470,7 +470,7 @@ SharedBuffer<u8> IncomingSplitBuffer::insert(BufferedPacketPtr &p_ptr, bool reli
 	if (reliable != sp->reliable)
 		LOG(derr_con << "Connection: WARNING: reliable=" << reliable
 					 << " != sp->reliable=" << sp->reliable
-					 << std::endl);
+					 << '\n');
 
 	// Cut chunk data out of packet
 	u32 chunkdatasize = p.size() - headersize;
@@ -508,7 +508,7 @@ void IncomingSplitBuffer::removeUnreliableTimedOuts(float dtime, float timeout) 
 		}
 	}
 	for (u16 j : remove_queue) {
-		LOG(dout_con << "NOTE: Removing timed out unreliable split packet" << std::endl);
+		LOG(dout_con << "NOTE: Removing timed out unreliable split packet" << '\n');
 		auto it = m_buf.find(j);
 		delete it->second;
 		m_buf.erase(it);
@@ -975,7 +975,7 @@ void UDPPeer::PutReliableSendCommand(ConnectionCommandPtr &c,
 	} else {
 		LOG(dout_con << m_connection->getDesc()
 					 << " Queueing reliable command for peer id: " << c->peer_id
-					 << " data size: " << c->data.getSize() << std::endl);
+					 << " data size: " << c->data.getSize() << '\n');
 
 		if (chan.queued_commands.size() + 1 >= chan.getWindowSize() / 2) {
 			LOG(derr_con << m_connection->getDesc()

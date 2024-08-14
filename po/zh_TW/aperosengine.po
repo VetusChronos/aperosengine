@@ -6133,7 +6133,7 @@ msgstr "設定檔將儲存於相對於您的全域路徑的檔案路徑。"
 
 #: src/settings_translation_file.cpp
 msgid ""
-"The gesture for for punching players/entities.\n"
+"The gesture for punching players/entities.\n"
 "This can be overridden by games and mods.\n"
 "\n"
 "* short_tap\n"

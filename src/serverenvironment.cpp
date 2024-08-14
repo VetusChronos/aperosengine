@@ -682,7 +682,7 @@ void ServerEnvironment::saveMeta() {
 
 	if (!fs::safeWriteToFile(path, ss.str())) {
 		infostream << "ServerEnvironment::saveMeta(): Failed to write "
-				   << path << std::endl;
+				   << path << '\n';
 		throw SerializationError("Couldn't save env meta");
 	}
 }
@@ -1216,7 +1216,7 @@ void ServerEnvironment::clearObjects(ClearObjectsMode mode) {
 	m_map->listAllLoadedBlocks(loaded_blocks);
 	infostream << "ServerEnvironment::clearObjects(): "
 			   << "Done listing all loaded blocks: "
-			   << loaded_blocks.size() << std::endl;
+			   << loaded_blocks.size() << '\n';
 
 	// Get list of loadable blocks
 	std::vector<v3s16> loadable_blocks;

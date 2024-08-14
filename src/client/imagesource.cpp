@@ -1308,7 +1308,7 @@ bool ImageSource::generateImagePart(std::string_view part_of_name,
 			if (baseimg) {
 				errorstream << "generateImagePart(): baseimg != NULL "
 							<< "for part_of_name=\"" << part_of_name
-							<< "\", cancelling." << std::endl;
+							<< "\", cancelling." << '\n';
 				return false;
 			}
 

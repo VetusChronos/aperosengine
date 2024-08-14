@@ -192,7 +192,7 @@ bool ScriptApiDetached::getDetachedInventoryCallback(
 	lua_remove(L, -2);
 	// Should be a table
 	if (lua_type(L, -1) != LUA_TTABLE) {
-		errorstream << "Detached inventory \"" << name << "\" not defined" << std::endl;
+		errorstream << "Detached inventory \"" << name << "\" not defined" << '\n';
 		lua_pop(L, 1);
 		return false;
 	}

@@ -30,24 +30,24 @@ static void zerr(int ret) {
 	switch (ret) {
 		case Z_ERRNO:
 			if (ferror(stdin))
-				dstream << "error reading stdin" << std::endl;
+				dstream << "error reading stdin" << '\n';
 			if (ferror(stdout))
-				dstream << "error writing stdout" << std::endl;
+				dstream << "error writing stdout" << '\n';
 			break;
 		case Z_STREAM_ERROR:
-			dstream << "invalid compression level" << std::endl;
+			dstream << "invalid compression level" << '\n';
 			break;
 		case Z_DATA_ERROR:
-			dstream << "invalid or incomplete deflate data" << std::endl;
+			dstream << "invalid or incomplete deflate data" << '\n';
 			break;
 		case Z_MEM_ERROR:
-			dstream << "out of memory" << std::endl;
+			dstream << "out of memory" << '\n';
 			break;
 		case Z_VERSION_ERROR:
-			dstream << "zlib version mismatch!" << std::endl;
+			dstream << "zlib version mismatch!" << '\n';
 			break;
 		default:
-			dstream << "return value = " << ret << std::endl;
+			dstream << "return value = " << ret << '\n';
 	}
 }
 
@@ -166,8 +166,8 @@ void decompressZlib(std::istream &is, std::ostream &os, size_t limit) {
 			for (u32 i = 0; i < z.avail_in; i++) {
 				is.unget();
 				if (is.fail() || is.bad()) {
-					dstream << "unget #" << i << " failed" << std::endl;
-					dstream << "fail=" << is.fail() << " bad=" << is.bad() << std::endl;
+					dstream << "unget #" << i << " failed" << '\n';
+					dstream << "fail=" << is.fail() << " bad=" << is.bad() << '\n';
 					throw SerializationError("decompressZlib: unget failed");
 				}
 			}

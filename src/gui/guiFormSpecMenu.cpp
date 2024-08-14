@@ -902,7 +902,7 @@ void GUIFormSpecMenu::parseItemImage(parserData *data, const std::string &elemen
 	}
 
 	if (!data->explicit_size)
-		warningstream << "invalid use of item_image without a size[] element" << std::endl;
+		warningstream << "invalid use of item_image without a size[] element" << '\n';
 
 	FieldSpec spec(
 			"",
@@ -960,7 +960,7 @@ void GUIFormSpecMenu::parseButton(parserData *data, const std::string &element,
 	}
 
 	if (!data->explicit_size)
-		warningstream << "invalid use of button without a size[] element" << std::endl;
+		warningstream << "invalid use of button without a size[] element" << '\n';
 
 	std::wstring wlabel = translate_string(utf8_to_wide(unescape_string(label)));
 
@@ -1124,17 +1124,20 @@ void GUIFormSpecMenu::parseTableColumns(parserData *data, const std::string &ele
 
 void GUIFormSpecMenu::parseTable(parserData *data, const std::string &element) {
 	std::vector<std::string> parts;
-	if (!precheckElement("table", element, 4, 5, parts))
-		return;
+	if (!precheckElement("table", element, 4, 5, parts)) return;
 
 	std::vector<std::string> v_pos = split(parts[0], ',');
 	std::vector<std::string> v_geom = split(parts[1], ',');
 	std::string name = parts[2];
-	std::vector<std::string> items = split(parts[3], ',');
+	std::vector<std::string> items;
+	if (!parts[3].empty()) {
+		items = split(parts[3], ',');
+	}
 	std::string str_initial_selection;
 
-	if (parts.size() >= 5)
+	if (parts.size() >= 5) {
 		str_initial_selection = parts[4];
+	}
 
 	MY_CHECKPOS("table", 0);
 	MY_CHECKGEOM("table", 1);
@@ -1165,7 +1168,7 @@ void GUIFormSpecMenu::parseTable(parserData *data, const std::string &element) {
 		item = wide_to_utf8(unescape_translate(utf8_to_wide(unescape_string(item))));
 	}
 
-	//now really show table
+	// Now really show table
 	GUITable *e = new GUITable(Environment, data->current_parent, spec.fid,
 			rect, m_tsrc);
 
@@ -1198,7 +1201,10 @@ void GUIFormSpecMenu::parseTextList(parserData *data, const std::string &element
 	std::vector<std::string> v_pos = split(parts[0], ',');
 	std::vector<std::string> v_geom = split(parts[1], ',');
 	std::string name = parts[2];
-	std::vector<std::string> items = split(parts[3], ',');
+	std::vector<std::string> items;
+	if (!parts[3].empty()) {
+		items = split(parts[3], ',');
+	}
 	std::string str_initial_selection;
 	std::string str_transparent = "false";
 
@@ -1284,8 +1290,9 @@ void GUIFormSpecMenu::parseDropDown(parserData *data, const std::string &element
 	if (data->real_coordinates) {
 		std::vector<std::string> v_geom = split(parts[1], ',');
 
-		if (v_geom.size() == 1)
+		if (v_geom.size() == 1) {
 			v_geom.emplace_back("1");
+		}
 
 		MY_CHECKGEOM("dropdown", 1);
 
@@ -1310,7 +1317,7 @@ void GUIFormSpecMenu::parseDropDown(parserData *data, const std::string &element
 	spec.ftype = f_DropDown;
 	spec.send = true;
 
-	//now really show list
+	// Now really show list
 	gui::IGUIComboBox *e = Environment->addComboBox(rect, data->current_parent,
 			spec.fid);
 
@@ -1319,9 +1326,8 @@ void GUIFormSpecMenu::parseDropDown(parserData *data, const std::string &element
 	}
 
 	for (const std::string &item : items) {
-		e->addItem(unescape_translate(unescape_string(
-											  utf8_to_wide(item)))
-						   .c_str());
+		e->addItem(unescape_translate(unescape_string(utf8_to_wide(item)))
+			.c_str());
 	}
 
 	if (!str_initial_selection.empty())
@@ -1344,24 +1350,21 @@ void GUIFormSpecMenu::parseDropDown(parserData *data, const std::string &element
 
 void GUIFormSpecMenu::parseFieldEnterAfterEdit(parserData *data, const std::string &element) {
 	std::vector<std::string> parts;
-	if (!precheckElement("field_enter_after_edit", element, 2, 2, parts))
-		return;
+	if (!precheckElement("field_enter_after_edit", element, 2, 2, parts)) return;
 
 	field_enter_after_edit[parts[0]] = is_yes(parts[1]);
 }
 
 void GUIFormSpecMenu::parseFieldCloseOnEnter(parserData *data, const std::string &element) {
 	std::vector<std::string> parts;
-	if (!precheckElement("field_close_on_enter", element, 2, 2, parts))
-		return;
+	if (!precheckElement("field_close_on_enter", element, 2, 2, parts)) return;
 
 	field_close_on_enter[parts[0]] = is_yes(parts[1]);
 }
 
 void GUIFormSpecMenu::parsePwdField(parserData *data, const std::string &element) {
 	std::vector<std::string> parts;
-	if (!precheckElement("pwdfield", element, 4, 4, parts))
-		return;
+	if (!precheckElement("pwdfield", element, 4, 4, parts)) return;
 
 	std::vector<std::string> v_pos = split(parts[0], ',');
 	std::vector<std::string> v_geom = split(parts[1], ',');
@@ -1470,8 +1473,9 @@ void GUIFormSpecMenu::createTextField(parserData *data, FieldSpec &spec,
 	auto style = getDefaultStyleForElement(is_multiline ? "textarea" : "field", spec.fname);
 
 	if (e) {
-		if (is_editable && spec.fname == m_focused_element)
+		if (is_editable && spec.fname == m_focused_element) {
 			Environment->setFocus(e);
+		}
 
 		if (is_multiline) {
 			e->setMultiLine(true);
@@ -1505,8 +1509,9 @@ void GUIFormSpecMenu::createTextField(parserData *data, FieldSpec &spec,
 		IGUIElement *t = gui::StaticText::add(Environment, spec.flabel.c_str(),
 				rect, false, true, data->current_parent, 0);
 
-		if (t)
+		if (t) {
 			t->setNotClipped(style.getBool(StyleSpec::NOCLIP, false));
+		}
 	}
 }
 
@@ -1518,8 +1523,9 @@ void GUIFormSpecMenu::parseSimpleField(parserData *data,
 
 	core::rect<s32> rect;
 
-	if (data->explicit_size)
+	if (data->explicit_size) {
 		warningstream << "invalid use of unpositioned \"field\" in inventory" << '\n';
+	}
 
 	v2s32 pos = getElementBasePos(nullptr);
 	pos.Y = (data->simple_field_count + 2) * 60;
@@ -1529,8 +1535,9 @@ void GUIFormSpecMenu::parseSimpleField(parserData *data,
 			size.X / 2 - 150, pos.Y,
 			size.X / 2 - 150 + 300, pos.Y + m_btn_height * 2);
 
-	if (m_form_src)
+	if (m_form_src) {
 		default_val = m_form_src->resolveText(default_val);
+	}
 
 	std::wstring wlabel = translate_string(utf8_to_wide(unescape_string(label)));
 
@@ -1584,11 +1591,13 @@ void GUIFormSpecMenu::parseTextArea(parserData *data, std::vector<std::string> &
 
 	core::rect<s32> rect = core::rect<s32>(pos.X, pos.Y, pos.X + geom.X, pos.Y + geom.Y);
 
-	if (!data->explicit_size)
-		warningstream << "invalid use of positioned " << type << " without a size[] element" << std::endl;
+	if (!data->explicit_size) {
+		warningstream << "invalid use of positioned " << type << " without a size[] element" << '\n';
+	}
 
-	if (m_form_src)
+	if (m_form_src) {
 		default_val = m_form_src->resolveText(default_val);
+	}
 
 	std::wstring wlabel = translate_string(utf8_to_wide(unescape_string(label)));
 
@@ -1684,7 +1693,7 @@ void GUIFormSpecMenu::parseLabel(parserData *data, const std::string &element) {
 	MY_CHECKPOS("label", 0);
 
 	if (!data->explicit_size)
-		warningstream << "invalid use of label without a size[] element" << std::endl;
+		warningstream << "invalid use of label without a size[] element" << '\n';
 
 	auto style = getDefaultStyleForElement("label", "");
 	gui::IGUIFont *font = style.getFont();
@@ -1804,7 +1813,7 @@ void GUIFormSpecMenu::parseVertLabel(parserData *data, const std::string &elemen
 	}
 
 	if (!data->explicit_size)
-		warningstream << "invalid use of label without a size[] element" << std::endl;
+		warningstream << "invalid use of label without a size[] element" << '\n';
 
 	std::wstring label;
 
@@ -1876,7 +1885,7 @@ void GUIFormSpecMenu::parseImageButton(parserData *data, const std::string &elem
 			pos.Y + geom.Y);
 
 	if (!data->explicit_size)
-		warningstream << "invalid use of image_button without a size[] element" << std::endl;
+		warningstream << "invalid use of image_button without a size[] element" << '\n';
 
 	image_name = unescape_string(image_name);
 	pressed_image_name = unescape_string(pressed_image_name);
@@ -2070,7 +2079,7 @@ void GUIFormSpecMenu::parseItemImageButton(parserData *data, const std::string &
 	core::rect<s32> rect = core::rect<s32>(pos.X, pos.Y, pos.X + geom.X, pos.Y + geom.Y);
 
 	if (!data->explicit_size)
-		warningstream << "invalid use of item_image_button without a size[] element" << std::endl;
+		warningstream << "invalid use of item_image_button without a size[] element" << '\n';
 
 	IItemDefManager *idef = m_client->idef();
 	ItemStack item;
@@ -4795,7 +4804,7 @@ bool GUIFormSpecMenu::OnEvent(const SEvent &event) {
 		if (event.GUIEvent.EventType == gui::EGET_ELEMENT_FOCUS_LOST && isVisible()) {
 			if (!canTakeFocus(event.GUIEvent.Element)) {
 				infostream << "GUIFormSpecMenu: Not allowing focus change."
-						   << std::endl;
+						   << '\n';
 				// Returning true disables focus change
 				return true;
 			}

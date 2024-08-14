@@ -141,7 +141,7 @@ void Client::handleCommand_AuthAccept(NetworkPacket *pkt) {
 
 	infostream << "Client: received map seed: " << m_map_seed << '\n';
 	infostream << "Client: received recommended send interval "
-			   << m_recommended_send_interval << std::endl;
+			   << m_recommended_send_interval << '\n';
 
 	// Reply to server
 	/*~ DO NOT TRANSLATE THIS LITERALLY!

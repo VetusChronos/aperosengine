@@ -6335,7 +6335,7 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"The gesture for for punching players/entities.\n"
+"The gesture for punching players/entities.\n"
 "This can be overridden by games and mods.\n"
 "\n"
 "* short_tap\n"

@@ -64,7 +64,7 @@ void TestVoxelManipulator::testVoxelArea() {
 
 	UASSERT(aa.size() == results.size());
 
-	infostream << "Result of diff:" << std::endl;
+	infostream << "Result of diff:" << '\n';
 	for (std::list<VoxelArea>::const_iterator
 					it = aa.begin();
 			it != aa.end(); ++it) {

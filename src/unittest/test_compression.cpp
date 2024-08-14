@@ -66,7 +66,7 @@ void TestCompression::testRLECompression() {
 
 	std::string str_out = os.str();
 
-	infostream << "str_out.size()=" << str_out.size() << std::endl;
+	infostream << "str_out.size()=" << str_out.size() << '\n';
 	infostream << "TestCompress: 1,5,5,1 -> ";
 	for (char i : str_out)
 		infostream << (u32)i << ",";
@@ -114,7 +114,7 @@ void TestCompression::testZlibCompression() {
 
 	std::string str_out = os.str();
 
-	infostream << "str_out.size()=" << str_out.size() << std::endl;
+	infostream << "str_out.size()=" << str_out.size() << '\n';
 	infostream << "TestCompress: 1,5,5,1 -> ";
 	for (char i : str_out)
 		infostream << (u32)i << ",";
@@ -155,7 +155,7 @@ void TestCompression::testZlibLargeData() {
 	std::ostringstream os_compressed(std::ios::binary);
 	compressZlib(data_in, os_compressed);
 	infostream << "Test: Output size of large compressZlib is "
-			   << os_compressed.str().size() << std::endl;
+			   << os_compressed.str().size() << '\n';
 
 	std::istringstream is_compressed(os_compressed.str(), std::ios::binary);
 	std::ostringstream os_decompressed(std::ios::binary);
@@ -191,7 +191,7 @@ void TestCompression::testZstdLargeData() {
 	std::ostringstream os_compressed(std::ios::binary);
 	compressZstd(data_in, os_compressed, 0);
 	infostream << "Test: Output size of large compressZstd is "
-			   << os_compressed.str().size() << std::endl;
+			   << os_compressed.str().size() << '\n';
 
 	std::istringstream is_compressed(os_compressed.str(), std::ios::binary);
 	std::ostringstream os_decompressed(std::ios::binary);
@@ -247,7 +247,7 @@ void TestCompression::_testZlibLimit(u32 size, u32 limit) {
 	std::ostringstream os_compressed(std::ios::binary);
 	compressZlib(data_in, os_compressed);
 	infostream << "Test: Output size of compressZlib for limit is "
-			   << os_compressed.str().size() << std::endl;
+			   << os_compressed.str().size() << '\n';
 
 	std::istringstream is_compressed(os_compressed.str(), std::ios::binary);
 	std::ostringstream os_decompressed(std::ios::binary);

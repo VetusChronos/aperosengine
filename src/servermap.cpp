@@ -60,7 +60,7 @@ ServerMap::ServerMap(const std::string &savedir, IGameDef *gamedef,
 		Map(gamedef),
 		settings_mgr(savedir + DIR_DELIM + "map_meta.txt"),
 		m_emerge(emerge) {
-	verbosestream << FUNCTION_NAME << std::endl;
+	verbosestream << FUNCTION_NAME << '\n';
 
 	// Tell the EmergeManager about our MapSettingsManager
 	emerge->map_settings_mgr = &settings_mgr;
@@ -104,7 +104,7 @@ ServerMap::ServerMap(const std::string &savedir, IGameDef *gamedef,
 			// If directory is empty, it is safe to save into it.
 			if (fs::GetDirListing(m_savedir).empty()) {
 				infostream << "ServerMap: Empty save directory is valid."
-						   << std::endl;
+						   << '\n';
 				m_map_saving_enabled = true;
 			} else {
 				if (settings_mgr.loadMapMeta()) {
@@ -129,14 +129,14 @@ ServerMap::ServerMap(const std::string &savedir, IGameDef *gamedef,
 		}
 	} catch (std::exception &e) {
 		warningstream << "ServerMap: Failed to load map from " << savedir
-					  << ", exception: " << e.what() << std::endl;
-		infostream << "Please remove the map or fix it." << std::endl;
-		warningstream << "Map saving will be disabled." << std::endl;
+					  << ", exception: " << e.what() << '\n';
+		infostream << "Please remove the map or fix it." << '\n';
+		warningstream << "Map saving will be disabled." << '\n';
 	}
 }
 
 ServerMap::~ServerMap() {
-	verbosestream << FUNCTION_NAME << std::endl;
+	verbosestream << FUNCTION_NAME << '\n';
 
 	try {
 		if (m_map_saving_enabled) {
@@ -345,7 +345,7 @@ MapBlock *ServerMap::createBlock(v3s16 p) {
 	try {
 		sector = createSector(p2d);
 	} catch (InvalidPositionException &e) {
-		infostream << "createBlock: createSector() failed" << std::endl;
+		infostream << "createBlock: createSector() failed" << '\n';
 		throw e;
 	}
 
@@ -455,7 +455,7 @@ void ServerMap::reportMetrics(u64 save_time_us, u32 saved_blocks, u32 all_blocks
 
 void ServerMap::save(ModifiedState save_level) {
 	if (!m_map_saving_enabled) {
-		warningstream << "Not saving map, saving disabled." << std::endl;
+		warningstream << "Not saving map, saving disabled." << '\n';
 		return;
 	}
 
@@ -463,7 +463,7 @@ void ServerMap::save(ModifiedState save_level) {
 
 	if (save_level == MOD_STATE_CLEAN)
 		infostream << "ServerMap: Saving whole map, this can take time."
-				   << std::endl;
+				   << '\n';
 
 	if (m_map_metadata_changed || save_level == MOD_STATE_CLEAN) {
 		if (settings_mgr.saveMapMeta())
@@ -515,7 +515,7 @@ void ServerMap::save(ModifiedState save_level) {
 				   << ", " << block_count_all << " blocks in memory."
 				   << '\n';
 		PrintInfo(infostream); // ServerMap/ClientMap:
-		infostream << "Blocks modified by: " << std::endl;
+		infostream << "Blocks modified by: " << '\n';
 		modprofiler.print(infostream);
 	}
 
@@ -649,14 +649,14 @@ void ServerMap::loadBlock(std::string *blob, v3s16 p3d, MapSector *sector, bool 
 	} catch (SerializationError &e) {
 		errorstream << "Invalid block data in database"
 					<< " (" << p3d.X << "," << p3d.Y << "," << p3d.Z << ")"
-					<< " (SerializationError): " << e.what() << std::endl;
+					<< " (SerializationError): " << e.what() << '\n';
 
 		// TODO: Block should be marked as invalid in memory so that it is
 		// not touched but the game can run
 
 		if (g_settings->getBool("ignore_world_load_errors")) {
 			errorstream << "Ignoring block load error. Duck and cover! "
-						<< "(ignore_world_load_errors)" << std::endl;
+						<< "(ignore_world_load_errors)" << '\n';
 		} else {
 			throw SerializationError("Invalid block data in database");
 		}

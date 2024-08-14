@@ -93,19 +93,20 @@ void TestFileSys::testPathStartsWith() {
 	std::string paths[numpaths] = {
 		"",
 		p("/"),
-		p("/home/user/minetest"),
-		p("/home/user/minetest/bin"),
-		p("/home/user/.minetest"),
+		p("/home/user/aperosengine"),
+		p("/home/user/aperosengine/bin"),
+		p("/home/user/.aperosengine"),
 		p("/tmp/dir/file"),
 		p("/tmp/file/"),
 		p("/tmP/file"),
 		p("/tmp"),
 		p("/tmp/dir"),
-		p("/home/user2/minetest/worlds"),
-		p("/home/user2/minetest/world"),
+		p("/home/user2/aperosengine/worlds"),
+		p("/home/user2/aperosengine/world"),
 	};
 	/*
 		expected fs::PathStartsWith results
+		(row for every path, column for every prefix)
 		0 = returns false
 		1 = returns true
 		2 = returns false on windows, true elsewhere
@@ -114,18 +115,18 @@ void TestFileSys::testPathStartsWith() {
 			FILESYS_CASE_INSENSITIVE is true
 	*/
 	int expected_results[numpaths][numpaths] = {
-		{ 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-		{ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-		{ 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-		{ 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-		{ 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
-		{ 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0 },
-		{ 1, 1, 0, 0, 0, 0, 1, 4, 1, 0, 0, 0 },
-		{ 1, 1, 0, 0, 0, 0, 4, 1, 4, 0, 0, 0 },
-		{ 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-		{ 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0 },
-		{ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-		{ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+		{ 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0 },
+		{ 0, 1, 0, 0, 0, 0, 1, 4, 1, 0, 0, 0 },
+		{ 0, 1, 0, 0, 0, 0, 4, 1, 4, 0, 0, 0 },
+		{ 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+		{ 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0 },
+		{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+		{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 	};
 
 	for (int i = 0; i < numpaths; i++)
@@ -163,83 +164,83 @@ void TestFileSys::testRemoveLastPathComponent() {
 	std::string path, result, removed;
 
 	UASSERT(fs::RemoveLastPathComponent("") == "");
-	path = p("/home/user/minetest/bin/..//worlds/world1");
+	path = p("/home/user/aperosengine/bin/..//worlds/world1");
 	result = fs::RemoveLastPathComponent(path, &removed, 0);
 	UASSERT(result == path);
 	UASSERT(removed == "");
 	result = fs::RemoveLastPathComponent(path, &removed, 1);
-	UASSERT(result == p("/home/user/minetest/bin/..//worlds"));
+	UASSERT(result == p("/home/user/aperosengine/bin/..//worlds"));
 	UASSERT(removed == p("world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 2);
-	UASSERT(result == p("/home/user/minetest/bin/.."));
+	UASSERT(result == p("/home/user/aperosengine/bin/.."));
 	UASSERT(removed == p("worlds/world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 3);
-	UASSERT(result == p("/home/user/minetest/bin"));
+	UASSERT(result == p("/home/user/aperosengine/bin"));
 	UASSERT(removed == p("../worlds/world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 4);
-	UASSERT(result == p("/home/user/minetest"));
+	UASSERT(result == p("/home/user/aperosengine"));
 	UASSERT(removed == p("bin/../worlds/world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 5);
 	UASSERT(result == p("/home/user"));
-	UASSERT(removed == p("minetest/bin/../worlds/world1"));
+	UASSERT(removed == p("aperosengine/bin/../worlds/world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 6);
 	UASSERT(result == p("/home"));
-	UASSERT(removed == p("user/minetest/bin/../worlds/world1"));
+	UASSERT(removed == p("user/aperosengine/bin/../worlds/world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 7);
 #ifdef _WIN32
 	UASSERT(result == "C:");
 #else
 	UASSERT(result == "");
 #endif
-	UASSERT(removed == p("home/user/minetest/bin/../worlds/world1"));
+	UASSERT(removed == p("home/user/aperosengine/bin/../worlds/world1"));
 }
 
 void TestFileSys::testRemoveLastPathComponentWithTrailingDelimiter() {
 	std::string path, result, removed;
 
-	path = p("/home/user/minetest/bin/..//worlds/world1/");
+	path = p("/home/user/aperosengine/bin/..//worlds/world1/");
 	result = fs::RemoveLastPathComponent(path, &removed, 0);
 	UASSERT(result == path);
 	UASSERT(removed == "");
 	result = fs::RemoveLastPathComponent(path, &removed, 1);
-	UASSERT(result == p("/home/user/minetest/bin/..//worlds"));
+	UASSERT(result == p("/home/user/aperosengine/bin/..//worlds"));
 	UASSERT(removed == p("world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 2);
-	UASSERT(result == p("/home/user/minetest/bin/.."));
+	UASSERT(result == p("/home/user/aperosengine/bin/.."));
 	UASSERT(removed == p("worlds/world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 3);
-	UASSERT(result == p("/home/user/minetest/bin"));
+	UASSERT(result == p("/home/user/aperosengine/bin"));
 	UASSERT(removed == p("../worlds/world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 4);
-	UASSERT(result == p("/home/user/minetest"));
+	UASSERT(result == p("/home/user/aperosengine"));
 	UASSERT(removed == p("bin/../worlds/world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 5);
 	UASSERT(result == p("/home/user"));
-	UASSERT(removed == p("minetest/bin/../worlds/world1"));
+	UASSERT(removed == p("aperosengine/bin/../worlds/world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 6);
 	UASSERT(result == p("/home"));
-	UASSERT(removed == p("user/minetest/bin/../worlds/world1"));
+	UASSERT(removed == p("user/aperosengine/bin/../worlds/world1"));
 	result = fs::RemoveLastPathComponent(path, &removed, 7);
 #ifdef _WIN32
 	UASSERT(result == "C:");
 #else
 	UASSERT(result == "");
 #endif
-	UASSERT(removed == p("home/user/minetest/bin/../worlds/world1"));
+	UASSERT(removed == p("home/user/aperosengine/bin/../worlds/world1"));
 }
 
 void TestFileSys::testRemoveRelativePathComponent() {
 	std::string path, result;
 
-	path = p("/home/user/minetest/bin");
+	path = p("/home/user/aperosengine/bin");
 	result = fs::RemoveRelativePathComponents(path);
 	UASSERT(result == path);
-	path = p("/home/user/minetest/bin/../worlds/world1");
+	path = p("/home/user/aperosengine/bin/../worlds/world1");
 	result = fs::RemoveRelativePathComponents(path);
-	UASSERT(result == p("/home/user/minetest/worlds/world1"));
-	path = p("/home/user/minetest/bin/../worlds/world1/");
+	UASSERT(result == p("/home/user/aperosengine/worlds/world1"));
+	path = p("/home/user/aperosengine/bin/../worlds/world1/");
 	result = fs::RemoveRelativePathComponents(path);
-	UASSERT(result == p("/home/user/minetest/worlds/world1"));
+	UASSERT(result == p("/home/user/aperosengine/worlds/world1"));
 	path = p(".");
 	result = fs::RemoveRelativePathComponents(path);
 	UASSERT(result == "");

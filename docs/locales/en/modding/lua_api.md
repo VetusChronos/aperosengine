@@ -3659,6 +3659,9 @@ Player Inventory lists
     * Is not created automatically, use `InvRef:set_size`
     * Is only used to enhance the empty hand's tool capabilities
 
+Custom lists can be added and deleted with `InvRef:set_size(name, size)` like
+any other inventory.
+
 ItemStack transaction order
 ---------------------------
 
@@ -3817,6 +3820,8 @@ vectors are written like this: `(x, y, z)`:
       `vector.new(v)` does the same as `vector.copy(v)`
 * `vector.zero()`:
     * Returns a new vector `(0, 0, 0)`.
+* `vector.random_direction()`:
+    * Returns a new vector of length 1, pointing into a direction chosen uniformly at random.
 * `vector.copy(v)`:
     * Returns a copy of the vector `v`.
 * `vector.from_string(s[, init])`:
@@ -4020,6 +4025,10 @@ Helper functions
       the value `val` in the table `list`. Non-numerical indices are ignored.
       If `val` could not be found, `-1` is returned. `list` must not have
       negative indices.
+* `table.keyof(table, val)`: returns the key containing
+      the value `val` in the table `table`. If multiple keys contain `val`,
+      it is unspecified which key will be returned.
+      If `val` could not be found, `nil` is returned.
 * `table.insert_all(table, other_table)`:
     * Appends all values in `other_table` to `table` - uses `#table + 1` to
       find new indices.
@@ -7493,6 +7502,8 @@ An `InvRef` is a reference to an inventory.
 * `is_empty(listname)`: return `true` if list is empty
 * `get_size(listname)`: get size of a list
 * `set_size(listname, size)`: set size of a list
+    * If `listname` is not known, a new list will be created
+    * Setting `size` to 0 deletes a list
     * returns `false` on error (e.g. invalid `listname` or `size`)
 * `get_width(listname)`: get width of a list
 * `set_width(listname, width)`: set width of list; currently used for crafting
@@ -10416,7 +10427,7 @@ See [Decoration types]. Used by `aperosengine.register_decoration`.
 
     ----- Schematic-type parameters
 
-    schematic = "foobar.mts",
+    schematic = "foobar.apr",
     -- If schematic is a string, it is the filepath relative to the current
     -- working directory of the specified AperosEngine schematic file.
     -- Could also be the ID of a previously registered schematic.

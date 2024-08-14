@@ -44,6 +44,11 @@ build/.cmake/
 appimage-build
 AppDir
 
+ Direnv
+.direnv/
+# Nix
+/result
+
 ## Files related to Minetest development cycle
 /*.patch
 *.diff

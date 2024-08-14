@@ -81,7 +81,7 @@ struct EnumString ModApiMapgen::es_Rotation[] = {
 
 struct EnumString ModApiMapgen::es_SchematicFormatType[] = {
 	{ SCHEM_FMT_HANDLE, "handle" },
-	{ SCHEM_FMT_MTS, "aprs" },
+	{ SCHEM_FMT_APRS, "aprs" },
 	{ SCHEM_FMT_LUA, "lua" },
 	{ 0, NULL },
 };
@@ -1721,7 +1721,7 @@ int ModApiMapgen::l_serialize_schematic(lua_State *L) {
 	}
 
 	//// Read format of definition to save as
-	int schem_format = SCHEM_FMT_MTS;
+	int schem_format = SCHEM_FMT_APRS;
 	std::string enumstr = readParam<std::string>(L, 2, "");
 	if (!enumstr.empty())
 		string_to_enum(es_SchematicFormatType, schem_format, enumstr);
@@ -1729,7 +1729,7 @@ int ModApiMapgen::l_serialize_schematic(lua_State *L) {
 	//// Serialize to binary string
 	std::ostringstream os(std::ios_base::binary);
 	switch (schem_format) {
-		case SCHEM_FMT_MTS:
+		case SCHEM_FMT_APRS:
 			schem->serializeToMts(&os);
 			break;
 		case SCHEM_FMT_LUA:

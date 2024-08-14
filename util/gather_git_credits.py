@@ -46,7 +46,8 @@ def load(revs):
 	p.wait()
 
 	# Some authors duplicate? Don't add manual workarounds here, edit the .mailmap!
-	for author in ("updatepo.sh <script@mt>", "Weblate <42@minetest.ru>"):
+	for author in ("updatepo.sh <script@mt>", "Weblate <42@minetest.ru>",
+		"import <script@mt>", "minetest <minetest@minetest.net>"):
 		points.pop(author, None)
 	return points
 

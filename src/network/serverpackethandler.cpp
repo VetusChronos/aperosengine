@@ -193,7 +193,7 @@ void Server::handleCommand_Init(NetworkPacket *pkt) {
 	{
 		std::string reason;
 		if (m_script->on_prejoinplayer(playername, addr_s, &reason)) {
-			actionstream << "Server: Player with the name \"" << playerName << "\" tried to connect from " << addr_s << " but it was disallowed for the following reason: " << reason << std::endl;
+			actionstream << "Server: Player with the name \"" << playerName << "\" tried to connect from " << addr_s << " but it was disallowed for the following reason: " << reason << '\n';
 			DenyAccess(peer_id, SERVER_ACCESSDENIED_CUSTOM_STRING, reason);
 			return;
 		}
@@ -229,7 +229,7 @@ void Server::handleCommand_Init(NetworkPacket *pkt) {
 			} else {
 				actionstream << "User " << playername << " tried to log in, "
 														 "but password field was invalid (unknown mechcode)."
-							 << std::endl;
+							 << '\n';
 				DenyAccess(peer_id, SERVER_ACCESSDENIED_SERVER_FAIL);
 				return;
 			}
@@ -293,7 +293,7 @@ void Server::handleCommand_Init2(NetworkPacket *pkt) {
 		Send some initialization data
 	*/
 
-	infostream << "Server: Sending content to " << getPlayerName(peer_id) << std::endl;
+	infostream << "Server: Sending content to " << getPlayerName(peer_id) << '\n';
 
 	// Send item definitions
 	SendItemDef(peer_id, m_itemdef, protocol_version);
@@ -1656,7 +1656,7 @@ void Server::handleCommand_SrpBytesM(NetworkPacket *pkt) {
 		m_script->createAuth(playername, client->enc_pwd);
 
 		if (!m_script->getAuth(playername, nullptr, nullptr)) {
-			errorstream << "Server: " << playername << " cannot be authenticated (auth handler does not work?)" << std::endl;
+			errorstream << "Server: " << playername << " cannot be authenticated (auth handler does not work?)" << '\n';
 			DenyAccess(peer_id, SERVER_ACCESSDENIED_SERVER_FAIL);
 			return;
 		}
@@ -1704,7 +1704,7 @@ void Server::handleCommand_ModChannelLeave(NetworkPacket *pkt) {
 	if (g_settings->getBool("enable_mod_channels") &&
 			m_modchannel_mgr->leaveChannel(channel_name, peer_id)) {
 		resp_pkt << (u8)MODCHANNEL_SIGNAL_LEAVE_OK;
-		infostream << "Peer " << peer_id << " left channel " << channel_name << std::endl;
+		infostream << "Peer " << peer_id << " left channel " << channel_name << '\n';
 	} else {
 		resp_pkt << (u8)MODCHANNEL_SIGNAL_LEAVE_FAILURE;
 		infostream << "Peer " << peer_id << " left channel " << channel_name << ", but was not registered." << '\n';
@@ -1718,7 +1718,7 @@ void Server::handleCommand_ModChannelMsg(NetworkPacket *pkt) {
 	*pkt >> channel_name >> channel_msg;
 
 	session_t peer_id = pkt->getPeerId();
-	verbosestream << "Mod channel message received from peer " << peer_id << " on channel " << channel_name << " message: " << channel_msg << std::endl;
+	verbosestream << "Mod channel message received from peer " << peer_id << " on channel " << channel_name << " message: " << channel_msg << '\n';
 
 	// If mod channels are not enabled, discard message
 	if (!g_settings->getBool("enable_mod_channels")) {

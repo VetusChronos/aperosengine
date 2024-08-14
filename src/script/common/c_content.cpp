@@ -1359,7 +1359,7 @@ ItemStack read_item(lua_State *L, int index, IItemDefManager *idef) {
 			return item;
 		} catch (SerializationError &e) {
 			warningstream << "unable to create item from itemstring"
-						  << ": " << itemstring << std::endl;
+						  << ": " << itemstring << '\n';
 			return ItemStack();
 		}
 	} else if (lua_istable(L, index)) {

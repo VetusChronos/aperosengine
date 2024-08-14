@@ -55,7 +55,7 @@ void VoxelManipulator::print(std::ostream &o, const NodeDefManager *ndef,
 	const v3s16 &em = m_area.getExtent();
 	v3s16 of = m_area.MinEdge;
 	o << "size: " << em.X << "x" << em.Y << "x" << em.Z
-	  << " offset: (" << of.X << "," << of.Y << "," << of.Z << ")" << std::endl;
+	  << " offset: (" << of.X << "," << of.Y << "," << of.Z << ")" << '\n';
 
 	for (s32 y = m_area.MaxEdge.Y; y >= m_area.MinEdge.Y; y--) {
 		if (em.X >= 3 && em.Y >= 3) {
@@ -111,7 +111,7 @@ void VoxelManipulator::print(std::ostream &o, const NodeDefManager *ndef,
 			}
 			o << ' ';
 		}
-		o << std::endl;
+		o << '\n';
 	}
 }
 

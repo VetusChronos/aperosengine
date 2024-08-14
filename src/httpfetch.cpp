@@ -111,7 +111,7 @@ u64 httpfetch_caller_alloc_secure() {
 
 void httpfetch_caller_free(u64 caller) {
 	verbosestream << "httpfetch_caller_free: freeing "
-				  << caller << std::endl;
+				  << caller << '\n';
 
 	httpfetch_request_clear(caller);
 	if (caller != HTTPFETCH_DISCARD) {
@@ -664,7 +664,7 @@ protected:
 		if (mres != CURLM_OK) {
 			errorstream << "curl_multi_cleanup"
 						<< " returned error code " << mres
-						<< std::endl;
+						<< '\n';
 		}
 
 		return NULL;
@@ -677,7 +677,7 @@ void httpfetch_init(int parallel_limit) {
 	FATAL_ERROR_IF(g_httpfetch_thread, "httpfetch_init called twice");
 
 	verbosestream << "httpfetch_init: parallel_limit=" << parallel_limit
-				  << std::endl;
+				  << '\n';
 
 	CURLcode res = curl_global_init(CURL_GLOBAL_DEFAULT);
 	FATAL_ERROR_IF(res != CURLE_OK, "cURL init failed");
@@ -691,7 +691,7 @@ void httpfetch_init(int parallel_limit) {
 }
 
 void httpfetch_cleanup() {
-	verbosestream << "httpfetch_cleanup: cleaning up" << std::endl;
+	verbosestream << "httpfetch_cleanup: cleaning up" << '\n';
 
 	if (g_httpfetch_thread) {
 		g_httpfetch_thread->stop();

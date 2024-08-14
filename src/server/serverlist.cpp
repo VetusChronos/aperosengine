@@ -63,12 +63,15 @@ void sendAnnounce(AnnounceAction action,
 		server["game_time"] = game_time;
 		server["clients"] = (int)clients_names.size();
 		server["clients_max"] = g_settings->getU16("max_users");
-		server["clients_list"] = Json::Value(Json::arrayValue);
-		for (const std::string &clients_name : clients_names) {
-			server["clients_list"].append(clients_name);
+		if (g_settings->getBool("server_announce_send_players")) {
+			server["clients_list"] = Json::Value(Json::arrayValue);
+			for (const std::string &clients_name : clients_names) {
+				server["clients_list"].append(clients_name);
+			}
 		}
-		if (!gameid.empty())
+		if (!gameid.empty()) {
 			server["gameid"] = gameid;
+		}
 	}
 
 	if (action == AA_START) {
@@ -82,8 +85,9 @@ void sendAnnounce(AnnounceAction action,
 			server["mods"].append(mod.name);
 		}
 	} else if (action == AA_UPDATE) {
-		if (lag)
+		if (lag) {
 			server["lag"] = lag;
+		}
 	}
 
 	if (action == AA_START) {

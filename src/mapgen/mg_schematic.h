@@ -86,7 +86,7 @@ enum SchematicType {
 
 enum SchematicFormatType {
 	SCHEM_FMT_HANDLE,
-	SCHEM_FMT_MTS,
+	SCHEM_FMT_APRS,
 	SCHEM_FMT_LUA,
 };
 

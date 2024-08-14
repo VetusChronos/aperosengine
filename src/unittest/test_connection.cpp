@@ -276,7 +276,7 @@ void TestConnection::testConnectSendReceive() {
 
 		auto sentdata = pkt.oldForgePacket();
 
-		infostream << "** running client.Send()" << std::endl;
+		infostream << "** running client.Send()" << '\n';
 		client.Send(PEER_ID_SERVER, 0, &pkt, true);
 
 		sleep_ms(50);

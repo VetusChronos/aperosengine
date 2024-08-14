@@ -444,7 +444,7 @@ void RemoteClient::SentBlock(v3s16 p) {
 	else
 		infostream << "RemoteClient::SentBlock(): Sent block"
 					  " already in m_blocks_sending"
-				   << std::endl;
+				   << '\n';
 }
 
 void RemoteClient::SetBlockNotSent(v3s16 p) {
@@ -722,7 +722,7 @@ void ClientInterface::UpdatePlayerList() {
 		m_clients_names.clear();
 
 		if (!clients.empty())
-			infostream << "Players:" << std::endl;
+			infostream << "Players:" << '\n';
 
 		for (session_t i : clients) {
 			RemotePlayer *player = m_env->getPlayer(i);

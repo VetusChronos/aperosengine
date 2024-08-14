@@ -422,7 +422,7 @@ void MapBlock::deSerialize(std::istream &in_compressed, u8 version, bool disk) {
 	if (!ser_ver_supported(version))
 		throw VersionMismatchException("ERROR: MapBlock format not supported");
 
-	TRACESTREAM(<< "MapBlock::deSerialize " << getPos() << std::endl);
+	TRACESTREAM(<< "MapBlock::deSerialize " << getPos() << '\n');
 
 	m_is_air_expired = true;
 
@@ -452,18 +452,18 @@ void MapBlock::deSerialize(std::istream &in_compressed, u8 version, bool disk) {
 	if (disk && version >= 29) {
 		// Timestamp
 		TRACESTREAM(<< "MapBlock::deSerialize " << getPos()
-					<< ": Timestamp" << std::endl);
+					<< ": Timestamp" << '\n');
 		setTimestampNoChangedFlag(readU32(is));
 		m_disk_timestamp = m_timestamp;
 
 		// Node/id mapping
 		TRACESTREAM(<< "MapBlock::deSerialize " << getPos()
-					<< ": NameIdMapping" << std::endl);
+					<< ": NameIdMapping" << '\n');
 		nimap.deSerialize(is);
 	}
 
 	TRACESTREAM(<< "MapBlock::deSerialize " << getPos()
-				<< ": Bulk node data" << std::endl);
+				<< ": Bulk node data" << '\n');
 	u8 content_width = readU8(is);
 	u8 params_width = readU8(is);
 	if (content_width != 1 && content_width != 2)
@@ -488,7 +488,7 @@ void MapBlock::deSerialize(std::istream &in_compressed, u8 version, bool disk) {
 		NodeMetadata
 	*/
 	TRACESTREAM(<< "MapBlock::deSerialize " << getPos()
-				<< ": Node metadata" << std::endl);
+				<< ": Node metadata" << '\n');
 	if (version >= 29) {
 		m_node_metadata.deSerialize(is, m_gamedef->idef());
 	} else {
@@ -506,7 +506,7 @@ void MapBlock::deSerialize(std::istream &in_compressed, u8 version, bool disk) {
 		} catch (SerializationError &e) {
 			warningstream << "MapBlock::deSerialize(): Ignoring an error"
 						  << " while deserializing node metadata at ("
-						  << getPos() << ": " << e.what() << std::endl;
+						  << getPos() << ": " << e.what() << '\n';
 		}
 	}
 
@@ -527,19 +527,19 @@ void MapBlock::deSerialize(std::istream &in_compressed, u8 version, bool disk) {
 
 		// Static objects
 		TRACESTREAM(<< "MapBlock::deSerialize " << getPos()
-					<< ": Static objects" << std::endl);
+					<< ": Static objects" << '\n');
 		m_static_objects.deSerialize(is);
 
 		if (version < 29) {
 			// Timestamp
 			TRACESTREAM(<< "MapBlock::deSerialize " << getPos()
-						<< ": Timestamp" << std::endl);
+						<< ": Timestamp" << '\n');
 			setTimestampNoChangedFlag(readU32(is));
 			m_disk_timestamp = m_timestamp;
 
 			// Node/id mapping
 			TRACESTREAM(<< "MapBlock::deSerialize " << getPos()
-						<< ": NameIdMapping" << std::endl);
+						<< ": NameIdMapping" << '\n');
 			nimap.deSerialize(is);
 		}
 
@@ -548,7 +548,7 @@ void MapBlock::deSerialize(std::istream &in_compressed, u8 version, bool disk) {
 
 		if (version >= 25) {
 			TRACESTREAM(<< "MapBlock::deSerialize " << getPos()
-						<< ": Node timers (ver>=25)" << std::endl);
+						<< ": Node timers (ver>=25)" << '\n');
 			m_node_timers.deSerialize(is, version);
 		}
 
@@ -558,7 +558,7 @@ void MapBlock::deSerialize(std::istream &in_compressed, u8 version, bool disk) {
 	}
 
 	TRACESTREAM(<< "MapBlock::deSerialize " << getPos()
-				<< ": Done." << std::endl);
+				<< ": Done." << '\n');
 }
 
 void MapBlock::deSerializeNetworkSpecific(std::istream &is) {
@@ -570,7 +570,7 @@ void MapBlock::deSerializeNetworkSpecific(std::istream &is) {
 
 	} catch (SerializationError &e) {
 		warningstream << "MapBlock::deSerializeNetworkSpecific(): Ignoring an error"
-					  << ": " << e.what() << std::endl;
+					  << ": " << e.what() << '\n';
 	}
 }
 
@@ -700,7 +700,7 @@ void MapBlock::deSerialize_pre22(std::istream &is, u8 version, bool disk) {
 				}
 			} catch (SerializationError &e) {
 				warningstream << "MapBlock::deSerialize(): Ignoring an error"
-							  << " while deserializing node metadata" << std::endl;
+							  << " while deserializing node metadata" << '\n';
 			}
 		}
 	}
@@ -719,7 +719,7 @@ void MapBlock::deSerialize_pre22(std::istream &is, u8 version, bool disk) {
 			// Not supported and length not known if count is not 0
 			if (count != 0) {
 				warningstream << "MapBlock::deSerialize_pre22(): "
-							  << "Ignoring stuff coming at and after MBOs" << std::endl;
+							  << "Ignoring stuff coming at and after MBOs" << '\n';
 				return;
 			}
 		}

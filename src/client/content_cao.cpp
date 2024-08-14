@@ -286,7 +286,7 @@ void TestCAO::step(float dtime, ClientEnvironment *env) {
 }
 
 void TestCAO::processMessage(const std::string &data) {
-	infostream << "TestCAO: Got data: " << data << std::endl;
+	infostream << "TestCAO: Got data: " << data << '\n';
 	std::istringstream is(data, std::ios::binary);
 	u16 cmd;
 	is >> cmd;
@@ -745,7 +745,7 @@ void GenericCAO::addToScene(ITextureSource *tsrc, scene::ISceneManager *smgr) {
 				mat.BackfaceCulling = m_prop.backface_culling;
 			});
 		} else
-			errorstream << "GenericCAO::addToScene(): Could not load mesh " << m_prop.mesh << std::endl;
+			errorstream << "GenericCAO::addToScene(): Could not load mesh " << m_prop.mesh << '\n';
 	} else if (m_prop.visual == "wielditem" || m_prop.visual == "item") {
 		grabMatrixNode();
 		ItemStack item;
@@ -769,7 +769,7 @@ void GenericCAO::addToScene(ITextureSource *tsrc, scene::ISceneManager *smgr) {
 		m_wield_meshnode->setScale(m_prop.visual_size / 2.0f);
 	} else {
 		infostream << "GenericCAO::addToScene(): \"" << m_prop.visual
-				   << "\" not supported" << std::endl;
+				   << "\" not supported" << '\n';
 	}
 
 	/* Set VBO hint */
@@ -1325,7 +1325,7 @@ void GenericCAO::updateTextures(std::string mod) {
 				texturestring += mod;
 				video::ITexture *texture = tsrc->getTextureForMesh(texturestring);
 				if (!texture) {
-					errorstream << "GenericCAO::updateTextures(): Could not load texture " << texturestring << std::endl;
+					errorstream << "GenericCAO::updateTextures(): Could not load texture " << texturestring << '\n';
 					continue;
 				}
 

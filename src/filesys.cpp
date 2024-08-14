@@ -191,14 +191,14 @@ bool DeleteSingleFileOrEmptyDirectory(const std::string &path) {
 std::string TempPath() {
 	DWORD bufsize = GetTempPath(0, NULL);
 	if (bufsize == 0) {
-		errorstream << "GetTempPath failed, error = " << GetLastError() << std::endl;
+		errorstream << "GetTempPath failed, error = " << GetLastError() << '\n';
 		return "";
 	}
 	std::string buf;
 	buf.resize(bufsize);
 	DWORD len = GetTempPath(bufsize, &buf[0]);
 	if (len == 0 || len > bufsize) {
-		errorstream << "GetTempPath failed, error = " << GetLastError() << std::endl;
+		errorstream << "GetTempPath failed, error = " << GetLastError() << '\n';
 		return "";
 	}
 	buf.resize(len);
@@ -354,7 +354,7 @@ bool RecursiveDelete(const std::string &path) {
 		Execute the 'rm' command directly, by fork() and execve()
 	*/
 
-	infostream << "Removing \"" << path << "\"" << std::endl;
+	infostream << "Removing \"" << path << "\"" << '\n';
 
 	pid_t child_pid = fork();
 
@@ -372,7 +372,7 @@ bool RecursiveDelete(const std::string &path) {
 		};
 
 		verbosestream << "Executing '" << argv[0] << "' '" << argv[1] << "' '"
-					  << argv[2] << "'" << std::endl;
+					  << argv[2] << "'" << '\n';
 
 		execv(argv[0], const_cast<char **>(argv));
 
@@ -571,7 +571,7 @@ void GetRecursiveSubPaths(const std::string &path,
 }
 
 bool RecursiveDeleteContent(const std::string &path) {
-	infostream << "Removing content of \"" << path << "\"" << std::endl;
+	infostream << "Removing content of \"" << path << "\"" << '\n';
 	std::vector<DirListNode> list = GetDirListing(path);
 	for (const DirListNode &dln : list) {
 		if (trim(dln.name) == "." || trim(dln.name) == "..")
@@ -641,40 +641,47 @@ bool MoveDir(const std::string &source, const std::string &target) {
 	}
 
 	// Try renaming first which is instant
-	if (fs::Rename(source, target))
-		return true;
+	if (fs::Rename(source, target)) return true;
 
 	infostream << "MoveDir: rename not possible, will copy instead" << '\n';
 	bool retval = fs::CopyDir(source, target);
-	if (retval)
+	if (retval) {
 		retval &= fs::RecursiveDelete(source);
+	}
 	return retval;
 }
 
 bool PathStartsWith(const std::string &path, const std::string &prefix) {
+	if (prefix.empty()) {
+		return path.empty();
+	}
 	size_t pathsize = path.size();
 	size_t pathpos = 0;
 	size_t prefixsize = prefix.size();
 	size_t prefixpos = 0;
 	for (;;) {
+		// Test if current characters at path and prefix are delimiter OR EOS
 		bool delim1 = pathpos == pathsize || IsDirDelimiter(path[pathpos]);
 		bool delim2 = prefixpos == prefixsize || IsDirDelimiter(prefix[prefixpos]);
 
-		if (delim1 != delim2)
-			return false;
+		// Return false if it's delimiter/EOS in one path but not in the other
+		if (delim1 != delim2) return false;
 
 		if (delim1) {
-			while (pathpos < pathsize &&
-					IsDirDelimiter(path[pathpos]))
+			// Skip consequent delimiters in path, in prefix
+			while (pathpos < pathsize && IsDirDelimiter(path[pathpos]))
 				++pathpos;
-			while (prefixpos < prefixsize &&
-					IsDirDelimiter(prefix[prefixpos]))
+			while (prefixpos < prefixsize && IsDirDelimiter(prefix[prefixpos]))
 				++prefixpos;
-			if (prefixpos == prefixsize)
-				return true;
-			if (pathpos == pathsize)
-				return false;
+			// Return true if prefix has ended (at delimiter/EOS)
+			if (prefixpos == prefixsize) return true;
+			// Return false if path has ended (at delimiter/EOS)
+            // while prefix did not.
+			if (pathpos == pathsize) return false;
 		} else {
+			// Skip pairwise-equal characters in path and prefix until
+			// delimiter/EOS in path or prefix.
+			// Return false if differing characters are met.
 			size_t len = 0;
 			do {
 				char pathchar = path[pathpos + len];
@@ -683,8 +690,7 @@ bool PathStartsWith(const std::string &path, const std::string &prefix) {
 					pathchar = my_tolower(pathchar);
 					prefixchar = my_tolower(prefixchar);
 				}
-				if (pathchar != prefixchar)
-					return false;
+				if (pathchar != prefixchar) return false;
 				++len;
 			} while (pathpos + len < pathsize && !IsDirDelimiter(path[pathpos + len]) && prefixpos + len < prefixsize && !IsDirDelimiter(prefix[prefixpos + len]));
 			pathpos += len;

@@ -408,7 +408,7 @@ static void print_version(std::ostream &os) {
 static void list_game_ids() {
 	std::set<std::string> gameids = getAvailableGameIds();
 	for (const std::string &gameid : gameids)
-		std::cout << gameid << std::endl;
+		std::cout << gameid << '\n';
 }
 
 static void list_worlds(bool print_name, bool print_path) {

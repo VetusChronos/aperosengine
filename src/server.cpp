@@ -129,9 +129,9 @@ void *ServerThread::run() {
 			m_server->Receive(remaining_time);
 
 		} catch (con::PeerNotFoundException &e) {
-			infostream << "Server: PeerNotFoundException" << std::endl;
+			infostream << "Server: PeerNotFoundException" << '\n';
 		} catch (ClientNotFoundException &e) {
-			infostream << "Server: ClientNotFoundException" << std::endl;
+			infostream << "Server: ClientNotFoundException" << '\n';
 		} catch (con::ConnectionBindFailed &e) {
 			m_server->setAsyncFatalError(e.what());
 		} catch (LuaError &e) {
@@ -560,13 +560,13 @@ void Server::start() {
 }
 
 void Server::stop() {
-	infostream << "Server: Stopping and waiting for threads" << std::endl;
+	infostream << "Server: Stopping and waiting for threads" << '\n';
 
 	// Stop threads (set run=false first so both start stopping)
 	m_thread->stop();
 	m_thread->wait();
 
-	infostream << "Server: Threads stopped" << std::endl;
+	infostream << "Server: Threads stopped" << '\n';
 }
 
 void Server::step() {
@@ -1215,14 +1215,14 @@ void Server::onMapEditEvent(const MapEditEvent &event) {
 
 void Server::peerAdded(con::Peer *peer) {
 	verbosestream << "Server::peerAdded(): peer->id="
-				  << peer->id << std::endl;
+				  << peer->id << '\n';
 
 	m_peer_change_queue.push(con::PeerChange(con::PEER_ADDED, peer->id, false));
 }
 
 void Server::deletingPeer(con::Peer *peer, bool timeout) {
 	verbosestream << "Server::deletingPeer(): peer->id="
-				  << peer->id << ", timeout=" << timeout << std::endl;
+				  << peer->id << ", timeout=" << timeout << '\n';
 
 	m_clients.event(peer->id, CSE_Disconnect);
 	m_peer_change_queue.push(con::PeerChange(con::PEER_REMOVED, peer->id, timeout));
@@ -1273,7 +1273,7 @@ void Server::handlePeerChanges() {
 
 		verbosestream << "Server: Handling peer change: "
 					  << "id=" << c.peer_id << ", timeout=" << c.timeout
-					  << std::endl;
+					  << '\n';
 
 		switch (c.type) {
 			case con::PEER_ADDED:
@@ -2065,7 +2065,7 @@ s32 Server::playSound(ServerPlayingSound &params, bool ephemeral) {
 		RemotePlayer *player = m_env->getPlayer(params.to_player.c_str());
 		if (!player) {
 			infostream << "Server::playSound: Player \"" << params.to_player
-					   << "\" not found" << std::endl;
+					   << "\" not found" << '\n';
 			return -1;
 		}
 		dst_clients.push_back(player->getPeerId());
@@ -2545,7 +2545,7 @@ void Server::sendRequestedMedia(session_t peer_id,
 
 		if (it == m_media.end()) {
 			errorstream << "Server::sendRequestedMedia(): Client asked for "
-						<< "unknown file \"" << (name) << "\"" << std::endl;
+						<< "unknown file \"" << (name) << "\"" << '\n';
 			continue;
 		}
 		const auto &m = it->second;
@@ -3587,7 +3587,7 @@ bool Server::dynamicAddMedia(const DynamicMediaArgs &a) {
 // Return value: success/failure
 bool Server::rollbackRevertActions(const std::list<RollbackAction> &actions,
 		std::list<std::string> *log) {
-	infostream << "Server::rollbackRevertActions(len=" << actions.size() << ")" << std::endl;
+	infostream << "Server::rollbackRevertActions(len=" << actions.size() << ")" << '\n';
 	auto *map = &m_env->getServerMap();
 
 	// Fail if no actions to handle
@@ -3607,20 +3607,20 @@ bool Server::rollbackRevertActions(const std::list<RollbackAction> &actions,
 			num_failed++;
 			std::ostringstream os;
 			os << "Revert of step (" << num_tried << ") " << action.toString() << " failed";
-			infostream << "Map::rollbackRevertActions(): " << os.str() << std::endl;
+			infostream << "Map::rollbackRevertActions(): " << os.str() << '\n';
 			if (log)
 				log->push_back(os.str());
 		} else {
 			std::ostringstream os;
 			os << "Successfully reverted step (" << num_tried << ") " << action.toString();
-			infostream << "Map::rollbackRevertActions(): " << os.str() << std::endl;
+			infostream << "Map::rollbackRevertActions(): " << os.str() << '\n';
 			if (log)
 				log->push_back(os.str());
 		}
 	}
 
 	infostream << "Map::rollbackRevertActions(): " << num_failed << "/" << num_tried
-			   << " failed" << std::endl;
+			   << " failed" << '\n';
 
 	// Call it done if less than half failed
 	return num_failed <= num_tried / 2;
@@ -3793,7 +3793,7 @@ PlayerSAO *Server::emergePlayer(const char *name, session_t peer_id, u16 proto_v
 
 	// If player is already connected, cancel
 	if (player) {
-		infostream << "emergePlayer(): Player already connected" << std::endl;
+		infostream << "emergePlayer(): Player already connected" << '\n';
 		return NULL;
 	}
 
@@ -3803,7 +3803,7 @@ PlayerSAO *Server::emergePlayer(const char *name, session_t peer_id, u16 proto_v
 	if (m_env->getPlayer(peer_id)) {
 		infostream << "emergePlayer(): Player with wrong name but same"
 					  " peer_id already exists"
-				   << std::endl;
+				   << '\n';
 		return NULL;
 	}
 
@@ -3846,7 +3846,7 @@ PlayerSAO *Server::emergePlayer(const char *name, session_t peer_id, u16 proto_v
 }
 
 void dedicated_server_loop(Server &server, bool &kill) {
-	verbosestream << "dedicated_server_loop()" << std::endl;
+	verbosestream << "dedicated_server_loop()" << '\n';
 
 	IntervalLimiter m_profiler_interval;
 
