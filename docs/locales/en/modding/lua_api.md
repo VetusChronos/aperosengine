@@ -2861,14 +2861,14 @@ Elements
     * Requires formspec version >= 6.
     * See `background9[]` documentation for more information.
 
-### `model[<X>,<Y>;<W>,<H>;<name>;<mesh>;<textures>;<rotation X,Y>;<continuous>;<mouse control>;<frame loop range>;<animation speed>]`
+### `model[<X>,<Y>;<W>,<H>;<name>;<mesh>;<textures>;<rotation>;<continuous>;<mouse control>;<frame loop range>;<animation speed>]`
 
 * Show a mesh model.
 * `name`: Element name that can be used for styling
 * `mesh`: The mesh model to use.
 * `textures`: The mesh textures to use according to the mesh materials.
    Texture names must be separated by commas.
-* `rotation {X,Y}` (Optional): Initial rotation of the camera.
+* `rotation` (Optional): Initial rotation of the camera, format `x,y`.
   The axes are euler angles in degrees.
 * `continuous` (Optional): Whether the rotation is continuous. Default `false`.
 * `mouse control` (Optional): Whether the model can be controlled with the mouse. Default `true`.
@@ -7094,6 +7094,8 @@ Misc.
 * `aperosengine.is_player(obj)`: boolean, whether `obj` is a player
 * `aperosengine.player_exists(name)`: boolean, whether player exists
   (regardless of online status)
+* `aperosengine.is_valid_player_name(name)`: boolean, whether the given name
+  could be used as a player name (regardless of whether said player exists).
 * `aperosengine.hud_replace_builtin(name, hud_definition)`
     * Replaces definition of a builtin hud element
     * `name`: `"breath"`, `"health"` or `"minimap"`
@@ -7983,6 +7985,29 @@ child will follow movement and rotation of that bone.
 * `get_bone_overrides()`: returns all bone overrides as table `{[bonename] = override, ...}`
 * `set_properties(object property table)`
 * `get_properties()`: returns a table of all object properties
+* `set_observers(observers)`: sets observers (players this object is sent to)
+    * If `observers` is `nil`, the object's observers are "unmanaged":
+      The object is sent to all players as governed by server settings. This is the default.
+    * `observers` is a "set" of player names: `{name1 = true, name2 = true, ...}`
+        * A set is a table where the keys are the elements of the set
+          (in this case, *valid* player names) and the values are all `true`.
+    * Attachments: The *effective observers* of an object are made up of
+      all players who can observe the object *and* are also effective observers
+      of its parent object (if there is one).
+    * Players are automatically added to their own observer sets.
+      Players **must** effectively observe themselves.
+    * Object activation and deactivation are unaffected by observability.
+    * Attached sounds do not work correctly and thus should not be used
+      on objects with managed observers yet.
+* `get_observers()`:
+    * throws an error if the object is invalid
+    * returns `nil` if the observers are unmanaged
+    * returns a table with all observer names as keys and `true` values (a "set") otherwise
+* `get_effective_observers()`:
+    * Like `get_observers()`, but returns the "effective" observers, taking into account attachments
+    * Time complexity: O(nm)
+        * n: number of observers of the involved entities
+        * m: number of ancestors along the attachment chain
 * `is_player()`: returns true for players, false otherwise
 * `get_nametag_attributes()`
     * returns a table with the attributes of the nametag of an object
@@ -8911,6 +8936,9 @@ Entity definition
 -----------------
 
 Used by `aperosengine.register_entity`.
+The entity definition table becomes a metatable of a newly created per-entity
+luaentity table, meaning its fields (e.g. `initial_properties`) will be shared
+between all instances of an entity.
 
 ```lua
 {
@@ -8967,7 +8995,7 @@ Used by `aperosengine.register_abm`.
     -- Operation interval in seconds
 
     chance = 50,
-    -- Chance of triggering `action` per-node per-interval is 1.0 / chance
+    -- Probability of triggering `action` per-node per-interval is 1.0 / chance (integers only)
 
     min_y = -32768,
     max_y = 32767,

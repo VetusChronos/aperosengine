@@ -24,15 +24,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "constants.h"
 #include "network/networkprotocol.h"
 #include "util/basic_macros.h"
+#include "util/string.h"
 #include <list>
 #include <mutex>
 #include <functional>
 #include <tuple>
+#include <string>
 
 #define PLAYERNAME_SIZE 20
 
 #define PLAYERNAME_ALLOWED_CHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 #define PLAYERNAME_ALLOWED_CHARS_USER_EXPL "'a' to 'z', 'A' to 'Z', '0' to '9', '-', '_'"
+
+bool is_valid_player_name(std::string_view name);
 
 struct PlayerFovSpec {
 	f32 fov;
@@ -150,7 +154,7 @@ class Environment;
 
 class Player {
 public:
-	Player(const char *name, IItemDefManager *idef);
+	Player(const std::string &name, IItemDefManager *idef);
 	virtual ~Player() = 0;
 
 	DISABLE_CLASS_COPY(Player);
@@ -167,14 +171,14 @@ public:
 	// in BS-space
 	v3f getSpeed() const { return m_speed; }
 
-	const char *getName() const { return m_name; }
+	const std::string& getName() const { return m_name; }
 
 	u32 getFreeHudID() {
 		size_t size = hud.size();
 		for (size_t i = 0; i != size; i++) {
-			if (!hud[i])
-				return i;
+			if (!hud[i]) return i;
 		}
+		
 		return size;
 	}
 
@@ -234,7 +238,7 @@ public:
 	s32 hud_hotbar_itemcount;
 
 protected:
-	char m_name[PLAYERNAME_SIZE];
+	std::string m_name;
 	v3f m_speed; // velocity; in BS-space
 	u16 m_wield_index = 0;
 	PlayerFovSpec m_fov_override_spec = { 0.0f, false, 0.0f };

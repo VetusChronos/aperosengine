@@ -549,21 +549,20 @@ ServerMap &ServerEnvironment::getServerMap() {
 
 RemotePlayer *ServerEnvironment::getPlayer(const session_t peer_id) {
 	for (RemotePlayer *player : m_players) {
-		if (player->getPeerId() == peer_id)
-			return player;
+		if (player->getPeerId() == peer_id) return player;
 	}
+
 	return NULL;
 }
 
-RemotePlayer *ServerEnvironment::getPlayer(const char *name, bool match_invalid_peer) {
+RemotePlayer *ServerEnvironment::getPlayer(const std::string &name, bool match_invalid_peer) {
 	for (RemotePlayer *player : m_players) {
-		if (strcmp(player->getName(), name) != 0)
-			continue;
+		if (player->getName() != name) continue;
 
-		if (match_invalid_peer || player->getPeerId() != PEER_ID_INEXISTENT)
-			return player;
+		if (match_invalid_peer || player->getPeerId() != PEER_ID_INEXISTENT) return player;
 		break;
 	}
+
 	return nullptr;
 }
 
@@ -574,8 +573,9 @@ void ServerEnvironment::addPlayer(RemotePlayer *player) {
 		Exception: there can be multiple players with peer_id=0
 	*/
 	// If peer id is non-zero, it has to be unique.
-	if (player->getPeerId() != PEER_ID_INEXISTENT)
+	if (player->getPeerId() != PEER_ID_INEXISTENT) {
 		FATAL_ERROR_IF(getPlayer(player->getPeerId()) != NULL, "Peer id not unique");
+	}
 	// Name has to be unique.
 	FATAL_ERROR_IF(getPlayer(player->getName()) != NULL, "Player name not unique");
 	// Add.
@@ -1659,6 +1659,10 @@ u16 ServerEnvironment::addActiveObject(std::unique_ptr<ServerActiveObject> objec
 	return id;
 }
 
+void ServerEnvironment::invalidateActiveObjectObserverCaches() {
+	m_ao_manager.invalidateActiveObjectObserverCaches();
+}
+
 /*
 	Finds out what new objects have been added to
 	inside a radius around a position
@@ -1673,8 +1677,14 @@ void ServerEnvironment::getAddedActiveObjects(PlayerSAO *playersao, s16 radius,
 	if (player_radius_f < 0.0f)
 		player_radius_f = 0.0f;
 
-	m_ao_manager.getAddedActiveObjectsAroundPos(playersao->getBasePosition(), radius_f,
-			player_radius_f, current_objects, added_objects);
+	if (!playersao->isEffectivelyObservedBy(playersao->getPlayer()->getName())) {
+		throw ModError("Player does not observe itself");
+	}
+
+	m_ao_manager.getAddedActiveObjectsAroundPos(
+		playersao->getBasePosition(), playersao->getPlayer()->getName(),
+		radius_f, player_radius_f,
+		current_objects, added_objects);
 }
 
 /*
@@ -1688,15 +1698,24 @@ void ServerEnvironment::getRemovedActiveObjects(PlayerSAO *playersao, s16 radius
 	f32 radius_f = radius * BS;
 	f32 player_radius_f = player_radius * BS;
 
-	if (player_radius_f < 0)
+	if (player_radius_f < 0) {
 		player_radius_f = 0;
+	}
+
+	const std::string &player_name = playersao->getPlayer()->getName();
+
+	if (!playersao->isEffectivelyObservedBy(player_name)) {
+		throw ModError("Player does not observe itself");
+	}
+
 	/*
 		Go through current_objects; object is removed if:
 		- object is not found in m_active_objects (this is actually an
 		  error condition; objects should be removed only after all clients
 		  have been informed about removal), or
 		- object is to be removed or deactivated, or
-		- object is too far away
+		- object is too far away, or
+		- object is marked as not observable by the client
 	*/
 	for (u16 id : current_objects) {
 		ServerActiveObject *object = getActiveObject(id);
@@ -1714,22 +1733,21 @@ void ServerEnvironment::getRemovedActiveObjects(PlayerSAO *playersao, s16 radius
 		}
 
 		f32 distance_f = object->getBasePosition().getDistanceFrom(playersao->getBasePosition());
-		if (object->getType() == ACTIVEOBJECT_TYPE_PLAYER) {
-			if (distance_f <= player_radius_f || player_radius_f == 0)
-				continue;
-		} else if (distance_f <= radius_f)
-			continue;
+		bool in_range = object->getType() == ACTIVEOBJECT_TYPE_PLAYER
+			? distance_f <= player_radius_f || player_radius_f == 0
+			: distance_f <= radius_f;
 
-		// Object is no longer visible
-		removed_objects.emplace_back(false, id);
+		if (!in_range || !object->isEffectivelyObservedBy(player_name)) {
+			// out of range or not observed anymore
+			removed_objects.emplace_back(false, id);
+		}
 	}
 }
 
 void ServerEnvironment::setStaticForActiveObjectsInBlock(
 		v3s16 blockpos, bool static_exists, v3s16 static_block) {
 	MapBlock *block = m_map->getBlockNoCreateNoEx(blockpos);
-	if (!block)
-		return;
+	if (!block) return;
 
 	for (auto &so_it : block->m_static_objects.getAllActives()) {
 		// Get the ServerActiveObject counterpart to this StaticObject
@@ -1748,8 +1766,7 @@ void ServerEnvironment::setStaticForActiveObjectsInBlock(
 }
 
 bool ServerEnvironment::getActiveObjectMessage(ActiveObjectMessage *dest) {
-	if (m_active_object_messages.empty())
-		return false;
+	if (m_active_object_messages.empty()) return false;
 
 	*dest = std::move(m_active_object_messages.front());
 	m_active_object_messages.pop();
@@ -1763,11 +1780,9 @@ void ServerEnvironment::getSelectedActiveObjects(
 	const v3f line_vector = shootline_on_map.getVector();
 
 	auto process = [&](ServerActiveObject *obj) -> bool {
-		if (obj->isGone())
-			return false;
+		if (obj->isGone()) return false;
 		aabb3f selection_box;
-		if (!obj->getSelectionBox(&selection_box))
-			return false;
+		if (!obj->getSelectionBox(&selection_box)) return false;
 
 		v3f pos = obj->getBasePosition();
 		v3f rel_pos = shootline_on_map.start - pos;
@@ -1787,8 +1802,7 @@ void ServerEnvironment::getSelectedActiveObjects(
 					&current_intersection, &current_normal);
 			current_raw_normal = current_normal;
 		}
-		if (!collision)
-			return false;
+		if (!collision) return false;
 
 		PointabilityType pointable;
 		if (pointabilities) {
@@ -1811,6 +1825,7 @@ void ServerEnvironment::getSelectedActiveObjects(
 					(s16)obj->getId(), current_intersection, current_normal,
 					current_raw_normal, d_sq, pointable);
 		}
+
 		return false;
 	};
 
@@ -1827,9 +1842,7 @@ void ServerEnvironment::getSelectedActiveObjects(
 u16 ServerEnvironment::addActiveObjectRaw(std::unique_ptr<ServerActiveObject> object_u,
 		const StaticObject *from_static, u32 dtime_s) {
 	auto object = object_u.get();
-	if (!m_ao_manager.registerObject(std::move(object_u))) {
-		return 0;
-	}
+	if (!m_ao_manager.registerObject(std::move(object_u))) return 0;
 
 	// Register reference in scripting api (must be done before post-init)
 	m_script->addObjectReference(object);

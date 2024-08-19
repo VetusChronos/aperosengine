@@ -104,11 +104,19 @@ void ActiveObjectMgr::removeObject(u16 id) {
 	verbosestream << "Server::ActiveObjectMgr::removeObject(): "
 				  << "id=" << id << '\n';
 
-	// this will take the object out of the map and then destruct it
+	// This will take the object out of the map and then destruct it
 	bool ok = m_active_objects.remove(id);
 	if (!ok) {
 		infostream << "Server::ActiveObjectMgr::removeObject(): "
 				   << "id=" << id << " not found" << '\n';
+	}
+}
+
+void ActiveObjectMgr::invalidateActiveObjectObserverCaches() {
+	for (auto &active_object : m_active_objects.iter()) {
+		ServerActiveObject *obj = active_object.second.get();
+		if (!obj) continue;
+		obj->invalidateEffectiveObservers();
 	}
 }
 
@@ -118,14 +126,13 @@ void ActiveObjectMgr::getObjectsInsideRadius(const v3f &pos, float radius,
 	float r2 = radius * radius;
 	for (auto &activeObject : m_active_objects.iter()) {
 		ServerActiveObject *obj = activeObject.second.get();
-		if (!obj)
-			continue;
+		if (!obj) continue;
 		const v3f &objectpos = obj->getBasePosition();
-		if (objectpos.getDistanceFromSQ(pos) > r2)
-			continue;
+		if (objectpos.getDistanceFromSQ(pos) > r2) continue;
 
-		if (!include_obj_cb || include_obj_cb(obj))
+		if (!include_obj_cb || include_obj_cb(obj)) {
 			result.push_back(obj);
+		}
 	}
 }
 
@@ -134,25 +141,27 @@ void ActiveObjectMgr::getObjectsInArea(const aabb3f &box,
 		std::function<bool(ServerActiveObject *obj)> include_obj_cb) {
 	for (auto &activeObject : m_active_objects.iter()) {
 		ServerActiveObject *obj = activeObject.second.get();
-		if (!obj)
-			continue;
+		if (!obj) continue;
 		const v3f &objectpos = obj->getBasePosition();
-		if (!box.isPointInside(objectpos))
-			continue;
+		if (!box.isPointInside(objectpos)) continue;
 
-		if (!include_obj_cb || include_obj_cb(obj))
+		if (!include_obj_cb || include_obj_cb(obj)) {
 			result.push_back(obj);
+		}
 	}
 }
 
-void ActiveObjectMgr::getAddedActiveObjectsAroundPos(v3f player_pos, f32 radius,
-		f32 player_radius, const std::set<u16> &current_objects,
+void ActiveObjectMgr::getAddedActiveObjectsAroundPos(
+		const v3f &player_pos, const std::string &player_name,
+		f32 radius, f32 player_radius,
+		const std::set<u16> &current_objects,
 		std::vector<u16> &added_objects) {
 	/*
 		Go through the object list,
 		- discard removed/deactivated objects,
 		- discard objects that are too far away,
-		- discard objects that are found in current_objects.
+		- discard objects that are found in current_objects,
+		- discard objects that are not observed by the player.
 		- add remaining objects to added_objects
 	*/
 	for (auto &ao_it : m_active_objects.iter()) {
@@ -160,24 +169,21 @@ void ActiveObjectMgr::getAddedActiveObjectsAroundPos(v3f player_pos, f32 radius,
 
 		// Get object
 		ServerActiveObject *object = ao_it.second.get();
-		if (!object)
-			continue;
+		if (!object) continue;
 
-		if (object->isGone())
-			continue;
+		if (object->isGone()) continue;
 
 		f32 distance_f = object->getBasePosition().getDistanceFrom(player_pos);
 		if (object->getType() == ACTIVEOBJECT_TYPE_PLAYER) {
 			// Discard if too far
-			if (distance_f > player_radius && player_radius != 0)
-				continue;
-		} else if (distance_f > radius)
-			continue;
+			if (distance_f > player_radius && player_radius != 0) continue;
+		} else if (distance_f > radius) continue;
+		
+		if (!object->isEffectivelyObservedBy(player_name)) continue;
 
 		// Discard if already on current_objects
 		auto n = current_objects.find(id);
-		if (n != current_objects.end())
-			continue;
+		if (n != current_objects.end()) continue;
 		// Add to added_objects
 		added_objects.push_back(id);
 	}

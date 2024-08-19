@@ -60,7 +60,8 @@ private:
 
 class LocalPlayer : public Player {
 public:
-	LocalPlayer(Client *client, const char *name);
+
+	LocalPlayer(Client *client, const std::string &name);
 	virtual ~LocalPlayer();
 
 	// Initialize hp to 0, so that no hearts will be shown if server

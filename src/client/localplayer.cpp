@@ -19,6 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "localplayer.h"
 #include <cmath>
+
 #include "mtevent.h"
 #include "collision.h"
 #include "nodedef.h"
@@ -70,7 +71,7 @@ void PlayerSettings::settingsChangedCallback(const std::string &name, void *data
 	LocalPlayer
 */
 
-LocalPlayer::LocalPlayer(Client *client, const char *name) :
+LocalPlayer::LocalPlayer(Client *client, const std::string &name) :
 		Player(name, client->idef()),
 		m_client(client) {
 	m_player_settings.readGlobalSettings();

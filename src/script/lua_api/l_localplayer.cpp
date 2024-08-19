@@ -68,7 +68,7 @@ int LuaLocalPlayer::l_get_hp(lua_State *L) {
 int LuaLocalPlayer::l_get_name(lua_State *L) {
 	LocalPlayer *player = getobject(L, 1);
 
-	lua_pushstring(L, player->getName());
+	lua_pushstring(L, player->getName().c_str());
 	return 1;
 }
 
