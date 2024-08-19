@@ -142,10 +142,10 @@ perform_release() {
 	local release_version=$1
 	RELEASE_DATE=$(date +%Y-%m-%d)
 
-	sed -i '/\<release/s/\(version\)="[^"]*"/\1="'"$release_version"'"/' misc/net.minetest.minetest.metainfo.xml
-	sed -i 's/\(<release date\)="[^"]*"/\1="'"$RELEASE_DATE"'"/' misc/net.minetest.minetest.metainfo.xml
+	sed -i '/\<release/s/\(version\)="[^"]*"/\1="'"$release_version"'"/' misc/net.aperosengine.aperosengine.metainfo.xml
+	sed -i 's/\(<release date\)="[^"]*"/\1="'"$RELEASE_DATE"'"/' misc/net.aperosengine.aperosengine.metainfo.xml
 
-	git add -f misc/net.minetest.minetest.metainfo.xml
+	git add -f misc/net.aperosengine.aperosengine.metainfo.xml
 
 	git commit -m "Bump version to $release_version"
 
@@ -166,7 +166,7 @@ back_to_devel() {
 # Start of main logic:
 #######################
 
-# Switch to top minetest directory
+# Switch to top aperosengine directory
 cd ${0%/*}/..
 
 # Determine old versions
@@ -188,7 +188,7 @@ fi
 if [ "$DO_PATCH_REL" -eq 0 ]; then
 	# On a regular release the version moves from 5.7.0-dev -> 5.7.0 (new tag) -> 5.8.0-dev
 
-	old_proto=$(read_proto_ver origin/stable-5)
+	old_proto=$(read_proto_ver origin/main)
 	new_proto=$(read_proto_ver HEAD)
 	[ -n "$old_proto" ]
 	[ -n "$new_proto" ]
