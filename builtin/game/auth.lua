@@ -1,4 +1,4 @@
--- Minetest: builtin/auth.lua
+-- AperosEngine: builtin/auth.lua
 
 --
 -- Builtin authentication handler

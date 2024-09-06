@@ -12,7 +12,7 @@ core.known_metatables = known_metatables
 
 function core.register_async_metatable(...)
 	core.log("deprecated", "aperosengine.register_async_metatable is deprecated. " ..
-			"Use minetest.register_portable_metatable instead.")
+			"Use aperosengine.register_portable_metatable instead.")
 	return core.register_portable_metatable(...)
 end
 

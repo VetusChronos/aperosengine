@@ -44,7 +44,7 @@ download "$libhost/llvm/libjpeg-$libjpeg_version-win64.zip"
 download "$libhost/llvm/libpng-$libpng_version-win64.zip"
 download "$libhost/llvm/sdl2-$sdl2_version-win64.zip"
 
-# Set source dir, downloading Minetest as needed
+# Set source dir, downloading AperosEngine as needed
 get_sources
 
 # Build the thing

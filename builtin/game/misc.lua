@@ -1,4 +1,4 @@
--- Minetest: builtin/misc.lua
+-- AperosEngine: builtin/misc.lua
 
 local S = core.get_translator("__builtin")
 

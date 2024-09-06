@@ -707,7 +707,7 @@
 #    type: string
 # contentdb_url = https://content.aperosvoxel.domain
 
-#    If enabled and you have ContentDB packages installed, Minetest may contact ContentDB to
+#    If enabled and you have ContentDB packages installed, AperosEngine may contact ContentDB to
 #    check for package updates when opening the mainmenu.
 #    type: bool
 # contentdb_enable_updates_indicator = true

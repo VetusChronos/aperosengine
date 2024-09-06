@@ -784,7 +784,7 @@ bool CIrrDeviceSDL::run() {
 			// According to some web searches I did, this is probably
 			// vendor/device-specific.
 			// Since a working right mouse button is very important for
-			// Minetest, we have this little hack.
+			// AperosEngine, we have this little hack.
 			if (button == SDL_BUTTON_X2)
 				button = SDL_BUTTON_RIGHT;
 #endif

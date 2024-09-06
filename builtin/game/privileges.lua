@@ -1,4 +1,4 @@
--- Minetest: builtin/privileges.lua
+-- AperosEngine: builtin/privileges.lua
 
 local S = core.get_translator("__builtin")
 

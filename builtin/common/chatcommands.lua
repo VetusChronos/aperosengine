@@ -1,4 +1,4 @@
--- Minetest: builtin/common/chatcommands.lua
+-- AperosEngine: builtin/common/chatcommands.lua
 
 -- For server-side translations (if INIT == "game")
 -- Otherwise, use core.gettext

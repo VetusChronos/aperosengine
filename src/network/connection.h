@@ -231,7 +231,7 @@ private:
 		the connection is considered half-open.
 		During this time we inhibit re-sending any reliables or pings. This
 		is to avoid spending too many resources on a potential DoS attack
-		and to make sure Minetest servers are not useful for UDP amplificiation.
+		and to make sure AperosEngine servers are not useful for UDP amplificiation.
 	*/
 	bool m_half_open = true;
 

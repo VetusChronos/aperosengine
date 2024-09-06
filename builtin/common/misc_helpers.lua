@@ -1,4 +1,4 @@
--- Minetest: builtin/misc_helpers.lua
+-- AperosEngine: builtin/misc_helpers.lua
 
 --------------------------------------------------------------------------------
 -- Localize functions to avoid table lookups (better performance).

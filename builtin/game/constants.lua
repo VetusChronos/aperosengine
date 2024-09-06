@@ -1,4 +1,4 @@
--- Minetest: builtin/constants.lua
+-- AperosEngine: builtin/constants.lua
 
 --
 -- Constants values for use with the Lua API

@@ -1,4 +1,4 @@
--- Minetest: builtin/detached_inventory.lua
+-- AperosEngine: builtin/detached_inventory.lua
 
 core.detached_inventories = {}
 

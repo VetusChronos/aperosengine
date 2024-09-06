@@ -1076,7 +1076,7 @@ core::array<scene::ISceneNode *> CGUITTFont::addTextSceneNode(const wchar_t *tex
 				container.push_back(current_node);
 			}
 			offset.X += getWidthFromCharacter(current_char);
-			// Note that fallback font handling is missing here (Minetest never uses this)
+			// Note that fallback font handling is missing here (AperosEngine never uses this)
 
 			previous_char = current_char;
 			++text;

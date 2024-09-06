@@ -128,7 +128,7 @@ bool MyEventReceiver::OnEvent(const SEvent &event) {
 
 				bool new_fullscreen = !device->isFullscreen();
 				// Only update the setting if toggling succeeds - it always fails
-				// if Minetest was built without SDL.
+				// if AperosEngine was built without SDL.
 				if (device->setFullscreen(new_fullscreen)) {
 					g_settings->setBool("fullscreen", new_fullscreen);
 				}

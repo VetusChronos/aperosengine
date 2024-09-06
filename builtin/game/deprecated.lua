@@ -1,4 +1,4 @@
--- Minetest: builtin/deprecated.lua
+-- AperosEngine: builtin/deprecated.lua
 
 --
 -- EnvRef

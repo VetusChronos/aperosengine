@@ -1,5 +1,5 @@
 -- aperosengine.lua
--- Packet dissector for the UDP-based Minetest protocol
+-- Packet dissector for the UDP-based AperosEngine protocol
 -- Copy this to $HOME/.wireshark/plugins/
 
 
