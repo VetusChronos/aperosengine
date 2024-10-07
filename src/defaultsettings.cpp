@@ -31,7 +31,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
  * this could be done in future with D-Bus using query:
  * busctl get-property org.freedesktop.hostname1 /org/freedesktop/hostname1 org.freedesktop.hostname1 Chassis
  */
-static bool detect_touch() {
+static bool detect_touch()
+{
 #if defined(__ANDROID__)
 	return true;
 #elif defined(__linux__)
@@ -44,8 +45,8 @@ static bool detect_touch() {
 		chassis_type.pop_back();
 
 		if (chassis_type == "tablet" ||
-				chassis_type == "handset" ||
-				chassis_type == "watch")
+		    chassis_type == "handset" ||
+		    chassis_type == "watch")
 			return true;
 
 		if (!chassis_type.empty())
@@ -57,7 +58,7 @@ static bool detect_touch() {
 		std::getline(dmi_file, chassis_type);
 
 		if (chassis_type == "11" /* Handheld */ ||
-				chassis_type == "30" /* Tablet */)
+		    chassis_type == "30" /* Tablet */)
 			return true;
 
 		return false;
@@ -75,20 +76,14 @@ static bool detect_touch() {
 	}
 
 	return false;
-#elif defined(_WIN32)
-	// 0x01 The device has an integrated touch digitizer
-	// 0x80 The device is ready to receive digitizer input.
-	if ((GetSystemMetrics(SM_DIGITIZER) & 0x81) == 0x81)
-		return true;
-
-	return false;
 #else
 	// we don't know, return default
 	return false;
 #endif
 }
 
-void set_default_settings() {
+void set_default_settings()
+{
 	Settings *settings = Settings::createLayer(SL_DEFAULTS);
 	bool has_touch = detect_touch();
 
@@ -101,7 +96,8 @@ void set_default_settings() {
 	// Client
 	settings->setDefault("address", "");
 	settings->setDefault("enable_sound", "true");
-	settings->setDefault("enable_touch", bool_to_cstr(has_touch));
+	settings->setDefault("touch_controls", bool_to_cstr(has_touch));
+	settings->setDefault("touch_gui", bool_to_cstr(has_touch));
 	settings->setDefault("sound_volume", "0.8");
 	settings->setDefault("sound_volume_unfocused", "0.3");
 	settings->setDefault("mute_sound", "false");
@@ -247,7 +243,7 @@ void set_default_settings() {
 	settings->setDefault("3d_paralax_strength", "0.025");
 	settings->setDefault("tooltip_show_delay", "400");
 	settings->setDefault("tooltip_append_itemname", "false");
-	settings->setDefault("fps_max", "128");
+	settings->setDefault("fps_max", "60");
 	settings->setDefault("fps_max_unfocused", "20");
 	settings->setDefault("viewing_range", "90");
 	settings->setDefault("client_mesh_chunk", "1");
@@ -278,6 +274,7 @@ void set_default_settings() {
 	settings->setDefault("view_bobbing_amount", "1.0");
 	settings->setDefault("fall_bobbing_amount", "0.03");
 	settings->setDefault("enable_3d_clouds", "true");
+	settings->setDefault("soft_clouds", "false");
 	settings->setDefault("cloud_radius", "12");
 	settings->setDefault("menu_clouds", "true");
 	settings->setDefault("translucent_liquids", "true");
@@ -306,6 +303,7 @@ void set_default_settings() {
 	settings->setDefault("enable_particles", "true");
 	settings->setDefault("arm_inertia", "true");
 	settings->setDefault("show_nametag_backgrounds", "false");
+	settings->setDefault("show_block_bounds_radius_near", "4");
 	settings->setDefault("transparency_sorting_distance", "16");
 
 	settings->setDefault("enable_minimap", "false");
@@ -337,6 +335,9 @@ void set_default_settings() {
 	settings->setDefault("bloom_intensity", "0.05");
 	settings->setDefault("bloom_radius", "1");
 	settings->setDefault("enable_volumetric_lighting", "false");
+	settings->setDefault("enable_water_reflections", "false");
+	settings->setDefault("enable_translucent_foliage", "false");
+	settings->setDefault("enable_node_specular", "false");
 
 	// Effects Shadows
 	settings->setDefault("enable_dynamic_shadows", "false");
@@ -572,7 +573,7 @@ void set_default_settings() {
 	settings->setDefault("curl_verify_cert", "false");
 
 	// Apply settings according to screen size
-	float x_inches = (float)porting::getDisplaySize().X /
+	float x_inches = (float) porting::getDisplaySize().X /
 			(160.f * porting::getDisplayDensity());
 
 	if (x_inches < 3.7f) {

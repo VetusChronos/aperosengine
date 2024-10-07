@@ -91,12 +91,12 @@ sudo xbps-install git
 
 Download source (this is the URL to the latest of source repository, which might not work at all times) using Git:
 
-    git clone --depth 1 https://github.com/yunasatoy/aperosengine.git
+    git clone --depth 1 https://github.com/vetuschronos/aperosengine.git
     cd minetest
 
 Download source, without using Git:
 
-    wget https://github.com/yunasatoy/aperosengine/archive/main.tar.gz
+    wget https://github.com/vetuschronos/aperosengine/archive/main.tar.gz
     tar xf main.tar.gz
     cd aperosengine-main
 

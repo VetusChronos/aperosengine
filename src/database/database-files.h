@@ -28,7 +28,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <unordered_set>
 #include <json/json.h> // for Json::Value
 
-class PlayerDatabaseFiles : public PlayerDatabase {
+class PlayerDatabaseFiles : public PlayerDatabase
+{
 public:
 	PlayerDatabaseFiles(const std::string &savedir);
 	virtual ~PlayerDatabaseFiles() = default;
@@ -51,7 +52,8 @@ private:
 	std::string m_savedir;
 };
 
-class AuthDatabaseFiles : public AuthDatabase {
+class AuthDatabaseFiles : public AuthDatabase
+{
 public:
 	AuthDatabaseFiles(const std::string &savedir);
 	virtual ~AuthDatabaseFiles() = default;
@@ -70,7 +72,8 @@ private:
 	bool writeAuthFile();
 };
 
-class ModStorageDatabaseFiles : public ModStorageDatabase {
+class ModStorageDatabaseFiles : public ModStorageDatabase
+{
 public:
 	ModStorageDatabaseFiles(const std::string &savedir);
 	virtual ~ModStorageDatabaseFiles() = default;
@@ -78,10 +81,10 @@ public:
 	virtual void getModEntries(const std::string &modname, StringMap *storage);
 	virtual void getModKeys(const std::string &modname, std::vector<std::string> *storage);
 	virtual bool getModEntry(const std::string &modname,
-			const std::string &key, std::string *value);
+		const std::string &key, std::string *value);
 	virtual bool hasModEntry(const std::string &modname, const std::string &key);
 	virtual bool setModEntry(const std::string &modname,
-			const std::string &key, std::string_view value);
+		const std::string &key, std::string_view value);
 	virtual bool removeModEntry(const std::string &modname, const std::string &key);
 	virtual bool removeModEntries(const std::string &modname);
 	virtual void listMods(std::vector<std::string> *res);

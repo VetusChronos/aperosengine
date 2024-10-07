@@ -27,7 +27,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "itemdef.h"
 #include "s_item.h"
 
-void ScriptApiClient::on_mods_loaded() {
+void ScriptApiClient::on_mods_loaded()
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get registered shutdown hooks
@@ -41,7 +42,8 @@ void ScriptApiClient::on_mods_loaded() {
 	}
 }
 
-void ScriptApiClient::on_shutdown() {
+void ScriptApiClient::on_shutdown()
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get registered shutdown hooks
@@ -55,7 +57,8 @@ void ScriptApiClient::on_shutdown() {
 	}
 }
 
-bool ScriptApiClient::on_sending_message(const std::string &message) {
+bool ScriptApiClient::on_sending_message(const std::string &message)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_chat_messages
@@ -72,7 +75,8 @@ bool ScriptApiClient::on_sending_message(const std::string &message) {
 	return readParam<bool>(L, -1);
 }
 
-bool ScriptApiClient::on_receiving_message(const std::string &message) {
+bool ScriptApiClient::on_receiving_message(const std::string &message)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_chat_messages
@@ -89,7 +93,8 @@ bool ScriptApiClient::on_receiving_message(const std::string &message) {
 	return readParam<bool>(L, -1);
 }
 
-void ScriptApiClient::on_damage_taken(int32_t damage_amount) {
+void ScriptApiClient::on_damage_taken(int32_t damage_amount)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_chat_messages
@@ -104,7 +109,8 @@ void ScriptApiClient::on_damage_taken(int32_t damage_amount) {
 	}
 }
 
-void ScriptApiClient::on_hp_modification(int32_t newhp) {
+void ScriptApiClient::on_hp_modification(int32_t newhp)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_chat_messages
@@ -119,21 +125,8 @@ void ScriptApiClient::on_hp_modification(int32_t newhp) {
 	}
 }
 
-void ScriptApiClient::on_death() {
-	SCRIPTAPI_PRECHECKHEADER
-
-	// Get registered shutdown hooks
-	lua_getglobal(L, "core");
-	lua_getfield(L, -1, "registered_on_death");
-	// Call callbacks
-	try {
-		runCallbacks(0, RUN_CALLBACKS_MODE_FIRST);
-	} catch (LuaError &e) {
-		getClient()->setFatalError(e);
-	}
-}
-
-void ScriptApiClient::environment_step(float dtime) {
+void ScriptApiClient::environment_step(float dtime)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_globalsteps
@@ -149,7 +142,8 @@ void ScriptApiClient::environment_step(float dtime) {
 }
 
 void ScriptApiClient::on_formspec_input(const std::string &formname,
-		const StringMap &fields) {
+	const StringMap &fields)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_chat_messages
@@ -175,7 +169,8 @@ void ScriptApiClient::on_formspec_input(const std::string &formname,
 	}
 }
 
-bool ScriptApiClient::on_dignode(v3s16 p, MapNode node) {
+bool ScriptApiClient::on_dignode(v3s16 p, MapNode node)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_dignode
@@ -196,7 +191,8 @@ bool ScriptApiClient::on_dignode(v3s16 p, MapNode node) {
 	return lua_toboolean(L, -1);
 }
 
-bool ScriptApiClient::on_punchnode(v3s16 p, MapNode node) {
+bool ScriptApiClient::on_punchnode(v3s16 p, MapNode node)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_punchgnode
@@ -217,7 +213,8 @@ bool ScriptApiClient::on_punchnode(v3s16 p, MapNode node) {
 	return readParam<bool>(L, -1);
 }
 
-bool ScriptApiClient::on_placenode(const PointedThing &pointed, const ItemDefinition &item) {
+bool ScriptApiClient::on_placenode(const PointedThing &pointed, const ItemDefinition &item)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_placenode
@@ -238,7 +235,8 @@ bool ScriptApiClient::on_placenode(const PointedThing &pointed, const ItemDefini
 	return readParam<bool>(L, -1);
 }
 
-bool ScriptApiClient::on_item_use(const ItemStack &item, const PointedThing &pointed) {
+bool ScriptApiClient::on_item_use(const ItemStack &item, const PointedThing &pointed)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_item_use
@@ -259,7 +257,8 @@ bool ScriptApiClient::on_item_use(const ItemStack &item, const PointedThing &poi
 	return readParam<bool>(L, -1);
 }
 
-bool ScriptApiClient::on_inventory_open(Inventory *inventory) {
+bool ScriptApiClient::on_inventory_open(Inventory *inventory)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	lua_getglobal(L, "core");
@@ -276,6 +275,7 @@ bool ScriptApiClient::on_inventory_open(Inventory *inventory) {
 	return readParam<bool>(L, -1);
 }
 
-void ScriptApiClient::setEnv(ClientEnvironment *env) {
+void ScriptApiClient::setEnv(ClientEnvironment *env)
+{
 	ScriptApiBase::setEnv(env);
 }

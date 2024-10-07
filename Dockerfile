@@ -35,7 +35,7 @@ FROM dev as builder
 COPY .git /usr/src/aperosvoxel/.git
 COPY CMakeLists.txt /usr/src/aperosvoxel/CMakeLists.txt
 COPY README.md /usr/src/aperosvoxel/README.md
-COPY aperosvoxel.conf.example /usr/src/aperosvoxel/aperosvoxel.conf.example
+COPY aperosengine.conf.example /usr/src/aperosvoxel/aperosengine.conf.example
 COPY builtin /usr/src/aperosvoxel/builtin
 COPY cmake /usr/src/aperosvoxel/cmake
 COPY doc /usr/src/aperosvoxel/doc
@@ -70,7 +70,7 @@ WORKDIR /var/lib/aperosvoxel
 
 COPY --from=builder /usr/local/share/aperosvoxel /usr/local/share/aperosvoxel
 COPY --from=builder /usr/local/bin/aperosvoxelserver /usr/local/bin/aperosvoxelserver
-COPY --from=builder /usr/local/share/doc/aperosvoxel/aperosvoxel.conf.example /etc/aperosvoxel/aperosvoxel.conf
+COPY --from=builder /usr/local/share/doc/aperosvoxel/aperosengine.conf.example /etc/aperosvoxel/aperosengine.conf
 COPY --from=builder /usr/local/lib/libspatialindex* /usr/local/lib/
 COPY --from=builder /usr/local/lib/libluajit* /usr/local/lib/
 USER aperosvoxel:aperosvoxel
@@ -79,4 +79,4 @@ EXPOSE 30000/udp 30000/tcp
 VOLUME /var/lib/aperosvoxel/ /etc/aperosvoxel/
 
 ENTRYPOINT ["/usr/local/bin/aperosvoxelserver"]
-CMD ["--config", "/etc/aperosvoxel/aperosvoxel.conf"]
+CMD ["--config", "/etc/aperosvoxel/aperosengine.conf"]

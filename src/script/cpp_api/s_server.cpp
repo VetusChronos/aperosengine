@@ -25,7 +25,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 bool ScriptApiServer::getAuth(const std::string &playername,
 		std::string *dst_password,
 		std::set<std::string> *dst_privs,
-		s64 *dst_last_login) {
+		s64 *dst_last_login)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -54,10 +55,10 @@ bool ScriptApiServer::getAuth(const std::string &playername,
 		throw LuaError("Authentication handler didn't return privilege table");
 	if (dst_privs)
 		readPrivileges(-1, *dst_privs);
-	lua_pop(L, 1); // Remove key from privs table
+	lua_pop(L, 1);  // Remove key from privs table
 
 	s64 last_login;
-	if (!getintfield(L, -1, "last_login", last_login))
+	if(!getintfield(L, -1, "last_login", last_login))
 		throw LuaError("Authentication handler didn't return last_login");
 	if (dst_last_login)
 		*dst_last_login = (s64)last_login;
@@ -65,12 +66,13 @@ bool ScriptApiServer::getAuth(const std::string &playername,
 	return true;
 }
 
-void ScriptApiServer::getAuthHandler() {
+void ScriptApiServer::getAuthHandler()
+{
 	lua_State *L = getStack();
 
 	lua_getglobal(L, "core");
 	lua_getfield(L, -1, "registered_auth_handler");
-	if (lua_isnil(L, -1)) {
+	if (lua_isnil(L, -1)){
 		lua_pop(L, 1);
 		lua_getfield(L, -1, "builtin_auth_handler");
 	}
@@ -82,7 +84,8 @@ void ScriptApiServer::getAuthHandler() {
 		throw LuaError("Authentication handler table not valid");
 }
 
-void ScriptApiServer::readPrivileges(int index, std::set<std::string> &result) {
+void ScriptApiServer::readPrivileges(int index, std::set<std::string> &result)
+{
 	lua_State *L = getStack();
 
 	result.clear();
@@ -101,7 +104,8 @@ void ScriptApiServer::readPrivileges(int index, std::set<std::string> &result) {
 }
 
 void ScriptApiServer::createAuth(const std::string &playername,
-		const std::string &password) {
+		const std::string &password)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -117,7 +121,8 @@ void ScriptApiServer::createAuth(const std::string &playername,
 }
 
 bool ScriptApiServer::setPassword(const std::string &playername,
-		const std::string &password) {
+		const std::string &password)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -134,7 +139,8 @@ bool ScriptApiServer::setPassword(const std::string &playername,
 }
 
 bool ScriptApiServer::on_chat_message(const std::string &name,
-		const std::string &message) {
+		const std::string &message)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_chat_messages
@@ -147,7 +153,8 @@ bool ScriptApiServer::on_chat_message(const std::string &name,
 	return readParam<bool>(L, -1);
 }
 
-void ScriptApiServer::on_mods_loaded() {
+void ScriptApiServer::on_mods_loaded()
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get registered shutdown hooks
@@ -157,7 +164,8 @@ void ScriptApiServer::on_mods_loaded() {
 	runCallbacks(0, RUN_CALLBACKS_MODE_FIRST);
 }
 
-void ScriptApiServer::on_shutdown() {
+void ScriptApiServer::on_shutdown()
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get registered shutdown hooks
@@ -168,7 +176,8 @@ void ScriptApiServer::on_shutdown() {
 }
 
 std::string ScriptApiServer::formatChatMessage(const std::string &name,
-		const std::string &message) {
+	const std::string &message)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Push function onto stack
@@ -189,7 +198,8 @@ std::string ScriptApiServer::formatChatMessage(const std::string &name,
 	return ret;
 }
 
-u32 ScriptApiServer::allocateDynamicMediaCallback(lua_State *L, int f_idx) {
+u32 ScriptApiServer::allocateDynamicMediaCallback(lua_State *L, int f_idx)
+{
 	if (f_idx < 0)
 		f_idx = lua_gettop(L) + f_idx + 1;
 
@@ -221,7 +231,8 @@ u32 ScriptApiServer::allocateDynamicMediaCallback(lua_State *L, int f_idx) {
 	return token;
 }
 
-void ScriptApiServer::freeDynamicMediaCallback(u32 token) {
+void ScriptApiServer::freeDynamicMediaCallback(u32 token)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	verbosestream << "freeDynamicMediaCallback(" << token << ")" << '\n';
@@ -235,7 +246,8 @@ void ScriptApiServer::freeDynamicMediaCallback(u32 token) {
 	lua_pop(L, 2);
 }
 
-void ScriptApiServer::on_dynamic_media_added(u32 token, const std::string &playername) {
+void ScriptApiServer::on_dynamic_media_added(u32 token, const std::string &playername)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);

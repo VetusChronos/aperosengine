@@ -21,7 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "irrlichttypes.h"
 
-enum FloatType {
+enum FloatType
+{
 	FLOATTYPE_UNKNOWN,
 	FLOATTYPE_SLOW,
 	FLOATTYPE_SYSTEM

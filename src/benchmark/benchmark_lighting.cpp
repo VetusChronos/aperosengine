@@ -22,7 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "dummygamedef.h"
 #include "dummymap.h"
 
-TEST_CASE("benchmark_lighting") {
+TEST_CASE("benchmark_lighting")
+{
 	DummyGameDef gamedef;
 	NodeDefManager *ndef = gamedef.getWritableNodeDefManager();
 
@@ -50,31 +51,29 @@ TEST_CASE("benchmark_lighting") {
 
 	// Make a platform with a light below it.
 	{
-		std::map<v3s16, MapBlock *> modified_blocks;
+		std::map<v3s16, MapBlock*> modified_blocks;
 		MMVManip vm(&map);
 		vm.initialEmerge(bpmin, bpmax, false);
 		s32 volume = vm.m_area.getVolume();
 		for (s32 i = 0; i < volume; i++)
 			vm.m_data[i] = MapNode(CONTENT_AIR);
 		for (s16 z = -10; z <= 10; z++)
-			for (s16 x = -10; x <= 10; x++)
-				vm.setNodeNoEmerge(v3s16(x, 1, z), MapNode(content_wall));
+		for (s16 x = -10; x <= 10; x++)
+			vm.setNodeNoEmerge(v3s16(x, 1, z), MapNode(content_wall));
 		vm.setNodeNoEmerge(v3s16(0, -10, 0), MapNode(content_light));
 		voxalgo::blit_back_with_light(&map, &vm, &modified_blocks);
 	}
 
-	BENCHMARK_ADVANCED("voxalgo::update_lighting_nodes")
-	(Catch::Benchmark::Chronometer meter) {
-		std::map<v3s16, MapBlock *> modified_blocks;
+	BENCHMARK_ADVANCED("voxalgo::update_lighting_nodes")(Catch::Benchmark::Chronometer meter) {
+		std::map<v3s16, MapBlock*> modified_blocks;
 		meter.measure([&] {
 			map.addNodeAndUpdate(v3s16(0, 0, 0), MapNode(content_light), modified_blocks);
 			map.removeNodeAndUpdate(v3s16(0, 0, 0), modified_blocks);
 		});
 	};
 
-	BENCHMARK_ADVANCED("voxalgo::blit_back_with_light")
-	(Catch::Benchmark::Chronometer meter) {
-		std::map<v3s16, MapBlock *> modified_blocks;
+	BENCHMARK_ADVANCED("voxalgo::blit_back_with_light")(Catch::Benchmark::Chronometer meter) {
+		std::map<v3s16, MapBlock*> modified_blocks;
 		MMVManip vm(&map);
 		vm.initialEmerge(v3s16(0, 0, 0), v3s16(0, 0, 0), false);
 		meter.measure([&] {

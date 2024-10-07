@@ -29,14 +29,16 @@ class TestClientActiveObjectMgr;
 class TestServerActiveObjectMgr;
 
 template <typename T>
-class ActiveObjectMgr {
+class ActiveObjectMgr
+{
 	friend class ::TestServerActiveObjectMgr;
 
 public:
 	ActiveObjectMgr() = default;
 	DISABLE_CLASS_COPY(ActiveObjectMgr);
 
-	virtual ~ActiveObjectMgr() {
+	virtual ~ActiveObjectMgr()
+	{
 		SANITY_CHECK(m_active_objects.empty());
 		// Note: Do not call clear() here. The derived class is already half
 		// destructed.
@@ -46,7 +48,8 @@ public:
 	virtual bool registerObject(std::unique_ptr<T> obj) = 0;
 	virtual void removeObject(u16 id) = 0;
 
-	void clear() {
+	void clear()
+	{
 		// on_destruct could add new objects so this has to be a loop
 		do {
 			for (auto &it : m_active_objects.iter()) {
@@ -57,12 +60,14 @@ public:
 		} while (!m_active_objects.empty());
 	}
 
-	T *getActiveObject(u16 id) {
+	T *getActiveObject(u16 id)
+	{
 		return m_active_objects.get(id).get();
 	}
 
 protected:
-	u16 getFreeId() const {
+	u16 getFreeId() const
+	{
 		// try to reuse id's as late as possible
 		static thread_local u16 last_used_id = 0;
 		u16 startid = last_used_id;
@@ -74,7 +79,8 @@ protected:
 		return last_used_id;
 	}
 
-	bool isFreeId(u16 id) const {
+	bool isFreeId(u16 id) const
+	{
 		return id != 0 && !m_active_objects.get(id);
 	}
 

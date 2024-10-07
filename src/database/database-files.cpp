@@ -32,13 +32,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // This backend is intended to be used on Minetest 0.4.16 only for the transition backend
 // for player files
 
-PlayerDatabaseFiles::PlayerDatabaseFiles(const std::string &savedir) :
-		m_savedir(savedir) {
+PlayerDatabaseFiles::PlayerDatabaseFiles(const std::string &savedir) : m_savedir(savedir)
+{
 	fs::CreateDir(m_savedir);
 }
 
 void PlayerDatabaseFiles::deSerialize(RemotePlayer *p, std::istream &is,
-		const std::string &playername, PlayerSAO *sao) {
+	 const std::string &playername, PlayerSAO *sao)
+{
 	Settings args("PlayerArgsEnd");
 
 	if (!args.parseConfigLines(is)) {
@@ -52,28 +53,24 @@ void PlayerDatabaseFiles::deSerialize(RemotePlayer *p, std::istream &is,
 	if (sao) {
 		try {
 			sao->setHPRaw(args.getU16("hp"));
-		} catch (SettingNotFoundException &e) {
+		} catch(SettingNotFoundException &e) {
 			sao->setHPRaw(PLAYER_MAX_HP_DEFAULT);
 		}
 
 		try {
 			sao->setBasePosition(args.getV3F("position"));
-		} catch (SettingNotFoundException &e) {
-		}
+		} catch (SettingNotFoundException &e) {}
 
 		try {
 			sao->setLookPitch(args.getFloat("pitch"));
-		} catch (SettingNotFoundException &e) {
-		}
+		} catch (SettingNotFoundException &e) {}
 		try {
 			sao->setPlayerYaw(args.getFloat("yaw"));
-		} catch (SettingNotFoundException &e) {
-		}
+		} catch (SettingNotFoundException &e) {}
 
 		try {
 			sao->setBreath(args.getU16("breath"), false);
-		} catch (SettingNotFoundException &e) {
-		}
+		} catch (SettingNotFoundException &e) {}
 
 		try {
 			const std::string &extended_attributes = args.get("extended_attributes");
@@ -91,15 +88,14 @@ void PlayerDatabaseFiles::deSerialize(RemotePlayer *p, std::istream &is,
 				sao->getMeta().setString(it, attr_value.asString());
 			}
 			sao->getMeta().setModified(false);
-		} catch (SettingNotFoundException &e) {
-		}
+		} catch (SettingNotFoundException &e) {}
 	}
 
 	try {
 		p->inventory.deSerialize(is);
 	} catch (SerializationError &e) {
 		errorstream << "Failed to deserialize player inventory. player_name="
-					<< p->getName() << " " << e.what() << '\n';
+			<< p->getName() << " " << e.what() << '\n';
 	}
 
 	if (!p->inventory.getList("craftpreview") && p->inventory.getList("craftresult")) {
@@ -107,16 +103,18 @@ void PlayerDatabaseFiles::deSerialize(RemotePlayer *p, std::istream &is,
 		p->inventory.addList("craftpreview", 1);
 
 		bool craftresult_is_preview = true;
-		if (args.exists("craftresult_is_preview"))
+		if(args.exists("craftresult_is_preview"))
 			craftresult_is_preview = args.getBool("craftresult_is_preview");
-		if (craftresult_is_preview) {
+		if(craftresult_is_preview)
+		{
 			// Clear craftresult
 			p->inventory.getList("craftresult")->changeItem(0, ItemStack());
 		}
 	}
 }
 
-void PlayerDatabaseFiles::serialize(RemotePlayer *p, std::ostream &os) {
+void PlayerDatabaseFiles::serialize(RemotePlayer *p, std::ostream &os)
+{
 	// Utilize a Settings object for storing values
 	Settings args("PlayerArgsEnd");
 	args.setS32("version", 1);
@@ -150,7 +148,8 @@ void PlayerDatabaseFiles::serialize(RemotePlayer *p, std::ostream &os) {
 	p->inventory.serialize(os);
 }
 
-void PlayerDatabaseFiles::savePlayer(RemotePlayer *player) {
+void PlayerDatabaseFiles::savePlayer(RemotePlayer *player)
+{
 	fs::CreateDir(m_savedir);
 
 	std::string savedir = m_savedir + DIR_DELIM;
@@ -181,7 +180,7 @@ void PlayerDatabaseFiles::savePlayer(RemotePlayer *player) {
 
 	if (!path_found) {
 		errorstream << "Didn't find free file for player " << player->getName()
-					<< '\n';
+				<< '\n';
 		return;
 	}
 
@@ -195,7 +194,8 @@ void PlayerDatabaseFiles::savePlayer(RemotePlayer *player) {
 	player->onSuccessfulSave();
 }
 
-bool PlayerDatabaseFiles::removePlayer(const std::string &name) {
+bool PlayerDatabaseFiles::removePlayer(const std::string &name)
+{
 	std::string players_path = m_savedir + DIR_DELIM;
 	std::string path = players_path + name;
 
@@ -220,7 +220,8 @@ bool PlayerDatabaseFiles::removePlayer(const std::string &name) {
 	return false;
 }
 
-bool PlayerDatabaseFiles::loadPlayer(RemotePlayer *player, PlayerSAO *sao) {
+bool PlayerDatabaseFiles::loadPlayer(RemotePlayer *player, PlayerSAO *sao)
+{
 	std::string players_path = m_savedir + DIR_DELIM;
 	std::string path = players_path + player->getName();
 
@@ -244,12 +245,12 @@ bool PlayerDatabaseFiles::loadPlayer(RemotePlayer *player, PlayerSAO *sao) {
 	return false;
 }
 
-void PlayerDatabaseFiles::listPlayers(std::vector<std::string> &res) {
+void PlayerDatabaseFiles::listPlayers(std::vector<std::string> &res)
+{
 	std::vector<fs::DirListNode> files = fs::GetDirListing(m_savedir);
 	// list files into players directory
 	for (std::vector<fs::DirListNode>::const_iterator it = files.begin(); it !=
-			files.end();
-			++it) {
+		files.end(); ++it) {
 		// Ignore directories
 		if (it->dir)
 			continue;
@@ -271,12 +272,13 @@ void PlayerDatabaseFiles::listPlayers(std::vector<std::string> &res) {
 	}
 }
 
-AuthDatabaseFiles::AuthDatabaseFiles(const std::string &savedir) :
-		m_savedir(savedir) {
+AuthDatabaseFiles::AuthDatabaseFiles(const std::string &savedir) : m_savedir(savedir)
+{
 	readAuthFile();
 }
 
-bool AuthDatabaseFiles::getAuth(const std::string &name, AuthEntry &res) {
+bool AuthDatabaseFiles::getAuth(const std::string &name, AuthEntry &res)
+{
 	const auto res_i = m_auth_list.find(name);
 	if (res_i == m_auth_list.end()) {
 		return false;
@@ -285,21 +287,24 @@ bool AuthDatabaseFiles::getAuth(const std::string &name, AuthEntry &res) {
 	return true;
 }
 
-bool AuthDatabaseFiles::saveAuth(const AuthEntry &authEntry) {
+bool AuthDatabaseFiles::saveAuth(const AuthEntry &authEntry)
+{
 	m_auth_list[authEntry.name] = authEntry;
 
 	// save entire file
 	return writeAuthFile();
 }
 
-bool AuthDatabaseFiles::createAuth(AuthEntry &authEntry) {
+bool AuthDatabaseFiles::createAuth(AuthEntry &authEntry)
+{
 	m_auth_list[authEntry.name] = authEntry;
 
 	// save entire file
 	return writeAuthFile();
 }
 
-bool AuthDatabaseFiles::deleteAuth(const std::string &name) {
+bool AuthDatabaseFiles::deleteAuth(const std::string &name)
+{
 	if (!m_auth_list.erase(name)) {
 		// did not delete anything -> hadn't existed
 		return false;
@@ -307,7 +312,8 @@ bool AuthDatabaseFiles::deleteAuth(const std::string &name) {
 	return writeAuthFile();
 }
 
-void AuthDatabaseFiles::listNames(std::vector<std::string> &res) {
+void AuthDatabaseFiles::listNames(std::vector<std::string> &res)
+{
 	res.clear();
 	res.reserve(m_auth_list.size());
 	for (const auto &res_pair : m_auth_list) {
@@ -315,11 +321,13 @@ void AuthDatabaseFiles::listNames(std::vector<std::string> &res) {
 	}
 }
 
-void AuthDatabaseFiles::reload() {
+void AuthDatabaseFiles::reload()
+{
 	readAuthFile();
 }
 
-bool AuthDatabaseFiles::readAuthFile() {
+bool AuthDatabaseFiles::readAuthFile()
+{
 	std::string path = m_savedir + DIR_DELIM + "auth.txt";
 	auto file = open_ifstream(path.c_str(), false);
 	if (!file.good()) {
@@ -338,17 +346,18 @@ bool AuthDatabaseFiles::readAuthFile() {
 		s64 last_login = parts.size() > 3 ? atol(parts[3].c_str()) : 0;
 
 		m_auth_list[name] = {
-			1,
-			name,
-			password,
-			privileges,
-			last_login,
+				1,
+				name,
+				password,
+				privileges,
+				last_login,
 		};
 	}
 	return true;
 }
 
-bool AuthDatabaseFiles::writeAuthFile() {
+bool AuthDatabaseFiles::writeAuthFile()
+{
 	std::string path = m_savedir + DIR_DELIM + "auth.txt";
 	std::ostringstream output(std::ios_base::binary);
 	for (const auto &auth_i : m_auth_list) {
@@ -365,11 +374,13 @@ bool AuthDatabaseFiles::writeAuthFile() {
 	return true;
 }
 
-ModStorageDatabaseFiles::ModStorageDatabaseFiles(const std::string &savedir) :
-		m_storage_dir(savedir + DIR_DELIM + "mod_storage") {
+ModStorageDatabaseFiles::ModStorageDatabaseFiles(const std::string &savedir):
+	m_storage_dir(savedir + DIR_DELIM + "mod_storage")
+{
 }
 
-void ModStorageDatabaseFiles::getModEntries(const std::string &modname, StringMap *storage) {
+void ModStorageDatabaseFiles::getModEntries(const std::string &modname, StringMap *storage)
+{
 	Json::Value *meta = getOrCreateJson(modname);
 	if (!meta)
 		return;
@@ -382,7 +393,8 @@ void ModStorageDatabaseFiles::getModEntries(const std::string &modname, StringMa
 }
 
 void ModStorageDatabaseFiles::getModKeys(const std::string &modname,
-		std::vector<std::string> *storage) {
+		std::vector<std::string> *storage)
+{
 	Json::Value *meta = getOrCreateJson(modname);
 	if (!meta)
 		return;
@@ -394,7 +406,8 @@ void ModStorageDatabaseFiles::getModKeys(const std::string &modname,
 }
 
 bool ModStorageDatabaseFiles::getModEntry(const std::string &modname,
-		const std::string &key, std::string *value) {
+	const std::string &key, std::string *value)
+{
 	Json::Value *meta = getOrCreateJson(modname);
 	if (!meta)
 		return false;
@@ -406,13 +419,15 @@ bool ModStorageDatabaseFiles::getModEntry(const std::string &modname,
 	return false;
 }
 
-bool ModStorageDatabaseFiles::hasModEntry(const std::string &modname, const std::string &key) {
+bool ModStorageDatabaseFiles::hasModEntry(const std::string &modname, const std::string &key)
+{
 	Json::Value *meta = getOrCreateJson(modname);
 	return meta && meta->isMember(key);
 }
 
 bool ModStorageDatabaseFiles::setModEntry(const std::string &modname,
-		const std::string &key, std::string_view value) {
+	const std::string &key, std::string_view value)
+{
 	Json::Value *meta = getOrCreateJson(modname);
 	if (!meta)
 		return false;
@@ -425,7 +440,8 @@ bool ModStorageDatabaseFiles::setModEntry(const std::string &modname,
 }
 
 bool ModStorageDatabaseFiles::removeModEntry(const std::string &modname,
-		const std::string &key) {
+		const std::string &key)
+{
 	Json::Value *meta = getOrCreateJson(modname);
 	if (!meta)
 		return false;
@@ -438,7 +454,8 @@ bool ModStorageDatabaseFiles::removeModEntry(const std::string &modname,
 	return false;
 }
 
-bool ModStorageDatabaseFiles::removeModEntries(const std::string &modname) {
+bool ModStorageDatabaseFiles::removeModEntries(const std::string &modname)
+{
 	Json::Value *meta = getOrCreateJson(modname);
 	if (!meta || meta->empty())
 		return false;
@@ -448,21 +465,23 @@ bool ModStorageDatabaseFiles::removeModEntries(const std::string &modname) {
 	return true;
 }
 
-void ModStorageDatabaseFiles::beginSave() {
+void ModStorageDatabaseFiles::beginSave()
+{
 }
 
-void ModStorageDatabaseFiles::endSave() {
+void ModStorageDatabaseFiles::endSave()
+{
 	if (m_modified.empty())
 		return;
 
 	if (!fs::CreateAllDirs(m_storage_dir)) {
 		errorstream << "ModStorageDatabaseFiles: Unable to save. '"
-					<< m_storage_dir << "' cannot be created." << '\n';
+				<< m_storage_dir << "' cannot be created." << '\n';
 		return;
 	}
 	if (!fs::IsDir(m_storage_dir)) {
 		errorstream << "ModStorageDatabaseFiles: Unable to save. '"
-					<< m_storage_dir << "' is not a directory." << '\n';
+				<< m_storage_dir << "' is not a directory." << '\n';
 		return;
 	}
 
@@ -473,7 +492,7 @@ void ModStorageDatabaseFiles::endSave() {
 
 		if (!fs::safeWriteToFile(m_storage_dir + DIR_DELIM + modname, fastWriteJson(json))) {
 			errorstream << "ModStorageDatabaseFiles[" << modname
-						<< "]: failed to write file." << '\n';
+					<< "]: failed to write file." << '\n';
 			++it;
 			continue;
 		}
@@ -482,7 +501,8 @@ void ModStorageDatabaseFiles::endSave() {
 	}
 }
 
-void ModStorageDatabaseFiles::listMods(std::vector<std::string> *res) {
+void ModStorageDatabaseFiles::listMods(std::vector<std::string> *res)
+{
 	// List in-memory metadata first.
 	for (const auto &pair : m_mod_storage) {
 		res->push_back(pair.first);
@@ -495,7 +515,8 @@ void ModStorageDatabaseFiles::listMods(std::vector<std::string> *res) {
 	}
 }
 
-Json::Value *ModStorageDatabaseFiles::getOrCreateJson(const std::string &modname) {
+Json::Value *ModStorageDatabaseFiles::getOrCreateJson(const std::string &modname)
+{
 	auto found = m_mod_storage.find(modname);
 	if (found != m_mod_storage.end())
 		return &found->second;
@@ -511,7 +532,7 @@ Json::Value *ModStorageDatabaseFiles::getOrCreateJson(const std::string &modname
 
 		if (!Json::parseFromStream(builder, is, &meta, &errs)) {
 			errorstream << "ModStorageDatabaseFiles[" << modname
-						<< "]: failed to decode data: " << errs << '\n';
+					<< "]: failed to decode data: " << errs << '\n';
 			return nullptr;
 		}
 	}

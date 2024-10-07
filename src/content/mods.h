@@ -36,7 +36,8 @@ class ModStorageDatabase;
 
 #define MODNAME_ALLOWED_CHARS "abcdefghijklmnopqrstuvwxyz0123456789_"
 
-struct ModSpec {
+struct ModSpec
+{
 	std::string name;
 	std::string author;
 	std::string path;
@@ -75,11 +76,13 @@ struct ModSpec {
 	// if modpack:
 	std::map<std::string, ModSpec> modpack_content;
 
-	ModSpec() {
+	ModSpec()
+	{
 	}
 
 	ModSpec(const std::string &name, const std::string &path, bool part_of_modpack, const std::string &virtual_path) :
-			name(name), path(path), part_of_modpack(part_of_modpack), virtual_path(virtual_path) {
+			name(name), path(path), part_of_modpack(part_of_modpack), virtual_path(virtual_path)
+	{
 	}
 
 	void checkAndLog() const;
@@ -106,7 +109,9 @@ std::map<std::string, ModSpec> getModsInPath(const std::string &path,
 // replaces modpack Modspecs with their content
 std::vector<ModSpec> flattenMods(const std::map<std::string, ModSpec> &mods);
 
-class ModStorage : public IMetadata {
+
+class ModStorage : public IMetadata
+{
 public:
 	ModStorage() = delete;
 	ModStorage(const std::string &mod_name, ModStorageDatabase *database);

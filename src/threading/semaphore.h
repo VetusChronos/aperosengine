@@ -29,7 +29,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "util/basic_macros.h"
 
-class Semaphore {
+class Semaphore
+{
 public:
 	Semaphore(int val = 0);
 	~Semaphore();

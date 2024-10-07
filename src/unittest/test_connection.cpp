@@ -23,13 +23,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "porting.h"
 #include "settings.h"
 #include "util/serialize.h"
-#include "network/connection_internal.h"
+#include "network/peerhandler.h"
+#include "network/atp/internal.h"
 #include "network/networkpacket.h"
 #include "network/socket.h"
 
 class TestConnection : public TestBase {
 public:
-	TestConnection() {
+	TestConnection()
+	{
 		if (INTERNET_SIMULATOR == false)
 			TestManager::registerTestModule(this);
 	}
@@ -45,7 +47,8 @@ public:
 
 static TestConnection g_test_instance;
 
-void TestConnection::runTests(IGameDef *gamedef) {
+void TestConnection::runTests(IGameDef *gamedef)
+{
 	TEST(testNetworkPacketSerialize);
 	TEST(testHelpers);
 	TEST(testConnectSendReceive);
@@ -53,22 +56,22 @@ void TestConnection::runTests(IGameDef *gamedef) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct Handler : public con::PeerHandler {
-	Handler(const char *a_name) :
-			name(a_name) {}
+struct Handler : public con::PeerHandler
+{
+	Handler(const char *a_name) : name(a_name) {}
 
-	void peerAdded(con::Peer *peer) {
+	void peerAdded(con::IPeer *peer)
+	{
 		infostream << "Handler(" << name << ")::peerAdded(): "
-											"id="
-				   << peer->id << '\n';
+			"id=" << peer->id << '\n';
 		last_id = peer->id;
 		count++;
 	}
 
-	void deletingPeer(con::Peer *peer, bool timeout) {
+	void deletingPeer(con::IPeer *peer, bool timeout)
+	{
 		infostream << "Handler(" << name << ")::deletingPeer(): "
-											"id="
-				   << peer->id << ", timeout=" << timeout << '\n';
+			"id=" << peer->id << ", timeout=" << timeout << '\n';
 		last_id = peer->id;
 		count--;
 	}
@@ -78,7 +81,8 @@ struct Handler : public con::PeerHandler {
 	const char *name;
 };
 
-void TestConnection::testNetworkPacketSerialize() {
+void TestConnection::testNetworkPacketSerialize()
+{
 	const static u8 expected[] = {
 		0x00, 0x7b,
 		0x00, 0x02, 0xd8, 0x42, 0xdf, 0x9a
@@ -110,14 +114,15 @@ void TestConnection::testNetworkPacketSerialize() {
 	}
 }
 
-void TestConnection::testHelpers() {
+void TestConnection::testHelpers()
+{
 	// Some constants for testing
 	u32 proto_id = 0x12345678;
 	session_t peer_id = 123;
 	u8 channel = 2;
 	SharedBuffer<u8> data1(1);
 	data1[0] = 100;
-	Address a(127, 0, 0, 1, 10);
+	Address a(127,0,0,1, 10);
 	const u16 seqnum = 34352;
 
 	con::BufferedPacketPtr p1 = con::makePacket(a, data1,
@@ -136,15 +141,15 @@ void TestConnection::testHelpers() {
 	UASSERT(readU8(&p1->data[6]) == channel);
 	UASSERT(readU8(&p1->data[7]) == data1[0]);
 
-	//infostream<<"initial data1[0]="<<((u32)data1[0]&0xff)<<std::endl;
+	//infostream<<"initial data1[0]="<<((u32)data1[0]&0xff)<<'\n';
 
 	SharedBuffer<u8> p2 = con::makeReliablePacket(data1, seqnum);
 
 	/*infostream<<"p2.getSize()="<<p2.getSize()<<", data1.getSize()="
-			<<data1.getSize()<<std::endl;
+			<<data1.getSize()<<'\n';
 	infostream<<"readU8(&p2[3])="<<readU8(&p2[3])
-			<<" p2[3]="<<((u32)p2[3]&0xff)<<std::endl;
-	infostream<<"data1[0]="<<((u32)data1[0]&0xff)<<std::endl;*/
+			<<" p2[3]="<<((u32)p2[3]&0xff)<<'\n';
+	infostream<<"data1[0]="<<((u32)data1[0]&0xff)<<'\n';*/
 
 	UASSERT(p2.getSize() == 3 + data1.getSize());
 	UASSERT(readU8(&p2[0]) == con::PACKET_TYPE_RELIABLE);
@@ -152,14 +157,17 @@ void TestConnection::testHelpers() {
 	UASSERT(readU8(&p2[3]) == data1[0]);
 }
 
-void TestConnection::testConnectSendReceive() {
+
+void TestConnection::testConnectSendReceive()
+{
+
+	constexpr u32 timeout_ms = 100;
+
 	/*
 		Test some real connections
 
 		NOTE: This mostly tests the legacy interface.
 	*/
-
-	u32 proto_id = 0xad26846a;
 
 	Handler hand_server("server");
 	Handler hand_client("client");
@@ -181,11 +189,11 @@ void TestConnection::testConnectSendReceive() {
 	}
 
 	infostream << "** Creating server Connection" << '\n';
-	con::Connection server(proto_id, 512, 5.0, false, &hand_server);
+	con::Connection server(512, 5.0f, false, &hand_server);
 	server.Serve(address);
 
 	infostream << "** Creating client Connection" << '\n';
-	con::Connection client(proto_id, 512, 5.0, false, &hand_client);
+	con::Connection client(512, 5.0f, false, &hand_client);
 
 	UASSERT(hand_server.count == 0);
 	UASSERT(hand_client.count == 0);
@@ -205,13 +213,11 @@ void TestConnection::testConnectSendReceive() {
 	// Client should not have added client yet
 	UASSERT(hand_client.count == 0);
 
-	try {
-		NetworkPacket pkt;
-		infostream << "** running client.Receive()" << '\n';
-		client.Receive(&pkt);
+	NetworkPacket pkt;
+	infostream << "** running client.Receive()" << '\n';
+	if (client.ReceiveTimeoutMs(&pkt, timeout_ms)) {
 		infostream << "** Client received: peer_id=" << pkt.getPeerId()
-				   << ", size=" << pkt.getSize() << '\n';
-	} catch (con::NoIncomingDataException &e) {
+			<< ", size=" << pkt.getSize() << '\n';
 	}
 
 	// Client should have added server now
@@ -222,14 +228,14 @@ void TestConnection::testConnectSendReceive() {
 
 	sleep_ms(100);
 
-	try {
-		NetworkPacket pkt;
-		infostream << "** running server.Receive()" << '\n';
-		server.Receive(&pkt);
+	NetworkPacket pkt1;
+	infostream << "** running server.Receive()" << '\n';
+	if (server.ReceiveTimeoutMs(&pkt, timeout_ms)) {
 		infostream << "** Server received: peer_id=" << pkt.getPeerId()
-				   << ", size=" << pkt.getSize()
-				   << '\n';
-	} catch (con::NoIncomingDataException &e) {
+			<< ", size=" << pkt.getSize()
+			<< '\n';
+	}
+	else {
 		// No actual data received, but the client has
 		// probably been connected
 	}
@@ -244,27 +250,23 @@ void TestConnection::testConnectSendReceive() {
 	//sleep_ms(50);
 
 	while (client.Connected() == false) {
-		try {
-			NetworkPacket pkt;
-			infostream << "** running client.Receive()" << '\n';
-			client.Receive(&pkt);
+		NetworkPacket pkt;
+		infostream << "** running client.Receive()" << '\n';
+		if (client.TryReceive(&pkt)) {
 			infostream << "** Client received: peer_id=" << pkt.getPeerId()
-					   << ", size=" << pkt.getSize() << '\n';
-		} catch (con::NoIncomingDataException &e) {
+				<< ", size=" << pkt.getSize() << '\n';
 		}
 		sleep_ms(50);
 	}
 
 	sleep_ms(50);
 
-	try {
-		NetworkPacket pkt;
-		infostream << "** running server.Receive()" << '\n';
-		server.Receive(&pkt);
+	NetworkPacket pkt2;
+	infostream << "** running server.Receive()" << '\n';
+	if (server.ReceiveTimeoutMs(&pkt, timeout_ms)) {
 		infostream << "** Server received: peer_id=" << pkt.getPeerId()
-				   << ", size=" << pkt.getSize()
-				   << '\n';
-	} catch (con::NoIncomingDataException &e) {
+			<< ", size=" << pkt.getSize()
+			<< '\n';
 	}
 
 	/*
@@ -276,18 +278,18 @@ void TestConnection::testConnectSendReceive() {
 
 		auto sentdata = pkt.oldForgePacket();
 
-		infostream << "** running client.Send()" << '\n';
+		infostream<<"** running client.Send()"<<'\n';
 		client.Send(PEER_ID_SERVER, 0, &pkt, true);
 
 		sleep_ms(50);
 
 		NetworkPacket recvpacket;
 		infostream << "** running server.Receive()" << '\n';
-		server.Receive(&recvpacket);
+		UASSERT(server.ReceiveTimeoutMs(&recvpacket, timeout_ms));
 		infostream << "** Server received: peer_id=" << pkt.getPeerId()
-				   << ", size=" << pkt.getSize()
-				   << ", data=" << (const char *)pkt.getU8Ptr(0)
-				   << '\n';
+				<< ", size=" << pkt.getSize()
+				<< ", data=" << (const char*)pkt.getU8Ptr(0)
+				<< '\n';
 
 		auto recvdata = pkt.oldForgePacket();
 
@@ -301,8 +303,8 @@ void TestConnection::testConnectSendReceive() {
 	{
 		const int datasize = 30000;
 		NetworkPacket pkt(0xff, datasize);
-		for (u16 i = 0; i < datasize; i++) {
-			pkt << static_cast<u8>(i / 4);
+		for (u16 i=0; i<datasize; i++) {
+			pkt << static_cast<u8>(i/4);
 		}
 
 		infostream << "Sending data (size=" << datasize << "):";
@@ -311,8 +313,8 @@ void TestConnection::testConnectSendReceive() {
 				infostream << " ";
 			char buf[10];
 			porting::mt_snprintf(buf, sizeof(buf), "%.2X",
-					((int)((const char *)pkt.getU8Ptr(0))[i]) & 0xff);
-			infostream << buf;
+				((int)((const char *)pkt.getU8Ptr(0))[i]) & 0xff);
+			infostream<<buf;
 		}
 		if (datasize > 20)
 			infostream << "...";
@@ -333,20 +335,18 @@ void TestConnection::testConnectSendReceive() {
 		for (;;) {
 			if (porting::getTimeMs() - timems0 > 5000 || received)
 				break;
-			try {
-				NetworkPacket pkt;
-				client.Receive(&pkt);
+			NetworkPacket pkt;
+			if (client.ReceiveTimeoutMs(&pkt, timeout_ms)) {
 				size = pkt.getSize();
 				peer_id = pkt.getPeerId();
 				recvdata = pkt.oldForgePacket();
 				received = true;
-			} catch (con::NoIncomingDataException &e) {
 			}
 			sleep_ms(10);
 		}
 		UASSERT(received);
 		infostream << "** Client received: peer_id=" << peer_id
-				   << ", size=" << size << '\n';
+			<< ", size=" << size << '\n';
 
 		infostream << "Received data (size=" << size << "): ";
 		for (int i = 0; i < size && i < 20; i++) {

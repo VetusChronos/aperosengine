@@ -22,18 +22,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "profiler.h"
 #include "activeobjectmgr.h"
 
-namespace client {
+namespace client
+{
 
-ActiveObjectMgr::~ActiveObjectMgr() {
+ActiveObjectMgr::~ActiveObjectMgr()
+{
 	if (!m_active_objects.empty()) {
 		warningstream << "client::ActiveObjectMgr::~ActiveObjectMgr(): not cleared."
-					  << '\n';
+				<< '\n';
 		clear();
 	}
 }
 
 void ActiveObjectMgr::step(
-		float dtime, const std::function<void(ClientActiveObject *)> &f) {
+		float dtime, const std::function<void(ClientActiveObject *)> &f)
+{
 	size_t count = 0;
 	for (auto &ao_it : m_active_objects.iter()) {
 		if (!ao_it.second)
@@ -44,13 +47,14 @@ void ActiveObjectMgr::step(
 	g_profiler->avg("ActiveObjectMgr: CAO count [#]", count);
 }
 
-bool ActiveObjectMgr::registerObject(std::unique_ptr<ClientActiveObject> obj) {
+bool ActiveObjectMgr::registerObject(std::unique_ptr<ClientActiveObject> obj)
+{
 	assert(obj); // Pre-condition
 	if (obj->getId() == 0) {
 		u16 new_id = getFreeId();
 		if (new_id == 0) {
 			infostream << "Client::ActiveObjectMgr::registerObject(): "
-					   << "no free id available" << '\n';
+					<< "no free id available" << '\n';
 
 			return false;
 		}
@@ -59,23 +63,24 @@ bool ActiveObjectMgr::registerObject(std::unique_ptr<ClientActiveObject> obj) {
 
 	if (!isFreeId(obj->getId())) {
 		infostream << "Client::ActiveObjectMgr::registerObject(): "
-				   << "id is not free (" << obj->getId() << ")" << '\n';
+				<< "id is not free (" << obj->getId() << ")" << '\n';
 		return false;
 	}
 	infostream << "Client::ActiveObjectMgr::registerObject(): "
-			   << "added (id=" << obj->getId() << ")" << '\n';
+			<< "added (id=" << obj->getId() << ")" << '\n';
 	m_active_objects.put(obj->getId(), std::move(obj));
 	return true;
 }
 
-void ActiveObjectMgr::removeObject(u16 id) {
+void ActiveObjectMgr::removeObject(u16 id)
+{
 	verbosestream << "Client::ActiveObjectMgr::removeObject(): "
-				  << "id=" << id << '\n';
+			<< "id=" << id << '\n';
 
 	std::unique_ptr<ClientActiveObject> obj = m_active_objects.take(id);
 	if (!obj) {
 		infostream << "Client::ActiveObjectMgr::removeObject(): "
-				   << "id=" << id << " not found" << '\n';
+				<< "id=" << id << " not found" << '\n';
 		return;
 	}
 
@@ -83,7 +88,8 @@ void ActiveObjectMgr::removeObject(u16 id) {
 }
 
 void ActiveObjectMgr::getActiveObjects(const v3f &origin, f32 max_d,
-		std::vector<DistanceSortedActiveObject> &dest) {
+		std::vector<DistanceSortedActiveObject> &dest)
+{
 	f32 max_d2 = max_d * max_d;
 	for (auto &ao_it : m_active_objects.iter()) {
 		ClientActiveObject *obj = ao_it.second.get();
@@ -99,7 +105,8 @@ void ActiveObjectMgr::getActiveObjects(const v3f &origin, f32 max_d,
 	}
 }
 
-std::vector<DistanceSortedActiveObject> ActiveObjectMgr::getActiveSelectableObjects(const core::line3d<f32> &shootline) {
+std::vector<DistanceSortedActiveObject> ActiveObjectMgr::getActiveSelectableObjects(const core::line3d<f32> &shootline)
+{
 	std::vector<DistanceSortedActiveObject> dest;
 	f32 max_d = shootline.getLength();
 	v3f dir = shootline.getVector().normalize();
@@ -117,8 +124,8 @@ std::vector<DistanceSortedActiveObject> ActiveObjectMgr::getActiveSelectableObje
 		f32 obj_radius_sq = selection_box.getExtent().getLengthSQ() / 4;
 
 		v3f c = obj_center - shootline.start;
-		f32 a = dir.dotProduct(c); // project c onto dir
-		f32 b_sq = c.getLengthSQ() - a * a; // distance from shootline to obj_center, squared
+		f32 a = dir.dotProduct(c);           // project c onto dir
+		f32 b_sq = c.getLengthSQ() - a * a;  // distance from shootline to obj_center, squared
 
 		if (b_sq > obj_radius_sq)
 			continue;

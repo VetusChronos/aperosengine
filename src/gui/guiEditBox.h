@@ -28,14 +28,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 using namespace irr;
 using namespace irr::gui;
 
-class GUIEditBox : public IGUIEditBox {
+class GUIEditBox : public IGUIEditBox
+{
 public:
 	GUIEditBox(IGUIEnvironment *environment, IGUIElement *parent, s32 id,
 			core::rect<s32> rectangle, bool border, bool writable) :
 			IGUIEditBox(environment, parent, id, rectangle),
-			m_border(border),
-			m_writable(writable),
-			m_frame_rect(rectangle) {
+			m_border(border), m_writable(writable), m_frame_rect(rectangle)
+	{
 	}
 
 	virtual ~GUIEditBox();
@@ -62,7 +62,8 @@ public:
 
 	//! Checks if an override color is enabled
 	/** \return true if the override color is enabled, false otherwise */
-	virtual bool isOverrideColorEnabled(void) const {
+	virtual bool isOverrideColorEnabled(void) const
+	{
 		return m_override_color_enabled;
 	}
 

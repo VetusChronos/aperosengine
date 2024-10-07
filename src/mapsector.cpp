@@ -22,17 +22,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "mapblock.h"
 #include "serialization.h"
 
-MapSector::MapSector(Map *parent, v2s16 pos, IGameDef *gamedef) :
+MapSector::MapSector(Map *parent, v2s16 pos, IGameDef *gamedef):
 		m_parent(parent),
 		m_pos(pos),
-		m_gamedef(gamedef) {
+		m_gamedef(gamedef)
+{
 }
 
-MapSector::~MapSector() {
+MapSector::~MapSector()
+{
 	deleteBlocks();
 }
 
-void MapSector::deleteBlocks() {
+void MapSector::deleteBlocks()
+{
 	// Clear cache
 	m_block_cache = nullptr;
 
@@ -40,7 +43,8 @@ void MapSector::deleteBlocks() {
 	m_blocks.clear();
 }
 
-MapBlock *MapSector::getBlockBuffered(s16 y) {
+MapBlock *MapSector::getBlockBuffered(s16 y)
+{
 	MapBlock *block;
 
 	if (m_block_cache && y == m_block_cache_y) {
@@ -58,11 +62,13 @@ MapBlock *MapSector::getBlockBuffered(s16 y) {
 	return block;
 }
 
-MapBlock *MapSector::getBlockNoCreateNoEx(s16 y) {
+MapBlock *MapSector::getBlockNoCreateNoEx(s16 y)
+{
 	return getBlockBuffered(y);
 }
 
-std::unique_ptr<MapBlock> MapSector::createBlankBlockNoInsert(s16 y) {
+std::unique_ptr<MapBlock> MapSector::createBlankBlockNoInsert(s16 y)
+{
 	assert(getBlockBuffered(y) == nullptr); // Pre-condition
 
 	if (blockpos_over_max_limit(v3s16(0, y, 0)))
@@ -73,7 +79,8 @@ std::unique_ptr<MapBlock> MapSector::createBlankBlockNoInsert(s16 y) {
 	return std::make_unique<MapBlock>(blockpos_map, m_gamedef);
 }
 
-MapBlock *MapSector::createBlankBlock(s16 y) {
+MapBlock *MapSector::createBlankBlock(s16 y)
+{
 	std::unique_ptr<MapBlock> block_u = createBlankBlockNoInsert(y);
 	MapBlock *block = block_u.get();
 
@@ -82,7 +89,8 @@ MapBlock *MapSector::createBlankBlock(s16 y) {
 	return block;
 }
 
-void MapSector::insertBlock(std::unique_ptr<MapBlock> block) {
+void MapSector::insertBlock(std::unique_ptr<MapBlock> block)
+{
 	s16 block_y = block->getPos().Y;
 
 	MapBlock *block2 = getBlockBuffered(block_y);
@@ -97,12 +105,14 @@ void MapSector::insertBlock(std::unique_ptr<MapBlock> block) {
 	m_blocks[block_y] = std::move(block);
 }
 
-void MapSector::deleteBlock(MapBlock *block) {
+void MapSector::deleteBlock(MapBlock *block)
+{
 	detachBlock(block);
 	// returned smart-ptr is dropped
 }
 
-std::unique_ptr<MapBlock> MapSector::detachBlock(MapBlock *block) {
+std::unique_ptr<MapBlock> MapSector::detachBlock(MapBlock *block)
+{
 	s16 block_y = block->getPos().Y;
 
 	// Clear from cache
@@ -121,7 +131,8 @@ std::unique_ptr<MapBlock> MapSector::detachBlock(MapBlock *block) {
 	return ret;
 }
 
-void MapSector::getBlocks(MapBlockVect &dest) {
+void MapSector::getBlocks(MapBlockVect &dest)
+{
 	dest.reserve(dest.size() + m_blocks.size());
 	for (auto &block : m_blocks) {
 		dest.push_back(block.second.get());

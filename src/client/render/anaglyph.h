@@ -25,12 +25,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 /**
  * Set color mask when rendering the next steps
  */
-class SetColorMaskStep : public TrivialRenderStep {
+class SetColorMaskStep : public TrivialRenderStep
+{
 public:
 	SetColorMaskStep(int color_mask);
 
 	void run(PipelineContext &context) override;
-
 private:
 	int color_mask;
 };
@@ -39,27 +39,28 @@ private:
  * Resets depth buffer of the current render target
  *
  */
-class ClearDepthBufferTarget : public RenderTarget {
+class ClearDepthBufferTarget : public RenderTarget
+{
 public:
 	ClearDepthBufferTarget(RenderTarget *target);
 
 	void reset(PipelineContext &context) override {}
 	void activate(PipelineContext &context) override;
-
 private:
 	RenderTarget *target;
 };
+
 
 /**
  * Enables or disables override material when activated
  *
  */
-class ConfigureOverrideMaterialTarget : public RenderTarget {
+class ConfigureOverrideMaterialTarget : public RenderTarget
+{
 public:
 	ConfigureOverrideMaterialTarget(RenderTarget *upstream, bool enable);
 
 	virtual void activate(PipelineContext &context) override;
-
 private:
 	RenderTarget *upstream;
 	bool enable;

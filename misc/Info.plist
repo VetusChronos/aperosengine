@@ -5,15 +5,15 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>aperosvoxeç</string>
+	<string>aperosengine</string>
 	<key>CFBundleIconFile</key>
-	<string>minetest-icon.icns</string>
+	<string>aperosengine-icon.ico</string>
 	<key>CFBundleName</key>
-	<string>AperosVoxeç</string>
+	<string>AperosEngine</string>
 	<key>CFBundleDisplayName</key>
-	<string>AperosVoxeç</string>
+	<string>AperosEngine</string>
 	<key>CFBundleIdentifier</key>
-	<string>net.minetest.minetest</string>
+	<string>net.aperosengine.aperosengine</string>
 	<key>NSHighResolutionCapable</key>
 	<false/>
 </dict>

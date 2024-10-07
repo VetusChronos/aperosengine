@@ -24,7 +24,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "filesys.h"
 #include "settings.h"
 
-ContentType getContentType(const std::string &path) {
+ContentType getContentType(const std::string &path)
+{
 	if (fs::IsFile(path + DIR_DELIM "modpack.txt") || fs::IsFile(path + DIR_DELIM "modpack.conf"))
 		return ContentType::MODPACK;
 
@@ -40,29 +41,30 @@ ContentType getContentType(const std::string &path) {
 	return ContentType::UNKNOWN;
 }
 
-void parseContentInfo(ContentSpec &spec) {
+void parseContentInfo(ContentSpec &spec)
+{
 	std::string conf_path;
 
 	switch (getContentType(spec.path)) {
-		case ContentType::MOD:
-			spec.type = "mod";
-			conf_path = spec.path + DIR_DELIM "mod.conf";
-			break;
-		case ContentType::MODPACK:
-			spec.type = "modpack";
-			conf_path = spec.path + DIR_DELIM "modpack.conf";
-			break;
-		case ContentType::GAME:
-			spec.type = "game";
-			conf_path = spec.path + DIR_DELIM "game.conf";
-			break;
-		case ContentType::TXP:
-			spec.type = "txp";
-			conf_path = spec.path + DIR_DELIM "texture_pack.conf";
-			break;
-		default:
-			spec.type = "unknown";
-			break;
+	case ContentType::MOD:
+		spec.type = "mod";
+		conf_path = spec.path + DIR_DELIM "mod.conf";
+		break;
+	case ContentType::MODPACK:
+		spec.type = "modpack";
+		conf_path = spec.path + DIR_DELIM "modpack.conf";
+		break;
+	case ContentType::GAME:
+		spec.type = "game";
+		conf_path = spec.path + DIR_DELIM "game.conf";
+		break;
+	case ContentType::TXP:
+		spec.type = "txp";
+		conf_path = spec.path + DIR_DELIM "texture_pack.conf";
+		break;
+	default:
+		spec.type = "unknown";
+		break;
 	}
 
 	Settings conf;

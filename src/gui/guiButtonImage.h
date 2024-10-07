@@ -26,7 +26,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 using namespace irr;
 
-class GUIButtonImage : public GUIButton {
+class GUIButtonImage : public GUIButton
+{
 public:
 	//! constructor
 	GUIButtonImage(gui::IGUIEnvironment *environment, gui::IGUIElement *parent,

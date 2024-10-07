@@ -22,7 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <string>
 #include <ctime>
 
-enum ChatMessageType {
+enum ChatMessageType
+{
 	CHATMESSAGE_TYPE_RAW = 0,
 	CHATMESSAGE_TYPE_NORMAL = 1,
 	CHATMESSAGE_TYPE_ANNOUNCE = 2,
@@ -30,16 +31,15 @@ enum ChatMessageType {
 	CHATMESSAGE_TYPE_MAX = 4,
 };
 
-struct ChatMessage {
-	ChatMessage(const std::wstring &m = L"") :
-			message(m) {}
+struct ChatMessage
+{
+	ChatMessage(const std::wstring &m = L"") : message(m) {}
 
 	ChatMessage(ChatMessageType t, const std::wstring &m, const std::wstring &s = L"",
 			std::time_t ts = std::time(0)) :
 			type(t),
-			message(m),
-			sender(s),
-			timestamp(ts) {
+			message(m), sender(s), timestamp(ts)
+	{
 	}
 
 	ChatMessageType type = CHATMESSAGE_TYPE_RAW;

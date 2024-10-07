@@ -26,7 +26,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 using sound_handle_t = int;
 
-class ModApiMainMenuSound : public ModApiBase {
+class ModApiMainMenuSound : public ModApiBase
+{
 private:
 	// sound_play(spec, loop)
 	static int l_sound_play(lua_State *L);
@@ -35,15 +36,15 @@ public:
 	static void Initialize(lua_State *L, int top);
 };
 
-class MainMenuSoundHandle final : public ModApiBase {
+class MainMenuSoundHandle final : public ModApiBase
+{
 private:
 	sound_handle_t m_handle;
 
 	static const char className[];
 	static const luaL_Reg methods[];
 
-	MainMenuSoundHandle(sound_handle_t handle) :
-			m_handle(handle) {}
+	MainMenuSoundHandle(sound_handle_t handle) : m_handle(handle) {}
 
 	DISABLE_CLASS_COPY(MainMenuSoundHandle)
 

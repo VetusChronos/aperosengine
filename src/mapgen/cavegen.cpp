@@ -32,13 +32,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // TODO Remove this. Cave liquids are now defined and located using biome definitions
 static NoiseParams nparams_caveliquids(0, 1, v3f(150.0, 150.0, 150.0), 776, 3, 0.6, 2.0);
 
+
 ////
 //// CavesNoiseIntersection
 ////
 
 CavesNoiseIntersection::CavesNoiseIntersection(
-		const NodeDefManager *nodedef, BiomeManager *biomemgr, BiomeGen *biomegen, v3s16 chunksize,
-		NoiseParams *np_cave1, NoiseParams *np_cave2, s32 seed, float cave_width) {
+	const NodeDefManager *nodedef, BiomeManager *biomemgr, BiomeGen *biomegen, v3s16 chunksize,
+	NoiseParams *np_cave1, NoiseParams *np_cave2, s32 seed, float cave_width)
+{
 	assert(nodedef);
 	assert(biomemgr);
 	assert(biomegen);
@@ -50,7 +52,7 @@ CavesNoiseIntersection::CavesNoiseIntersection(
 	m_csize = chunksize;
 	m_cave_width = cave_width;
 
-	m_ystride = m_csize.X;
+	m_ystride    = m_csize.X;
 	m_zstride_1d = m_csize.X * (m_csize.Y + 1);
 
 	// Noises are created using 1-down overgeneration
@@ -60,13 +62,17 @@ CavesNoiseIntersection::CavesNoiseIntersection(
 	noise_cave2 = new Noise(np_cave2, seed, m_csize.X, m_csize.Y + 1, m_csize.Z);
 }
 
-CavesNoiseIntersection::~CavesNoiseIntersection() {
+
+CavesNoiseIntersection::~CavesNoiseIntersection()
+{
 	delete noise_cave1;
 	delete noise_cave2;
 }
 
+
 void CavesNoiseIntersection::generateCaves(MMVManip *vm,
-		v3s16 nmin, v3s16 nmax, biome_t *biomemap) {
+	v3s16 nmin, v3s16 nmax, biome_t *biomemap)
+{
 	assert(vm);
 	assert(biomemap);
 
@@ -74,132 +80,128 @@ void CavesNoiseIntersection::generateCaves(MMVManip *vm,
 	noise_cave2->perlinMap3D(nmin.X, nmin.Y - 1, nmin.Z);
 
 	const v3s16 &em = vm->m_area.getExtent();
-	u32 index2d = 0; // Biomemap index
-
-	s16 *biome_transitions = m_bmgn->getBiomeTransitions();
+	u32 index2d = 0;  // Biomemap index
 
 	for (s16 z = nmin.Z; z <= nmax.Z; z++)
-		for (s16 x = nmin.X; x <= nmax.X; x++, index2d++) {
-			bool column_is_open = false; // Is column open to overground
-			bool is_under_river = false; // Is column under river water
-			bool is_under_tunnel = false; // Is tunnel or is under tunnel
-			bool is_top_filler_above = false; // Is top or filler above node
-			// Indexes at column top
-			u32 vi = vm->m_area.index(x, nmax.Y, z);
-			u32 index3d = (z - nmin.Z) * m_zstride_1d + m_csize.Y * m_ystride +
-					(x - nmin.X); // 3D noise index
-			// Biome of column
-			Biome *biome = (Biome *)m_bmgr->getRaw(biomemap[index2d]);
-			u16 depth_top = biome->depth_top;
-			u16 base_filler = depth_top + biome->depth_filler;
-			u16 depth_riverbed = biome->depth_riverbed;
-			u16 nplaced = 0;
+	for (s16 x = nmin.X; x <= nmax.X; x++, index2d++) {
+		bool column_is_open = false;  // Is column open to overground
+		bool is_under_river = false;  // Is column under river water
+		bool is_under_tunnel = false;  // Is tunnel or is under tunnel
+		bool is_top_filler_above = false;  // Is top or filler above node
+		// Indexes at column top
+		u32 vi = vm->m_area.index(x, nmax.Y, z);
+		u32 index3d = (z - nmin.Z) * m_zstride_1d + m_csize.Y * m_ystride +
+			(x - nmin.X);  // 3D noise index
+		// Biome of column
+		Biome *biome = (Biome *)m_bmgr->getRaw(biomemap[index2d]);
+		u16 depth_top = biome->depth_top;
+		u16 base_filler = depth_top + biome->depth_filler;
+		u16 depth_riverbed = biome->depth_riverbed;
+		u16 nplaced = 0;
 
-			int cur_biome_depth = 0;
-			s16 biome_y_min = biome_transitions[cur_biome_depth];
+		s16 biome_y_min = m_bmgn->getNextTransitionY(nmax.Y);
 
-			// Don't excavate the overgenerated stone at nmax.Y + 1,
-			// this creates a 'roof' over the tunnel, preventing light in
-			// tunnels at mapchunk borders when generating mapchunks upwards.
-			// This 'roof' is removed when the mapchunk above is generated.
-			for (s16 y = nmax.Y; y >= nmin.Y - 1; y--,
-					 index3d -= m_ystride,
-					 VoxelArea::add_y(em, vi, -1)) {
-				// We need this check to make sure that biomes don't generate too far down
-				if (y < biome_y_min) {
-					biome = m_bmgn->getBiomeAtIndex(index2d, v3s16(x, y, z));
+		// Don't excavate the overgenerated stone at nmax.Y + 1,
+		// this creates a 'roof' over the tunnel, preventing light in
+		// tunnels at mapchunk borders when generating mapchunks upwards.
+		// This 'roof' is removed when the mapchunk above is generated.
+		for (s16 y = nmax.Y; y >= nmin.Y - 1; y--,
+				index3d -= m_ystride,
+				VoxelArea::add_y(em, vi, -1)) {
+			// We need this check to make sure that biomes don't generate too far down
+			if (y < biome_y_min) {
+				biome = m_bmgn->getBiomeAtIndex(index2d, v3s16(x, y, z));
+				biome_y_min = m_bmgn->getNextTransitionY(y);
 
-					// Finding the height of the next biome
-					// On first iteration this may loop a couple times after than it should just run once
-					while (y < biome_y_min) {
-						biome_y_min = biome_transitions[++cur_biome_depth];
-					}
-
-					/*if (x == nmin.X && z == nmin.Z)
-						printf("Cave: check @ %i -> %s -> again at %i\n", y, biome->name.c_str(), biome_y_min);*/
+				if (x == nmin.X && z == nmin.Z && false) {
+					dstream << "cavegen: biome at " << y << " is " << biome->name
+						<< ", next at " << biome_y_min << '\n';
 				}
+			}
 
-				content_t c = vm->m_data[vi].getContent();
+			content_t c = vm->m_data[vi].getContent();
 
-				if (c == CONTENT_AIR || c == biome->c_water_top ||
-						c == biome->c_water) {
-					column_is_open = true;
-					is_top_filler_above = false;
-					continue;
-				}
+			if (c == CONTENT_AIR || c == biome->c_water_top ||
+					c == biome->c_water) {
+				column_is_open = true;
+				is_top_filler_above = false;
+				continue;
+			}
 
-				if (c == biome->c_river_water) {
-					column_is_open = true;
-					is_under_river = true;
-					is_top_filler_above = false;
-					continue;
-				}
+			if (c == biome->c_river_water) {
+				column_is_open = true;
+				is_under_river = true;
+				is_top_filler_above = false;
+				continue;
+			}
 
-				// Ground
-				float d1 = contour(noise_cave1->result[index3d]);
-				float d2 = contour(noise_cave2->result[index3d]);
+			// Ground
+			float d1 = contour(noise_cave1->result[index3d]);
+			float d2 = contour(noise_cave2->result[index3d]);
 
-				if (d1 * d2 > m_cave_width && m_ndef->get(c).is_ground_content) {
-					// In tunnel and ground content, excavate
-					vm->m_data[vi] = MapNode(CONTENT_AIR);
-					is_under_tunnel = true;
-					// If tunnel roof is top or filler, replace with stone
-					if (is_top_filler_above)
-						vm->m_data[vi + em.X] = MapNode(biome->c_stone);
-					is_top_filler_above = false;
-				} else if (column_is_open && is_under_tunnel &&
-						(c == biome->c_stone || c == biome->c_filler)) {
-					// Tunnel entrance floor, place biome surface nodes
-					if (is_under_river) {
-						if (nplaced < depth_riverbed) {
-							vm->m_data[vi] = MapNode(biome->c_riverbed);
-							is_top_filler_above = true;
-							nplaced++;
-						} else {
-							// Disable top/filler placement
-							column_is_open = false;
-							is_under_river = false;
-							is_under_tunnel = false;
-						}
-					} else if (nplaced < depth_top) {
-						vm->m_data[vi] = MapNode(biome->c_top);
-						is_top_filler_above = true;
-						nplaced++;
-					} else if (nplaced < base_filler) {
-						vm->m_data[vi] = MapNode(biome->c_filler);
+			if (d1 * d2 > m_cave_width && m_ndef->get(c).is_ground_content) {
+				// In tunnel and ground content, excavate
+				vm->m_data[vi] = MapNode(CONTENT_AIR);
+				is_under_tunnel = true;
+				// If tunnel roof is top or filler, replace with stone
+				if (is_top_filler_above)
+					vm->m_data[vi + em.X] = MapNode(biome->c_stone);
+				is_top_filler_above = false;
+			} else if (column_is_open && is_under_tunnel &&
+					(c == biome->c_stone || c == biome->c_filler)) {
+				// Tunnel entrance floor, place biome surface nodes
+				if (is_under_river) {
+					if (nplaced < depth_riverbed) {
+						vm->m_data[vi] = MapNode(biome->c_riverbed);
 						is_top_filler_above = true;
 						nplaced++;
 					} else {
 						// Disable top/filler placement
 						column_is_open = false;
+						is_under_river = false;
 						is_under_tunnel = false;
 					}
+				} else if (nplaced < depth_top) {
+					vm->m_data[vi] = MapNode(biome->c_top);
+					is_top_filler_above = true;
+					nplaced++;
+				} else if (nplaced < base_filler) {
+					vm->m_data[vi] = MapNode(biome->c_filler);
+					is_top_filler_above = true;
+					nplaced++;
 				} else {
-					// Not tunnel or tunnel entrance floor
-					// Check node for possible replacing with stone for tunnel roof
-					if (c == biome->c_top || c == biome->c_filler)
-						is_top_filler_above = true;
-
+					// Disable top/filler placement
 					column_is_open = false;
+					is_under_tunnel = false;
 				}
+			} else {
+				// Not tunnel or tunnel entrance floor
+				// Check node for possible replacing with stone for tunnel roof
+				if (c == biome->c_top || c == biome->c_filler)
+					is_top_filler_above = true;
+
+				column_is_open = false;
 			}
 		}
+	}
 }
+
 
 ////
 //// CavernsNoise
 ////
 
 CavernsNoise::CavernsNoise(
-		const NodeDefManager *nodedef, v3s16 chunksize, NoiseParams *np_cavern,
-		s32 seed, float cavern_limit, float cavern_taper, float cavern_threshold) {
+	const NodeDefManager *nodedef, v3s16 chunksize, NoiseParams *np_cavern,
+	s32 seed, float cavern_limit, float cavern_taper, float cavern_threshold)
+{
 	assert(nodedef);
 
-	m_ndef = nodedef;
+	m_ndef  = nodedef;
 
-	m_csize = chunksize;
-	m_cavern_limit = cavern_limit;
-	m_cavern_taper = cavern_taper;
+	m_csize            = chunksize;
+	m_cavern_limit     = cavern_limit;
+	m_cavern_taper     = cavern_taper;
 	m_cavern_threshold = cavern_threshold;
 
 	m_ystride = m_csize.X;
@@ -219,11 +221,15 @@ CavernsNoise::CavernsNoise(
 		c_lava_source = CONTENT_AIR;
 }
 
-CavernsNoise::~CavernsNoise() {
+
+CavernsNoise::~CavernsNoise()
+{
 	delete noise_cavern;
 }
 
-bool CavernsNoise::generateCaverns(MMVManip *vm, v3s16 nmin, v3s16 nmax) {
+
+bool CavernsNoise::generateCaverns(MMVManip *vm, v3s16 nmin, v3s16 nmax)
+{
 	assert(vm);
 
 	// Calculate noise
@@ -231,10 +237,10 @@ bool CavernsNoise::generateCaverns(MMVManip *vm, v3s16 nmin, v3s16 nmax) {
 
 	// Cache cavern_amp values
 	float *cavern_amp = new float[m_csize.Y + 1];
-	u8 cavern_amp_index = 0; // Index zero at column top
+	u8 cavern_amp_index = 0;  // Index zero at column top
 	for (s16 y = nmax.Y; y >= nmin.Y - 1; y--, cavern_amp_index++) {
 		cavern_amp[cavern_amp_index] =
-				MYMIN((m_cavern_limit - y) / (float)m_cavern_taper, 1.0f);
+			MYMIN((m_cavern_limit - y) / (float)m_cavern_taper, 1.0f);
 	}
 
 	//// Place nodes
@@ -243,63 +249,65 @@ bool CavernsNoise::generateCaverns(MMVManip *vm, v3s16 nmin, v3s16 nmax) {
 	u32 index2d = 0;
 
 	for (s16 z = nmin.Z; z <= nmax.Z; z++)
-		for (s16 x = nmin.X; x <= nmax.X; x++, index2d++) {
-			// Reset cave_amp index to column top
-			cavern_amp_index = 0;
-			// Initial voxelmanip index at column top
-			u32 vi = vm->m_area.index(x, nmax.Y, z);
-			// Initial 3D noise index at column top
-			u32 index3d = (z - nmin.Z) * m_zstride_1d + m_csize.Y * m_ystride +
-					(x - nmin.X);
-			// Don't excavate the overgenerated stone at node_max.Y + 1,
-			// this creates a 'roof' over the cavern, preventing light in
-			// caverns at mapchunk borders when generating mapchunks upwards.
-			// This 'roof' is excavated when the mapchunk above is generated.
-			for (s16 y = nmax.Y; y >= nmin.Y - 1; y--,
-					 index3d -= m_ystride,
-					 VoxelArea::add_y(em, vi, -1),
-					 cavern_amp_index++) {
-				content_t c = vm->m_data[vi].getContent();
-				float n_absamp_cavern = std::fabs(noise_cavern->result[index3d]) *
-						cavern_amp[cavern_amp_index];
-				// Disable CavesRandomWalk at a safe distance from caverns
-				// to avoid excessively spreading liquids in caverns.
-				if (n_absamp_cavern > m_cavern_threshold - 0.1f) {
-					near_cavern = true;
-					if (n_absamp_cavern > m_cavern_threshold &&
-							m_ndef->get(c).is_ground_content)
-						vm->m_data[vi] = MapNode(CONTENT_AIR);
-				}
+	for (s16 x = nmin.X; x <= nmax.X; x++, index2d++) {
+		// Reset cave_amp index to column top
+		cavern_amp_index = 0;
+		// Initial voxelmanip index at column top
+		u32 vi = vm->m_area.index(x, nmax.Y, z);
+		// Initial 3D noise index at column top
+		u32 index3d = (z - nmin.Z) * m_zstride_1d + m_csize.Y * m_ystride +
+			(x - nmin.X);
+		// Don't excavate the overgenerated stone at node_max.Y + 1,
+		// this creates a 'roof' over the cavern, preventing light in
+		// caverns at mapchunk borders when generating mapchunks upwards.
+		// This 'roof' is excavated when the mapchunk above is generated.
+		for (s16 y = nmax.Y; y >= nmin.Y - 1; y--,
+				index3d -= m_ystride,
+				VoxelArea::add_y(em, vi, -1),
+				cavern_amp_index++) {
+			content_t c = vm->m_data[vi].getContent();
+			float n_absamp_cavern = std::fabs(noise_cavern->result[index3d]) *
+				cavern_amp[cavern_amp_index];
+			// Disable CavesRandomWalk at a safe distance from caverns
+			// to avoid excessively spreading liquids in caverns.
+			if (n_absamp_cavern > m_cavern_threshold - 0.1f) {
+				near_cavern = true;
+				if (n_absamp_cavern > m_cavern_threshold &&
+						m_ndef->get(c).is_ground_content)
+					vm->m_data[vi] = MapNode(CONTENT_AIR);
 			}
 		}
+	}
 
 	delete[] cavern_amp;
 
 	return near_cavern;
 }
 
+
 ////
 //// CavesRandomWalk
 ////
 
 CavesRandomWalk::CavesRandomWalk(
-		const NodeDefManager *ndef,
-		GenerateNotifier *gennotify,
-		s32 seed,
-		int water_level,
-		content_t water_source,
-		content_t lava_source,
-		float large_cave_flooded,
-		BiomeGen *biomegen) {
+	const NodeDefManager *ndef,
+	GenerateNotifier *gennotify,
+	s32 seed,
+	int water_level,
+	content_t water_source,
+	content_t lava_source,
+	float large_cave_flooded,
+	BiomeGen *biomegen)
+{
 	assert(ndef);
 
-	this->ndef = ndef;
-	this->gennotify = gennotify;
-	this->seed = seed;
-	this->water_level = water_level;
-	this->np_caveliquids = &nparams_caveliquids;
+	this->ndef               = ndef;
+	this->gennotify          = gennotify;
+	this->seed               = seed;
+	this->water_level        = water_level;
+	this->np_caveliquids     = &nparams_caveliquids;
 	this->large_cave_flooded = large_cave_flooded;
-	this->bmgn = biomegen;
+	this->bmgn               = biomegen;
 
 	c_water_source = water_source;
 	if (c_water_source == CONTENT_IGNORE)
@@ -314,16 +322,18 @@ CavesRandomWalk::CavesRandomWalk(
 		c_lava_source = CONTENT_AIR;
 }
 
+
 void CavesRandomWalk::makeCave(MMVManip *vm, v3s16 nmin, v3s16 nmax,
-		PseudoRandom *ps, bool is_large_cave, int max_stone_height, s16 *heightmap) {
+	PseudoRandom *ps, bool is_large_cave, int max_stone_height, s16 *heightmap)
+{
 	assert(vm);
 	assert(ps);
 
-	this->vm = vm;
-	this->ps = ps;
-	this->node_min = nmin;
-	this->node_max = nmax;
-	this->heightmap = heightmap;
+	this->vm         = vm;
+	this->ps         = ps;
+	this->node_min   = nmin;
+	this->node_max   = nmax;
+	this->heightmap  = heightmap;
 	this->large_cave = is_large_cave;
 
 	this->ystride = nmax.X - nmin.X + 1;
@@ -340,7 +350,7 @@ void CavesRandomWalk::makeCave(MMVManip *vm, v3s16 nmin, v3s16 nmax,
 		if (biome->c_cave_liquid[0] != CONTENT_IGNORE) {
 			use_biome_liquid = true;
 			c_biome_liquid =
-					biome->c_cave_liquid[ps->range(0, biome->c_cave_liquid.size() - 1)];
+				biome->c_cave_liquid[ps->range(0, biome->c_cave_liquid.size() - 1)];
 			if (c_biome_liquid == CONTENT_AIR)
 				flooded = false;
 		}
@@ -409,7 +419,8 @@ void CavesRandomWalk::makeCave(MMVManip *vm, v3s16 nmin, v3s16 nmax,
 	// Add generation notify begin event
 	if (gennotify) {
 		v3s16 abs_pos(of.X + orp.X, of.Y + orp.Y, of.Z + orp.Z);
-		GenNotifyType notifytype = large_cave ? GENNOTIFY_LARGECAVE_BEGIN : GENNOTIFY_CAVE_BEGIN;
+		GenNotifyType notifytype = large_cave ?
+			GENNOTIFY_LARGECAVE_BEGIN : GENNOTIFY_CAVE_BEGIN;
 		gennotify->addEvent(notifytype, abs_pos);
 	}
 
@@ -420,12 +431,15 @@ void CavesRandomWalk::makeCave(MMVManip *vm, v3s16 nmin, v3s16 nmax,
 	// Add generation notify end event
 	if (gennotify) {
 		v3s16 abs_pos(of.X + orp.X, of.Y + orp.Y, of.Z + orp.Z);
-		GenNotifyType notifytype = large_cave ? GENNOTIFY_LARGECAVE_END : GENNOTIFY_CAVE_END;
+		GenNotifyType notifytype = large_cave ?
+			GENNOTIFY_LARGECAVE_END : GENNOTIFY_CAVE_END;
 		gennotify->addEvent(notifytype, abs_pos);
 	}
 }
 
-void CavesRandomWalk::makeTunnel(bool dirswitch) {
+
+void CavesRandomWalk::makeTunnel(bool dirswitch)
+{
 	if (dirswitch && !large_cave) {
 		main_direction.Z = ((float)(ps->next() % 20) - (float)10) / 10;
 		main_direction.Y = ((float)(ps->next() % 20) - (float)10) / 30;
@@ -443,14 +457,16 @@ void CavesRandomWalk::makeTunnel(bool dirswitch) {
 	v3s16 maxlen;
 	if (large_cave) {
 		maxlen = v3s16(
-				rs_part_max_length_rs,
-				rs_part_max_length_rs / 2,
-				rs_part_max_length_rs);
+			rs_part_max_length_rs,
+			rs_part_max_length_rs / 2,
+			rs_part_max_length_rs
+		);
 	} else {
 		maxlen = v3s16(
-				rs_part_max_length_rs,
-				ps->range(1, rs_part_max_length_rs),
-				rs_part_max_length_rs);
+			rs_part_max_length_rs,
+			ps->range(1, rs_part_max_length_rs),
+			rs_part_max_length_rs
+		);
 	}
 
 	v3f vec;
@@ -506,7 +522,9 @@ void CavesRandomWalk::makeTunnel(bool dirswitch) {
 	orp = rp;
 }
 
-void CavesRandomWalk::carveRoute(v3f vec, float f, bool randomize_xz) {
+
+void CavesRandomWalk::carveRoute(v3f vec, float f, bool randomize_xz)
+{
 	MapNode airnode(CONTENT_AIR);
 	MapNode waternode(c_water_source);
 	MapNode lavanode(c_lava_source);
@@ -530,8 +548,9 @@ void CavesRandomWalk::carveRoute(v3f vec, float f, bool randomize_xz) {
 			// TODO 'np_caveliquids' is deprecated and should eventually be removed.
 			// Cave liquids are now defined and located using biome definitions.
 			float nval = NoisePerlin3D(np_caveliquids, startp.X,
-					startp.Y, startp.Z, seed);
-			liquidnode = (nval < 0.40f && node_max.Y < water_level - 256) ? lavanode : waternode;
+				startp.Y, startp.Z, seed);
+			liquidnode = (nval < 0.40f && node_max.Y < water_level - 256) ?
+				lavanode : waternode;
 		}
 	}
 
@@ -546,7 +565,7 @@ void CavesRandomWalk::carveRoute(v3f vec, float f, bool randomize_xz) {
 
 	for (s16 z0 = d0; z0 <= d1; z0++) {
 		s16 si = rs / 2 - MYMAX(0, abs(z0) - rs / 7 - 1);
-		for (s16 x0 = -si - ps->range(0, 1); x0 <= si - 1 + ps->range(0, 1); x0++) {
+		for (s16 x0 = -si - ps->range(0,1); x0 <= si - 1 + ps->range(0,1); x0++) {
 			s16 maxabsxz = MYMAX(abs(x0), abs(z0));
 
 			s16 si2 = rs / 2 - MYMAX(0, maxabsxz - rs / 7 - 1);
@@ -592,7 +611,9 @@ void CavesRandomWalk::carveRoute(v3f vec, float f, bool randomize_xz) {
 	}
 }
 
-inline bool CavesRandomWalk::isPosAboveSurface(v3s16 p) {
+
+inline bool CavesRandomWalk::isPosAboveSurface(v3s16 p)
+{
 	if (heightmap != NULL &&
 			p.Z >= node_min.Z && p.Z <= node_max.Z &&
 			p.X >= node_min.X && p.X <= node_max.X) {
@@ -606,16 +627,18 @@ inline bool CavesRandomWalk::isPosAboveSurface(v3s16 p) {
 	return false;
 }
 
+
 ////
 //// CavesV6
 ////
 
 CavesV6::CavesV6(const NodeDefManager *ndef, GenerateNotifier *gennotify,
-		int water_level, content_t water_source, content_t lava_source) {
+	int water_level, content_t water_source, content_t lava_source)
+{
 	assert(ndef);
 
-	this->ndef = ndef;
-	this->gennotify = gennotify;
+	this->ndef        = ndef;
+	this->gennotify   = gennotify;
 	this->water_level = water_level;
 
 	c_water_source = water_source;
@@ -631,19 +654,21 @@ CavesV6::CavesV6(const NodeDefManager *ndef, GenerateNotifier *gennotify,
 		c_lava_source = CONTENT_AIR;
 }
 
+
 void CavesV6::makeCave(MMVManip *vm, v3s16 nmin, v3s16 nmax,
-		PseudoRandom *ps, PseudoRandom *ps2,
-		bool is_large_cave, int max_stone_height, s16 *heightmap) {
+	PseudoRandom *ps, PseudoRandom *ps2,
+	bool is_large_cave, int max_stone_height, s16 *heightmap)
+{
 	assert(vm);
 	assert(ps);
 	assert(ps2);
 
-	this->vm = vm;
-	this->ps = ps;
-	this->ps2 = ps2;
-	this->node_min = nmin;
-	this->node_max = nmax;
-	this->heightmap = heightmap;
+	this->vm         = vm;
+	this->ps         = ps;
+	this->ps2        = ps2;
+	this->node_min   = nmin;
+	this->node_max   = nmax;
+	this->heightmap  = heightmap;
 	this->large_cave = is_large_cave;
 
 	this->ystride = nmax.X - nmin.X + 1;
@@ -651,10 +676,10 @@ void CavesV6::makeCave(MMVManip *vm, v3s16 nmin, v3s16 nmax,
 	// Set initial parameters from randomness
 	min_tunnel_diameter = 2;
 	max_tunnel_diameter = ps->range(2, 6);
-	int dswitchint = ps->range(1, 14);
+	int dswitchint      = ps->range(1, 14);
 	if (large_cave) {
-		part_max_length_rs = ps->range(2, 4);
-		tunnel_routepoints = ps->range(5, ps->range(15, 30));
+		part_max_length_rs  = ps->range(2, 4);
+		tunnel_routepoints  = ps->range(5, ps->range(15, 30));
 		min_tunnel_diameter = 5;
 		max_tunnel_diameter = ps->range(7, ps->range(8, 24));
 	} else {
@@ -709,7 +734,8 @@ void CavesV6::makeCave(MMVManip *vm, v3s16 nmin, v3s16 nmax,
 	// Add generation notify begin event
 	if (gennotify != NULL) {
 		v3s16 abs_pos(of.X + orp.X, of.Y + orp.Y, of.Z + orp.Z);
-		GenNotifyType notifytype = large_cave ? GENNOTIFY_LARGECAVE_BEGIN : GENNOTIFY_CAVE_BEGIN;
+		GenNotifyType notifytype = large_cave ?
+			GENNOTIFY_LARGECAVE_BEGIN : GENNOTIFY_CAVE_BEGIN;
 		gennotify->addEvent(notifytype, abs_pos);
 	}
 
@@ -720,12 +746,15 @@ void CavesV6::makeCave(MMVManip *vm, v3s16 nmin, v3s16 nmax,
 	// Add generation notify end event
 	if (gennotify != NULL) {
 		v3s16 abs_pos(of.X + orp.X, of.Y + orp.Y, of.Z + orp.Z);
-		GenNotifyType notifytype = large_cave ? GENNOTIFY_LARGECAVE_END : GENNOTIFY_CAVE_END;
+		GenNotifyType notifytype = large_cave ?
+			GENNOTIFY_LARGECAVE_END : GENNOTIFY_CAVE_END;
 		gennotify->addEvent(notifytype, abs_pos);
 	}
 }
 
-void CavesV6::makeTunnel(bool dirswitch) {
+
+void CavesV6::makeTunnel(bool dirswitch)
+{
 	if (dirswitch && !large_cave) {
 		main_direction.Z = ((float)(ps->next() % 20) - (float)10) / 10;
 		main_direction.Y = ((float)(ps->next() % 20) - (float)10) / 30;
@@ -743,14 +772,16 @@ void CavesV6::makeTunnel(bool dirswitch) {
 	v3s16 maxlen;
 	if (large_cave) {
 		maxlen = v3s16(
-				rs_part_max_length_rs,
-				rs_part_max_length_rs / 2,
-				rs_part_max_length_rs);
+			rs_part_max_length_rs,
+			rs_part_max_length_rs / 2,
+			rs_part_max_length_rs
+		);
 	} else {
 		maxlen = v3s16(
-				rs_part_max_length_rs,
-				ps->range(1, rs_part_max_length_rs),
-				rs_part_max_length_rs);
+			rs_part_max_length_rs,
+			ps->range(1, rs_part_max_length_rs),
+			rs_part_max_length_rs
+		);
 	}
 
 	v3f vec;
@@ -775,8 +806,8 @@ void CavesV6::makeTunnel(bool dirswitch) {
 	// in carveRoute while still running all PseudoRandom calls to ensure caves
 	// are consistent with existing worlds.
 	bool tunnel_above_ground =
-			p1.Y > getSurfaceFromHeightmap(p1) &&
-			p2.Y > getSurfaceFromHeightmap(p2);
+		p1.Y > getSurfaceFromHeightmap(p1) &&
+		p2.Y > getSurfaceFromHeightmap(p2);
 
 	vec += main_direction;
 
@@ -813,8 +844,10 @@ void CavesV6::makeTunnel(bool dirswitch) {
 	orp = rp;
 }
 
+
 void CavesV6::carveRoute(v3f vec, float f, bool randomize_xz,
-		bool tunnel_above_ground) {
+	bool tunnel_above_ground)
+{
 	MapNode airnode(CONTENT_AIR);
 	MapNode waternode(c_water_source);
 	MapNode lavanode(c_lava_source);
@@ -836,7 +869,7 @@ void CavesV6::carveRoute(v3f vec, float f, bool randomize_xz,
 
 	for (s16 z0 = d0; z0 <= d1; z0++) {
 		s16 si = rs / 2 - MYMAX(0, abs(z0) - rs / 7 - 1);
-		for (s16 x0 = -si - ps->range(0, 1); x0 <= si - 1 + ps->range(0, 1); x0++) {
+		for (s16 x0 = -si - ps->range(0,1); x0 <= si - 1 + ps->range(0,1); x0++) {
 			if (tunnel_above_ground)
 				continue;
 
@@ -883,7 +916,9 @@ void CavesV6::carveRoute(v3f vec, float f, bool randomize_xz,
 	}
 }
 
-inline s16 CavesV6::getSurfaceFromHeightmap(v3s16 p) {
+
+inline s16 CavesV6::getSurfaceFromHeightmap(v3s16 p)
+{
 	if (heightmap != NULL &&
 			p.Z >= node_min.Z && p.Z <= node_max.Z &&
 			p.X >= node_min.X && p.X <= node_max.X) {
@@ -892,4 +927,5 @@ inline s16 CavesV6::getSurfaceFromHeightmap(v3s16 p) {
 	}
 
 	return water_level;
+
 }

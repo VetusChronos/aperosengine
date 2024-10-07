@@ -23,17 +23,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "plain.h"
 #include "pipeline.h"
 
+
 /**
  * Offset camera for a specific eye in stereo rendering mode
  */
-class OffsetCameraStep : public TrivialRenderStep {
+class OffsetCameraStep : public TrivialRenderStep
+{
 public:
 	OffsetCameraStep(float eye_offset);
 	OffsetCameraStep(bool right_eye);
 
 	void run(PipelineContext &context) override;
 	void reset(PipelineContext &context) override;
-
 private:
 	core::matrix4 base_transform;
 	core::matrix4 move;

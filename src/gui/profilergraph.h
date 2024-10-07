@@ -23,26 +23,31 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <deque>
 #include <utility>
 #include <IGUIFont.h>
-#include <IVideoDriver.h>
 #include "profiler.h"
 
+namespace irr::video {
+	class IVideoDriver;
+}
+
 /* Profiler display */
-class ProfilerGraph {
+class ProfilerGraph
+{
 private:
-	struct Piece {
-		Piece(Profiler::GraphValues v) :
-				values(std::move(v)) {}
+	struct Piece
+	{
+		Piece(Profiler::GraphValues v) : values(std::move(v)) {}
 		Profiler::GraphValues values;
 	};
-	struct Meta {
+	struct Meta
+	{
 		float min;
 		float max;
 		video::SColor color;
 		Meta(float initial = 0,
 				video::SColor color = video::SColor(255, 255, 255, 255)) :
 				min(initial),
-				max(initial),
-				color(color) {
+				max(initial), color(color)
+		{
 		}
 	};
 	std::deque<Piece> m_log;

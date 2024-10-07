@@ -21,7 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "exceptions.h"
 #include "util/serialize.h"
 
-void NameIdMapping::serialize(std::ostream &os) const {
+void NameIdMapping::serialize(std::ostream &os) const
+{
 	writeU8(os, 0); // version
 	writeU16(os, m_id_to_name.size());
 	for (const auto &i : m_id_to_name) {
@@ -30,7 +31,8 @@ void NameIdMapping::serialize(std::ostream &os) const {
 	}
 }
 
-void NameIdMapping::deSerialize(std::istream &is) {
+void NameIdMapping::deSerialize(std::istream &is)
+{
 	int version = readU8(is);
 	if (version != 0)
 		throw SerializationError("unsupported NameIdMapping version");

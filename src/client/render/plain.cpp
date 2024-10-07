@@ -28,7 +28,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/shadows/dynamicshadowsrender.h"
 
 /// Draw3D pipeline step
-void Draw3D::run(PipelineContext &context) {
+void Draw3D::run(PipelineContext &context)
+{
 	if (m_target)
 		m_target->activate(context);
 
@@ -40,7 +41,8 @@ void Draw3D::run(PipelineContext &context) {
 	context.hud->drawSelectionMesh();
 }
 
-void DrawWield::run(PipelineContext &context) {
+void DrawWield::run(PipelineContext &context)
+{
 	if (m_target)
 		m_target->activate(context);
 
@@ -48,7 +50,8 @@ void DrawWield::run(PipelineContext &context) {
 		context.client->getCamera()->drawWieldedTool();
 }
 
-void DrawHUD::run(PipelineContext &context) {
+void DrawHUD::run(PipelineContext &context)
+{
 	if (context.show_hud) {
 		if (context.shadow_renderer)
 			context.shadow_renderer->drawDebug();
@@ -58,25 +61,28 @@ void DrawHUD::run(PipelineContext &context) {
 		if (context.draw_crosshair)
 			context.hud->drawCrosshair();
 
-		context.hud->drawHotbar(context.client->getEnv().getLocalPlayer()->getWieldIndex());
 		context.hud->drawLuaElements(context.client->getCamera()->getOffset());
 		context.client->getCamera()->drawNametags();
 	}
 	context.device->getGUIEnvironment()->drawAll();
 }
 
-void MapPostFxStep::setRenderTarget(RenderTarget *_target) {
+
+void MapPostFxStep::setRenderTarget(RenderTarget * _target)
+{
 	target = _target;
 }
 
-void MapPostFxStep::run(PipelineContext &context) {
+void MapPostFxStep::run(PipelineContext &context)
+{
 	if (target)
 		target->activate(context);
 
 	context.client->getEnv().getClientMap().renderPostFx(context.client->getCamera()->getCameraMode());
 }
 
-void RenderShadowMapStep::run(PipelineContext &context) {
+void RenderShadowMapStep::run(PipelineContext &context)
+{
 	// This is necessary to render shadows for animations correctly
 	context.device->getSceneManager()->getRootSceneNode()->OnAnimate(context.device->getTimer()->getTime());
 	context.shadow_renderer->update();
@@ -84,7 +90,8 @@ void RenderShadowMapStep::run(PipelineContext &context) {
 
 // class UpscaleStep
 
-void UpscaleStep::run(PipelineContext &context) {
+void UpscaleStep::run(PipelineContext &context)
+{
 	video::ITexture *lowres = m_source->getTexture(0);
 	m_target->activate(context);
 	context.device->getVideoDriver()->draw2DImage(lowres,
@@ -92,7 +99,8 @@ void UpscaleStep::run(PipelineContext &context) {
 			core::rect<s32>(0, 0, lowres->getSize().Width, lowres->getSize().Height));
 }
 
-std::unique_ptr<RenderStep> create3DStage(Client *client, v2f scale) {
+std::unique_ptr<RenderStep> create3DStage(Client *client, v2f scale)
+{
 	RenderStep *step = new Draw3D();
 	if (g_settings->getBool("enable_shaders") && g_settings->getBool("enable_post_processing")) {
 		RenderPipeline *pipeline = new RenderPipeline();
@@ -105,12 +113,14 @@ std::unique_ptr<RenderStep> create3DStage(Client *client, v2f scale) {
 	return std::unique_ptr<RenderStep>(step);
 }
 
-static v2f getDownscaleFactor() {
+static v2f getDownscaleFactor()
+{
 	u16 undersampling = MYMAX(g_settings->getU16("undersampling"), 1);
 	return v2f(1.0f / undersampling);
 }
 
-RenderStep *addUpscaling(RenderPipeline *pipeline, RenderStep *previousStep, v2f downscale_factor) {
+RenderStep* addUpscaling(RenderPipeline *pipeline, RenderStep *previousStep, v2f downscale_factor)
+{
 	const int TEXTURE_UPSCALE = 0;
 
 	if (downscale_factor.X == 1.0f && downscale_factor.Y == 1.0f)
@@ -119,6 +129,7 @@ RenderStep *addUpscaling(RenderPipeline *pipeline, RenderStep *previousStep, v2f
 	// When shaders are enabled, post-processing pipeline takes care of rescaling
 	if (g_settings->getBool("enable_shaders") && g_settings->getBool("enable_post_processing"))
 		return previousStep;
+
 
 	// Initialize buffer
 	TextureBuffer *buffer = pipeline->createOwned<TextureBuffer>();
@@ -136,7 +147,8 @@ RenderStep *addUpscaling(RenderPipeline *pipeline, RenderStep *previousStep, v2f
 	return upscale;
 }
 
-void populatePlainPipeline(RenderPipeline *pipeline, Client *client) {
+void populatePlainPipeline(RenderPipeline *pipeline, Client *client)
+{
 	auto downscale_factor = getDownscaleFactor();
 	auto step3D = pipeline->own(create3DStage(client, downscale_factor));
 	pipeline->addStep(step3D);

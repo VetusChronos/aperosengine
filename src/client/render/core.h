@@ -21,6 +21,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 #include "irrlichttypes_extrabloated.h"
 
+namespace irr
+{
+	class IrrlichtDevice;
+}
+
 class ShadowRenderer;
 class Camera;
 class Client;
@@ -29,7 +34,8 @@ class Minimap;
 class RenderPipeline;
 class RenderTarget;
 
-class RenderingCore {
+class RenderingCore
+{
 protected:
 	IrrlichtDevice *device;
 	Client *client;
@@ -39,7 +45,7 @@ protected:
 	RenderPipeline *pipeline;
 
 	v2f virtual_size_scale;
-	v2u32 virtual_size{ 0, 0 };
+	v2u32 virtual_size { 0, 0 };
 
 public:
 	RenderingCore(IrrlichtDevice *device, Client *client, Hud *hud,

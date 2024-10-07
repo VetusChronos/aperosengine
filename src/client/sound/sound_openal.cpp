@@ -28,7 +28,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 std::shared_ptr<SoundManagerSingleton> g_sound_manager_singleton;
 
-std::shared_ptr<SoundManagerSingleton> createSoundManagerSingleton() {
+std::shared_ptr<SoundManagerSingleton> createSoundManagerSingleton()
+{
 	auto smg = std::make_shared<SoundManagerSingleton>();
 	if (!smg->init()) {
 		smg.reset();
@@ -37,6 +38,7 @@ std::shared_ptr<SoundManagerSingleton> createSoundManagerSingleton() {
 }
 
 std::unique_ptr<ISoundManager> createOpenALSoundManager(SoundManagerSingleton *smg,
-		std::unique_ptr<SoundFallbackPathProvider> fallback_path_provider) {
+		std::unique_ptr<SoundFallbackPathProvider> fallback_path_provider)
+{
 	return std::make_unique<sound::ProxySoundManager>(smg, std::move(fallback_path_provider));
 };

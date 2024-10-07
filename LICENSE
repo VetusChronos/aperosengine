@@ -1,8 +1,8 @@
 License of Aperos Engine source code
 ------------------------------------
 
-AperosEngine
-Copyright (C) 2024 YunaSatoy, Yuna Sato
+Aperos Engine
+Copyright (C) 2024 Vetus (Chronos)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -78,9 +78,6 @@ rubenwardy, paramat:
   textures/base/pack/end_icon.png
 
 erlehmann:
-  misc/minetest-icon-24x24.png
-  misc/minetest-icon.ico
-  misc/minetest.svg
   textures/base/pack/logo.png
 
 JRottm:

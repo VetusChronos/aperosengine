@@ -18,7 +18,7 @@
 if not core.get_http_api then
 	function create_contentdb_dlg()
 		return messagebox("contentdb",
-				fgettext("ContentDB is not available when Minetest was compiled without cURL"))
+				fgettext("ContentDB is not available when AperosEngine was compiled without cURL"))
 	end
 	return
 end
@@ -181,7 +181,7 @@ local function get_info_formspec(text)
 	return table.concat({
 		"formspec_version[6]",
 		"size[15.75,9.5]",
-		core.settings:get_bool("enable_touch") and "padding[0.01,0.01]" or "position[0.5,0.55]",
+		core.settings:get_bool("touch_gui") and "padding[0.01,0.01]" or "position[0.5,0.55]",
 
 		"label[4,4.35;", text, "]",
 		"container[0,", H - 0.8 - 0.375, "]",
@@ -212,7 +212,7 @@ local function get_formspec(dlgdata)
 	local formspec = {
 		"formspec_version[6]",
 		"size[15.75,9.5]",
-		core.settings:get_bool("enable_touch") and "padding[0.01,0.01]" or "position[0.5,0.55]",
+		core.settings:get_bool("touch_gui") and "padding[0.01,0.01]" or "position[0.5,0.55]",
 
 		"style[status,downloading,queued;border=false]",
 
@@ -297,7 +297,7 @@ local function get_formspec(dlgdata)
 		-- title
 		formspec[#formspec + 1] = "label[1.875,0.1;"
 		formspec[#formspec + 1] = core.formspec_escape(
-				core.colorize(mt_color_green, package.title) ..
+				core.colorize(apr_color_green, package.title) ..
 				core.colorize("#BFBFBF", " by " .. package.author))
 		formspec[#formspec + 1] = "]"
 
@@ -462,8 +462,8 @@ end
 
 local function handle_events(event)
 	if event == "DialogShow" then
-		-- On touchscreen, don't show the "MINETEST" header behind the dialog.
-		mm_game_theme.set_engine(core.settings:get_bool("enable_touch"))
+		-- On touchscreen, don't show the "APEROSENGINE" header behind the dialog.
+		mm_game_theme.set_engine(core.settings:get_bool("touch_gui"))
 
 		-- If ContentDB is already loaded, auto-install packages here.
 		do_auto_install()

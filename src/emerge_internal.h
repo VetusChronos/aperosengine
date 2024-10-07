@@ -1,6 +1,6 @@
 /*
 Minetest
-Copyright (C) 2010-2013 kwolekr, Ryan Kwolek <kwolekr@aperosvoxel.domain>
+Copyright (C) 2010-2013 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -40,7 +40,7 @@ class EmergeScripting;
 class EmergeThread : public Thread {
 public:
 	bool enable_mapgen_debug_info;
-	int id;
+	const int id; // Index of this thread
 
 	EmergeThread(Server *server, int ethreadid);
 	~EmergeThread() = default;
@@ -49,7 +49,7 @@ public:
 	void signal();
 
 	// Requires queue mutex held
-	bool pushBlock(const v3s16 &pos);
+	bool pushBlock(v3s16 pos);
 
 	void cancelPendingItems();
 
@@ -57,9 +57,10 @@ public:
 	Mapgen *getMapgen() { return m_mapgen; }
 
 protected:
+
 	void runCompletionCallbacks(
-			const v3s16 &pos, EmergeAction action,
-			const EmergeCallbackList &callbacks);
+		v3s16 pos, EmergeAction action,
+		const EmergeCallbackList &callbacks);
 
 private:
 	Server *m_server;
@@ -78,10 +79,22 @@ private:
 
 	bool popBlockEmerge(v3s16 *pos, BlockEmergeData *bedata);
 
-	EmergeAction getBlockOrStartGen(
-			const v3s16 &pos, bool allow_gen, MapBlock **block, BlockMakeData *data);
+	/**
+	 * Try to get a block from memory and decide what to do.
+	 *
+	 * @param pos block position
+	 * @param from_db serialized block data, optional
+	 *                (for second call after EMERGE_FROM_DISK was returned)
+	 * @param allow_gen allow invoking mapgen?
+	 * @param block output pointer for block
+	 * @param data info for mapgen
+	 * @return what to do for this block
+	 */
+	EmergeAction getBlockOrStartGen(v3s16 pos, bool allow_gen,
+		const std::string *from_db,  MapBlock **block, BlockMakeData *data);
+
 	MapBlock *finishGen(v3s16 pos, BlockMakeData *bmdata,
-			std::map<v3s16, MapBlock *> *modified_blocks);
+		std::map<v3s16, MapBlock *> *modified_blocks);
 
 	friend class EmergeManager;
 	friend class EmergeScripting;
@@ -89,17 +102,20 @@ private:
 };
 
 // Scoped helper to set Server::m_ignore_map_edit_events_area
-class MapEditEventAreaIgnorer {
+class MapEditEventAreaIgnorer
+{
 public:
-	MapEditEventAreaIgnorer(VoxelArea *ignorevariable, const VoxelArea &a) :
-			m_ignorevariable(ignorevariable) {
+	MapEditEventAreaIgnorer(VoxelArea *ignorevariable, const VoxelArea &a):
+		m_ignorevariable(ignorevariable)
+	{
 		if (m_ignorevariable->getVolume() == 0)
 			*m_ignorevariable = a;
 		else
 			m_ignorevariable = nullptr;
 	}
 
-	~MapEditEventAreaIgnorer() {
+	~MapEditEventAreaIgnorer()
+	{
 		if (m_ignorevariable) {
 			assert(m_ignorevariable->getVolume() != 0);
 			*m_ignorevariable = VoxelArea();

@@ -36,9 +36,9 @@ class ModStorage;
 class ModStorageDatabase;
 
 namespace irr::scene {
-class IAnimatedMesh;
-class ISceneManager;
-} //namespace irr::scene
+	class IAnimatedMesh;
+	class ISceneManager;
+}
 
 struct SubgameSpec;
 struct ModSpec;
@@ -47,32 +47,33 @@ struct ModSpec;
 	mapnode properties
 */
 
-class IGameDef {
+class IGameDef
+{
 public:
 	// These are thread-safe IF they are not edited while running threads.
 	// Thus, first they are set up and then they are only read.
-	virtual IItemDefManager *getItemDefManager() = 0;
-	virtual const NodeDefManager *getNodeDefManager() = 0;
-	virtual ICraftDefManager *getCraftDefManager() = 0;
+	virtual IItemDefManager* getItemDefManager()=0;
+	virtual const NodeDefManager* getNodeDefManager()=0;
+	virtual ICraftDefManager* getCraftDefManager()=0;
 
 	// Used for keeping track of names/ids of unknown nodes
-	virtual u16 allocateUnknownNodeId(const std::string &name) = 0;
+	virtual u16 allocateUnknownNodeId(const std::string &name)=0;
 
 	// Only usable on the server, and NOT thread-safe. It is usable from the
 	// environment thread.
-	virtual IRollbackManager *getRollbackManager() { return NULL; }
+	virtual IRollbackManager* getRollbackManager() { return NULL; }
 
 	// Shorthands
 	// TODO: these should be made const-safe so that a const IGameDef* is
 	//       actually usable
-	IItemDefManager *idef() { return getItemDefManager(); }
-	const NodeDefManager *ndef() { return getNodeDefManager(); }
-	ICraftDefManager *cdef() { return getCraftDefManager(); }
+	IItemDefManager  *idef()     { return getItemDefManager(); }
+	const NodeDefManager  *ndef() { return getNodeDefManager(); }
+	ICraftDefManager *cdef()     { return getCraftDefManager(); }
 	IRollbackManager *rollback() { return getRollbackManager(); }
 
 	virtual const std::vector<ModSpec> &getMods() const = 0;
-	virtual const ModSpec *getModSpec(const std::string &modname) const = 0;
-	virtual const SubgameSpec *getGameSpec() const { return nullptr; }
+	virtual const ModSpec* getModSpec(const std::string &modname) const = 0;
+	virtual const SubgameSpec* getGameSpec() const { return nullptr; }
 	virtual std::string getWorldPath() const { return ""; }
 	virtual std::string getModDataPath() const { return ""; }
 	virtual ModStorageDatabase *getModStorageDatabase() = 0;
@@ -80,6 +81,6 @@ public:
 	virtual bool joinModChannel(const std::string &channel) = 0;
 	virtual bool leaveModChannel(const std::string &channel) = 0;
 	virtual bool sendModChannelMessage(const std::string &channel,
-			const std::string &message) = 0;
+		const std::string &message) = 0;
 	virtual ModChannel *getModChannel(const std::string &channel) = 0;
 };

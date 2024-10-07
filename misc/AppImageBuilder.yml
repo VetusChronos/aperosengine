@@ -3,11 +3,11 @@ version: 1
 AppDir:
   path: AppDir
   app_info:
-    id: net.minetest.minetest
-    name: AperosVoxel
-    icon: minetest
+    id: net.aperosengine.aperosengine
+    name: AperosEngine
+    icon: aperosengine
     version: !ENV ${VERSION}
-    exec: usr/bin/aperosvoxel
+    exec: usr/bin/aperosengine
     exec_args: $@
   files:
     include: []
@@ -54,7 +54,7 @@ script: |
     cmake --install appimage-build
 
     # Is a backup icon location in case
-    mkdir -p AppDir/usr/share/minetest/misc
-    cp AppDir/usr/share/icons/hicolor/128x128/apps/minetest.png AppDir/usr/share/minetest/misc/minetest-xorg-icon-128.png
+    mkdir -p AppDir/usr/share/aperosengine/misc
+    cp AppDir/usr/share/icons/hicolor/128x128/apps/aperosengine.png AppDir/usr/share/aperosengine/misc/aperosengine-xorg-icon-128.png
     # Validation issues
-    sed -i '/PrefersNonDefaultGPU/d' AppDir/usr/share/applications/net.minetest.minetest.desktop
+    sed -i '/PrefersNonDefaultGPU/d' AppDir/usr/share/applications/net.aperosengine.aperosengine.desktop

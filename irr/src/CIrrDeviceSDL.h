@@ -25,9 +25,11 @@
 
 #include <memory>
 
-namespace irr {
+namespace irr
+{
 
-class CIrrDeviceSDL : public CIrrDeviceStub {
+class CIrrDeviceSDL : public CIrrDeviceStub
+{
 public:
 	//! constructor
 	CIrrDeviceSDL(const SIrrlichtCreationParameters &param);
@@ -98,7 +100,10 @@ public:
 	bool activateJoysticks(core::array<SJoystickInfo> &joystickInfo) override;
 
 	//! Get the device type
-	E_DEVICE_TYPE getType() const override { return EIDT_SDL; }
+	E_DEVICE_TYPE getType() const override
+	{
+		return EIDT_SDL;
+	}
 
 	//! Get the display density in dots per inch.
 	float getDisplayDensity() const override;
@@ -106,15 +111,18 @@ public:
 	void SwapWindow();
 
 	//! Implementation of the linux cursor control
-	class CCursorControl : public gui::ICursorControl {
+	class CCursorControl : public gui::ICursorControl
+	{
 	public:
 		CCursorControl(CIrrDeviceSDL *dev) :
-				Device(dev), IsVisible(true) {
+				Device(dev), IsVisible(true)
+		{
 			initCursors();
 		}
 
 		//! Changes the visible state of the mouse cursor.
-		void setVisible(bool visible) override {
+		void setVisible(bool visible) override
+		{
 			IsVisible = visible;
 			if (visible)
 				SDL_ShowCursor(SDL_ENABLE);
@@ -124,27 +132,32 @@ public:
 		}
 
 		//! Returns if the cursor is currently visible.
-		bool isVisible() const override {
+		bool isVisible() const override
+		{
 			return IsVisible;
 		}
 
 		//! Sets the new position of the cursor.
-		void setPosition(const core::position2d<f32> &pos) override {
+		void setPosition(const core::position2d<f32> &pos) override
+		{
 			setPosition(pos.X, pos.Y);
 		}
 
 		//! Sets the new position of the cursor.
-		void setPosition(f32 x, f32 y) override {
+		void setPosition(f32 x, f32 y) override
+		{
 			setPosition((s32)(x * Device->Width), (s32)(y * Device->Height));
 		}
 
 		//! Sets the new position of the cursor.
-		void setPosition(const core::position2d<s32> &pos) override {
+		void setPosition(const core::position2d<s32> &pos) override
+		{
 			setPosition(pos.X, pos.Y);
 		}
 
 		//! Sets the new position of the cursor.
-		void setPosition(s32 x, s32 y) override {
+		void setPosition(s32 x, s32 y) override
+		{
 			SDL_WarpMouseInWindow(Device->Window,
 					static_cast<int>(x / Device->ScaleX),
 					static_cast<int>(y / Device->ScaleY));
@@ -157,52 +170,56 @@ public:
 		}
 
 		//! Returns the current position of the mouse cursor.
-		const core::position2d<s32> &getPosition(bool updateCursor) override {
-			if (updateCursor) {
+		const core::position2d<s32> &getPosition(bool updateCursor) override
+		{
+			if (updateCursor)
 				updateCursorPos();
-			}
-			
 			return CursorPos;
 		}
 
 		//! Returns the current position of the mouse cursor.
-		core::position2d<f32> getRelativePosition(bool updateCursor) override {
-			if (updateCursor) {
+		core::position2d<f32> getRelativePosition(bool updateCursor) override
+		{
+			if (updateCursor)
 				updateCursorPos();
-			}
-			
 			return core::position2d<f32>(CursorPos.X / (f32)Device->Width,
 					CursorPos.Y / (f32)Device->Height);
 		}
 
-		void setReferenceRect(core::rect<s32> *rect = 0) override {}
+		void setReferenceRect(core::rect<s32> *rect = 0) override
+		{
+		}
 
-		virtual void setRelativeMode(bool relative) _IRR_OVERRIDE_ {
+		virtual void setRelativeMode(bool relative) _IRR_OVERRIDE_
+		{
 			// Only change it when necessary, as it flushes mouse motion when enabled
 			if (relative != static_cast<bool>(SDL_GetRelativeMouseMode())) {
-				if (relative) {
+				if (relative)
 					SDL_SetRelativeMouseMode(SDL_TRUE);
-				} else {
+				else
 					SDL_SetRelativeMouseMode(SDL_FALSE);
-				}
 			}
 		}
 
-		void setActiveIcon(gui::ECURSOR_ICON iconId) override {
+		void setActiveIcon(gui::ECURSOR_ICON iconId) override
+		{
 			ActiveIcon = iconId;
 			if (iconId > Cursors.size() || !Cursors[iconId]) {
 				iconId = gui::ECI_NORMAL;
-				if (iconId > Cursors.size() || !Cursors[iconId]) { return; }
+				if (iconId > Cursors.size() || !Cursors[iconId])
+					return;
 			}
 			SDL_SetCursor(Cursors[iconId].get());
 		}
 
-		gui::ECURSOR_ICON getActiveIcon() const override {
+		gui::ECURSOR_ICON getActiveIcon() const override
+		{
 			return ActiveIcon;
 		}
 
 	private:
-		void updateCursorPos() {
+		void updateCursorPos()
+		{
 #ifdef _IRR_EMSCRIPTEN_PLATFORM_
 			EmscriptenPointerlockChangeEvent pointerlockStatus; // let's hope that test is not expensive ...
 			if (emscripten_get_pointerlock_status(&pointerlockStatus) == EMSCRIPTEN_RESULT_SUCCESS) {
@@ -220,18 +237,14 @@ public:
 			CursorPos.X = Device->MouseX;
 			CursorPos.Y = Device->MouseY;
 
-			if (CursorPos.X < 0) {
+			if (CursorPos.X < 0)
 				CursorPos.X = 0;
-			}
-			if (CursorPos.X > (s32)Device->Width) {
+			if (CursorPos.X > (s32)Device->Width)
 				CursorPos.X = Device->Width;
-			}
-			if (CursorPos.Y < 0) {
+			if (CursorPos.Y < 0)
 				CursorPos.Y = 0;
-			}
-			if (CursorPos.Y > (s32)Device->Height) {
+			if (CursorPos.Y > (s32)Device->Height)
 				CursorPos.Y = Device->Height;
-			}
 #endif
 		}
 
@@ -241,11 +254,12 @@ public:
 		core::position2d<s32> CursorPos;
 		bool IsVisible;
 
-		struct CursorDeleter {
-			void operator()(SDL_Cursor *ptr) {
-				if (ptr) {
+		struct CursorDeleter
+		{
+			void operator()(SDL_Cursor *ptr)
+			{
+				if (ptr)
 					SDL_FreeCursor(ptr);
-				}
 			}
 		};
 		std::vector<std::unique_ptr<SDL_Cursor, CursorDeleter>> Cursors;
@@ -297,15 +311,19 @@ private:
 
 	core::rect<s32> lastElemPos;
 
-	struct SKeyMap {
+	struct SKeyMap
+	{
 		SKeyMap() {}
 		SKeyMap(s32 x11, s32 win32) :
-				SDLKey(x11), Win32Key(win32) {}
+				SDLKey(x11), Win32Key(win32)
+		{
+		}
 
 		s32 SDLKey;
 		s32 Win32Key;
 
-		bool operator<(const SKeyMap &o) const {
+		bool operator<(const SKeyMap &o) const
+		{
 			return SDLKey < o.SDLKey;
 		}
 	};

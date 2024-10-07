@@ -30,18 +30,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 /* Plain implementation */
 
-class SimpleMetricCounter : public MetricCounter {
+class SimpleMetricCounter : public MetricCounter
+{
 public:
-	SimpleMetricCounter() :
-			MetricCounter(), m_counter(0.0) {}
+	SimpleMetricCounter() : MetricCounter(), m_counter(0.0) {}
 
 	virtual ~SimpleMetricCounter() {}
 
-	void increment(double number) override {
+	void increment(double number) override
+	{
 		MutexAutoLock lock(m_mutex);
 		m_counter += number;
 	}
-	double get() const override {
+	double get() const override
+	{
 		MutexAutoLock lock(m_mutex);
 		return m_counter;
 	}
@@ -51,26 +53,30 @@ private:
 	double m_counter;
 };
 
-class SimpleMetricGauge : public MetricGauge {
+class SimpleMetricGauge : public MetricGauge
+{
 public:
-	SimpleMetricGauge() :
-			MetricGauge(), m_gauge(0.0) {}
+	SimpleMetricGauge() : MetricGauge(), m_gauge(0.0) {}
 
 	virtual ~SimpleMetricGauge() {}
 
-	void increment(double number) override {
+	void increment(double number) override
+	{
 		MutexAutoLock lock(m_mutex);
 		m_gauge += number;
 	}
-	void decrement(double number) override {
+	void decrement(double number) override
+	{
 		MutexAutoLock lock(m_mutex);
 		m_gauge -= number;
 	}
-	void set(double number) override {
+	void set(double number) override
+	{
 		MutexAutoLock lock(m_mutex);
 		m_gauge = number;
 	}
-	double get() const override {
+	double get() const override
+	{
 		MutexAutoLock lock(m_mutex);
 		return m_gauge;
 	}
@@ -81,12 +87,14 @@ private:
 };
 
 MetricCounterPtr MetricsBackend::addCounter(
-		const std::string &name, const std::string &help_str, Labels labels) {
+		const std::string &name, const std::string &help_str, Labels labels)
+{
 	return std::make_shared<SimpleMetricCounter>();
 }
 
 MetricGaugePtr MetricsBackend::addGauge(
-		const std::string &name, const std::string &help_str, Labels labels) {
+		const std::string &name, const std::string &help_str, Labels labels)
+{
 	return std::make_shared<SimpleMetricGauge>();
 }
 
@@ -94,7 +102,8 @@ MetricGaugePtr MetricsBackend::addGauge(
 
 #if USE_PROMETHEUS
 
-class PrometheusMetricCounter : public MetricCounter {
+class PrometheusMetricCounter : public MetricCounter
+{
 public:
 	PrometheusMetricCounter() = delete;
 
@@ -103,10 +112,11 @@ public:
 			std::shared_ptr<prometheus::Registry> registry) :
 			MetricCounter(),
 			m_family(prometheus::BuildCounter()
-							 .Name(name)
-							 .Help(help_str)
-							 .Register(*registry)),
-			m_counter(m_family.Add(labels)) {
+							.Name(name)
+							.Help(help_str)
+							.Register(*registry)),
+			m_counter(m_family.Add(labels))
+	{
 	}
 
 	virtual ~PrometheusMetricCounter() {}
@@ -119,7 +129,8 @@ private:
 	prometheus::Counter &m_counter;
 };
 
-class PrometheusMetricGauge : public MetricGauge {
+class PrometheusMetricGauge : public MetricGauge
+{
 public:
 	PrometheusMetricGauge() = delete;
 
@@ -128,10 +139,11 @@ public:
 			std::shared_ptr<prometheus::Registry> registry) :
 			MetricGauge(),
 			m_family(prometheus::BuildGauge()
-							 .Name(name)
-							 .Help(help_str)
-							 .Register(*registry)),
-			m_gauge(m_family.Add(labels)) {
+							.Name(name)
+							.Help(help_str)
+							.Register(*registry)),
+			m_gauge(m_family.Add(labels))
+	{
 	}
 
 	virtual ~PrometheusMetricGauge() {}
@@ -146,10 +158,13 @@ private:
 	prometheus::Gauge &m_gauge;
 };
 
-class PrometheusMetricsBackend : public MetricsBackend {
+class PrometheusMetricsBackend : public MetricsBackend
+{
 public:
 	PrometheusMetricsBackend(const std::string &addr) :
-			MetricsBackend(), m_exposer(std::make_unique<prometheus::Exposer>(addr)), m_registry(std::make_shared<prometheus::Registry>()) {
+			MetricsBackend(), m_exposer(std::make_unique<prometheus::Exposer>(addr)),
+			m_registry(std::make_shared<prometheus::Registry>())
+	{
 		m_exposer->RegisterCollectable(m_registry);
 	}
 
@@ -168,16 +183,19 @@ private:
 };
 
 MetricCounterPtr PrometheusMetricsBackend::addCounter(
-		const std::string &name, const std::string &help_str, Labels labels) {
+		const std::string &name, const std::string &help_str, Labels labels)
+{
 	return std::make_shared<PrometheusMetricCounter>(name, help_str, labels, m_registry);
 }
 
 MetricGaugePtr PrometheusMetricsBackend::addGauge(
-		const std::string &name, const std::string &help_str, Labels labels) {
+		const std::string &name, const std::string &help_str, Labels labels)
+{
 	return std::make_shared<PrometheusMetricGauge>(name, help_str, labels, m_registry);
 }
 
-MetricsBackend *createPrometheusMetricsBackend() {
+MetricsBackend *createPrometheusMetricsBackend()
+{
 	std::string addr;
 	g_settings->getNoEx("prometheus_listener_address", addr);
 	return new PrometheusMetricsBackend(addr);

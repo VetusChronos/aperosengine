@@ -28,18 +28,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <algorithm>
 
 // common start: ensure auth db
-AuthDatabase *ModApiAuth::getAuthDb(lua_State *L) {
+AuthDatabase *ModApiAuth::getAuthDb(lua_State *L)
+{
 	ServerEnvironment *server_environment =
 			dynamic_cast<ServerEnvironment *>(getEnv(L));
 	if (!server_environment) {
 		luaL_error(L, "Attempt to access an auth function but the auth"
-					  " system is yet not initialized. This causes bugs.");
+			" system is yet not initialized. This causes bugs.");
 		return nullptr;
 	}
 	return server_environment->getAuthDatabase();
 }
 
-void ModApiAuth::pushAuthEntry(lua_State *L, const AuthEntry &authEntry) {
+void ModApiAuth::pushAuthEntry(lua_State *L, const AuthEntry &authEntry)
+{
 	lua_newtable(L);
 	int table = lua_gettop(L);
 	// id
@@ -67,7 +69,8 @@ void ModApiAuth::pushAuthEntry(lua_State *L, const AuthEntry &authEntry) {
 }
 
 // auth_read(name)
-int ModApiAuth::l_auth_read(lua_State *L) {
+int ModApiAuth::l_auth_read(lua_State *L)
+{
 	NO_MAP_LOCK_REQUIRED;
 	AuthDatabase *auth_db = getAuthDb(L);
 	if (!auth_db)
@@ -83,7 +86,8 @@ int ModApiAuth::l_auth_read(lua_State *L) {
 }
 
 // auth_save(table)
-int ModApiAuth::l_auth_save(lua_State *L) {
+int ModApiAuth::l_auth_save(lua_State *L)
+{
 	NO_MAP_LOCK_REQUIRED;
 	AuthDatabase *auth_db = getAuthDb(L);
 	if (!auth_db)
@@ -119,7 +123,8 @@ int ModApiAuth::l_auth_save(lua_State *L) {
 }
 
 // auth_create(table)
-int ModApiAuth::l_auth_create(lua_State *L) {
+int ModApiAuth::l_auth_create(lua_State *L)
+{
 	NO_MAP_LOCK_REQUIRED;
 	AuthDatabase *auth_db = getAuthDb(L);
 	if (!auth_db)
@@ -157,7 +162,8 @@ int ModApiAuth::l_auth_create(lua_State *L) {
 }
 
 // auth_delete(name)
-int ModApiAuth::l_auth_delete(lua_State *L) {
+int ModApiAuth::l_auth_delete(lua_State *L)
+{
 	NO_MAP_LOCK_REQUIRED;
 	AuthDatabase *auth_db = getAuthDb(L);
 	if (!auth_db)
@@ -168,7 +174,8 @@ int ModApiAuth::l_auth_delete(lua_State *L) {
 }
 
 // auth_list_names()
-int ModApiAuth::l_auth_list_names(lua_State *L) {
+int ModApiAuth::l_auth_list_names(lua_State *L)
+{
 	NO_MAP_LOCK_REQUIRED;
 	AuthDatabase *auth_db = getAuthDb(L);
 	if (!auth_db)
@@ -186,7 +193,8 @@ int ModApiAuth::l_auth_list_names(lua_State *L) {
 }
 
 // auth_reload()
-int ModApiAuth::l_auth_reload(lua_State *L) {
+int ModApiAuth::l_auth_reload(lua_State *L)
+{
 	NO_MAP_LOCK_REQUIRED;
 	AuthDatabase *auth_db = getAuthDb(L);
 	if (auth_db)
@@ -194,7 +202,9 @@ int ModApiAuth::l_auth_reload(lua_State *L) {
 	return 0;
 }
 
-void ModApiAuth::Initialize(lua_State *L, int top) {
+void ModApiAuth::Initialize(lua_State *L, int top)
+{
+
 	lua_newtable(L);
 	int auth_top = lua_gettop(L);
 

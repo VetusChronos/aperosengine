@@ -50,7 +50,7 @@ fake_function() {
 	gettext("Virtual joystick triggers Aux1 button");
 	gettext("Use virtual joystick to trigger \"Aux1\" button.\nIf enabled, virtual joystick will also tap \"Aux1\" button when out of main circle.");
 	gettext("Punch gesture");
-	gettext("The gesture for punching players/entities.\nThis can be overridden by games and mods.\n\n* short_tap\nEasy to use and well-known from other games that shall not be named.\n\n* long_tap\nKnown from the classic Minetest mobile controls.\nCombat is more or less impossible.");
+	gettext("The gesture for punching players/entities.\nThis can be overridden by games and mods.\n\n* short_tap\nEasy to use and well-known from other games that shall not be named.\n\n* long_tap\nKnown from the classic AperosEngine mobile controls.\nCombat is more or less impossible.");
 	gettext("Graphics and Audio");
 	gettext("Graphics");
 	gettext("Screen");
@@ -279,7 +279,7 @@ fake_function() {
 	gettext("Enable updates available indicator on content tab");
 	gettext("If enabled and you have ContentDB packages installed, AperosEngine may contact ContentDB to\ncheck for package updates when opening the mainmenu.");
 	gettext("ContentDB Flag Blacklist");
-	gettext("Comma-separated list of flags to hide in the content repository.\n\"nonfree\" can be used to hide packages which do not qualify as 'free software',\nas defined by the Free Software Foundation.\nYou can also specify content ratings.\nThese flags are independent from Minetest versions,\nso see a full list at https://content.aperosvoxel.domain/help/content_flags/");
+	gettext("Comma-separated list of flags to hide in the content repository.\n\"nonfree\" can be used to hide packages which do not qualify as 'free software',\nas defined by the Free Software Foundation.\nYou can also specify content ratings.\nThese flags are independent from AperosEngine versions,\nso see a full list at https://content.aperosvoxel.domain/help/content_flags/");
 	gettext("ContentDB Max Concurrent Downloads");
 	gettext("Maximum number of concurrent downloads. Downloads exceeding this limit will be queued.\nThis should be lower than curl_parallel_limit.");
 	gettext("Client and Server");
@@ -322,7 +322,7 @@ fake_function() {
 	gettext("Strict protocol checking");
 	gettext("Enable to disallow old clients from connecting.\nOlder clients are compatible in the sense that they will not crash when connecting\nto new servers, but they may not support all new features that you are expecting.");
 	gettext("Protocol version minimum");
-	gettext("Define the oldest clients allowed to connect.\nOlder clients are compatible in the sense that they will not crash when connecting\nto new servers, but they may not support all new features that you are expecting.\nThis allows for more fine-grained control than strict_protocol_version_checking.\nMinetest still enforces its own internal minimum, and enabling\nstrict_protocol_version_checking will effectively override this.");
+	gettext("Define the oldest clients allowed to connect.\nOlder clients are compatible in the sense that they will not crash when connecting\nto new servers, but they may not support all new features that you are expecting.\nThis allows for more fine-grained control than strict_protocol_version_checking.\AperosEngine still enforces its own internal minimum, and enabling\nstrict_protocol_version_checking will effectively override this.");
 	gettext("Remote media");
 	gettext("Specifies URL from which client fetches media instead of using UDP.\n$filename should be accessible from $remote_media$filename via cURL\n(obviously, remote_media should end with a slash).\nFiles that are not present will be fetched the usual way.");
 	gettext("IPv6 server");
@@ -828,7 +828,7 @@ fake_function() {
 	gettext("Chat commands");
 	gettext("Instrument chat commands on registration.");
 	gettext("Global callbacks");
-	gettext("Instrument global callback functions on registration.\n(anything you pass to a minetest.register_*() function)");
+	gettext("Instrument global callback functions on registration.\n(anything you pass to a aperosengine.register_*() function)");
 	gettext("Builtin");
 	gettext("Instrument builtin.\nThis is usually only needed by core/builtin contributors");
 	gettext("Profiler");
@@ -857,7 +857,7 @@ fake_function() {
 	gettext("Mapblock mesh generation delay");
 	gettext("Delay between mesh updates on the client in ms. Increasing this will slow\ndown the rate of mesh updates, thus reducing jitter on slower clients.");
 	gettext("Mapblock mesh generation threads");
-	gettext("Number of threads to use for mesh generation.\nValue of 0 (default) will let Minetest autodetect the number of available threads.");
+	gettext("Number of threads to use for mesh generation.\nValue of 0 (default) will let AperosEngine autodetect the number of available threads.");
 	gettext("Minimap scan height");
 	gettext("True = 256\nFalse = 128\nUsable to make minimap smoother on slower machines.");
 	gettext("World-aligned textures mode");
@@ -913,7 +913,7 @@ fake_function() {
 	gettext("Spread of light curve boost range.\nControls the width of the range to be boosted.\nStandard deviation of the light curve boost Gaussian.");
 	gettext("Networking");
 	gettext("Prometheus listener address");
-	gettext("Prometheus listener address.\nIf Minetest is compiled with ENABLE_PROMETHEUS option enabled,\nenable metrics listener for Prometheus on that address.\nMetrics can be fetched on http://127.0.0.1:30000/metrics");
+	gettext("Prometheus listener address.\nIf AperosEngine is compiled with ENABLE_PROMETHEUS option enabled,\nenable metrics listener for Prometheus on that address.\nMetrics can be fetched on http://127.0.0.1:30000/metrics");
 	gettext("Maximum size of the outgoing chat queue");
 	gettext("Maximum size of the outgoing chat queue.\n0 to disable queueing and -1 to make the queue size unlimited.");
 	gettext("Mapblock unload timeout");
@@ -1008,7 +1008,7 @@ fake_function() {
 	gettext("Display Density Scaling Factor");
 	gettext("Adjust the detected display density, used for scaling UI elements.");
 	gettext("Enable console window");
-	gettext("Windows systems only: Start Minetest with the command line window in the background.\nContains the same information as the file debug.txt (default name).");
+	gettext("Windows systems only: Start AperosEngine with the command line window in the background.\nContains the same information as the file debug.txt (default name).");
 	gettext("Max. clearobjects extra blocks");
 	gettext("Number of extra blocks that can be loaded by /clearobjects at once.\nThis is a trade-off between SQLite transaction overhead and\nmemory consumption (4096=100MB, as a rule of thumb).");
 	gettext("Map directory");

@@ -34,7 +34,8 @@ namespace sound {
  */
 
 size_t OggVorbisBufferSource::read_func(void *ptr, size_t size, size_t nmemb,
-		void *datasource) noexcept {
+		void *datasource) noexcept
+{
 	OggVorbisBufferSource *s = (OggVorbisBufferSource *)datasource;
 	size_t copied_size = MYMIN(s->buf.size() - s->cur_offset, size);
 	memcpy(ptr, s->buf.data() + s->cur_offset, copied_size);
@@ -42,7 +43,8 @@ size_t OggVorbisBufferSource::read_func(void *ptr, size_t size, size_t nmemb,
 	return copied_size;
 }
 
-int OggVorbisBufferSource::seek_func(void *datasource, ogg_int64_t offset, int whence) noexcept {
+int OggVorbisBufferSource::seek_func(void *datasource, ogg_int64_t offset, int whence) noexcept
+{
 	OggVorbisBufferSource *s = (OggVorbisBufferSource *)datasource;
 	if (whence == SEEK_SET) {
 		if (offset < 0 || (size_t)offset > s->buf.size()) {
@@ -52,7 +54,8 @@ int OggVorbisBufferSource::seek_func(void *datasource, ogg_int64_t offset, int w
 		s->cur_offset = offset;
 		return 0;
 	} else if (whence == SEEK_CUR) {
-		if ((size_t)MYMIN(-offset, 0) > s->cur_offset || s->cur_offset + offset > s->buf.size()) {
+		if ((size_t)MYMIN(-offset, 0) > s->cur_offset
+				|| s->cur_offset + offset > s->buf.size()) {
 			// offset out of bounds
 			return -1;
 		}
@@ -69,13 +72,15 @@ int OggVorbisBufferSource::seek_func(void *datasource, ogg_int64_t offset, int w
 	return -1;
 }
 
-int OggVorbisBufferSource::close_func(void *datasource) noexcept {
+int OggVorbisBufferSource::close_func(void *datasource) noexcept
+{
 	auto s = reinterpret_cast<OggVorbisBufferSource *>(datasource);
 	delete s;
 	return 0;
 }
 
-long OggVorbisBufferSource::tell_func(void *datasource) noexcept {
+long OggVorbisBufferSource::tell_func(void *datasource) noexcept
+{
 	OggVorbisBufferSource *s = (OggVorbisBufferSource *)datasource;
 	return s->cur_offset;
 }
@@ -91,15 +96,16 @@ const ov_callbacks OggVorbisBufferSource::s_ov_callbacks = {
  * RAIIOggFile struct
  */
 
-std::optional<OggFileDecodeInfo> RAIIOggFile::getDecodeInfo(const std::string &filename_for_logging) {
+std::optional<OggFileDecodeInfo> RAIIOggFile::getDecodeInfo(const std::string &filename_for_logging)
+{
 	OggFileDecodeInfo ret;
 	ret.name_for_logging = filename_for_logging;
 
 	long num_logical_bitstreams = ov_streams(&m_file);
 	if (num_logical_bitstreams < 1) {
 		warningstream << "Audio: Can't decode. Has not even one logical bitstream (but "
-					  << num_logical_bitstreams << "): "
-					  << ret.name_for_logging << '\n';
+				<< num_logical_bitstreams << "): "
+				<< ret.name_for_logging << '\n';
 		return std::nullopt;
 	}
 
@@ -109,7 +115,7 @@ std::optional<OggFileDecodeInfo> RAIIOggFile::getDecodeInfo(const std::string &f
 	vorbis_info *info0 = ov_info(&m_file, 0);
 	if (!info0) {
 		warningstream << "Audio: Can't decode. ov_info failed for: "
-					  << ret.name_for_logging << '\n';
+				<< ret.name_for_logging << '\n';
 		return std::nullopt;
 	}
 
@@ -123,7 +129,7 @@ std::optional<OggFileDecodeInfo> RAIIOggFile::getDecodeInfo(const std::string &f
 		ret.bytes_per_sample = 4;
 	} else {
 		warningstream << "Audio: Can't decode. Sound is neither mono nor stereo: "
-					  << ret.name_for_logging << '\n';
+				<< ret.name_for_logging << '\n';
 		return std::nullopt;
 	}
 
@@ -131,7 +137,7 @@ std::optional<OggFileDecodeInfo> RAIIOggFile::getDecodeInfo(const std::string &f
 
 	if (!ov_seekable(&m_file)) {
 		warningstream << "Audio: Can't decode. Sound is not seekable, can't get length: "
-					  << ret.name_for_logging << '\n';
+				<< ret.name_for_logging << '\n';
 		return std::nullopt;
 	}
 
@@ -147,19 +153,19 @@ std::optional<OggFileDecodeInfo> RAIIOggFile::getDecodeInfo(const std::string &f
 		vorbis_info *info = ov_info(&m_file, strm);
 		if (!info) {
 			warningstream << "Audio: Can't decode. ov_info failed for: "
-						  << ret.name_for_logging << '\n';
+					<< ret.name_for_logging << '\n';
 			return std::nullopt;
 		}
 		if (info->channels != info0->channels) {
 			warningstream << "Audio: Can't decode. Channel count changes from "
-						  << info0->channels << " to " << info->channels << ": "
-						  << ret.name_for_logging << '\n';
+					<< info0->channels << " to " << info->channels << ": "
+					<< ret.name_for_logging << '\n';
 			return std::nullopt;
 		}
 		if (info->rate != info0->rate) {
 			warningstream << "Audio: Can't decode. Sample rate changes from "
-						  << info0->rate << " to " << info->rate << ": "
-						  << ret.name_for_logging << '\n';
+					<< info0->rate << " to " << info->rate << ": "
+					<< ret.name_for_logging << '\n';
 			return std::nullopt;
 		}
 	}
@@ -168,7 +174,8 @@ std::optional<OggFileDecodeInfo> RAIIOggFile::getDecodeInfo(const std::string &f
 }
 
 RAIIALSoundBuffer RAIIOggFile::loadBuffer(const OggFileDecodeInfo &decode_info,
-		ALuint pcm_start, ALuint pcm_end) {
+		ALuint pcm_start, ALuint pcm_end)
+{
 	constexpr int endian = 0; // 0 for Little-Endian, 1 for Big-Endian
 	constexpr int word_size = 2; // we use s16 samples
 	constexpr int word_signed = 1; // ^
@@ -181,14 +188,15 @@ RAIIALSoundBuffer RAIIOggFile::loadBuffer(const OggFileDecodeInfo &decode_info,
 	if (current_pcm != pcm_start) {
 		if (ov_pcm_seek(&m_file, pcm_start) != 0) {
 			warningstream << "Audio: Error decoding (could not seek): "
-						  << decode_info.name_for_logging << '\n';
+					<< decode_info.name_for_logging << '\n';
 			return RAIIALSoundBuffer();
 		}
 		assert(ov_pcm_tell(&m_file) == pcm_start);
 		current_pcm = pcm_start;
 	}
 
-	const size_t size = static_cast<size_t>(pcm_end - pcm_start) * decode_info.bytes_per_sample;
+	const size_t size = static_cast<size_t>(pcm_end - pcm_start)
+			* decode_info.bytes_per_sample;
 
 	std::unique_ptr<char[]> snd_buffer(new char[size]);
 
@@ -202,22 +210,17 @@ RAIIALSoundBuffer RAIIOggFile::loadBuffer(const OggFileDecodeInfo &decode_info,
 				endian, word_size, word_signed, &bitstream);
 
 		if (num_bytes <= 0) {
-			std::string_view errstr = [&] {
+			std::string_view errstr = [&]{
 				switch (num_bytes) {
-					case 0:
-						return "EOF";
-					case OV_HOLE:
-						return "OV_HOLE";
-					case OV_EBADLINK:
-						return "OV_EBADLINK";
-					case OV_EINVAL:
-						return "OV_EINVAL";
-					default:
-						return "unknown error";
+				case 0: return "EOF";
+				case OV_HOLE: return "OV_HOLE";
+				case OV_EBADLINK: return "OV_EBADLINK";
+				case OV_EINVAL: return "OV_EINVAL";
+				default: return "unknown error";
 				}
 			}();
 			warningstream << "Audio: Error decoding (" << errstr << "): "
-						  << decode_info.name_for_logging << '\n';
+					<< decode_info.name_for_logging << '\n';
 			return RAIIALSoundBuffer();
 		}
 
@@ -226,13 +229,13 @@ RAIIALSoundBuffer RAIIOggFile::loadBuffer(const OggFileDecodeInfo &decode_info,
 		s64 current_byte_offset = ov_pcm_tell(&m_file) * decode_info.bytes_per_sample;
 		if (current_byte_offset != last_byte_offset + num_bytes) {
 			infostream << "Audio: ov_read skipped "
-					   << current_byte_offset - (last_byte_offset + num_bytes)
-					   << " bytes, re-seeking: "
-					   << decode_info.name_for_logging << '\n';
+					<< current_byte_offset - (last_byte_offset + num_bytes)
+					<< " bytes, re-seeking: "
+					<< decode_info.name_for_logging << '\n';
 			s64 expected_offset = (last_byte_offset + num_bytes) / decode_info.bytes_per_sample;
 			if (ov_pcm_seek(&m_file, expected_offset) != 0) {
 				warningstream << "Audio: Error decoding (could not seek): "
-							  << decode_info.name_for_logging << '\n';
+						<< decode_info.name_for_logging << '\n';
 				return RAIIALSoundBuffer();
 			}
 			assert(ov_pcm_tell(&m_file) == expected_offset);
@@ -251,8 +254,8 @@ RAIIALSoundBuffer RAIIOggFile::loadBuffer(const OggFileDecodeInfo &decode_info,
 	ALenum error = alGetError();
 	if (error != AL_NO_ERROR) {
 		warningstream << "Audio: OpenAL error: " << getAlErrorString(error)
-					  << "preparing sound buffer for sound \""
-					  << decode_info.name_for_logging << "\"" << '\n';
+				<< "preparing sound buffer for sound \""
+				<< decode_info.name_for_logging << "\"" << '\n';
 	}
 
 	return snd_buffer_id;

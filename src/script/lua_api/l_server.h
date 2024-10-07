@@ -21,7 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "lua_api/l_base.h"
 
-class ModApiServer : public ModApiBase {
+class ModApiServer : public ModApiBase
+{
 private:
 	// request_shutdown([message], [reconnect])
 	static int l_request_shutdown(lua_State *L);
@@ -105,7 +106,7 @@ private:
 	// unban_player_or_ip()
 	static int l_unban_player_or_ip(lua_State *L);
 
-	// disconnect_player(name, [reason]) -> success
+	// disconnect_player(name[, reason[, reconnect]]) -> success
 	static int l_disconnect_player(lua_State *L);
 
 	// remove_player(name)

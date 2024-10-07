@@ -23,13 +23,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <array>
 #include "irrlichttypes_extrabloated.h"
 
-class GUIBox : public gui::IGUIElement {
+class GUIBox : public gui::IGUIElement
+{
 public:
 	GUIBox(gui::IGUIEnvironment *env, gui::IGUIElement *parent, s32 id,
-			const core::rect<s32> &rectangle,
-			const std::array<video::SColor, 4> &colors,
-			const std::array<video::SColor, 4> &bordercolors,
-			const std::array<s32, 4> &borderwidths);
+		const core::rect<s32> &rectangle,
+		const std::array<video::SColor, 4> &colors,
+		const std::array<video::SColor, 4> &bordercolors,
+		const std::array<s32, 4> &borderwidths);
 
 	virtual void draw() override;
 

@@ -26,7 +26,8 @@ DEALINGS IN THE SOFTWARE.
 #include "threading/event.h"
 #include "threading/mutex_auto_lock.h"
 
-void Event::wait() {
+void Event::wait()
+{
 	MutexAutoLock lock(mutex);
 	while (!notified) {
 		cv.wait(lock);
@@ -34,7 +35,9 @@ void Event::wait() {
 	notified = false;
 }
 
-void Event::signal() {
+
+void Event::signal()
+{
 	MutexAutoLock lock(mutex);
 	notified = true;
 	cv.notify_one();

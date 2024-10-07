@@ -26,7 +26,8 @@ namespace sound {
 /**
  * Struct for AL and ALC extensions
  */
-struct ALExtensions {
+struct ALExtensions
+{
 	explicit ALExtensions(const ALCdevice *deviceHandle [[maybe_unused]]);
 
 #ifdef AL_SOFT_direct_channels_remix
@@ -34,4 +35,4 @@ struct ALExtensions {
 #endif
 };
 
-} //namespace sound
+}

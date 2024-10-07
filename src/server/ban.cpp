@@ -28,23 +28,26 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "log.h"
 #include "filesys.h"
 
-BanManager::BanManager(const std::string &banfilepath) :
-		m_banfilepath(banfilepath) {
+BanManager::BanManager(const std::string &banfilepath):
+		m_banfilepath(banfilepath)
+{
 	try {
 		load();
-	} catch (SerializationError &e) {
+	} catch(SerializationError &e) {
 		infostream << "BanManager: creating "
-				   << m_banfilepath << '\n';
+				<< m_banfilepath << '\n';
 	}
 }
 
-BanManager::~BanManager() {
+BanManager::~BanManager()
+{
 	save();
 }
 
-void BanManager::load() {
+void BanManager::load()
+{
 	MutexAutoLock lock(m_mutex);
-	infostream << "BanManager: loading from " << m_banfilepath << '\n';
+	infostream<<"BanManager: loading from "<<m_banfilepath<<'\n';
 	auto is = open_ifstream(m_banfilepath.c_str(), false);
 	if (!is.good()) {
 		throw SerializationError("BanManager::load(): Couldn't open file");
@@ -56,14 +59,15 @@ void BanManager::load() {
 		Strfnd f(line);
 		std::string ip = trim(f.next("|"));
 		std::string name = trim(f.next("|"));
-		if (!ip.empty()) {
+		if(!ip.empty()) {
 			m_ips[ip] = name;
 		}
 	}
 	m_modified = false;
 }
 
-void BanManager::save() {
+void BanManager::save()
+{
 	MutexAutoLock lock(m_mutex);
 	infostream << "BanManager: saving to " << m_banfilepath << '\n';
 	std::ostringstream ss(std::ios_base::binary);
@@ -79,16 +83,19 @@ void BanManager::save() {
 	m_modified = false;
 }
 
-bool BanManager::isIpBanned(const std::string &ip) {
+bool BanManager::isIpBanned(const std::string &ip)
+{
 	MutexAutoLock lock(m_mutex);
 	return m_ips.find(ip) != m_ips.end();
 }
 
-std::string BanManager::getBanDescription(const std::string &ip_or_name) {
+std::string BanManager::getBanDescription(const std::string &ip_or_name)
+{
 	MutexAutoLock lock(m_mutex);
 	std::string s;
 	for (const auto &ip : m_ips) {
-		if (ip.first == ip_or_name || ip.second == ip_or_name || ip_or_name.empty()) {
+		if (ip.first  == ip_or_name || ip.second == ip_or_name
+				|| ip_or_name.empty()) {
 			s += ip.first + "|" + ip.second + ", ";
 		}
 	}
@@ -96,7 +103,8 @@ std::string BanManager::getBanDescription(const std::string &ip_or_name) {
 	return s;
 }
 
-std::string BanManager::getBanName(const std::string &ip) {
+std::string BanManager::getBanName(const std::string &ip)
+{
 	MutexAutoLock lock(m_mutex);
 	StringMap::iterator it = m_ips.find(ip);
 	if (it == m_ips.end())
@@ -104,13 +112,15 @@ std::string BanManager::getBanName(const std::string &ip) {
 	return it->second;
 }
 
-void BanManager::add(const std::string &ip, const std::string &name) {
+void BanManager::add(const std::string &ip, const std::string &name)
+{
 	MutexAutoLock lock(m_mutex);
 	m_ips[ip] = name;
 	m_modified = true;
 }
 
-void BanManager::remove(const std::string &ip_or_name) {
+void BanManager::remove(const std::string &ip_or_name)
+{
 	MutexAutoLock lock(m_mutex);
 	for (auto it = m_ips.begin(); it != m_ips.end();) {
 		if ((it->first == ip_or_name) || (it->second == ip_or_name)) {
@@ -122,7 +132,10 @@ void BanManager::remove(const std::string &ip_or_name) {
 	}
 }
 
-bool BanManager::isModified() {
+
+bool BanManager::isModified()
+{
 	MutexAutoLock lock(m_mutex);
 	return m_modified;
 }
+

@@ -22,14 +22,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/numeric.h"
 #include "inputhandler.h"
 #include "gui/mainmenumanager.h"
-#include "gui/touchscreengui.h"
+#include "gui/touchcontrols.h"
 #include "hud.h"
 
-void KeyCache::populate_nonchanging() {
+void KeyCache::populate_nonchanging()
+{
 	key[KeyType::ESC] = EscapeKey;
 }
 
-void KeyCache::populate() {
+void KeyCache::populate()
+{
 	key[KeyType::FORWARD] = getKeySetting("keymap_forward");
 	key[KeyType::BACKWARD] = getKeySetting("keymap_backward");
 	key[KeyType::LEFT] = getKeySetting("keymap_left");
@@ -95,14 +97,15 @@ void KeyCache::populate() {
 	}
 }
 
-bool MyEventReceiver::OnEvent(const SEvent &event) {
+bool MyEventReceiver::OnEvent(const SEvent &event)
+{
 	if (event.EventType == irr::EET_LOG_TEXT_EVENT) {
 		static const LogLevel irr_loglev_conv[] = {
 			LL_VERBOSE, // ELL_DEBUG
-			LL_INFO, // ELL_INFORMATION
+			LL_INFO,    // ELL_INFORMATION
 			LL_WARNING, // ELL_WARNING
-			LL_ERROR, // ELL_ERROR
-			LL_NONE, // ELL_NONE
+			LL_ERROR,   // ELL_ERROR
+			LL_NONE,    // ELL_NONE
 		};
 		assert(event.LogEvent.Level < ARRLEN(irr_loglev_conv));
 		g_logger.log(irr_loglev_conv[event.LogEvent.Level],
@@ -140,8 +143,8 @@ bool MyEventReceiver::OnEvent(const SEvent &event) {
 
 	// Let the menu handle events, if one is active.
 	if (isMenuActive()) {
-		if (g_touchscreengui)
-			g_touchscreengui->setVisible(false);
+		if (g_touchcontrols)
+			g_touchcontrols->setVisible(false);
 		return g_menumgr.preprocessEvent(event);
 	}
 
@@ -165,9 +168,9 @@ bool MyEventReceiver::OnEvent(const SEvent &event) {
 			return true;
 		}
 
-	} else if (g_touchscreengui && event.EventType == irr::EET_TOUCH_INPUT_EVENT) {
-		// In case of touchscreengui, we have to handle different events
-		g_touchscreengui->translateEvent(event);
+	} else if (g_touchcontrols && event.EventType == irr::EET_TOUCH_INPUT_EVENT) {
+		// In case of touchcontrols, we have to handle different events
+		g_touchcontrols->translateEvent(event);
 		return true;
 	} else if (event.EventType == irr::EET_JOYSTICK_INPUT_EVENT) {
 		// joystick may be nullptr if game is launched with '--random-input' parameter
@@ -175,38 +178,38 @@ bool MyEventReceiver::OnEvent(const SEvent &event) {
 	} else if (event.EventType == irr::EET_MOUSE_INPUT_EVENT) {
 		// Handle mouse events
 		switch (event.MouseInput.Event) {
-			case EMIE_LMOUSE_PRESSED_DOWN:
-				keyIsDown.set(LMBKey);
-				keyWasDown.set(LMBKey);
-				keyWasPressed.set(LMBKey);
-				break;
-			case EMIE_MMOUSE_PRESSED_DOWN:
-				keyIsDown.set(MMBKey);
-				keyWasDown.set(MMBKey);
-				keyWasPressed.set(MMBKey);
-				break;
-			case EMIE_RMOUSE_PRESSED_DOWN:
-				keyIsDown.set(RMBKey);
-				keyWasDown.set(RMBKey);
-				keyWasPressed.set(RMBKey);
-				break;
-			case EMIE_LMOUSE_LEFT_UP:
-				keyIsDown.unset(LMBKey);
-				keyWasReleased.set(LMBKey);
-				break;
-			case EMIE_MMOUSE_LEFT_UP:
-				keyIsDown.unset(MMBKey);
-				keyWasReleased.set(MMBKey);
-				break;
-			case EMIE_RMOUSE_LEFT_UP:
-				keyIsDown.unset(RMBKey);
-				keyWasReleased.set(RMBKey);
-				break;
-			case EMIE_MOUSE_WHEEL:
-				mouse_wheel += event.MouseInput.Wheel;
-				break;
-			default:
-				break;
+		case EMIE_LMOUSE_PRESSED_DOWN:
+			keyIsDown.set(LMBKey);
+			keyWasDown.set(LMBKey);
+			keyWasPressed.set(LMBKey);
+			break;
+		case EMIE_MMOUSE_PRESSED_DOWN:
+			keyIsDown.set(MMBKey);
+			keyWasDown.set(MMBKey);
+			keyWasPressed.set(MMBKey);
+			break;
+		case EMIE_RMOUSE_PRESSED_DOWN:
+			keyIsDown.set(RMBKey);
+			keyWasDown.set(RMBKey);
+			keyWasPressed.set(RMBKey);
+			break;
+		case EMIE_LMOUSE_LEFT_UP:
+			keyIsDown.unset(LMBKey);
+			keyWasReleased.set(LMBKey);
+			break;
+		case EMIE_MMOUSE_LEFT_UP:
+			keyIsDown.unset(MMBKey);
+			keyWasReleased.set(MMBKey);
+			break;
+		case EMIE_RMOUSE_LEFT_UP:
+			keyIsDown.unset(RMBKey);
+			keyWasReleased.set(RMBKey);
+			break;
+		case EMIE_MOUSE_WHEEL:
+			mouse_wheel += event.MouseInput.Wheel;
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -217,52 +220,27 @@ bool MyEventReceiver::OnEvent(const SEvent &event) {
 /*
  * RealInputHandler
  */
-float RealInputHandler::getMovementSpeed() {
-	bool f = m_receiver->IsKeyDown(keycache.key[KeyType::FORWARD]),
-		 b = m_receiver->IsKeyDown(keycache.key[KeyType::BACKWARD]),
-		 l = m_receiver->IsKeyDown(keycache.key[KeyType::LEFT]),
-		 r = m_receiver->IsKeyDown(keycache.key[KeyType::RIGHT]);
-	if (f || b || l || r) {
-		// if contradictory keys pressed, stay still
-		if (f && b && l && r)
-			return 0.0f;
-		else if (f && b && !l && !r)
-			return 0.0f;
-		else if (!f && !b && l && r)
-			return 0.0f;
-		return 1.0f; // If there is a keyboard event, assume maximum speed
-	}
-	if (g_touchscreengui && g_touchscreengui->getMovementSpeed())
-		return g_touchscreengui->getMovementSpeed();
+float RealInputHandler::getJoystickSpeed()
+{
+	if (g_touchcontrols && g_touchcontrols->getJoystickSpeed())
+		return g_touchcontrols->getJoystickSpeed();
 	return joystick.getMovementSpeed();
 }
 
-float RealInputHandler::getMovementDirection() {
-	float x = 0, z = 0;
-
-	/* Check keyboard for input */
-	if (m_receiver->IsKeyDown(keycache.key[KeyType::FORWARD]))
-		z += 1;
-	if (m_receiver->IsKeyDown(keycache.key[KeyType::BACKWARD]))
-		z -= 1;
-	if (m_receiver->IsKeyDown(keycache.key[KeyType::RIGHT]))
-		x += 1;
-	if (m_receiver->IsKeyDown(keycache.key[KeyType::LEFT]))
-		x -= 1;
-
-	if (x != 0 || z != 0) /* If there is a keyboard event, it takes priority */
-		return std::atan2(x, z);
-	// `getMovementDirection() == 0` means forward, so we cannot use
-	// `getMovementDirection()` as a condition.
-	else if (g_touchscreengui && g_touchscreengui->getMovementSpeed())
-		return g_touchscreengui->getMovementDirection();
+float RealInputHandler::getJoystickDirection()
+{
+	// `getJoystickDirection() == 0` means forward, so we cannot use
+	// `getJoystickDirection()` as a condition.
+	if (g_touchcontrols && g_touchcontrols->getJoystickSpeed())
+		return g_touchcontrols->getJoystickDirection();
 	return joystick.getMovementDirection();
 }
 
 /*
  * RandomInputHandler
  */
-s32 RandomInputHandler::Rand(s32 min, s32 max) {
+s32 RandomInputHandler::Rand(s32 min, s32 max)
+{
 	return (myrand() % (max - min + 1)) + min;
 }
 
@@ -272,7 +250,8 @@ struct RandomInputHandlerSimData {
 	int time_max;
 };
 
-void RandomInputHandler::step(float dtime) {
+void RandomInputHandler::step(float dtime)
+{
 	static RandomInputHandlerSimData rnd_data[] = {
 		{ "keymap_jump", 0.0f, 40 },
 		{ "keymap_aux1", 0.0f, 40 },
@@ -312,25 +291,11 @@ void RandomInputHandler::step(float dtime) {
 		counterMovement -= dtime;
 		if (counterMovement < 0.0) {
 			counterMovement = 0.1 * Rand(1, 40);
-			movementSpeed = Rand(0, 100) * 0.01;
-			movementDirection = Rand(-100, 100) * 0.01 * M_PI;
+			joystickSpeed = Rand(0,100)*0.01;
+			joystickDirection = Rand(-100, 100)*0.01 * M_PI;
 		}
 	} else {
-		bool f = keydown[keycache.key[KeyType::FORWARD]],
-			 l = keydown[keycache.key[KeyType::LEFT]];
-		if (f || l) {
-			movementSpeed = 1.0f;
-			if (f && !l)
-				movementDirection = 0.0;
-			else if (!f && l)
-				movementDirection = -M_PI_2;
-			else if (f && l)
-				movementDirection = -M_PI_4;
-			else
-				movementDirection = 0.0;
-		} else {
-			movementSpeed = 0.0;
-			movementDirection = 0.0;
-		}
+		joystickSpeed = 0.0f;
+		joystickDirection = 0.0f;
 	}
 }

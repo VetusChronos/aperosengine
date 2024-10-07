@@ -28,28 +28,19 @@ class BasicStrfnd {
 	typedef std::basic_string<T> String;
 	String str;
 	size_t pos;
-
 public:
 	BasicStrfnd(const String &s) { start(s); }
-	BasicStrfnd(const T *ptr) {
-		str = ptr;
-		pos = 0;
-	}
-	BasicStrfnd(std::basic_string_view<T> sv) {
-		str = sv;
-		pos = 0;
-	}
+	BasicStrfnd(const T *ptr) { str = ptr; pos = 0; }
+	BasicStrfnd(std::basic_string_view<T> sv) { str = sv; pos = 0; }
 
-	void start(const String &s) {
-		str = s;
-		pos = 0;
-	}
+	void start(const String &s) { str = s; pos = 0; }
 	size_t where() { return pos; }
 	void to(size_t i) { pos = i; }
 	bool at_end() { return pos >= str.size(); }
 	String what() { return str; }
 
-	String next(const String &sep) {
+	String next(const String &sep)
+	{
 		if (pos >= str.size())
 			return String();
 
@@ -63,7 +54,8 @@ public:
 	}
 
 	// Returns substr up to the next occurrence of sep that isn't escaped with esc ('\\')
-	String next_esc(const String &sep, T esc = static_cast<T>('\\')) {
+	String next_esc(const String &sep, T esc=static_cast<T>('\\'))
+	{
 		if (pos >= str.size())
 			return String();
 
@@ -79,7 +71,8 @@ public:
 		return str.substr(old_p, n - old_p);
 	}
 
-	void skip_over(const String &chars) {
+	void skip_over(const String &chars)
+	{
 		size_t p = str.find_first_not_of(chars, pos);
 		if (p != String::npos)
 			pos = p;

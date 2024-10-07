@@ -43,8 +43,8 @@ enum texture_layer {
 
 struct image_definition {
 	video::ITexture *texture = nullptr;
-	bool tile;
-	unsigned int minsize;
+	bool             tile;
+	unsigned int     minsize;
 };
 
 /******************************************************************************/
@@ -61,14 +61,14 @@ struct MainMenuData;
 /******************************************************************************/
 
 /** GUIEngine specific implementation of TextDest used within guiFormSpecMenu */
-class TextDestGuiEngine : public TextDest {
+class TextDestGuiEngine : public TextDest
+{
 public:
 	/**
 	 * default constructor
 	 * @param engine the engine data is transmitted for further processing
 	 */
-	TextDestGuiEngine(GUIEngine *engine) :
-			m_engine(engine){};
+	TextDestGuiEngine(GUIEngine* engine) : m_engine(engine) {};
 
 	/**
 	 * receive fields transmitted by guiFormSpecMenu
@@ -88,14 +88,14 @@ private:
 };
 
 /** GUIEngine specific implementation of ISimpleTextureSource */
-class MenuTextureSource : public ISimpleTextureSource {
+class MenuTextureSource : public ISimpleTextureSource
+{
 public:
 	/**
 	 * default constructor
 	 * @param driver the video driver to load textures from
 	 */
-	MenuTextureSource(video::IVideoDriver *driver) :
-			m_driver(driver){};
+	MenuTextureSource(video::IVideoDriver *driver) : m_driver(driver) {};
 
 	/**
 	 * destructor, removes all loaded textures
@@ -113,11 +113,12 @@ private:
 	/** driver to get textures from */
 	video::IVideoDriver *m_driver = nullptr;
 	/** set of textures to delete */
-	std::vector<video::ITexture *> m_to_delete;
+	std::vector<video::ITexture*> m_to_delete;
 };
 
 /** GUIEngine specific implementation of SoundFallbackPathProvider */
-class MenuMusicFetcher final : public SoundFallbackPathProvider {
+class MenuMusicFetcher final : public SoundFallbackPathProvider
+{
 protected:
 	void addThePaths(const std::string &name,
 			std::vector<std::string> &paths) override;
@@ -152,14 +153,16 @@ public:
 	/**
 	 * return MainMenuScripting interface
 	 */
-	MainMenuScripting *getScriptIface() {
+	MainMenuScripting *getScriptIface()
+	{
 		return m_script.get();
 	}
 
 	/**
 	 * return dir of current menuscript
 	 */
-	std::string getScriptDir() {
+	std::string getScriptDir()
+	{
 		return m_scriptdir;
 	}
 
@@ -189,40 +192,38 @@ private:
 	/** update size of topleftext element */
 	void updateTopLeftTextSize();
 
-	RenderingEngine *m_rendering_engine = nullptr;
+	RenderingEngine                      *m_rendering_engine = nullptr;
 	/** parent gui element */
-	gui::IGUIElement *m_parent = nullptr;
+	gui::IGUIElement                     *m_parent = nullptr;
 	/** manager to add menus to */
-	IMenuManager *m_menumanager = nullptr;
+	IMenuManager                         *m_menumanager = nullptr;
 	/** scene manager to add scene elements to */
-	scene::ISceneManager *m_smgr = nullptr;
+	scene::ISceneManager                 *m_smgr = nullptr;
 	/** pointer to data beeing transfered back to main game handling */
-	MainMenuData *m_data = nullptr;
+	MainMenuData                         *m_data = nullptr;
 	/** texture source */
 	std::unique_ptr<ISimpleTextureSource> m_texture_source;
-	/** shader source */
-	std::unique_ptr<IWritableShaderSource> m_shader_source;
 	/** sound manager */
-	std::unique_ptr<ISoundManager> m_sound_manager;
+	std::unique_ptr<ISoundManager>        m_sound_manager;
 
 	/** representation of form source to be used in mainmenu formspec */
-	FormspecFormSource *m_formspecgui = nullptr;
+	FormspecFormSource                   *m_formspecgui = nullptr;
 	/** formspec input receiver */
-	TextDestGuiEngine *m_buttonhandler = nullptr;
+	TextDestGuiEngine                    *m_buttonhandler = nullptr;
 	/** the formspec menu */
-	irr_ptr<GUIFormSpecMenu> m_menu;
+	irr_ptr<GUIFormSpecMenu>              m_menu;
 
 	/** reference to kill variable managed by SIGINT handler */
-	bool &m_kill;
+	bool                                 &m_kill;
 
 	/** variable used to abort menu and return back to main game handling */
-	bool m_startgame = false;
+	bool                                  m_startgame = false;
 
 	/** scripting interface */
-	std::unique_ptr<MainMenuScripting> m_script;
+	std::unique_ptr<MainMenuScripting>    m_script;
 
 	/** script basefolder */
-	std::string m_scriptdir = "";
+	std::string                           m_scriptdir = "";
 
 	void setFormspecPrepend(const std::string &fs);
 
@@ -276,23 +277,11 @@ private:
 	/** and text that is in it */
 	EnrichedString m_toplefttext;
 
-	/** initialize cloud subsystem */
-	void cloudInit();
 	/** do preprocessing for cloud subsystem */
 	void drawClouds(float dtime);
 
-	/** internam data required for drawing clouds */
-	struct clouddata {
-		/** pointer to cloud class */
-		irr_ptr<Clouds> clouds;
-		/** camera required for drawing clouds */
-		scene::ICameraSceneNode *camera = nullptr;
-	};
-
 	/** is drawing of clouds enabled atm */
 	bool m_clouds_enabled = true;
-	/** data used to draw clouds */
-	clouddata m_cloud;
 
 	static void fullscreenChangedCallback(const std::string &name, void *data);
 };

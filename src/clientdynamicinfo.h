@@ -21,7 +21,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "irrlichttypes_bloated.h"
 
-struct ClientDynamicInfo {
+
+struct ClientDynamicInfo
+{
 public:
 	v2u32 render_target_size;
 	f32 real_gui_scaling;
@@ -40,6 +42,6 @@ public:
 	static ClientDynamicInfo getCurrent();
 
 private:
-	static v2f32 calculateMaxFSSize(v2u32 render_target_size, f32 gui_scaling);
+	static v2f32 calculateMaxFSSize(v2u32 render_target_size, f32 density, f32 gui_scaling);
 #endif
 };

@@ -33,7 +33,8 @@ DEALINGS IN THE SOFTWARE.
  * are waiting on the event when it is signaled, the next call to @c wait()
  * will return (almost) immediately.
  */
-class Event {
+class Event
+{
 public:
 	void wait();
 	void signal();

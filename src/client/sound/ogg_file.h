@@ -71,7 +71,8 @@ struct RAIIOggFile {
 
 	DISABLE_CLASS_COPY(RAIIOggFile)
 
-	~RAIIOggFile() noexcept {
+	~RAIIOggFile() noexcept
+	{
 		if (m_needs_clear)
 			ov_clear(&m_file);
 	}

@@ -21,9 +21,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <list>
 
-class KeyType {
+class KeyType
+{
 public:
-	enum T {
+	enum T
+	{
 		// Player movement
 		FORWARD,
 		BACKWARD,

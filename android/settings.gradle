@@ -1,2 +1,2 @@
-rootProject.name = "AperosVoxel"
+rootProject.name = "AperosEngine"
 include ':app', ':native'

@@ -19,10 +19,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "lighting.h"
 
-AutoExposure::AutoExposure() :
-		luminance_min(-3.f),
-		luminance_max(-3.f),
-		exposure_correction(0.0f),
-		speed_dark_bright(1000.f),
-		speed_bright_dark(1000.f),
-		center_weight_power(1.f) {}
+AutoExposure::AutoExposure()
+	: luminance_min(-3.f),
+	luminance_max(-3.f),
+	exposure_correction(0.0f),
+	speed_dark_bright(1000.f),
+	speed_bright_dark(1000.f),
+	center_weight_power(1.f)
+{}

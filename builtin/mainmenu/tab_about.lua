@@ -15,6 +15,7 @@
 --with this program; if not, write to the Free Software Foundation, Inc.,
 --51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+
 local function prepare_credits(dest, source)
 	local string = table.concat(source, "\n") .. "\n"
 
@@ -29,7 +30,7 @@ local function prepare_credits(dest, source)
 	table.insert(dest, string)
 end
 
-ocal function get_credits()
+local function get_credits()
 	local f = assert(io.open(core.get_mainmenu_path() .. "/credits.json"))
 	local json = core.parse_json(f:read("*all"))
 	f:close()

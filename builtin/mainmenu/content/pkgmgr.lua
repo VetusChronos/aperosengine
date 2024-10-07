@@ -311,7 +311,7 @@ function pkgmgr.render_packagelist(render_list, use_technical_names, with_icon)
 
 		if v.is_modpack then
 			local rawlist = render_list:get_raw_list()
-			color = mt_color_dark_green
+			color = apr_color_dark_green
 
 			for j = 1, #rawlist do
 				if rawlist[j].modpack == list[i].name then
@@ -323,13 +323,13 @@ function pkgmgr.render_packagelist(render_list, use_technical_names, with_icon)
 						icon = 1
 					else
 						-- Modpack not entirely enabled so showing as grey
-						color = mt_color_grey
+						color = apr_color_grey
 					end
 				end
 			end
 		elseif v.is_game_content or v.type == "game" then
 			icon = 1
-			color = mt_color_blue
+			color = apr_color_blue
 
 			local rawlist = render_list:get_raw_list()
 			if v.type == "game" and with_icon then
@@ -341,15 +341,15 @@ function pkgmgr.render_packagelist(render_list, use_technical_names, with_icon)
 			end
 		elseif v.enabled or v.type == "txp" then
 			icon = 1
-			color = mt_color_green
+			color = apr_color_green
 		end
 
 		if icon_info then
 			if icon_info.type == "warning" then
-				color = mt_color_orange
+				color = apr_color_orange
 				icon = 2
 			elseif icon_info.type == "error" then
-				color = mt_color_red
+				color = apr_color_red
 				icon = 3
 			elseif icon_info.type == "update" then
 				icon = 4
@@ -840,14 +840,9 @@ function pkgmgr.get_contentdb_id(content)
 		return content.author:lower() .. "/" .. content.name
 	end
 
-	-- Until Minetest 5.8.0, Minetest Game was bundled with Minetest.
-	-- Unfortunately, the bundled MTG was not versioned (missing "release"
-	-- field in game.conf).
-	-- Therefore, we consider any installation of MTG that is not versioned,
-	-- has not been cloned from Git, and is not system-wide to be updatable.
 	if content.type == "game" and content.id == "aperosvoxel" and content.release == 0 and
 			not core.is_dir(content.path .. "/.git") and core.may_modify_path(content.path) then
-		return "aperosvoxel/aperosvoxel"
+		return "vetuschronos/aperosvoxel"
 	end
 
 	return nil

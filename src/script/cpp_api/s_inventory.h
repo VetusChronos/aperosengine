@@ -25,7 +25,8 @@ struct MoveAction;
 struct ItemStack;
 
 class ScriptApiDetached
-		: virtual public ScriptApiBase {
+		: virtual public ScriptApiBase
+{
 public:
 	/* Detached inventory callbacks */
 	// Return number of accepted items to be moved
@@ -52,7 +53,6 @@ public:
 	void detached_inventory_OnTake(
 			const MoveAction &ma, const ItemStack &stack,
 			ServerActiveObject *player);
-
 private:
 	bool getDetachedInventoryCallback(
 			const std::string &name, const char *callbackname);

@@ -28,7 +28,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "database.h"
 #include "leveldb/db.h"
 
-class Database_LevelDB : public MapDatabase {
+class Database_LevelDB : public MapDatabase
+{
 public:
 	Database_LevelDB(const std::string &savedir);
 	~Database_LevelDB() = default;
@@ -45,7 +46,8 @@ private:
 	std::unique_ptr<leveldb::DB> m_database;
 };
 
-class PlayerDatabaseLevelDB : public PlayerDatabase {
+class PlayerDatabaseLevelDB : public PlayerDatabase
+{
 public:
 	PlayerDatabaseLevelDB(const std::string &savedir);
 	~PlayerDatabaseLevelDB() = default;
@@ -59,7 +61,8 @@ private:
 	std::unique_ptr<leveldb::DB> m_database;
 };
 
-class AuthDatabaseLevelDB : public AuthDatabase {
+class AuthDatabaseLevelDB : public AuthDatabase
+{
 public:
 	AuthDatabaseLevelDB(const std::string &savedir);
 	virtual ~AuthDatabaseLevelDB() = default;

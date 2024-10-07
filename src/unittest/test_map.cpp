@@ -24,7 +24,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "mapblock.h"
 #include "dummymap.h"
 
-class TestMap : public TestBase {
+class TestMap : public TestBase
+{
 public:
 	TestMap() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestMap"; }
@@ -39,7 +40,8 @@ public:
 
 static TestMap g_test_instance;
 
-void TestMap::runTests(IGameDef *gamedef) {
+void TestMap::runTests(IGameDef *gamedef)
+{
 	TEST(testMaxMapgenLimit);
 	TEST(testForEachNodeInArea, gamedef);
 	TEST(testForEachNodeInAreaBlank, gamedef);
@@ -48,32 +50,34 @@ void TestMap::runTests(IGameDef *gamedef) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestMap::testMaxMapgenLimit() {
+void TestMap::testMaxMapgenLimit()
+{
 	// limit must end on a mapblock boundary
 	UASSERTEQ(int, MAX_MAP_GENERATION_LIMIT % MAP_BLOCKSIZE, MAP_BLOCKSIZE - 1);
 
 	// objectpos_over_limit should do exactly this except the last node
 	// actually spans from LIMIT-0.5 to LIMIT+0.5
 	float limit_times_bs = MAX_MAP_GENERATION_LIMIT * BS;
-	UASSERT(objectpos_over_limit(v3f(limit_times_bs - BS / 2)) == false);
+	UASSERT(objectpos_over_limit(v3f(limit_times_bs-BS/2)) == false);
 	UASSERT(objectpos_over_limit(v3f(limit_times_bs)) == false);
-	UASSERT(objectpos_over_limit(v3f(limit_times_bs + BS / 2)) == false);
-	UASSERT(objectpos_over_limit(v3f(limit_times_bs + BS)) == true);
+	UASSERT(objectpos_over_limit(v3f(limit_times_bs+BS/2)) == false);
+	UASSERT(objectpos_over_limit(v3f(limit_times_bs+BS)) == true);
 
-	UASSERT(objectpos_over_limit(v3f(-limit_times_bs + BS / 2)) == false);
+	UASSERT(objectpos_over_limit(v3f(-limit_times_bs+BS/2)) == false);
 	UASSERT(objectpos_over_limit(v3f(-limit_times_bs)) == false);
-	UASSERT(objectpos_over_limit(v3f(-limit_times_bs - BS / 2)) == false);
-	UASSERT(objectpos_over_limit(v3f(-limit_times_bs - BS)) == true);
+	UASSERT(objectpos_over_limit(v3f(-limit_times_bs-BS/2)) == false);
+	UASSERT(objectpos_over_limit(v3f(-limit_times_bs-BS)) == true);
 
 	// blockpos_over_max_limit
 	s16 limit_block = MAX_MAP_GENERATION_LIMIT / MAP_BLOCKSIZE;
 	UASSERT(blockpos_over_max_limit(v3s16(limit_block)) == false);
-	UASSERT(blockpos_over_max_limit(v3s16(limit_block + 1)) == true);
+	UASSERT(blockpos_over_max_limit(v3s16(limit_block+1)) == true);
 	UASSERT(blockpos_over_max_limit(v3s16(-limit_block)) == false);
-	UASSERT(blockpos_over_max_limit(v3s16(-limit_block - 1)) == true);
+	UASSERT(blockpos_over_max_limit(v3s16(-limit_block-1)) == true);
 }
 
-void TestMap::testForEachNodeInArea(IGameDef *gamedef) {
+void TestMap::testForEachNodeInArea(IGameDef *gamedef)
+{
 	v3s16 minp_visit(-10, -10, -10);
 	v3s16 maxp_visit(20, 20, 10);
 	v3s16 dims_visit = maxp_visit - minp_visit + v3s16(1, 1, 1);
@@ -140,7 +144,8 @@ void TestMap::testForEachNodeInArea(IGameDef *gamedef) {
 	UASSERTEQ(content_t, found[p4].getContent(), n4.getContent());
 }
 
-void TestMap::testForEachNodeInAreaBlank(IGameDef *gamedef) {
+void TestMap::testForEachNodeInAreaBlank(IGameDef *gamedef)
+{
 	DummyMap map(gamedef, v3s16(0, 0, 0), v3s16(-1, -1, -1));
 
 	v3s16 invalid_p(0, 0, 0);
@@ -156,7 +161,8 @@ void TestMap::testForEachNodeInAreaBlank(IGameDef *gamedef) {
 	UASSERT(visited);
 }
 
-void TestMap::testForEachNodeInAreaEmpty(IGameDef *gamedef) {
+void TestMap::testForEachNodeInAreaEmpty(IGameDef *gamedef)
+{
 	DummyMap map(gamedef, v3s16(), v3s16());
 	map.forEachNodeInArea(v3s16(0, 0, 0), v3s16(-1, -1, -1), [&](v3s16 p, MapNode n) -> bool {
 		UASSERT(false); // Should be unreachable

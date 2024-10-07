@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 # This can be read from ${PROJECT_NAME} after project() is called
 project(aperosengine)
-set(PROJECT_NAME_CAPITALIZED "AperosVoxel")
+set(PROJECT_NAME_CAPITALIZED "Aperos Engine")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -12,17 +12,17 @@ set(CLANG_MINIMUM_VERSION "7.0.1")
 # You should not need to edit these manually, use util/bump_version.sh
 set(VERSION_MAJOR 1)
 set(VERSION_MINOR 0)
-set(VERSION_PATCH 5)
+set(VERSION_PATCH 9)
 set(VERSION_EXTRA "" CACHE STRING "Stuff to append to version string")
 
 # Change to false for releases
 set(DEVELOPMENT_BUILD TRUE)
 
-set(VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+set(VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-beta")
 if(VERSION_EXTRA)
 	set(VERSION_STRING "${VERSION_STRING}-${VERSION_EXTRA}")
 elseif(DEVELOPMENT_BUILD)
-	set(VERSION_STRING "${VERSION_STRING}-alpha")
+	set(VERSION_STRING "${VERSION_STRING}-beta-dev")
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -32,10 +32,10 @@ endif()
 
 # Configuration options
 set(BUILD_CLIENT TRUE CACHE BOOL "Build client")
-set(BUILD_SERVER TRUE CACHE BOOL "Build server")
+set(BUILD_SERVER FALSE CACHE BOOL "Build server")
 set(BUILD_UNITTESTS TRUE CACHE BOOL "Build unittests")
 set(BUILD_BENCHMARKS FALSE CACHE BOOL "Build benchmarks")
-set(BUILD_DOCUMENTATION FALSE CACHE BOOL "Build documentation")
+set(BUILD_DOCUMENTATION TRUE CACHE BOOL "Build documentation")
 
 set(DEFAULT_ENABLE_LTO TRUE)
 # by default don't enable on Debug builds to get faster builds
@@ -55,6 +55,11 @@ if((WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR APPLE)
 	set(DEFAULT_ENABLE_LTO FALSE)
 endif()
 set(ENABLE_LTO ${DEFAULT_ENABLE_LTO} CACHE BOOL "Use Link Time Optimization")
+
+set(BUILD_WITH_TRACY FALSE CACHE BOOL
+	"Fetch and build with the Tracy profiler client")
+set(FETCH_TRACY_GIT_TAG "main" CACHE STRING
+	"Git tag for fetching Tracy client. Match with your server (gui) version")
 
 set(DEFAULT_RUN_IN_PLACE FALSE)
 if(WIN32)
@@ -253,20 +258,20 @@ install(FILES "docs/locales/en/client_lua_api.md" DESTINATION "${DOCDIR}" COMPON
 install(FILES "docs/locales/en/menu_lua_api.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
 install(FILES "docs/locales/en/texture_packs.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
 install(FILES "docs/locales/en/world_format.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
-install(FILES "aperosvoxel.conf.example" DESTINATION "${EXAMPLE_CONF_DIR}")
+install(FILES "aperosengine.conf.example" DESTINATION "${EXAMPLE_CONF_DIR}")
 
 if(UNIX AND NOT APPLE)
-	install(FILES "docs/locales/en/minetest.6" "docs/locales/en/minetestserver.6" DESTINATION "${MANDIR}/man6")
-	install(FILES "misc/net.minetest.minetest.desktop" DESTINATION "${XDG_APPS_DIR}")
-	install(FILES "misc/net.minetest.minetest.metainfo.xml" DESTINATION "${METAINFODIR}")
-	install(FILES "misc/minetest.svg" DESTINATION "${ICONDIR}/hicolor/scalable/apps")
-	install(FILES "misc/minetest-xorg-icon-128.png"
+	install(FILES "docs/locales/en/aperosengine.6" "docs/locales/en/aperosengine.6" DESTINATION "${MANDIR}/man6")
+	install(FILES "misc/net.aperosengine.aperosengine.desktop" DESTINATION "${XDG_APPS_DIR}")
+	install(FILES "misc/net.aperosengine.aperosengine.metainfo.xml" DESTINATION "${METAINFODIR}")
+	#install(FILES "misc/aperosengine.svg" DESTINATION "${ICONDIR}/hicolor/scalable/apps")
+	install(FILES "misc/aperosengine-xorg-icon-128.png"
 		DESTINATION "${ICONDIR}/hicolor/128x128/apps"
-		RENAME "minetest.png")
+		RENAME "aperosengine.png")
 endif()
 
 if(APPLE)
-	install(FILES "misc/minetest-icon.icns" DESTINATION "${SHAREDIR}")
+	install(FILES "misc/aperosengine-icon.ico" DESTINATION "${SHAREDIR}")
 	install(FILES "misc/Info.plist" DESTINATION "${BUNDLE_PATH}/Contents")
 endif()
 
@@ -283,24 +288,26 @@ if(BUILD_UNITTESTS OR BUILD_BENCHMARKS)
 	add_subdirectory(lib/catch2)
 endif()
 
+add_subdirectory(lib/tiniergltf)
+
 # Subdirectories
 # Be sure to add all relevant definitions above this
 add_subdirectory(src)
 
 # CPack
 
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A free open-source voxel game engine with easy modding and game creation.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A free open source voxel game engine focusing on ease of modding and game creation.")
 set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
-set(CPACK_PACKAGE_VENDOR "yunasatoy")
-set(CPACK_PACKAGE_CONTACT "Yuna Sato <celeron55@gmail.com>")
+set(CPACK_PACKAGE_VENDOR "vetuschronos")
+set(CPACK_PACKAGE_CONTACT "Vetus (Chronos) <vetuschronos@hotmail.com>")
 
 include(CPackComponent)
 
 cpack_add_component(Docs
 	DISPLAY_NAME "Documentation"
-	DESCRIPTION "Documentation about AperosEngine and AperosEngine modding"
+	DESCRIPTION "Documentation about Aperos Engine and Aperos Engine modding"
 )
 
 if(WIN32)
@@ -324,7 +331,7 @@ if(WIN32)
 		set(CPACK_CREATE_DESKTOP_LINKS ${PROJECT_NAME})
 		set(CPACK_PACKAGING_INSTALL_PREFIX "/${PROJECT_NAME_CAPITALIZED}")
 
-		set(CPACK_WIX_PRODUCT_ICON "${CMAKE_CURRENT_SOURCE_DIR}/misc/minetest-icon.ico")
+		set(CPACK_WIX_PRODUCT_ICON "${CMAKE_CURRENT_SOURCE_DIR}/misc/aperosengine-icon.ico")
 		# Supported languages can be found at
 		# http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html
 		#set(CPACK_WIX_CULTURES "ar-SA,bg-BG,ca-ES,hr-HR,cs-CZ,da-DK,nl-NL,en-US,et-EE,fi-FI,fr-FR,de-DE")
@@ -367,4 +374,20 @@ if(BUILD_DOCUMENTATION)
 			COMMENT "Generating API documentation with Doxygen" VERBATIM
 		)
 	endif()
+endif()
+
+# Fetch Tracy
+if(BUILD_WITH_TRACY)
+	include(FetchContent)
+
+	message(STATUS "Fetching Tracy (${FETCH_TRACY_GIT_TAG})...")
+	FetchContent_Declare(
+		tracy
+		GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+		GIT_TAG ${FETCH_TRACY_GIT_TAG}
+		GIT_SHALLOW TRUE
+		GIT_PROGRESS TRUE
+	)
+	FetchContent_MakeAvailable(tracy)
+	message(STATUS "Fetching Tracy - done")
 endif()

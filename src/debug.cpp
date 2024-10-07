@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+
 #include "porting.h"
 #include "debug.h"
 #include "exceptions.h"
@@ -30,15 +31,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "config.h"
 
 #ifdef _MSC_VER
-#include <dbghelp.h>
-#include <windows.h>
-#include <eh.h>
-#include "version.h"
-#include "filesys.h"
+	#include <dbghelp.h>
+	#include <windows.h>
+	#include <eh.h>
+	#include "version.h"
+	#include "filesys.h"
 #endif
 
 #if USE_CURSES
-#include "terminal_chat_console.h"
+	#include "terminal_chat_console.h"
 #endif
 
 /*
@@ -46,95 +47,98 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 void sanity_check_fn(const char *assertion, const char *file,
-		unsigned int line, const char *function) {
+		unsigned int line, const char *function)
+{
 #if USE_CURSES
 	g_term_console.stopAndWaitforThread();
 #endif
 
-	errorstream << '\n'
-				<< "In thread " << std::hex
-				<< std::this_thread::get_id() << ":" << '\n';
+	errorstream << '\n' << "In thread " << std::hex
+		<< std::this_thread::get_id() << ":" << '\n';
 	errorstream << file << ":" << line << ": " << function
-				<< ": An engine assumption '" << assertion << "' failed." << '\n';
+		<< ": An engine assumption '" << assertion << "' failed." << '\n';
 
 	abort();
 }
 
 void fatal_error_fn(const char *msg, const char *file,
-		unsigned int line, const char *function) {
+		unsigned int line, const char *function)
+{
 #if USE_CURSES
 	g_term_console.stopAndWaitforThread();
 #endif
 
-	errorstream << '\n'
-				<< "In thread " << std::hex
-				<< std::this_thread::get_id() << ":" << '\n';
+	errorstream << '\n' << "In thread " << std::hex
+		<< std::this_thread::get_id() << ":" << '\n';
 	errorstream << file << ":" << line << ": " << function
-				<< ": A fatal error occurred: " << msg << '\n';
+		<< ": A fatal error occurred: " << msg << '\n';
 
 	abort();
 }
 
-std::string debug_describe_exc(const std::exception &e) {
-	if (dynamic_cast<const std::bad_alloc *>(&e))
+std::string debug_describe_exc(const std::exception &e)
+{
+	if (dynamic_cast<const std::bad_alloc*>(&e))
 		return "C++ out of memory";
 	return std::string("\"").append(e.what()).append("\"");
 }
 
 #ifdef _MSC_VER
 
-const char *Win32ExceptionCodeToString(DWORD exception_code) {
+const char *Win32ExceptionCodeToString(DWORD exception_code)
+{
 	switch (exception_code) {
-		case EXCEPTION_ACCESS_VIOLATION:
-			return "Access violation";
-		case EXCEPTION_DATATYPE_MISALIGNMENT:
-			return "Misaligned data access";
-		case EXCEPTION_BREAKPOINT:
-			return "Breakpoint reached";
-		case EXCEPTION_SINGLE_STEP:
-			return "Single debug step";
-		case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
-			return "Array access out of bounds";
-		case EXCEPTION_FLT_DENORMAL_OPERAND:
-			return "Denormal floating point operand";
-		case EXCEPTION_FLT_DIVIDE_BY_ZERO:
-			return "Floating point division by zero";
-		case EXCEPTION_FLT_INEXACT_RESULT:
-			return "Inaccurate floating point result";
-		case EXCEPTION_FLT_INVALID_OPERATION:
-			return "Invalid floating point operation";
-		case EXCEPTION_FLT_OVERFLOW:
-			return "Floating point exponent overflow";
-		case EXCEPTION_FLT_STACK_CHECK:
-			return "Floating point stack overflow or underflow";
-		case EXCEPTION_FLT_UNDERFLOW:
-			return "Floating point exponent underflow";
-		case EXCEPTION_INT_DIVIDE_BY_ZERO:
-			return "Integer division by zero";
-		case EXCEPTION_INT_OVERFLOW:
-			return "Integer overflow";
-		case EXCEPTION_PRIV_INSTRUCTION:
-			return "Privileged instruction executed";
-		case EXCEPTION_IN_PAGE_ERROR:
-			return "Could not access or load page";
-		case EXCEPTION_ILLEGAL_INSTRUCTION:
-			return "Illegal instruction encountered";
-		case EXCEPTION_NONCONTINUABLE_EXCEPTION:
-			return "Attempted to continue after fatal exception";
-		case EXCEPTION_STACK_OVERFLOW:
-			return "Stack overflow";
-		case EXCEPTION_INVALID_DISPOSITION:
-			return "Invalid disposition returned to the exception dispatcher";
-		case EXCEPTION_GUARD_PAGE:
-			return "Attempted guard page access";
-		case EXCEPTION_INVALID_HANDLE:
-			return "Invalid handle";
+	case EXCEPTION_ACCESS_VIOLATION:
+		return "Access violation";
+	case EXCEPTION_DATATYPE_MISALIGNMENT:
+		return "Misaligned data access";
+	case EXCEPTION_BREAKPOINT:
+		return "Breakpoint reached";
+	case EXCEPTION_SINGLE_STEP:
+		return "Single debug step";
+	case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+		return "Array access out of bounds";
+	case EXCEPTION_FLT_DENORMAL_OPERAND:
+		return "Denormal floating point operand";
+	case EXCEPTION_FLT_DIVIDE_BY_ZERO:
+		return "Floating point division by zero";
+	case EXCEPTION_FLT_INEXACT_RESULT:
+		return "Inaccurate floating point result";
+	case EXCEPTION_FLT_INVALID_OPERATION:
+		return "Invalid floating point operation";
+	case EXCEPTION_FLT_OVERFLOW:
+		return "Floating point exponent overflow";
+	case EXCEPTION_FLT_STACK_CHECK:
+		return "Floating point stack overflow or underflow";
+	case EXCEPTION_FLT_UNDERFLOW:
+		return "Floating point exponent underflow";
+	case EXCEPTION_INT_DIVIDE_BY_ZERO:
+		return "Integer division by zero";
+	case EXCEPTION_INT_OVERFLOW:
+		return "Integer overflow";
+	case EXCEPTION_PRIV_INSTRUCTION:
+		return "Privileged instruction executed";
+	case EXCEPTION_IN_PAGE_ERROR:
+		return "Could not access or load page";
+	case EXCEPTION_ILLEGAL_INSTRUCTION:
+		return "Illegal instruction encountered";
+	case EXCEPTION_NONCONTINUABLE_EXCEPTION:
+		return "Attempted to continue after fatal exception";
+	case EXCEPTION_STACK_OVERFLOW:
+		return "Stack overflow";
+	case EXCEPTION_INVALID_DISPOSITION:
+		return "Invalid disposition returned to the exception dispatcher";
+	case EXCEPTION_GUARD_PAGE:
+		return "Attempted guard page access";
+	case EXCEPTION_INVALID_HANDLE:
+		return "Invalid handle";
 	}
 
 	return "Unknown exception";
 }
 
-long WINAPI Win32ExceptionHandler(struct _EXCEPTION_POINTERS *pExceptInfo) {
+long WINAPI Win32ExceptionHandler(struct _EXCEPTION_POINTERS *pExceptInfo)
+{
 	char buf[512];
 	MINIDUMP_EXCEPTION_INFORMATION mdei;
 	MINIDUMP_USER_STREAM_INFORMATION mdusi;
@@ -147,26 +151,26 @@ long WINAPI Win32ExceptionHandler(struct _EXCEPTION_POINTERS *pExceptInfo) {
 	version_str += g_version_hash;
 
 	HANDLE hFile = CreateFileA(dumpfile.c_str(), GENERIC_WRITE,
-			FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 		goto minidump_failed;
 
 	if (SetEndOfFile(hFile) == FALSE)
 		goto minidump_failed;
 
-	mdei.ClientPointers = NULL;
+	mdei.ClientPointers	   = NULL;
 	mdei.ExceptionPointers = pExceptInfo;
-	mdei.ThreadId = GetCurrentThreadId();
+	mdei.ThreadId		   = GetCurrentThreadId();
 
-	mdus.Type = CommentStreamA;
+	mdus.Type       = CommentStreamA;
 	mdus.BufferSize = version_str.size();
-	mdus.Buffer = (PVOID)version_str.c_str();
+	mdus.Buffer     = (PVOID)version_str.c_str();
 
 	mdusi.UserStreamArray = &mdus;
 	mdusi.UserStreamCount = 1;
 
 	if (MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile,
-				MiniDumpNormal, &mdei, &mdusi, NULL) == FALSE)
+			MiniDumpNormal, &mdei, &mdusi, NULL) == FALSE)
 		goto minidump_failed;
 
 	minidump_created = true;
@@ -177,10 +181,10 @@ minidump_failed:
 
 	DWORD excode = pExceptInfo->ExceptionRecord->ExceptionCode;
 	_snprintf(buf, sizeof(buf),
-			" >> === FATAL ERROR ===\n"
-			" >> %s (Exception 0x%08X) at 0x%p\n",
-			Win32ExceptionCodeToString(excode), excode,
-			pExceptInfo->ExceptionRecord->ExceptionAddress);
+		" >> === FATAL ERROR ===\n"
+		" >> %s (Exception 0x%08X) at 0x%p\n",
+		Win32ExceptionCodeToString(excode), excode,
+		pExceptInfo->ExceptionRecord->ExceptionAddress);
 	dstream << buf;
 
 	if (minidump_created)
@@ -193,8 +197,10 @@ minidump_failed:
 
 #endif
 
-void debug_set_exception_handler() {
+void debug_set_exception_handler()
+{
 #ifdef _MSC_VER
 	SetUnhandledExceptionFilter(Win32ExceptionHandler);
 #endif
 }
+

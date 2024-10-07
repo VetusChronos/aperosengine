@@ -31,7 +31,7 @@ It can be copied over from an old world to a newly created world.
     ├── players ────── Player directory
     │   │── player1 ── Player file
     │   └── Foo ────── Player file
-    └── world.mt ───── World metadata
+    └── world.apr ───── World metadata
 
 ## `auth.txt`
 
@@ -70,7 +70,7 @@ Example lines:
 ## `auth.sqlite`
 
 Contains authentication data as an SQLite database. This replaces auth.txt
-above when `auth_backend` is set to `sqlite3` in world.mt.
+above when `auth_backend` is set to `sqlite3` in world.apr.
 
 This database contains two tables: `auth` and `user_privileges`:
 
@@ -139,7 +139,7 @@ Filename can be anything.
 
 See [Player File Format](#player-file-format) below.
 
-## `world.mt`
+## `world.apr`
 
 World metadata.
 

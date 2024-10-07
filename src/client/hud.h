@@ -22,6 +22,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <vector>
 #include <IGUIFont.h>
+#include <SMaterial.h>
+#include <SMeshBuffer.h>
+#include "irr_ptr.h"
 #include "irr_aabb3d.h"
 #include "../hud.h"
 
@@ -32,9 +35,22 @@ class InventoryList;
 class LocalPlayer;
 struct ItemStack;
 
-class Hud {
+namespace irr::scene
+{
+	class IMesh;
+}
+
+namespace irr::video
+{
+	class ITexture;
+	class IVideoDriver;
+}
+
+class Hud
+{
 public:
-	enum BlockBoundsMode {
+	enum BlockBoundsMode
+	{
 		BLOCK_BOUNDS_OFF,
 		BLOCK_BOUNDS_CURRENT,
 		BLOCK_BOUNDS_NEAR,
@@ -61,7 +77,7 @@ public:
 	void disableBlockBounds();
 	void drawBlockBounds();
 
-	void drawHotbar(u16 playeritem);
+	void drawHotbar(const v2s32 &pos, const v2f &offset, u16 direction, const v2f &align);
 	void resizeHotbar();
 	void drawCrosshair();
 	void drawSelectionMesh();
@@ -77,11 +93,13 @@ public:
 
 	v3f getSelectionRotation() const { return m_selection_rotation; }
 
-	void setSelectionMeshColor(const video::SColor &color) {
+	void setSelectionMeshColor(const video::SColor &color)
+	{
 		m_selection_mesh_color = color;
 	}
 
-	void setSelectedFaceNormal(const v3f &face_normal) {
+	void setSelectedFaceNormal(const v3f &face_normal)
+	{
 		m_selected_face_normal = face_normal;
 	}
 
@@ -92,10 +110,10 @@ public:
 private:
 	bool calculateScreenPos(const v3s16 &camera_offset, HudElement *e, v2s32 *pos);
 	void drawStatbar(v2s32 pos, u16 corner, u16 drawdir,
-			const std::string &texture, const std::string &bgtexture,
+			const std::string &texture, const std::string& bgtexture,
 			s32 count, s32 maxcount, v2s32 offset, v2s32 size = v2s32());
 
-	void drawItems(v2s32 upperleftpos, v2s32 screen_offset, s32 itemcount,
+	void drawItems(v2s32 screen_pos, v2s32 screen_offset, s32 itemcount, v2f alignment,
 			s32 inv_offset, InventoryList *mainlist, u16 selectitem,
 			u16 direction, bool is_hotbar);
 
@@ -113,7 +131,7 @@ private:
 	Inventory *inventory = nullptr;
 	ITextureSource *tsrc = nullptr;
 
-	float m_hud_scaling; // cached minetest setting
+	float m_hud_scaling; // cached aperosengine setting
 	float m_scale_factor;
 	v3s16 m_camera_offset;
 	v2u32 m_screensize;
@@ -133,17 +151,20 @@ private:
 	v3f m_selected_face_normal;
 
 	video::SMaterial m_selection_material;
+	video::SMaterial m_block_bounds_material;
 
-	scene::SMeshBuffer m_rotation_mesh_buffer;
+	irr_ptr<scene::SMeshBuffer> m_rotation_mesh_buffer;
 
-	enum {
+	enum
+	{
 		HIGHLIGHT_BOX,
 		HIGHLIGHT_HALO,
 		HIGHLIGHT_NONE
 	} m_mode;
 };
 
-enum ItemRotationKind {
+enum ItemRotationKind
+{
 	IT_ROT_SELECTED,
 	IT_ROT_HOVERED,
 	IT_ROT_DRAGGED,
@@ -169,3 +190,4 @@ void drawItemStack(
 		ItemRotationKind rotation_kind,
 		const v3s16 &angle,
 		const v3s16 &rotation_speed);
+

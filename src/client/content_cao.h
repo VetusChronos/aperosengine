@@ -37,8 +37,9 @@ struct MinimapMarker;
 	SmoothTranslator
 */
 
-template <typename T>
-struct SmoothTranslator {
+template<typename T>
+struct SmoothTranslator
+{
 	T val_old;
 	T val_current;
 	T val_target;
@@ -51,20 +52,23 @@ struct SmoothTranslator {
 	void init(T current);
 
 	void update(T new_target, bool is_end_position = false,
-			float update_interval = -1);
+		float update_interval = -1);
 
 	void translate(f32 dtime);
 };
 
-struct SmoothTranslatorWrapped : SmoothTranslator<f32> {
+struct SmoothTranslatorWrapped : SmoothTranslator<f32>
+{
 	void translate(f32 dtime);
 };
 
-struct SmoothTranslatorWrappedv3f : SmoothTranslator<v3f> {
+struct SmoothTranslatorWrappedv3f : SmoothTranslator<v3f>
+{
 	void translate(f32 dtime);
 };
 
-class GenericCAO : public ClientActiveObject {
+class GenericCAO : public ClientActiveObject
+{
 private:
 	// Only set at initialization
 	std::string m_name = "";
@@ -75,7 +79,7 @@ private:
 	//
 	scene::ISceneManager *m_smgr = nullptr;
 	Client *m_client = nullptr;
-	aabb3f m_selection_box = aabb3f(-BS / 3., -BS / 3., -BS / 3., BS / 3., BS / 3., BS / 3.);
+	aabb3f m_selection_box = aabb3f(-BS/3.,-BS/3.,-BS/3., BS/3.,BS/3.,BS/3.);
 	scene::IMeshSceneNode *m_meshnode = nullptr;
 	scene::IAnimatedMeshSceneNode *m_animated_meshnode = nullptr;
 	WieldMeshSceneNode *m_wield_meshnode = nullptr;
@@ -91,7 +95,7 @@ private:
 	SmoothTranslator<v3f> pos_translator;
 	SmoothTranslatorWrappedv3f rot_translator;
 	// Spritesheet/animation stuff
-	v2f m_tx_size = v2f(1, 1);
+	v2f m_tx_size = v2f(1,1);
 	v2s16 m_tx_basepos;
 	bool m_initial_tx_basepos_set = false;
 	bool m_tx_select_horiz_by_yawpitch = false;
@@ -102,8 +106,8 @@ private:
 	// stores position and rotation for each bone name
 	BoneOverrideMap m_bone_override;
 
-	int m_attachment_parent_id = 0;
-	std::unordered_set<int> m_attachment_child_ids;
+	object_t m_attachment_parent_id = 0;
+	std::unordered_set<object_t> m_attachment_child_ids;
 	std::string m_attachment_bone = "";
 	v3f m_attachment_position;
 	v3f m_attachment_rotation;
@@ -137,14 +141,17 @@ public:
 
 	~GenericCAO();
 
-	static std::unique_ptr<ClientActiveObject> create(Client *client, ClientEnvironment *env) {
+	static std::unique_ptr<ClientActiveObject> create(Client *client, ClientEnvironment *env)
+	{
 		return std::make_unique<GenericCAO>(client, env);
 	}
 
-	inline ActiveObjectType getType() const override {
+	inline ActiveObjectType getType() const override
+	{
 		return ACTIVEOBJECT_TYPE_GENERIC;
 	}
-	inline const ItemGroupList &getGroups() const {
+	inline const ItemGroupList &getGroups() const
+	{
 		return m_armor_groups;
 	}
 	void initialize(const std::string &data) override;
@@ -180,55 +187,63 @@ public:
 	// Note that m_matrixnode.setPosition() shouldn't be called. Use
 	// m_matrixnode->getRelativeTransformationMatrix().setTranslation()
 	// instead (aka getPosRotMatrix().setTranslation()).
-	inline core::matrix4 &getPosRotMatrix() {
+	inline core::matrix4 &getPosRotMatrix()
+	{
 		assert(m_matrixnode);
 		return m_matrixnode->getRelativeTransformationMatrix();
 	}
 
-	inline const core::matrix4 *getAbsolutePosRotMatrix() const {
+	inline const core::matrix4 *getAbsolutePosRotMatrix() const
+	{
 		if (!m_matrixnode)
 			return nullptr;
 		return &m_matrixnode->getAbsoluteTransformation();
 	}
 
-	inline f32 getStepHeight() const {
+	inline f32 getStepHeight() const
+	{
 		return m_prop.stepheight;
 	}
 
-	inline bool isLocalPlayer() const override {
+	inline bool isLocalPlayer() const override
+	{
 		return m_is_local_player;
 	}
 
-	inline bool isPlayer() const {
+	inline bool isPlayer() const
+	{
 		return m_is_player;
 	}
 
-	inline bool isVisible() const {
+	inline bool isVisible() const
+	{
 		return m_is_visible;
 	}
 
-	inline void setVisible(bool toset) {
+	inline void setVisible(bool toset)
+	{
 		m_is_visible = toset;
 	}
 
 	void setChildrenVisible(bool toset);
-	void setAttachment(int parent_id, const std::string &bone, v3f position,
+	void setAttachment(object_t parent_id, const std::string &bone, v3f position,
 			v3f rotation, bool force_visible) override;
-	void getAttachment(int *parent_id, std::string *bone, v3f *position,
+	void getAttachment(object_t *parent_id, std::string *bone, v3f *position,
 			v3f *rotation, bool *force_visible) const override;
 	void clearChildAttachments() override;
-	void clearParentAttachment() override;
-	void addAttachmentChild(int child_id) override;
-	void removeAttachmentChild(int child_id) override;
+	void addAttachmentChild(object_t child_id) override;
+	void removeAttachmentChild(object_t child_id) override;
 	ClientActiveObject *getParent() const override;
-	const std::unordered_set<int> &getAttachmentChildIds() const override { return m_attachment_child_ids; }
+	const std::unordered_set<object_t> &getAttachmentChildIds() const override
+	{ return m_attachment_child_ids; }
 	void updateAttachments() override;
 
 	void removeFromScene(bool permanent) override;
 
 	void addToScene(ITextureSource *tsrc, scene::ISceneManager *smgr) override;
 
-	inline void expireVisuals() {
+	inline void expireVisuals()
+	{
 		m_visuals_expired = true;
 	}
 
@@ -263,12 +278,13 @@ public:
 
 	void processMessage(const std::string &data) override;
 
-	bool directReportPunch(v3f dir, const ItemStack *punchitem = NULL,
-			float time_from_last_punch = 1000000) override;
+	bool directReportPunch(v3f dir, const ItemStack *punchitem=NULL,
+			float time_from_last_punch=1000000) override;
 
 	std::string debugInfoText() override;
 
-	std::string infoText() override {
+	std::string infoText() override
+	{
 		return m_prop.infotext;
 	}
 

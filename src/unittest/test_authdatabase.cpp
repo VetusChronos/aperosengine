@@ -25,7 +25,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/string.h"
 #include "filesys.h"
 
-namespace {
+namespace
+{
 // Anonymous namespace to create classes that are only
 // visible to this file
 //
@@ -33,16 +34,17 @@ namespace {
 // allow us to run the same tests on different databases and
 // database acquisition strategies.
 
-class AuthDatabaseProvider {
+class AuthDatabaseProvider
+{
 public:
 	virtual ~AuthDatabaseProvider() = default;
 	virtual AuthDatabase *getAuthDatabase() = 0;
 };
 
-class FixedProvider : public AuthDatabaseProvider {
+class FixedProvider : public AuthDatabaseProvider
+{
 public:
-	FixedProvider(AuthDatabase *auth_db) :
-			auth_db(auth_db){};
+	FixedProvider(AuthDatabase *auth_db) : auth_db(auth_db){};
 	virtual ~FixedProvider(){};
 	virtual AuthDatabase *getAuthDatabase() { return auth_db; };
 
@@ -50,12 +52,13 @@ private:
 	AuthDatabase *auth_db;
 };
 
-class FilesProvider : public AuthDatabaseProvider {
+class FilesProvider : public AuthDatabaseProvider
+{
 public:
-	FilesProvider(const std::string &dir) :
-			dir(dir){};
+	FilesProvider(const std::string &dir) : dir(dir){};
 	virtual ~FilesProvider() { delete auth_db; };
-	virtual AuthDatabase *getAuthDatabase() {
+	virtual AuthDatabase *getAuthDatabase()
+	{
 		delete auth_db;
 		auth_db = new AuthDatabaseFiles(dir);
 		return auth_db;
@@ -66,12 +69,13 @@ private:
 	AuthDatabase *auth_db = nullptr;
 };
 
-class SQLite3Provider : public AuthDatabaseProvider {
+class SQLite3Provider : public AuthDatabaseProvider
+{
 public:
-	SQLite3Provider(const std::string &dir) :
-			dir(dir){};
+	SQLite3Provider(const std::string &dir) : dir(dir){};
 	virtual ~SQLite3Provider() { delete auth_db; };
-	virtual AuthDatabase *getAuthDatabase() {
+	virtual AuthDatabase *getAuthDatabase()
+	{
 		delete auth_db;
 		auth_db = new AuthDatabaseSQLite3(dir);
 		return auth_db;
@@ -81,9 +85,10 @@ private:
 	std::string dir;
 	AuthDatabase *auth_db = nullptr;
 };
-} //namespace
+}
 
-class TestAuthDatabase : public TestBase {
+class TestAuthDatabase : public TestBase
+{
 public:
 	TestAuthDatabase() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestAuthDatabase"; }
@@ -107,7 +112,8 @@ private:
 
 static TestAuthDatabase g_test_instance;
 
-void TestAuthDatabase::runTests(IGameDef *gamedef) {
+void TestAuthDatabase::runTests(IGameDef *gamedef)
+{
 	// fixed directory, for persistence
 	const std::string test_dir = getTestTempDirectory();
 
@@ -161,7 +167,8 @@ void TestAuthDatabase::runTests(IGameDef *gamedef) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestAuthDatabase::runTestsForCurrentDB() {
+void TestAuthDatabase::runTestsForCurrentDB()
+{
 	TEST(testRecallFail);
 	TEST(testCreate);
 	TEST(testRecall);
@@ -174,7 +181,8 @@ void TestAuthDatabase::runTestsForCurrentDB() {
 	TEST(testRecallFail);
 }
 
-void TestAuthDatabase::testRecallFail() {
+void TestAuthDatabase::testRecallFail()
+{
 	AuthDatabase *auth_db = auth_provider->getAuthDatabase();
 	AuthEntry authEntry;
 
@@ -182,7 +190,8 @@ void TestAuthDatabase::testRecallFail() {
 	UASSERT(!auth_db->getAuth("TestName", authEntry));
 }
 
-void TestAuthDatabase::testCreate() {
+void TestAuthDatabase::testCreate()
+{
 	AuthDatabase *auth_db = auth_provider->getAuthDatabase();
 	AuthEntry authEntry;
 
@@ -194,7 +203,8 @@ void TestAuthDatabase::testCreate() {
 	UASSERT(auth_db->createAuth(authEntry));
 }
 
-void TestAuthDatabase::testRecall() {
+void TestAuthDatabase::testRecall()
+{
 	AuthDatabase *auth_db = auth_provider->getAuthDatabase();
 	AuthEntry authEntry;
 
@@ -206,7 +216,8 @@ void TestAuthDatabase::testRecall() {
 	UASSERTEQ(std::string, str_join(authEntry.privileges, ","), "interact,shout");
 }
 
-void TestAuthDatabase::testChange() {
+void TestAuthDatabase::testChange()
+{
 	AuthDatabase *auth_db = auth_provider->getAuthDatabase();
 	AuthEntry authEntry;
 
@@ -216,7 +227,8 @@ void TestAuthDatabase::testChange() {
 	UASSERT(auth_db->saveAuth(authEntry));
 }
 
-void TestAuthDatabase::testRecallChanged() {
+void TestAuthDatabase::testRecallChanged()
+{
 	AuthDatabase *auth_db = auth_provider->getAuthDatabase();
 	AuthEntry authEntry;
 
@@ -228,7 +240,8 @@ void TestAuthDatabase::testRecallChanged() {
 	UASSERTEQ(u64, authEntry.last_login, 1002);
 }
 
-void TestAuthDatabase::testChangePrivileges() {
+void TestAuthDatabase::testChangePrivileges()
+{
 	AuthDatabase *auth_db = auth_provider->getAuthDatabase();
 	AuthEntry authEntry;
 
@@ -240,7 +253,8 @@ void TestAuthDatabase::testChangePrivileges() {
 	UASSERT(auth_db->saveAuth(authEntry));
 }
 
-void TestAuthDatabase::testRecallChangedPrivileges() {
+void TestAuthDatabase::testRecallChangedPrivileges()
+{
 	AuthDatabase *auth_db = auth_provider->getAuthDatabase();
 	AuthEntry authEntry;
 
@@ -250,7 +264,9 @@ void TestAuthDatabase::testRecallChangedPrivileges() {
 	UASSERTEQ(std::string, str_join(authEntry.privileges, ","), "dig,fly,interact");
 }
 
-void TestAuthDatabase::testListNames() {
+void TestAuthDatabase::testListNames()
+{
+
 	AuthDatabase *auth_db = auth_provider->getAuthDatabase();
 	std::vector<std::string> list;
 
@@ -269,7 +285,8 @@ void TestAuthDatabase::testListNames() {
 	UASSERTEQ(std::string, str_join(list, ","), "SecondName,TestName");
 }
 
-void TestAuthDatabase::testDelete() {
+void TestAuthDatabase::testDelete()
+{
 	AuthDatabase *auth_db = auth_provider->getAuthDatabase();
 
 	UASSERT(!auth_db->deleteAuth("NoSuchName"));

@@ -1,18 +1,18 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Chinese (Simplified) (Minetest)\n"
+"Project-Id-Version: Chinese (Simplified) (AperosEngine)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-11 15:14+0200\n"
-"PO-Revision-Date: 2024-01-30 16:01+0000\n"
-"Last-Translator: yue weikai <send52@outlook.com>\n"
+"PO-Revision-Date: 2024-07-31 22:09+0000\n"
+"Last-Translator: y5nw <y5nw@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Simplified) <https://hosted.weblate.org/projects/"
-"minetest/minetest/zh_Hans/>\n"
+"AperosEngine/AperosEngine/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.7-dev\n"
 
 #: builtin/client/chatcommands.lua
 msgid "Clear the out chat queue"
@@ -82,9 +82,8 @@ msgstr ""
 "使用 '.help <cmd>' 获取该命令的更多信息，或使用 '.help all' 列出所有内容。"
 
 #: builtin/common/chatcommands.lua
-#, fuzzy
 msgid "[all | <cmd>] [-t]"
-msgstr "[all | <命令>]"
+msgstr "[all | <命令>] [-t]"
 
 #: builtin/fstk/ui.lua
 msgid "<none available>"
@@ -151,7 +150,7 @@ msgstr "下载 $1 失败"
 msgid ""
 "Failed to extract \"$1\" (insufficient disk space, unsupported file type or "
 "broken archive)"
-msgstr "安装：\"$1\" 的文件类型不支持或压缩包已损坏"
+msgstr "无法解压\"$1\"：存储空间不足、文件类型不支持或压缩包已损坏"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid ""
@@ -174,16 +173,17 @@ msgid "Back to Main Menu"
 msgstr "返回主菜单"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
-msgid "ContentDB is not available when Minetest was compiled without cURL"
-msgstr "在没有cURL的情况下编译Minetest时，ContentDB不可用"
+msgid "ContentDB is not available when AperosEngine was compiled without cURL"
+msgstr "在没有cURL的情况下编译AperosEngine时，ContentDB不可用"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid "Downloading..."
 msgstr "下载中..."
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
+#, fuzzy
 msgid "Error getting dependencies for package"
-msgstr ""
+msgstr "无法获取这个包的依赖项"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid "Games"
@@ -667,28 +667,28 @@ msgstr "忽略"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"For a long time, the Minetest engine shipped with a default game called "
-"\"Minetest Game\". Since Minetest 5.8.0, Minetest ships without a default "
+"For a long time, the AperosEngine engine shipped with a default game called "
+"\"AperosVoxel\". Since AperosEngine 5.8.0, AperosEngine ships without a default "
 "game."
 msgstr ""
-"一直以来，Minetest 游戏引擎默认已经自带了“Minetest Game”这个子游戏。但是从 "
-"Minetest 5.8.0 版本起，Minetest 将不再自带任何子游戏。"
+"一直以来，AperosEngine 游戏引擎默认已经自带了“AperosVoxel”这个子游戏。但是从 "
+"AperosEngine 5.8.0 版本起，AperosEngine 将不再自带任何子游戏。"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"If you want to continue playing in your Minetest Game worlds, you need to "
-"reinstall Minetest Game."
+"If you want to continue playing in your AperosVoxel worlds, you need to "
+"reinstall AperosVoxel."
 msgstr ""
-"如果还要继续在已有的 Minetest Game 世界中游玩，请重新安装 Minetest Game 子游"
+"如果还要继续在已有的 AperosVoxel 世界中游玩，请重新安装 AperosVoxel 子游"
 "戏。"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Minetest Game is no longer installed by default"
-msgstr "Minetest Game 不再是默认自带的子游戏了"
+msgid "AperosVoxel is no longer installed by default"
+msgstr "AperosVoxel 不再是默认自带的子游戏了"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Reinstall Minetest Game"
-msgstr "重新安装 Minetest Game 子游戏"
+msgid "Reinstall AperosVoxel"
+msgstr "重新安装 AperosVoxel 子游戏"
 
 #: builtin/mainmenu/dlg_rename_modpack.lua
 msgid "Accept"
@@ -1058,12 +1058,12 @@ msgstr "从 ContentDB 安装游戏"
 
 #: builtin/mainmenu/tab_local.lua
 #, fuzzy
-msgid "Aperos Engine doesn't come with the AperosVoxel by default."
-msgstr "Minetest Game 不再是默认自带的子游戏了"
+msgid "AperosEngine doesn't come with a game by default."
+msgstr "AperosVoxel 不再是默认自带的子游戏了"
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"Aperos Engine is a game creation platform that allows you to create different games."
+"AperosEngine is a game-creation platform that allows you to play many different "
 "games."
 msgstr ""
 
@@ -1102,7 +1102,7 @@ msgstr "启动游戏"
 #: builtin/mainmenu/tab_local.lua
 #, fuzzy
 msgid "You need to install a game before you can create a world."
-msgstr "在安装mod前，你需要先安装一个子游戏"
+msgstr "您需要先安装一个子游戏才能创建新的世界。"
 
 #: builtin/mainmenu/tab_online.lua
 msgid "Address"
@@ -1417,7 +1417,7 @@ msgstr "雾气已启用"
 #: src/client/game.cpp
 #, fuzzy
 msgid "Fog enabled by game or mod"
-msgstr "缩放被当前子游戏或 mod 禁用"
+msgstr "雾被当前子游戏或 mod 启用"
 
 #: src/client/game.cpp
 msgid "Game info:"
@@ -1917,11 +1917,12 @@ msgstr "材质模式小地图"
 #: src/client/shader.cpp
 #, fuzzy, c-format
 msgid "Failed to compile the \"%s\" shader."
-msgstr "网页打不开"
+msgstr "无法编译“%s”着色器。"
 
 #: src/client/shader.cpp
+#, fuzzy
 msgid "Shaders are enabled but GLSL is not supported by the driver."
-msgstr ""
+msgstr "着色器已启用，但是驱动程序不支持 GLSL。"
 
 #. ~ Error when a mod is missing dependencies. Ex: "Mod Title is missing: mod1, mod2, mod3"
 #: src/content/mod_configuration.cpp
@@ -2114,16 +2115,17 @@ msgstr "按键"
 
 #: src/gui/guiOpenURL.cpp
 msgid "Open"
-msgstr ""
+msgstr "打开"
 
 #: src/gui/guiOpenURL.cpp
+#, fuzzy
 msgid "Open URL?"
-msgstr ""
+msgstr "是否打开网页？"
 
 #: src/gui/guiOpenURL.cpp
 #, fuzzy
 msgid "Unable to open URL"
-msgstr "网页打不开"
+msgstr "无法打开网页"
 
 #: src/gui/guiPasswordChange.cpp
 msgid "Change"
@@ -2827,14 +2829,14 @@ msgid ""
 "software',\n"
 "as defined by the Free Software Foundation.\n"
 "You can also specify content ratings.\n"
-"These flags are independent from Minetest versions,\n"
+"These flags are independent from AperosEngine versions,\n"
 "so see a full list at https://content.aperosvoxel.domain/help/content_flags/"
 msgstr ""
 "逗号分隔用于在仓库中隐藏内容的标签列表。\n"
 "\"nonfree\"可用于隐藏根据自由软件基金会\n"
 "不符合“自由软件”标准的包。\n"
 "你也可以为仓库内容指定评分。\n"
-"这些评分独立于Minetest版本，\n"
+"这些评分独立于AperosEngine版本，\n"
 "完整列表见https://content.aperosvoxel.domain/help/content_flags/"
 
 #: src/settings_translation_file.cpp
@@ -3045,7 +3047,7 @@ msgid ""
 "expecting.\n"
 "This allows for more fine-grained control than "
 "strict_protocol_version_checking.\n"
-"Minetest still enforces its own internal minimum, and enabling\n"
+"AperosEngine still enforces its own internal minimum, and enabling\n"
 "strict_protocol_version_checking will effectively override this."
 msgstr ""
 "启用禁止旧版客户端连接模式。\n"
@@ -3335,7 +3337,7 @@ msgstr "启用鼠标滚轮（滚动），以便在热栏中选择项目。"
 #: src/settings_translation_file.cpp
 #, fuzzy
 msgid "Enable random mod loading (mainly used for testing)."
-msgstr "启用随机用户输入（仅用于测试）。"
+msgstr "使用随机顺序加载 mod（主要用于测试）。"
 
 #: src/settings_translation_file.cpp
 msgid "Enable random user input (only used for testing)."
@@ -3428,9 +3430,10 @@ msgid "Enables the post processing pipeline."
 msgstr ""
 
 #: src/settings_translation_file.cpp
+#, fuzzy
 msgid ""
 "Enables touchscreen mode, allowing you to play the game with a touchscreen."
-msgstr ""
+msgstr "启用触摸屏模式。启用后您可以使用触摸屏玩游戏。"
 
 #: src/settings_translation_file.cpp
 msgid ""
@@ -4114,10 +4117,10 @@ msgstr "登录时的聊天命令。"
 #: src/settings_translation_file.cpp
 msgid ""
 "Instrument global callback functions on registration.\n"
-"(anything you pass to a minetest.register_*() function)"
+"(anything you pass to a AperosEngine.register_*() function)"
 msgstr ""
 "注册时计数全局回调函数。\n"
-"（传递给 minetest.register_*() 函数的任何内容）"
+"（传递给 AperosEngine.register_*() 函数的任何内容）"
 
 #: src/settings_translation_file.cpp
 msgid ""
@@ -5068,11 +5071,11 @@ msgstr "每10秒发送给玩家的消息量。"
 #: src/settings_translation_file.cpp
 msgid ""
 "Number of threads to use for mesh generation.\n"
-"Value of 0 (default) will let Minetest autodetect the number of available "
+"Value of 0 (default) will let AperosEngine autodetect the number of available "
 "threads."
 msgstr ""
 "用于生成网格的线程数。\n"
-"默认值为 0 时，Minetest 会自动检测可用线程数。"
+"默认值为 0 时，AperosEngine 会自动检测可用线程数。"
 
 #: src/settings_translation_file.cpp
 msgid "Occlusion Culler"
@@ -5097,9 +5100,8 @@ msgstr ""
 "则不暂停。"
 
 #: src/settings_translation_file.cpp
-#, fuzzy
 msgid "OpenGL debug"
-msgstr "地图生成器调试"
+msgstr "OpenGL 调试"
 
 #: src/settings_translation_file.cpp
 msgid "Optional override for chat weblink color."
@@ -5214,12 +5216,12 @@ msgstr "Prometheus 监听器地址"
 #: src/settings_translation_file.cpp
 msgid ""
 "Prometheus listener address.\n"
-"If Minetest is compiled with ENABLE_PROMETHEUS option enabled,\n"
+"If AperosEngine is compiled with ENABLE_PROMETHEUS option enabled,\n"
 "enable metrics listener for Prometheus on that address.\n"
 "Metrics can be fetched on http://127.0.0.1:30000/metrics"
 msgstr ""
 "Prometheus 监听器地址。\n"
-"如果Minetest在编译时启用了ENABLE_PROMETHEUS选项，\n"
+"如果AperosEngine在编译时启用了ENABLE_PROMETHEUS选项，\n"
 "在该地址上为 Prometheus 启用指标侦听器。\n"
 "可以从 http://127.0.0.1:30000/metrics 获取指标"
 
@@ -5230,7 +5232,7 @@ msgstr "包含液体的大洞穴的比例。"
 #: src/settings_translation_file.cpp
 #, fuzzy
 msgid "Protocol version minimum"
-msgstr "协议版本不匹配。 "
+msgstr "最低协议版本"
 
 #: src/settings_translation_file.cpp
 msgid "Punch gesture"
@@ -5254,8 +5256,9 @@ msgid "Random input"
 msgstr "随机输入"
 
 #: src/settings_translation_file.cpp
+#, fuzzy
 msgid "Random mod load order"
-msgstr ""
+msgstr "使用随机顺序加载 Mod"
 
 #: src/settings_translation_file.cpp
 msgid "Recent Chat Messages"
@@ -5633,7 +5636,7 @@ msgid ""
 "Set the language. By default, the system language is used.\n"
 "A restart is required after changing this."
 msgstr ""
-"设定语言。留空以使用系统语言。\n"
+"设定语言。默认使用系统语言。\n"
 "变更后须重新启动。"
 
 #: src/settings_translation_file.cpp
@@ -5716,7 +5719,7 @@ msgid "Shader path"
 msgstr "着色器路径"
 
 #: src/settings_translation_file.cpp
-msgid "Shaders"
+msgid "Effects"
 msgstr "着色器"
 
 #: src/settings_translation_file.cpp
@@ -6088,14 +6091,14 @@ msgstr "相对于将配置文件保存到的世界路径的文件路径."
 
 #: src/settings_translation_file.cpp
 msgid ""
-"The gesture for punching players/entities.\n"
+"The gesture for for punching players/entities.\n"
 "This can be overridden by games and mods.\n"
 "\n"
 "* short_tap\n"
 "Easy to use and well-known from other games that shall not be named.\n"
 "\n"
 "* long_tap\n"
-"Known from the classic Minetest mobile controls.\n"
+"Known from the classic AperosEngine mobile controls.\n"
 "Combat is more or less impossible."
 msgstr ""
 
@@ -6166,10 +6169,10 @@ msgid ""
 "OpenGL is the default for desktop, and OGLES2 for Android.\n"
 "Shaders are supported by everything but OGLES1."
 msgstr ""
-"关于渲染的后端引擎\n"
+"用于渲染的后端引擎\n"
 "注：更改之后要重启游戏！\n"
 "OpenGL是默认的电脑端渲染引擎，OGLES2是用于安卓的.\n"
-"实验性：被OpenGL和OGLES2的着色器."
+"除了OGLES1之外的后端引擎都支持着色器"
 
 #: src/settings_translation_file.cpp
 msgid ""
@@ -6302,9 +6305,8 @@ msgid "Tradeoffs for performance"
 msgstr "性能权衡"
 
 #: src/settings_translation_file.cpp
-#, fuzzy
 msgid "Translucent liquids"
-msgstr "不透明液体"
+msgstr "半透明液体"
 
 #: src/settings_translation_file.cpp
 msgid "Transparency Sorting Distance"
@@ -6351,10 +6353,10 @@ msgstr ""
 #: src/settings_translation_file.cpp
 #, fuzzy
 msgid ""
-"URL to JSON file which provides information about the newest Minetest "
+"URL to JSON file which provides information about the newest AperosEngine "
 "release\n"
 "If this is empty the engine will never check for updates."
-msgstr "提供最新 Minetest 版本信息的 JSON 文件的 URL"
+msgstr "提供最新 AperosEngine 版本信息的 JSON 文件的 URL"
 
 #: src/settings_translation_file.cpp
 msgid "URL to the server list displayed in the Multiplayer Tab."
@@ -6573,7 +6575,7 @@ msgstr ""
 #: src/settings_translation_file.cpp
 #, fuzzy
 msgid "Volume when unfocused"
-msgstr "游戏暂停时最高 FPS"
+msgstr "游戏暂停时的音量"
 
 #: src/settings_translation_file.cpp
 #, fuzzy
@@ -6755,11 +6757,11 @@ msgstr "窗口放大"
 
 #: src/settings_translation_file.cpp
 msgid ""
-"Windows systems only: Start Minetest with the command line window in the "
+"Windows systems only: Start AperosEngine with the command line window in the "
 "background.\n"
 "Contains the same information as the file debug.txt (default name)."
 msgstr ""
-"仅适用于 Windows 系统：在命令行中窗口中启动 Minetest.\n"
+"仅适用于 Windows 系统：在命令行中窗口中启动 AperosEngine.\n"
 "与 debug.txt（默认名称）文件包含相同的信息."
 
 #: src/settings_translation_file.cpp
@@ -7156,8 +7158,8 @@ msgstr "cURL 并发限制"
 #~ msgid "Down"
 #~ msgstr "向下"
 
-#~ msgid "Download a game, such as Minetest Game, from aperosvoxel.domain"
-#~ msgstr "从 aperosvoxel.domain 下载一个子游戏，例如 minetest_game"
+#~ msgid "Download a game, such as AperosVoxel, from aperosvoxel.domain"
+#~ msgstr "从 aperosvoxel.domain 下载一个子游戏，例如 AperosEngine_game"
 
 #~ msgid "Download one from aperosvoxel.domain"
 #~ msgstr "从 aperosvoxel.domain 下载一个"
@@ -8139,8 +8141,8 @@ msgstr "cURL 并发限制"
 #~ "html#a54da2a0e231901735e3da1b0edf72eb3"
 
 #~ msgid ""
-#~ "Keybindings. (If this menu screws up, remove stuff from minetest.conf)"
-#~ msgstr "键位配置。（如果这个菜单被弄乱，从 minetest.conf 中删掉点东西）"
+#~ "Keybindings. (If this menu screws up, remove stuff from aperosengine.conf)"
+#~ msgstr "键位配置。（如果这个菜单被弄乱，从 aperosengine.conf 中删掉点东西）"
 
 #~ msgid "Large chat console key"
 #~ msgstr "大型聊天控制台键"

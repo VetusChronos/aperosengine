@@ -42,28 +42,28 @@ class ServerInventoryManager;
 
 class ModApiBase : protected LuaHelper {
 public:
-	static ScriptApiBase *getScriptApiBase(lua_State *L);
-	static Server *getServer(lua_State *L);
+	static ScriptApiBase*   getScriptApiBase(lua_State *L);
+	static Server*          getServer(lua_State *L);
 	static ServerInventoryManager *getServerInventoryMgr(lua_State *L);
-#ifndef SERVER
-	static Client *getClient(lua_State *L);
-	static GUIEngine *getGuiEngine(lua_State *L);
-#endif // !SERVER
-	static EmergeThread *getEmergeThread(lua_State *L);
+	#ifndef SERVER
+	static Client*          getClient(lua_State *L);
+	static GUIEngine*       getGuiEngine(lua_State *L);
+	#endif // !SERVER
+	static EmergeThread*    getEmergeThread(lua_State *L);
 
-	static IGameDef *getGameDef(lua_State *L);
+	static IGameDef*        getGameDef(lua_State *L);
 
-	static Environment *getEnv(lua_State *L);
+	static Environment*     getEnv(lua_State *L);
 
 	// When we are not loading the mod, this function returns "."
-	static std::string getCurrentModPath(lua_State *L);
+	static std::string      getCurrentModPath(lua_State *L);
 
 	// Get an arbitrary subclass of ScriptApiBase
 	// by using dynamic_cast<> on getScriptApiBase()
-	template <typename T>
-	static T *getScriptApi(lua_State *L) {
+	template<typename T>
+	static T* getScriptApi(lua_State *L) {
 		ScriptApiBase *scriptIface = getScriptApiBase(L);
-		T *scriptIfaceDowncast = dynamic_cast<T *>(scriptIface);
+		T *scriptIfaceDowncast = dynamic_cast<T*>(scriptIface);
 		if (!scriptIfaceDowncast) {
 			throw LuaError("Requested unavailable ScriptApi - core engine bug!");
 		}
@@ -71,7 +71,7 @@ public:
 	}
 
 	static bool registerFunction(lua_State *L,
-			const char *name,
+			const char* name,
 			lua_CFunction func,
 			int top);
 
@@ -79,9 +79,10 @@ public:
 			const luaL_Reg *methods,
 			const luaL_Reg *metamethods);
 
-	template <typename T>
-	static inline T *checkObject(lua_State *L, int narg) {
-		return *reinterpret_cast<T **>(luaL_checkudata(L, narg, T::className));
+	template<typename T>
+	static inline T *checkObject(lua_State *L, int narg)
+	{
+		return *reinterpret_cast<T**>(luaL_checkudata(L, narg, T::className));
 	}
 
 	/**

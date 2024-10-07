@@ -1244,7 +1244,7 @@ end
 -- aperosengine dissector
 
 do
-	local p_aperosengine = Proto("aperosvoxel", "AperosVoxel")
+	local p_aperosengine = Proto("aperosengine", "AperosEngine")
 
 	local aperosengine_id = 0x4f457403
 	local vs_id = {

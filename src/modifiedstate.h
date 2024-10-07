@@ -21,7 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "irrlichttypes.h"
 
-enum ModifiedState : u16 {
+enum ModifiedState : u16
+{
 	// Has not been modified.
 	MOD_STATE_CLEAN = 0,
 	MOD_RESERVED1 = 1,

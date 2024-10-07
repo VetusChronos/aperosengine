@@ -34,7 +34,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	LuaError(std::string(__FUNCTION__) + ": " + (e).what() + ". " detail)
 
 bool ScriptApiItem::item_OnDrop(ItemStack &item,
-		ServerActiveObject *dropper, v3f pos) {
+		ServerActiveObject *dropper, v3f pos)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -55,12 +56,13 @@ bool ScriptApiItem::item_OnDrop(ItemStack &item,
 			throw WRAP_LUAERROR(e, "item=" + item.name);
 		}
 	}
-	lua_pop(L, 2); // Pop item and error handler
+	lua_pop(L, 2);  // Pop item and error handler
 	return true;
 }
 
 bool ScriptApiItem::item_OnPlace(std::optional<ItemStack> &ret_item,
-		ServerActiveObject *placer, const PointedThing &pointed) {
+		ServerActiveObject *placer, const PointedThing &pointed)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -89,12 +91,13 @@ bool ScriptApiItem::item_OnPlace(std::optional<ItemStack> &ret_item,
 	} else {
 		ret_item = std::nullopt;
 	}
-	lua_pop(L, 2); // Pop item and error handler
+	lua_pop(L, 2);  // Pop item and error handler
 	return true;
 }
 
 bool ScriptApiItem::item_OnUse(std::optional<ItemStack> &ret_item,
-		ServerActiveObject *user, const PointedThing &pointed) {
+		ServerActiveObject *user, const PointedThing &pointed)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -109,7 +112,7 @@ bool ScriptApiItem::item_OnUse(std::optional<ItemStack> &ret_item,
 	objectrefGetOrCreate(L, user);
 	pushPointedThing(pointed);
 	PCALL_RES(lua_pcall(L, 3, 1, error_handler));
-	if (!lua_isnil(L, -1)) {
+	if(!lua_isnil(L, -1)) {
 		try {
 			ret_item = read_item(L, -1, getServer()->idef());
 		} catch (LuaError &e) {
@@ -118,12 +121,13 @@ bool ScriptApiItem::item_OnUse(std::optional<ItemStack> &ret_item,
 	} else {
 		ret_item = std::nullopt;
 	}
-	lua_pop(L, 2); // Pop item and error handler
+	lua_pop(L, 2);  // Pop item and error handler
 	return true;
 }
 
 bool ScriptApiItem::item_OnSecondaryUse(std::optional<ItemStack> &ret_item,
-		ServerActiveObject *user, const PointedThing &pointed) {
+		ServerActiveObject *user, const PointedThing &pointed)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -145,12 +149,13 @@ bool ScriptApiItem::item_OnSecondaryUse(std::optional<ItemStack> &ret_item,
 	} else {
 		ret_item = std::nullopt;
 	}
-	lua_pop(L, 2); // Pop item and error handler
+	lua_pop(L, 2);  // Pop item and error handler
 	return true;
 }
 
 bool ScriptApiItem::item_OnCraft(ItemStack &item, ServerActiveObject *user,
-		const InventoryList *old_craft_grid, const InventoryLocation &craft_inv) {
+		const InventoryList *old_craft_grid, const InventoryLocation &craft_inv)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -176,12 +181,13 @@ bool ScriptApiItem::item_OnCraft(ItemStack &item, ServerActiveObject *user,
 			throw WRAP_LUAERROR(e, "item=" + item.name);
 		}
 	}
-	lua_pop(L, 2); // Pop item and error handler
+	lua_pop(L, 2);  // Pop item and error handler
 	return true;
 }
 
 bool ScriptApiItem::item_CraftPredict(ItemStack &item, ServerActiveObject *user,
-		const InventoryList *old_craft_grid, const InventoryLocation &craft_inv) {
+		const InventoryList *old_craft_grid, const InventoryLocation &craft_inv)
+{
 	SCRIPTAPI_PRECHECKHEADER
 	sanity_check(old_craft_grid);
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -207,7 +213,7 @@ bool ScriptApiItem::item_CraftPredict(ItemStack &item, ServerActiveObject *user,
 			throw WRAP_LUAERROR(e, "item=" + item.name);
 		}
 	}
-	lua_pop(L, 2); // Pop item and error handler
+	lua_pop(L, 2);  // Pop item and error handler
 	return true;
 }
 
@@ -218,8 +224,9 @@ bool ScriptApiItem::item_CraftPredict(ItemStack &item, ServerActiveObject *user,
 // If core.registered_items[name] doesn't exist, core.nodedef_default
 // is tried instead so unknown items can still be manipulated to some degree
 bool ScriptApiItem::getItemCallback(const char *name, const char *callbackname,
-		const v3s16 *p) {
-	lua_State *L = getStack();
+		const v3s16 *p)
+{
+	lua_State* L = getStack();
 
 	lua_getglobal(L, "core");
 	lua_getfield(L, -1, "registered_items");
@@ -254,14 +261,16 @@ bool ScriptApiItem::getItemCallback(const char *name, const char *callbackname,
 
 	if (!lua_isnil(L, -1)) {
 		errorstream << "Item \"" << name << "\" callback \""
-					<< callbackname << "\" is not a function" << '\n';
+			<< callbackname << "\" is not a function" << '\n';
 	}
 	lua_pop(L, 1);
 	return false;
 }
 
-void ScriptApiItem::pushPointedThing(const PointedThing &pointed, bool hitpoint) {
-	lua_State *L = getStack();
+void ScriptApiItem::pushPointedThing(const PointedThing &pointed, bool hitpoint)
+{
+	lua_State* L = getStack();
 
 	push_pointed_thing(L, pointed, false, hitpoint);
 }
+

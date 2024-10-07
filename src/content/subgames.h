@@ -26,7 +26,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class Settings;
 
-struct SubgameSpec {
+struct SubgameSpec
+{
 	std::string id;
 	std::string title;
 	std::string author;
@@ -54,15 +55,14 @@ struct SubgameSpec {
 			const std::string &first_mod = "",
 			const std::string &last_mod = "") :
 			id(id),
-			title(title),
-			author(author),
-			release(release),
+			title(title), author(author), release(release),
 			first_mod(first_mod),
 			last_mod(last_mod),
 			path(path),
 			gamemods_path(gamemods_path),
 			addon_mods_paths(addon_mods_paths),
-			menuicon_path(menuicon_path) {
+			menuicon_path(menuicon_path)
+	{
 	}
 
 	bool isValid() const { return (!id.empty() && !path.empty()); }
@@ -74,7 +74,7 @@ SubgameSpec findWorldSubgame(const std::string &world_path);
 
 std::set<std::string> getAvailableGameIds();
 std::vector<SubgameSpec> getAvailableGames();
-// Get the list of paths to mods in the environment variable $MINETEST_MOD_PATH
+// Get the list of paths to mods in the environment variable $APEROSENGINE_MOD_PATH
 std::vector<std::string> getEnvModPaths();
 
 bool getWorldExists(const std::string &world_path);
@@ -82,7 +82,8 @@ bool getWorldExists(const std::string &world_path);
 std::string getWorldName(const std::string &world_path, const std::string &default_name);
 std::string getWorldGameId(const std::string &world_path, bool can_be_legacy = false);
 
-struct WorldSpec {
+struct WorldSpec
+{
 	std::string path;
 	std::string name;
 	std::string gameid;
@@ -90,11 +91,12 @@ struct WorldSpec {
 	WorldSpec(const std::string &path = "", const std::string &name = "",
 			const std::string &gameid = "") :
 			path(path),
-			name(name),
-			gameid(gameid) {
+			name(name), gameid(gameid)
+	{
 	}
 
-	bool isValid() const {
+	bool isValid() const
+	{
 		return (!name.empty() && !path.empty() && !gameid.empty());
 	}
 };
@@ -102,6 +104,6 @@ struct WorldSpec {
 std::vector<WorldSpec> getAvailableWorlds();
 
 // loads the subgame's config and creates world directory
-// and world.mt if they don't exist
+// and world.apr if they don't exist
 void loadGameConfAndInitWorld(const std::string &path, const std::string &name,
 		const SubgameSpec &gamespec, bool create_world);

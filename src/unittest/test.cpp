@@ -56,7 +56,8 @@ public:
 	bool joinModChannel(const std::string &channel);
 	bool leaveModChannel(const std::string &channel);
 	bool sendModChannelMessage(const std::string &channel, const std::string &message);
-	ModChannel *getModChannel(const std::string &channel) {
+	ModChannel *getModChannel(const std::string &channel)
+	{
 		return m_modchannel_mgr->getModChannel(channel);
 	}
 
@@ -64,13 +65,17 @@ private:
 	std::unique_ptr<ModChannelMgr> m_modchannel_mgr;
 };
 
+
 TestGameDef::TestGameDef() :
-		DummyGameDef(),
-		m_modchannel_mgr(new ModChannelMgr()) {
+	DummyGameDef(),
+	m_modchannel_mgr(new ModChannelMgr())
+{
 	defineSomeNodes();
 }
 
-void TestGameDef::defineSomeNodes() {
+
+void TestGameDef::defineSomeNodes()
+{
 	IWritableItemDefManager *idef = (IWritableItemDefManager *)m_itemdef;
 	NodeDefManager *ndef = (NodeDefManager *)m_nodedef;
 
@@ -84,9 +89,9 @@ void TestGameDef::defineSomeNodes() {
 	itemdef.description = "Stone";
 	itemdef.groups["cracky"] = 3;
 	itemdef.inventory_image = "[inventorycube"
-							  "{default_stone.png"
-							  "{default_stone.png"
-							  "{default_stone.png";
+		"{default_stone.png"
+		"{default_stone.png"
+		"{default_stone.png";
 	f = ContentFeatures();
 	f.name = itemdef.name;
 	for (TileDef &tiledef : f.tiledef)
@@ -102,14 +107,14 @@ void TestGameDef::defineSomeNodes() {
 	itemdef.description = "Dirt with grass";
 	itemdef.groups["crumbly"] = 3;
 	itemdef.inventory_image = "[inventorycube"
-							  "{default_grass.png"
-							  "{default_dirt.png&default_grass_side.png"
-							  "{default_dirt.png&default_grass_side.png";
+		"{default_grass.png"
+		"{default_dirt.png&default_grass_side.png"
+		"{default_dirt.png&default_grass_side.png";
 	f = ContentFeatures();
 	f.name = itemdef.name;
 	f.tiledef[0].name = "default_grass.png";
 	f.tiledef[1].name = "default_dirt.png";
-	for (int i = 2; i < 6; i++)
+	for(int i = 2; i < 6; i++)
 		f.tiledef[i].name = "default_dirt.png^default_grass_side.png";
 	f.is_ground_content = true;
 	idef->registerItem(itemdef);
@@ -124,7 +129,7 @@ void TestGameDef::defineSomeNodes() {
 	f.param_type = CPT_LIGHT;
 	f.light_propagates = true;
 	f.sunlight_propagates = true;
-	f.light_source = LIGHT_MAX - 1;
+	f.light_source = LIGHT_MAX-1;
 	idef->registerItem(itemdef);
 	t_CONTENT_TORCH = ndef->set(f.name, f);
 
@@ -134,9 +139,9 @@ void TestGameDef::defineSomeNodes() {
 	itemdef.name = "default:water";
 	itemdef.description = "Water";
 	itemdef.inventory_image = "[inventorycube"
-							  "{default_water.png"
-							  "{default_water.png"
-							  "{default_water.png";
+		"{default_water.png"
+		"{default_water.png"
+		"{default_water.png";
 	f = ContentFeatures();
 	f.name = itemdef.name;
 	f.alpha = ALPHAMODE_BLEND;
@@ -157,21 +162,22 @@ void TestGameDef::defineSomeNodes() {
 	itemdef.name = "default:lava";
 	itemdef.description = "Lava";
 	itemdef.inventory_image = "[inventorycube"
-							  "{default_lava.png"
-							  "{default_lava.png"
-							  "{default_lava.png";
+		"{default_lava.png"
+		"{default_lava.png"
+		"{default_lava.png";
 	f = ContentFeatures();
 	f.name = itemdef.name;
 	f.alpha = ALPHAMODE_OPAQUE;
 	f.liquid_type = LIQUID_SOURCE;
 	f.liquid_viscosity = 7;
-	f.light_source = LIGHT_MAX - 1;
+	f.light_source = LIGHT_MAX-1;
 	f.is_ground_content = true;
 	f.groups["liquids"] = 3;
 	for (TileDef &tiledef : f.tiledef)
 		tiledef.name = "default_lava.png";
 	idef->registerItem(itemdef);
 	t_CONTENT_LAVA = ndef->set(f.name, f);
+
 
 	//// Brick
 	itemdef = ItemDefinition();
@@ -180,9 +186,9 @@ void TestGameDef::defineSomeNodes() {
 	itemdef.description = "Brick";
 	itemdef.groups["cracky"] = 3;
 	itemdef.inventory_image = "[inventorycube"
-							  "{default_brick.png"
-							  "{default_brick.png"
-							  "{default_brick.png";
+		"{default_brick.png"
+		"{default_brick.png"
+		"{default_brick.png";
 	f = ContentFeatures();
 	f.name = itemdef.name;
 	for (TileDef &tiledef : f.tiledef)
@@ -192,16 +198,19 @@ void TestGameDef::defineSomeNodes() {
 	t_CONTENT_BRICK = ndef->set(f.name, f);
 }
 
-bool TestGameDef::joinModChannel(const std::string &channel) {
+bool TestGameDef::joinModChannel(const std::string &channel)
+{
 	return m_modchannel_mgr->joinChannel(channel, PEER_ID_SERVER);
 }
 
-bool TestGameDef::leaveModChannel(const std::string &channel) {
+bool TestGameDef::leaveModChannel(const std::string &channel)
+{
 	return m_modchannel_mgr->leaveChannel(channel, PEER_ID_SERVER);
 }
 
 bool TestGameDef::sendModChannelMessage(const std::string &channel,
-		const std::string &message) {
+	const std::string &message)
+{
 	if (!m_modchannel_mgr->channelRegistered(channel))
 		return false;
 
@@ -212,17 +221,18 @@ bool TestGameDef::sendModChannelMessage(const std::string &channel,
 //// run_tests
 ////
 
-bool run_tests() {
+bool run_tests()
+{
 	u64 t1 = porting::getTimeMs();
 	TestGameDef gamedef;
 
 	g_logger.setLevelSilenced(LL_ERROR, true);
 
-	u32 num_modules_failed = 0;
+	u32 num_modules_failed     = 0;
 	u32 num_total_tests_failed = 0;
-	u32 num_total_tests_run = 0;
+	u32 num_total_tests_run    = 0;
 	std::vector<TestBase *> &testmods = TestManager::getTestModules();
-	for (auto *testmod : testmods) {
+	for (auto *testmod: testmods) {
 		if (!testmod->testModule(&gamedef))
 			num_modules_failed++;
 
@@ -237,7 +247,7 @@ bool run_tests() {
 	config.allowZeroTests = true;
 	session.useConfigData(config);
 	auto exit_code = session.run();
-	// We count all the Catch tests as one test for Minetest's own logging
+	// We count all the Catch tests as one test for AperosEngine's own logging
 	// because we don't have a way to tell how many individual tests Catch ran.
 	++num_total_tests_run;
 	if (exit_code != 0) {
@@ -252,29 +262,30 @@ bool run_tests() {
 	const char *overall_status = (num_modules_failed == 0) ? "PASSED" : "FAILED";
 
 	rawstream
-			<< "++++++++++++++++++++++++++++++++++++++++"
-			<< "++++++++++++++++++++++++++++++++++++++++" << '\n'
-			<< "Unit Test Results: " << overall_status << '\n'
-			<< "    " << num_modules_failed << " / " << testmods.size()
-			<< " failed modules (" << num_total_tests_failed << " / "
-			<< num_total_tests_run << " failed individual tests)." << '\n'
-			<< "    Testing took " << tdiff << "ms total." << '\n'
-			<< "++++++++++++++++++++++++++++++++++++++++"
-			<< "++++++++++++++++++++++++++++++++++++++++" << '\n';
+		<< "++++++++++++++++++++++++++++++++++++++++"
+		<< "++++++++++++++++++++++++++++++++++++++++" << '\n'
+		<< "Unit Test Results: " << overall_status << '\n'
+		<< "    " << num_modules_failed << " / " << testmods.size()
+		<< " failed modules (" << num_total_tests_failed << " / "
+		<< num_total_tests_run << " failed individual tests)." << '\n'
+		<< "    Testing took " << tdiff << "ms total." << '\n'
+		<< "++++++++++++++++++++++++++++++++++++++++"
+		<< "++++++++++++++++++++++++++++++++++++++++" << '\n';
 
 	return num_modules_failed == 0;
 }
 
 static TestBase *findTestModule(const std::string &module_name) {
 	std::vector<TestBase *> &testmods = TestManager::getTestModules();
-	for (auto *testmod : testmods) {
+	for (auto *testmod: testmods) {
 		if (module_name == testmod->getName())
 			return testmod;
 	}
 	return nullptr;
 }
 
-bool run_tests(const std::string &module_name) {
+bool run_tests(const std::string &module_name)
+{
 	TestGameDef gamedef;
 
 	auto testmod = findTestModule(module_name);
@@ -297,14 +308,14 @@ bool run_tests(const std::string &module_name) {
 	const char *overall_status = ok ? "PASSED" : "FAILED";
 
 	rawstream
-			<< "++++++++++++++++++++++++++++++++++++++++"
-			<< "++++++++++++++++++++++++++++++++++++++++" << '\n'
-			<< "Unit Test Results: " << overall_status << '\n'
-			<< "    " << testmod->num_tests_failed << " / "
-			<< testmod->num_tests_run << " failed tests." << '\n'
-			<< "    Testing took " << tdiff << "ms." << '\n'
-			<< "++++++++++++++++++++++++++++++++++++++++"
-			<< "++++++++++++++++++++++++++++++++++++++++" << '\n';
+		<< "++++++++++++++++++++++++++++++++++++++++"
+		<< "++++++++++++++++++++++++++++++++++++++++" << '\n'
+		<< "Unit Test Results: " << overall_status << '\n'
+		<< "    " << testmod->num_tests_failed << " / "
+		<< testmod->num_tests_run << " failed tests." << '\n'
+		<< "    Testing took " << tdiff << "ms." << '\n'
+		<< "++++++++++++++++++++++++++++++++++++++++"
+		<< "++++++++++++++++++++++++++++++++++++++++" << '\n';
 
 	return ok;
 }
@@ -313,17 +324,19 @@ bool run_tests(const std::string &module_name) {
 //// TestBase
 ////
 
-bool TestBase::testModule(IGameDef *gamedef) {
+bool TestBase::testModule(IGameDef *gamedef)
+{
 	rawstream << "======== Testing module " << getName() << '\n';
 	u64 t1 = porting::getTimeMs();
+
 
 	runTests(gamedef);
 
 	u64 tdiff = porting::getTimeMs() - t1;
 	rawstream << "======== Module " << getName() << " "
-			  << (num_tests_failed ? "failed" : "passed") << " (" << num_tests_failed
-			  << " failures / " << num_tests_run << " tests) - " << tdiff
-			  << "ms" << '\n';
+		<< (num_tests_failed ? "failed" : "passed") << " (" << num_tests_failed
+		<< " failures / " << num_tests_run << " tests) - " << tdiff
+		<< "ms" << '\n';
 
 	if (!m_test_dir.empty())
 		fs::RecursiveDelete(m_test_dir);
@@ -331,7 +344,8 @@ bool TestBase::testModule(IGameDef *gamedef) {
 	return num_tests_failed == 0;
 }
 
-std::string TestBase::getTestTempDirectory() {
+std::string TestBase::getTestTempDirectory()
+{
 	if (!m_test_dir.empty())
 		return m_test_dir;
 
@@ -340,14 +354,16 @@ std::string TestBase::getTestTempDirectory() {
 	return m_test_dir;
 }
 
-std::string TestBase::getTestTempFile() {
+std::string TestBase::getTestTempFile()
+{
 	char buf[32];
 	porting::mt_snprintf(buf, sizeof(buf), "%08X", myrand());
 
 	return getTestTempDirectory() + DIR_DELIM + buf + ".tmp";
 }
 
-void TestBase::runTest(const char *name, std::function<void()> &&test) {
+void TestBase::runTest(const char *name, std::function<void()> &&test)
+{
 	u64 t1 = porting::getTimeMs();
 	try {
 		test();
@@ -372,7 +388,7 @@ void TestBase::runTest(const char *name, std::function<void()> &&test) {
 
 /*
 	NOTE: These tests became non-working then NodeContainer was removed.
-		  These should be redone, utilizing some kind of a virtual
+	      These should be redone, utilizing some kind of a virtual
 		  interface for Map (IMap would be fine).
 */
 #if 0

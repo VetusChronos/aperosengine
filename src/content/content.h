@@ -22,7 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "convert_json.h"
 #include "irrlichttypes.h"
 
-enum class ContentType {
+enum class ContentType
+{
 	UNKNOWN,
 	MOD,
 	MODPACK,
@@ -30,7 +31,9 @@ enum class ContentType {
 	TXP
 };
 
-struct ContentSpec {
+
+struct ContentSpec
+{
 	std::string type;
 	std::string author;
 	u32 release = 0;
@@ -46,6 +49,7 @@ struct ContentSpec {
 	std::string path;
 	std::string textdomain;
 };
+
 
 ContentType getContentType(const std::string &path);
 void parseContentInfo(ContentSpec &spec);

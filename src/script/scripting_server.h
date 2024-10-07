@@ -35,17 +35,19 @@ struct PackedValue;
 /* Scripting <-> Server Game Interface                                       */
 /*****************************************************************************/
 
-class ServerScripting : virtual public ScriptApiBase,
-						public ScriptApiDetached,
-						public ScriptApiEntity,
-						public ScriptApiEnv,
-						public ScriptApiModChannels,
-						public ScriptApiNode,
-						public ScriptApiPlayer,
-						public ScriptApiServer,
-						public ScriptApiSecurity {
+class ServerScripting:
+		virtual public ScriptApiBase,
+		public ScriptApiDetached,
+		public ScriptApiEntity,
+		public ScriptApiEnv,
+		public ScriptApiModChannels,
+		public ScriptApiNode,
+		public ScriptApiPlayer,
+		public ScriptApiServer,
+		public ScriptApiSecurity
+{
 public:
-	ServerScripting(Server *server);
+	ServerScripting(Server* server);
 
 	void loadBuiltin();
 	// use ScriptApiBase::loadMod() to load mods
@@ -61,7 +63,7 @@ public:
 
 	// Pass job to async threads
 	u32 queueAsync(std::string &&serialized_func,
-			PackedValue *param, const std::string &mod_origin);
+		PackedValue *param, const std::string &mod_origin);
 
 private:
 	void InitializeModApi(lua_State *L, int top);

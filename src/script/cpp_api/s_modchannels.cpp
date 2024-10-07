@@ -22,7 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "modchannels.h"
 
 void ScriptApiModChannels::on_modchannel_message(const std::string &channel,
-		const std::string &sender, const std::string &message) {
+		const std::string &sender, const std::string &message)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_generateds
@@ -36,7 +37,8 @@ void ScriptApiModChannels::on_modchannel_message(const std::string &channel,
 }
 
 void ScriptApiModChannels::on_modchannel_signal(
-		const std::string &channel, ModChannelSignal signal) {
+		const std::string &channel, ModChannelSignal signal)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_on_generateds

@@ -21,79 +21,52 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "exceptions.h"
 
-namespace con {
+namespace con
+{
 /*
 	Exceptions
 */
-class NotFoundException : public BaseException {
+
+class PeerNotFoundException : public BaseException
+{
 public:
-	NotFoundException(const char *s) :
-			BaseException(s) {}
+	PeerNotFoundException(const char *s) : BaseException(s) {}
 };
 
-class PeerNotFoundException : public BaseException {
+class ConnectionException : public BaseException
+{
 public:
-	PeerNotFoundException(const char *s) :
-			BaseException(s) {}
+	ConnectionException(const char *s) : BaseException(s) {}
 };
 
-class ConnectionException : public BaseException {
+class ConnectionBindFailed : public BaseException
+{
 public:
-	ConnectionException(const char *s) :
-			BaseException(s) {}
+	ConnectionBindFailed(const char *s) : BaseException(s) {}
 };
 
-class ConnectionBindFailed : public BaseException {
+class InvalidIncomingDataException : public BaseException
+{
 public:
-	ConnectionBindFailed(const char *s) :
-			BaseException(s) {}
+	InvalidIncomingDataException(const char *s) : BaseException(s) {}
 };
 
-class InvalidIncomingDataException : public BaseException {
+}
+
+class SocketException : public BaseException
+{
 public:
-	InvalidIncomingDataException(const char *s) :
-			BaseException(s) {}
+	SocketException(const std::string &s) : BaseException(s) {}
 };
 
-class NoIncomingDataException : public BaseException {
+class ResolveError : public BaseException
+{
 public:
-	NoIncomingDataException(const char *s) :
-			BaseException(s) {}
+	ResolveError(const std::string &s) : BaseException(s) {}
 };
 
-class ProcessedSilentlyException : public BaseException {
+class SendFailedException : public BaseException
+{
 public:
-	ProcessedSilentlyException(const char *s) :
-			BaseException(s) {}
-};
-
-class ProcessedQueued : public BaseException {
-public:
-	ProcessedQueued(const char *s) :
-			BaseException(s) {}
-};
-
-class IncomingDataCorruption : public BaseException {
-public:
-	IncomingDataCorruption(const char *s) :
-			BaseException(s) {}
-};
-} //namespace con
-
-class SocketException : public BaseException {
-public:
-	SocketException(const std::string &s) :
-			BaseException(s) {}
-};
-
-class ResolveError : public BaseException {
-public:
-	ResolveError(const std::string &s) :
-			BaseException(s) {}
-};
-
-class SendFailedException : public BaseException {
-public:
-	SendFailedException(const std::string &s) :
-			BaseException(s) {}
+	SendFailedException(const std::string &s) : BaseException(s) {}
 };

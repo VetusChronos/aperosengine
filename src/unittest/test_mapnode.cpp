@@ -23,7 +23,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "nodedef.h"
 #include "content_mapnode.h"
 
-class TestMapNode : public TestBase {
+class TestMapNode : public TestBase
+{
 public:
 	TestMapNode() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestMapNode"; }
@@ -35,13 +36,15 @@ public:
 
 static TestMapNode g_test_instance;
 
-void TestMapNode::runTests(IGameDef *gamedef) {
+void TestMapNode::runTests(IGameDef *gamedef)
+{
 	TEST(testNodeProperties, gamedef->getNodeDefManager());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestMapNode::testNodeProperties(const NodeDefManager *nodedef) {
+void TestMapNode::testNodeProperties(const NodeDefManager *nodedef)
+{
 	MapNode n(CONTENT_AIR);
 
 	ContentLightingFlags f = nodedef->getLightingFlags(n);

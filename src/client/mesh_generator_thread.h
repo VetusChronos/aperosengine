@@ -23,15 +23,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <mutex>
 #include <unordered_map>
 #include <unordered_set>
+#include "mapblock_mesh.h"
+#include "threading/mutex_auto_lock.h"
+#include "util/thread.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
 
-#include "mapblock_mesh.h"
-#include "threading/mutex_auto_lock.h"
-#include "util/thread.h"
-
-struct QueuedMeshUpdate {
+struct QueuedMeshUpdate
+{
 	v3s16 p = v3s16(-1337, -1337, -1337);
 	std::vector<v3s16> ack_list;
 	int crack_level = -1;
@@ -47,8 +47,10 @@ struct QueuedMeshUpdate {
 /*
 	A thread-safe queue of mesh update tasks and a cache of MapBlock data
 */
-class MeshUpdateQueue {
-	enum UpdateMode {
+class MeshUpdateQueue
+{
+	enum UpdateMode
+	{
 		FORCE_UPDATE,
 		SKIP_UPDATE_IF_ALREADY_CACHED,
 	};
@@ -69,7 +71,8 @@ public:
 	// Marks a position as finished, unblocking the next update
 	void done(v3s16 pos);
 
-	u32 size() {
+	u32 size()
+	{
 		MutexAutoLock lock(m_mutex);
 		return m_queue.size();
 	}
@@ -89,7 +92,8 @@ private:
 	void cleanupCache();
 };
 
-struct MeshUpdateResult {
+struct MeshUpdateResult
+{
 	v3s16 p = v3s16(-1338, -1338, -1338);
 	MapBlockMesh *mesh = nullptr;
 	u8 solid_sides;
@@ -102,7 +106,8 @@ struct MeshUpdateResult {
 
 class MeshUpdateManager;
 
-class MeshUpdateWorkerThread : public UpdateThread {
+class MeshUpdateWorkerThread : public UpdateThread
+{
 public:
 	MeshUpdateWorkerThread(Client *client, MeshUpdateQueue *queue_in, MeshUpdateManager *manager, v3s16 *camera_offset);
 
@@ -119,7 +124,8 @@ private:
 	int m_generation_interval;
 };
 
-class MeshUpdateManager {
+class MeshUpdateManager
+{
 public:
 	MeshUpdateManager(Client *client);
 
@@ -129,6 +135,7 @@ public:
 			bool update_neighbors = false);
 	void putResult(const MeshUpdateResult &r);
 	bool getNextResult(MeshUpdateResult &r);
+
 
 	v3s16 m_camera_offset;
 
@@ -140,6 +147,7 @@ public:
 
 private:
 	void deferUpdate();
+
 
 	MeshUpdateQueue m_queue_in;
 	MutexedQueue<MeshUpdateResult> m_queue_out;

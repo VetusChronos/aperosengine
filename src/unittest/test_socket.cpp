@@ -25,7 +25,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class TestSocket : public TestBase {
 public:
-	TestSocket() {
+	TestSocket()
+	{
 		if (INTERNET_SIMULATOR == false)
 			TestManager::registerTestModule(this);
 	}
@@ -42,7 +43,8 @@ public:
 
 static TestSocket g_test_instance;
 
-void TestSocket::runTests(IGameDef *gamedef) {
+void TestSocket::runTests(IGameDef *gamedef)
+{
 	TEST(testIPv4Socket);
 
 	if (g_settings->getBool("enable_ipv6"))
@@ -51,7 +53,8 @@ void TestSocket::runTests(IGameDef *gamedef) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestSocket::testIPv4Socket() {
+void TestSocket::testIPv4Socket()
+{
 	Address address(0, 0, 0, 0, port);
 	Address bind_addr(0, 0, 0, 0, port);
 
@@ -102,7 +105,8 @@ void TestSocket::testIPv4Socket() {
 	}
 }
 
-void TestSocket::testIPv6Socket() {
+void TestSocket::testIPv6Socket()
+{
 	Address address6((IPv6AddressBytes *)NULL, port);
 	UDPSocket socket6;
 
@@ -110,11 +114,11 @@ void TestSocket::testIPv6Socket() {
 		/* Note: Failing to create an IPv6 socket is not technically an
 		   error because the OS may not support IPv6 or it may
 		   have been disabled. IPv6 is not /required/ by
-		   minetest and therefore this should not cause the unit
+		   aperosengine and therefore this should not cause the unit
 		   test to fail
 		*/
 		dstream << "WARNING: IPv6 socket creation failed (unit test)"
-				<< '\n';
+			<< '\n';
 		return;
 	}
 
@@ -132,7 +136,7 @@ void TestSocket::testIPv6Socket() {
 		char rcvbuffer[256] = { 0 };
 		Address sender;
 
-		for (;;) {
+		for(;;) {
 			if (socket6.Receive(sender, rcvbuffer, sizeof(rcvbuffer)) < 0)
 				break;
 		}
@@ -140,6 +144,6 @@ void TestSocket::testIPv6Socket() {
 		UASSERT(strncmp(sendbuffer, rcvbuffer, sizeof(sendbuffer)) == 0);
 
 		UASSERT(memcmp(sender.getAddress6().s6_addr,
-						Address(&bytes, 0).getAddress6().s6_addr, 16) == 0);
+				Address(&bytes, 0).getAddress6().s6_addr, 16) == 0);
 	}
 }

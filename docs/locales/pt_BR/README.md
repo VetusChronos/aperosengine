@@ -3,13 +3,13 @@ AperosVoxel Engine
 
 [![Licença](https://img.shields.io/badge/license-LGPLv2.1%2B-blue.svg)](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.pt-br.html)
 
-AperosVoxel é um mecanismo de jogo voxel de código aberto gratuito com fácil modificação e criação
-de outros jogos.
+Aperos (Voxel) Engine é um mecanismo de jogo voxel de código aberto gratuito com foco na facilidade de modificação 
+e criação de jogos.
 
-AperosVoxel é baseado no [Minetest Engine](https://minetest.net):
+AperosVoxel é baseado no [Minetest Engine](https://aperosvoxel.domain):
 
 > Direitos autorais (C) 2010-2024 Perttu Ahola <celeron55@gmail.com>
-e colaboradores do Minetest (veja os comentários do arquivo fonte). 
+e colaboradores do Minetest (veja o arquivo LICENSE). 
 Obrigada aos contribuidores!
 
 Localização
@@ -31,7 +31,7 @@ Localização
 
 Documentação adicional
 ----------------------
-- GitHub: https://github.com/yunasatoy/aperosengine/
+- GitHub: https://github.com/vetuschronos/aperosengine/
 - [Documentação do desenvolvedor](../en/engine/developing/) (inglês)
 - [Documentação para modding](../en/modding/) (inglês)
 - [docs/](../en/) diretório da documentação (inglês)
@@ -109,12 +109,12 @@ Os mundos podem ser encontrados como pastas separadas em: `user/worlds/`
 Arquivo de configuração
 -----------------------
 - Localização padrão:
-    `user/aperosvoxel.conf`
+    `user/aperosengine.conf`
 - Este arquivo é criado fechando o AperosEngine pela primeira vez.
 - Um arquivo diferente pode ser especificado na linha de comando:
     `--config <caminho-para-o-arquivo>`
 - Uma compilação executada no local procurará o arquivo de configuração em
-    `location_of_exe/../aperosvoxel.conf` e também `location_of_exe/../../aperosvoxel.conf`
+    `location_of_exe/../aperosengine.conf` e também `location_of_exe/../../aperosengine.conf`
 
 Opções por linha de comando
 ---------------------------
@@ -123,15 +123,15 @@ Opções por linha de comando
 Compilando
 ----------
 
-- [Compilando em GNU/Linux](../en/engine/compiling/Linux.md)
-- [Compilando no Windows](../en/engine/compiling/Windows.md)
-- [Compilando no MacOS](../en/engine/compiling/MacOS.md)
+- [Compilando em GNU/Linux](../en/engine/compiling/linux.md)
+- [Compilando no Windows](../en/engine/compiling/windows.md)
+- [Compilando no MacOS](../en/engine/compiling/macos.md)
 
 Docker
 ------
 
-- [Desenvolvendo aperosengineserver com Docker](../en/engine/developing/Docker.md)
-- [Executando um servidor com Docker](../en/engine/Docker-Server.md)
+- [Desenvolvimento aperosengineserver com Docker](../en/engine/developing/docker.md)
+- [Executando um servidor com Docker](../en/engine/docker_server.md)
 
 Esquema de versão
 -----------------
@@ -143,5 +143,4 @@ os números são definidos como 0.
 patch está definido como 0.
 - O `patch` é incrementado quando o lançamento contém apenas correções de bugs e muitas
 características menores/triviais consideradas necessárias.
-- O `stage` é incrementado quando indica se o motor foi liberado, 
-está em beta, alfa ou em dev
+- O `stage` é incrementado quando indica se o motor está na fase completa, em beta, alfa ou em dev

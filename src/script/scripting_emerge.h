@@ -24,9 +24,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class EmergeThread;
 
-class EmergeScripting : virtual public ScriptApiBase,
-						public ScriptApiMapgen,
-						public ScriptApiSecurity {
+class EmergeScripting:
+		virtual public ScriptApiBase,
+		public ScriptApiMapgen,
+		public ScriptApiSecurity
+{
 public:
 	EmergeScripting(EmergeThread *parent);
 

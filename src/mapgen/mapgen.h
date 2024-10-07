@@ -31,14 +31,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define MAPGEN_DEFAULT_NAME "v7"
 
 /////////////////// Mapgen flags
-#define MG_CAVES 0x02
-#define MG_DUNGEONS 0x04
-#define MG_LIGHT 0x10
+#define MG_CAVES       0x02
+#define MG_DUNGEONS    0x04
+#define MG_LIGHT       0x10
 #define MG_DECORATIONS 0x20
-#define MG_BIOMES 0x40
-#define MG_ORES 0x80
+#define MG_BIOMES      0x40
+#define MG_ORES        0x80
 
-typedef u16 biome_t; // copy from mg_biome.h to avoid an unnecessary include
+typedef u16 biome_t;  // copy from mg_biome.h to avoid an unnecessary include
 
 class Settings;
 class MMVManip;
@@ -92,7 +92,7 @@ public:
 	GenerateNotifier() = default;
 	// normal constructor
 	GenerateNotifier(u32 notify_on, const std::set<u32> *notify_on_deco_ids,
-			const std::set<std::string> *notify_on_custom);
+		const std::set<std::string> *notify_on_custom);
 
 	bool addEvent(GenNotifyType type, v3s16 pos);
 	bool addDecorationEvent(v3s16 pos, u32 deco_id);
@@ -147,13 +147,14 @@ struct MapgenParams {
 	virtual void readParams(const Settings *settings);
 	virtual void writeParams(Settings *settings) const;
 	// Default settings for g_settings such as flags
-	virtual void setDefaultSettings(Settings *settings){};
+	virtual void setDefaultSettings(Settings *settings) {};
 
 	s32 getSpawnRangeMax();
 
 private:
 	bool m_mapgen_edges_calculated = false;
 };
+
 
 /*
 	Generic interface for map generators.  All mapgens must inherit this class.
@@ -202,7 +203,7 @@ public:
 	s16 findLiquidSurface(v2s16 p2d, s16 ymin, s16 ymax);
 	void updateHeightmap(v3s16 nmin, v3s16 nmax);
 	void getSurfaces(v2s16 p2d, s16 ymin, s16 ymax,
-			std::vector<s16> &floors, std::vector<s16> &ceilings);
+		std::vector<s16> &floors, std::vector<s16> &ceilings);
 
 	void updateLiquid(UniqueQueue<v3s16> *trans_liquid, v3s16 nmin, v3s16 nmax);
 
@@ -222,7 +223,7 @@ public:
 	 * @param propagate_shadow see propagateSunlight()
 	 */
 	void calcLighting(v3s16 nmin, v3s16 nmax, v3s16 full_nmin, v3s16 full_nmax,
-			bool propagate_shadow = true);
+		bool propagate_shadow = true);
 	/**
 	 * Spread sunlight from the area above downwards.
 	 * Note that affected nodes have their night bank cleared so you want to
@@ -254,7 +255,7 @@ public:
 	static MapgenType getMapgenType(const std::string &mgname);
 	static const char *getMapgenName(MapgenType mgtype);
 	static Mapgen *createMapgen(MapgenType mgtype, MapgenParams *params,
-			EmergeParams *emerge);
+		EmergeParams *emerge);
 	static MapgenParams *createMapgenParams(MapgenType mgtype);
 	static void getMapgenNames(std::vector<const char *> *mgnames, bool include_hidden);
 	static void setDefaultSettings(Settings *settings);
@@ -270,7 +271,7 @@ private:
 	 *
 	 */
 	void lightSpread(VoxelArea &a, std::queue<std::pair<v3s16, u8>> &queue,
-			const v3s16 &p, u8 light);
+		const v3s16 &p, u8 light);
 
 	// isLiquidHorizontallyFlowable() is a helper function for updateLiquid()
 	// that checks whether there are floodable nodes without liquid beneath

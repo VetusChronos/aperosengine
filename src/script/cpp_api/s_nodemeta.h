@@ -28,7 +28,8 @@ struct ItemStack;
 
 class ScriptApiNodemeta
 		: virtual public ScriptApiBase,
-		  public ScriptApiItem {
+		  public ScriptApiItem
+{
 public:
 	ScriptApiNodemeta() = default;
 	virtual ~ScriptApiNodemeta() = default;
@@ -57,6 +58,6 @@ public:
 	void nodemeta_inventory_OnTake(
 			const MoveAction &ma, const ItemStack &stack,
 			ServerActiveObject *player);
-
 private:
+
 };

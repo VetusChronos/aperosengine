@@ -19,7 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #pragma once
 
-#include "irrlichttypes_extrabloated.h"
+#include "irrlichttypes.h"
 #include "joystick_controller.h"
 #include <list>
 #include "keycode.h"
@@ -38,8 +38,11 @@ class InputHandler;
  * (up to 10x faster) key lookup is an asset. Other parts of the codebase
  * (e.g. formspecs) should continue using getKeySetting().
  */
-struct KeyCache {
-	KeyCache() {
+struct KeyCache
+{
+
+	KeyCache()
+	{
 		handler = NULL;
 		populate();
 		populate_nonchanging();
@@ -54,12 +57,14 @@ struct KeyCache {
 	InputHandler *handler;
 };
 
-class KeyList : private std::list<KeyPress> {
+class KeyList : private std::list<KeyPress>
+{
 	typedef std::list<KeyPress> super;
 	typedef super::iterator iterator;
 	typedef super::const_iterator const_iterator;
 
-	virtual const_iterator find(const KeyPress &key) const {
+	virtual const_iterator find(const KeyPress &key) const
+	{
 		const_iterator f(begin());
 		const_iterator e(end());
 
@@ -73,7 +78,8 @@ class KeyList : private std::list<KeyPress> {
 		return e;
 	}
 
-	virtual iterator find(const KeyPress &key) {
+	virtual iterator find(const KeyPress &key)
+	{
 		iterator f(begin());
 		iterator e(end());
 
@@ -90,19 +96,22 @@ class KeyList : private std::list<KeyPress> {
 public:
 	void clear() { super::clear(); }
 
-	void set(const KeyPress &key) {
+	void set(const KeyPress &key)
+	{
 		if (find(key) == end())
 			push_back(key);
 	}
 
-	void unset(const KeyPress &key) {
+	void unset(const KeyPress &key)
+	{
 		iterator p(find(key));
 
 		if (p != end())
 			erase(p);
 	}
 
-	void toggle(const KeyPress &key) {
+	void toggle(const KeyPress &key)
+	{
 		iterator p(this->find(key));
 
 		if (p != end())
@@ -111,7 +120,8 @@ public:
 			push_back(key);
 	}
 
-	void append(const KeyList &other) {
+	void append(const KeyList &other)
+	{
 		for (const KeyPress &key : other) {
 			set(key);
 		}
@@ -120,7 +130,8 @@ public:
 	bool operator[](const KeyPress &key) const { return find(key) != end(); }
 };
 
-class MyEventReceiver : public IEventReceiver {
+class MyEventReceiver : public IEventReceiver
+{
 public:
 	// This is the one method that we have to implement
 	virtual bool OnEvent(const SEvent &event);
@@ -128,7 +139,8 @@ public:
 	bool IsKeyDown(const KeyPress &keyCode) const { return keyIsDown[keyCode]; }
 
 	// Checks whether a key was down and resets the state
-	bool WasKeyDown(const KeyPress &keyCode) {
+	bool WasKeyDown(const KeyPress &keyCode)
+	{
 		bool b = keyWasDown[keyCode];
 		if (b)
 			keyWasDown.unset(keyCode);
@@ -143,20 +155,24 @@ public:
 	// in the subsequent iteration of Game::processPlayerInteraction
 	bool WasKeyReleased(const KeyPress &keycode) const { return keyWasReleased[keycode]; }
 
-	void listenForKey(const KeyPress &keyCode) {
+	void listenForKey(const KeyPress &keyCode)
+	{
 		keysListenedFor.set(keyCode);
 	}
-	void dontListenForKeys() {
+	void dontListenForKeys()
+	{
 		keysListenedFor.clear();
 	}
 
-	s32 getMouseWheel() {
+	s32 getMouseWheel()
+	{
 		s32 a = mouse_wheel;
 		mouse_wheel = 0;
 		return a;
 	}
 
-	void clearInput() {
+	void clearInput()
+	{
 		keyIsDown.clear();
 		keyWasDown.clear();
 		keyWasPressed.clear();
@@ -165,16 +181,19 @@ public:
 		mouse_wheel = 0;
 	}
 
-	void releaseAllKeys() {
+	void releaseAllKeys()
+	{
 		keyWasReleased.append(keyIsDown);
 		keyIsDown.clear();
 	}
 
-	void clearWasKeyPressed() {
+	void clearWasKeyPressed()
+	{
 		keyWasPressed.clear();
 	}
 
-	void clearWasKeyReleased() {
+	void clearWasKeyReleased()
+	{
 		keyWasReleased.clear();
 	}
 
@@ -206,16 +225,19 @@ private:
 	bool fullscreen_is_down = false;
 };
 
-class InputHandler {
+class InputHandler
+{
 public:
-	InputHandler() {
+	InputHandler()
+	{
 		keycache.handler = this;
 		keycache.populate();
 	}
 
 	virtual ~InputHandler() = default;
 
-	virtual bool isRandom() const {
+	virtual bool isRandom() const
+	{
 		return false;
 	}
 
@@ -225,8 +247,8 @@ public:
 	virtual bool wasKeyReleased(GameKeyType k) = 0;
 	virtual bool cancelPressed() = 0;
 
-	virtual float getMovementSpeed() = 0;
-	virtual float getMovementDirection() = 0;
+	virtual float getJoystickSpeed() = 0;
+	virtual float getJoystickDirection() = 0;
 
 	virtual void clearWasKeyPressed() {}
 	virtual void clearWasKeyReleased() {}
@@ -247,57 +269,70 @@ public:
 	JoystickController joystick;
 	KeyCache keycache;
 };
+
 /*
-	Separated input handler
+	Separated input handler implementations
 */
 
-class RealInputHandler : public InputHandler {
+class RealInputHandler final : public InputHandler
+{
 public:
-	RealInputHandler(MyEventReceiver *receiver) :
-			m_receiver(receiver) {
+	RealInputHandler(MyEventReceiver *receiver) : m_receiver(receiver)
+	{
 		m_receiver->joystick = &joystick;
 	}
 
-	virtual ~RealInputHandler() {
+	virtual ~RealInputHandler()
+	{
 		m_receiver->joystick = nullptr;
 	}
 
-	virtual bool isKeyDown(GameKeyType k) {
+	virtual bool isKeyDown(GameKeyType k)
+	{
 		return m_receiver->IsKeyDown(keycache.key[k]) || joystick.isKeyDown(k);
 	}
-	virtual bool wasKeyDown(GameKeyType k) {
+	virtual bool wasKeyDown(GameKeyType k)
+	{
 		return m_receiver->WasKeyDown(keycache.key[k]) || joystick.wasKeyDown(k);
 	}
-	virtual bool wasKeyPressed(GameKeyType k) {
+	virtual bool wasKeyPressed(GameKeyType k)
+	{
 		return m_receiver->WasKeyPressed(keycache.key[k]) || joystick.wasKeyPressed(k);
 	}
-	virtual bool wasKeyReleased(GameKeyType k) {
+	virtual bool wasKeyReleased(GameKeyType k)
+	{
 		return m_receiver->WasKeyReleased(keycache.key[k]) || joystick.wasKeyReleased(k);
 	}
 
-	virtual float getMovementSpeed();
+	virtual float getJoystickSpeed();
 
-	virtual float getMovementDirection();
+	virtual float getJoystickDirection();
 
-	virtual bool cancelPressed() {
+	virtual bool cancelPressed()
+	{
 		return wasKeyDown(KeyType::ESC);
 	}
 
-	virtual void clearWasKeyPressed() {
+	virtual void clearWasKeyPressed()
+	{
 		m_receiver->clearWasKeyPressed();
 	}
-	virtual void clearWasKeyReleased() {
+	virtual void clearWasKeyReleased()
+	{
 		m_receiver->clearWasKeyReleased();
 	}
 
-	virtual void listenForKey(const KeyPress &keyCode) {
+	virtual void listenForKey(const KeyPress &keyCode)
+	{
 		m_receiver->listenForKey(keyCode);
 	}
-	virtual void dontListenForKeys() {
+	virtual void dontListenForKeys()
+	{
 		m_receiver->dontListenForKeys();
 	}
 
-	virtual v2s32 getMousePos() {
+	virtual v2s32 getMousePos()
+	{
 		auto control = RenderingEngine::get_raw_device()->getCursorControl();
 		if (control) {
 			return control->getPosition();
@@ -306,7 +341,8 @@ public:
 		return m_mousepos;
 	}
 
-	virtual void setMousePos(s32 x, s32 y) {
+	virtual void setMousePos(s32 x, s32 y)
+	{
 		auto control = RenderingEngine::get_raw_device()->getCursorControl();
 		if (control) {
 			control->setPosition(x, y);
@@ -315,16 +351,19 @@ public:
 		}
 	}
 
-	virtual s32 getMouseWheel() {
+	virtual s32 getMouseWheel()
+	{
 		return m_receiver->getMouseWheel();
 	}
 
-	void clear() {
+	void clear()
+	{
 		joystick.clear();
 		m_receiver->clearInput();
 	}
 
-	void releaseAllKeys() {
+	void releaseAllKeys()
+	{
 		joystick.releaseAllKeys();
 		m_receiver->releaseAllKeys();
 	}
@@ -334,11 +373,13 @@ private:
 	v2s32 m_mousepos;
 };
 
-class RandomInputHandler : public InputHandler {
+class RandomInputHandler final : public InputHandler
+{
 public:
 	RandomInputHandler() = default;
 
-	bool isRandom() const {
+	bool isRandom() const
+	{
 		return true;
 	}
 
@@ -347,8 +388,8 @@ public:
 	virtual bool wasKeyPressed(GameKeyType k) { return false; }
 	virtual bool wasKeyReleased(GameKeyType k) { return false; }
 	virtual bool cancelPressed() { return false; }
-	virtual float getMovementSpeed() { return movementSpeed; }
-	virtual float getMovementDirection() { return movementDirection; }
+	virtual float getJoystickSpeed() { return joystickSpeed; }
+	virtual float getJoystickDirection() { return joystickDirection; }
 	virtual v2s32 getMousePos() { return mousepos; }
 	virtual void setMousePos(s32 x, s32 y) { mousepos = v2s32(x, y); }
 
@@ -362,6 +403,6 @@ private:
 	KeyList keydown;
 	v2s32 mousepos;
 	v2s32 mousespeed;
-	float movementSpeed;
-	float movementDirection;
+	float joystickSpeed;
+	float joystickDirection;
 };

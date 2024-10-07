@@ -29,10 +29,12 @@ class ServerScripting;
  *
  * All new calls to this class must be tested in test_servermodmanager.cpp
  */
-class ServerModManager {
+class ServerModManager
+{
 	ModConfiguration configuration;
 
 public:
+
 	/**
 	 * Creates a ServerModManager which targets worldpath
 	 * @param worldpath
@@ -42,8 +44,8 @@ public:
 	/**
 	 * Creates an empty ServerModManager. For testing purposes.
 	 * Note: definition looks like this so it isn't accidentally used.
-	 */
-	explicit ServerModManager(std::nullptr_t){};
+	*/
+	explicit ServerModManager(std::nullptr_t) {};
 
 	void loadMods(ServerScripting &script);
 	const ModSpec *getModSpec(const std::string &modname) const;

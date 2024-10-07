@@ -31,10 +31,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "convert_json.h"
 #include "script/common/c_internal.h"
 
-void ModSpec::checkAndLog() const {
+void ModSpec::checkAndLog() const
+{
 	if (!string_allowed(name, MODNAME_ALLOWED_CHARS)) {
 		throw ModError("Error loading mod \"" + name +
-				"\": Mod name does not follow naming conventions: "
+			"\": Mod name does not follow naming conventions: "
 				"Only characters [a-z0-9_] are allowed.");
 	}
 
@@ -53,7 +54,8 @@ void ModSpec::checkAndLog() const {
 	}
 }
 
-bool parseDependsString(std::string &dep, std::unordered_set<char> &symbols) {
+bool parseDependsString(std::string &dep, std::unordered_set<char> &symbols)
+{
 	dep = trim(dep);
 	symbols.clear();
 	size_t pos = dep.size();
@@ -67,7 +69,8 @@ bool parseDependsString(std::string &dep, std::unordered_set<char> &symbols) {
 	return !dep.empty();
 }
 
-bool parseModContents(ModSpec &spec) {
+bool parseModContents(ModSpec &spec)
+{
 	// NOTE: this function works in mutual recursion with getModsInPath
 
 	spec.depends.clear();
@@ -84,6 +87,7 @@ bool parseModContents(ModSpec &spec) {
 	} else if (!fs::IsFile(spec.path + DIR_DELIM + "init.lua")) {
 		return false;
 	}
+
 
 	Settings info;
 	info.readConfigFile((spec.path + DIR_DELIM + "mod.conf").c_str());
@@ -105,8 +109,7 @@ bool parseModContents(ModSpec &spec) {
 		mod_conf_has_depends = true;
 		std::string dep = info.get("depends");
 		dep.erase(std::remove_if(dep.begin(), dep.end(),
-						  static_cast<int (*)(int)>(&std::isspace)),
-				dep.end());
+				static_cast<int (*)(int)>(&std::isspace)), dep.end());
 		for (const auto &dependency : str_split(dep, ',')) {
 			spec.depends.insert(dependency);
 		}
@@ -116,8 +119,7 @@ bool parseModContents(ModSpec &spec) {
 		mod_conf_has_depends = true;
 		std::string dep = info.get("optional_depends");
 		dep.erase(std::remove_if(dep.begin(), dep.end(),
-						  static_cast<int (*)(int)>(&std::isspace)),
-				dep.end());
+				static_cast<int (*)(int)>(&std::isspace)), dep.end());
 		for (const auto &dependency : str_split(dep, ',')) {
 			spec.optdepends.insert(dependency);
 		}
@@ -159,7 +161,8 @@ bool parseModContents(ModSpec &spec) {
 }
 
 std::map<std::string, ModSpec> getModsInPath(
-		const std::string &path, const std::string &virtual_path, bool part_of_modpack) {
+		const std::string &path, const std::string &virtual_path, bool part_of_modpack)
+{
 	// NOTE: this function works in mutual recursion with parseModContents
 
 	std::map<std::string, ModSpec> result;
@@ -191,7 +194,8 @@ std::map<std::string, ModSpec> getModsInPath(
 	return result;
 }
 
-std::vector<ModSpec> flattenMods(const std::map<std::string, ModSpec> &mods) {
+std::vector<ModSpec> flattenMods(const std::map<std::string, ModSpec> &mods)
+{
 	std::vector<ModSpec> result;
 	for (const auto &it : mods) {
 		const ModSpec &mod = it.second;
@@ -208,37 +212,45 @@ std::vector<ModSpec> flattenMods(const std::map<std::string, ModSpec> &mods) {
 	return result;
 }
 
-ModStorage::ModStorage(const std::string &mod_name, ModStorageDatabase *database) :
-		m_mod_name(mod_name), m_database(database) {
+
+ModStorage::ModStorage(const std::string &mod_name, ModStorageDatabase *database):
+	m_mod_name(mod_name), m_database(database)
+{
 }
 
-void ModStorage::clear() {
+void ModStorage::clear()
+{
 	m_database->removeModEntries(m_mod_name);
 }
 
-bool ModStorage::contains(const std::string &name) const {
+bool ModStorage::contains(const std::string &name) const
+{
 	return m_database->hasModEntry(m_mod_name, name);
 }
 
-bool ModStorage::setString(const std::string &name, std::string_view var) {
+bool ModStorage::setString(const std::string &name, std::string_view var)
+{
 	if (var.empty())
 		return m_database->removeModEntry(m_mod_name, name);
 	else
 		return m_database->setModEntry(m_mod_name, name, var);
 }
 
-const StringMap &ModStorage::getStrings(StringMap *place) const {
+const StringMap &ModStorage::getStrings(StringMap *place) const
+{
 	place->clear();
 	m_database->getModEntries(m_mod_name, place);
 	return *place;
 }
 
-const std::vector<std::string> &ModStorage::getKeys(std::vector<std::string> *place) const {
+const std::vector<std::string> &ModStorage::getKeys(std::vector<std::string> *place) const
+{
 	place->clear();
 	m_database->getModKeys(m_mod_name, place);
 	return *place;
 }
 
-const std::string *ModStorage::getStringRaw(const std::string &name, std::string *place) const {
+const std::string *ModStorage::getStringRaw(const std::string &name, std::string *place) const
+{
 	return m_database->getModEntry(m_mod_name, name, place) ? place : nullptr;
 }

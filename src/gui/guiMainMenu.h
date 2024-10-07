@@ -25,6 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <list>
 
 struct MainMenuDataForScript {
+
 	MainMenuDataForScript() = default;
 
 	// Whether the server has requested a reconnect

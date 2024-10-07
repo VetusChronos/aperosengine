@@ -49,7 +49,8 @@ public:
 
 static TestSerialization g_test_instance;
 
-void TestSerialization::runTests(IGameDef *gamedef) {
+void TestSerialization::runTests(IGameDef *gamedef)
+{
 	buildTestStrings();
 
 	TEST(testSerializeString);
@@ -67,12 +68,13 @@ void TestSerialization::runTests(IGameDef *gamedef) {
 // To be used like this:
 //   mkstr("Some\0string\0with\0embedded\0nuls")
 // since std::string("...") doesn't work as expected in that case.
-template <size_t N>
-std::string mkstr(const char (&s)[N]) {
+template<size_t N> std::string mkstr(const char (&s)[N])
+{
 	return std::string(s, N - 1);
 }
 
-void TestSerialization::buildTestStrings() {
+void TestSerialization::buildTestStrings()
+{
 	std::ostringstream tmp_os;
 	std::wostringstream tmp_os_w;
 	std::ostringstream tmp_os_w_encoded;
@@ -86,7 +88,8 @@ void TestSerialization::buildTestStrings() {
 	teststring2_w_encoded = tmp_os_w_encoded.str();
 }
 
-void TestSerialization::testSerializeString() {
+void TestSerialization::testSerializeString()
+{
 	// Test blank string
 	UASSERT(serializeString16("") == mkstr("\0\0"));
 
@@ -97,7 +100,8 @@ void TestSerialization::testSerializeString() {
 	UASSERT(serializeString16(teststring2) == mkstr("\1\0") + teststring2);
 }
 
-void TestSerialization::testDeSerializeString() {
+void TestSerialization::testDeSerializeString()
+{
 	// Test deserialize
 	{
 		std::istringstream is(serializeString16(teststring2), std::ios::binary);
@@ -120,7 +124,8 @@ void TestSerialization::testDeSerializeString() {
 	}
 }
 
-void TestSerialization::testSerializeLongString() {
+void TestSerialization::testSerializeLongString()
+{
 	// Test blank string
 	UASSERT(serializeString32("") == mkstr("\0\0\0\0"));
 
@@ -131,7 +136,8 @@ void TestSerialization::testSerializeLongString() {
 	UASSERT(serializeString32(teststring2) == mkstr("\0\0\1\0") + teststring2);
 }
 
-void TestSerialization::testDeSerializeLongString() {
+void TestSerialization::testDeSerializeLongString()
+{
 	// Test deserialize
 	{
 		std::istringstream is(serializeString32(teststring2), std::ios::binary);
@@ -160,13 +166,15 @@ void TestSerialization::testDeSerializeLongString() {
 	}
 }
 
-void TestSerialization::testSerializeJsonString() {
+
+void TestSerialization::testSerializeJsonString()
+{
 	std::istringstream is(std::ios::binary);
-	const auto reset_is = [&](const std::string &s) {
+	const auto reset_is = [&] (const std::string &s) {
 		is.clear();
 		is.str(s);
 	};
-	const auto assert_at_eof = [](std::istream &is) {
+	const auto assert_at_eof = [] (std::istream &is) {
 		is.get();
 		UASSERT(is.eof());
 	};
@@ -184,7 +192,7 @@ void TestSerialization::testSerializeJsonString() {
 	assert_at_eof(is);
 
 	// Test optional serialization
-	const std::pair<const char *, const char *> test_pairs[] = {
+	const std::pair<const char*, const char*> test_pairs[] = {
 		{ "abc", "abc" },
 		{ "x y z", "\"x y z\"" },
 		{ "\"", "\"\\\"\"" },
@@ -199,29 +207,29 @@ void TestSerialization::testSerializeJsonString() {
 	// Test all byte values
 	const std::string bs = "\\"; // MSVC fails when directly using "\\\\"
 	const std::string expected = mkstr("\"") +
-			"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007" +
-			"\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f" +
-			"\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017" +
-			"\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f" +
-			" !\\\"" + teststring2.substr(0x23, 0x5c - 0x23) +
-			bs + bs + teststring2.substr(0x5d, 0x7f - 0x5d) + "\\u007f" +
-			"\\u0080\\u0081\\u0082\\u0083\\u0084\\u0085\\u0086\\u0087" +
-			"\\u0088\\u0089\\u008a\\u008b\\u008c\\u008d\\u008e\\u008f" +
-			"\\u0090\\u0091\\u0092\\u0093\\u0094\\u0095\\u0096\\u0097" +
-			"\\u0098\\u0099\\u009a\\u009b\\u009c\\u009d\\u009e\\u009f" +
-			"\\u00a0\\u00a1\\u00a2\\u00a3\\u00a4\\u00a5\\u00a6\\u00a7" +
-			"\\u00a8\\u00a9\\u00aa\\u00ab\\u00ac\\u00ad\\u00ae\\u00af" +
-			"\\u00b0\\u00b1\\u00b2\\u00b3\\u00b4\\u00b5\\u00b6\\u00b7" +
-			"\\u00b8\\u00b9\\u00ba\\u00bb\\u00bc\\u00bd\\u00be\\u00bf" +
-			"\\u00c0\\u00c1\\u00c2\\u00c3\\u00c4\\u00c5\\u00c6\\u00c7" +
-			"\\u00c8\\u00c9\\u00ca\\u00cb\\u00cc\\u00cd\\u00ce\\u00cf" +
-			"\\u00d0\\u00d1\\u00d2\\u00d3\\u00d4\\u00d5\\u00d6\\u00d7" +
-			"\\u00d8\\u00d9\\u00da\\u00db\\u00dc\\u00dd\\u00de\\u00df" +
-			"\\u00e0\\u00e1\\u00e2\\u00e3\\u00e4\\u00e5\\u00e6\\u00e7" +
-			"\\u00e8\\u00e9\\u00ea\\u00eb\\u00ec\\u00ed\\u00ee\\u00ef" +
-			"\\u00f0\\u00f1\\u00f2\\u00f3\\u00f4\\u00f5\\u00f6\\u00f7" +
-			"\\u00f8\\u00f9\\u00fa\\u00fb\\u00fc\\u00fd\\u00fe\\u00ff" +
-			"\"";
+		"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007" +
+		"\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f" +
+		"\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017" +
+		"\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f" +
+		" !\\\"" + teststring2.substr(0x23, 0x5c-0x23) +
+		bs + bs + teststring2.substr(0x5d, 0x7f-0x5d) + "\\u007f" +
+		"\\u0080\\u0081\\u0082\\u0083\\u0084\\u0085\\u0086\\u0087" +
+		"\\u0088\\u0089\\u008a\\u008b\\u008c\\u008d\\u008e\\u008f" +
+		"\\u0090\\u0091\\u0092\\u0093\\u0094\\u0095\\u0096\\u0097" +
+		"\\u0098\\u0099\\u009a\\u009b\\u009c\\u009d\\u009e\\u009f" +
+		"\\u00a0\\u00a1\\u00a2\\u00a3\\u00a4\\u00a5\\u00a6\\u00a7" +
+		"\\u00a8\\u00a9\\u00aa\\u00ab\\u00ac\\u00ad\\u00ae\\u00af" +
+		"\\u00b0\\u00b1\\u00b2\\u00b3\\u00b4\\u00b5\\u00b6\\u00b7" +
+		"\\u00b8\\u00b9\\u00ba\\u00bb\\u00bc\\u00bd\\u00be\\u00bf" +
+		"\\u00c0\\u00c1\\u00c2\\u00c3\\u00c4\\u00c5\\u00c6\\u00c7" +
+		"\\u00c8\\u00c9\\u00ca\\u00cb\\u00cc\\u00cd\\u00ce\\u00cf" +
+		"\\u00d0\\u00d1\\u00d2\\u00d3\\u00d4\\u00d5\\u00d6\\u00d7" +
+		"\\u00d8\\u00d9\\u00da\\u00db\\u00dc\\u00dd\\u00de\\u00df" +
+		"\\u00e0\\u00e1\\u00e2\\u00e3\\u00e4\\u00e5\\u00e6\\u00e7" +
+		"\\u00e8\\u00e9\\u00ea\\u00eb\\u00ec\\u00ed\\u00ee\\u00ef" +
+		"\\u00f0\\u00f1\\u00f2\\u00f3\\u00f4\\u00f5\\u00f6\\u00f7" +
+		"\\u00f8\\u00f9\\u00fa\\u00fb\\u00fc\\u00fd\\u00fe\\u00ff" +
+		"\"";
 	std::string serialized = serializeJsonString(teststring2);
 	UASSERTEQ(std::string, serialized, expected);
 
@@ -248,10 +256,12 @@ void TestSerialization::testSerializeJsonString() {
 	UASSERTEQ(std::string, tmp, " bar");
 }
 
-void TestSerialization::testStreamRead() {
+
+void TestSerialization::testStreamRead()
+{
 	std::string datastr(
-			(const char *)test_serialized_data,
-			sizeof(test_serialized_data));
+		(const char *)test_serialized_data,
+		sizeof(test_serialized_data));
 	std::istringstream is(datastr, std::ios_base::binary);
 
 	UASSERT(readU8(is) == 0x11);
@@ -286,7 +296,9 @@ void TestSerialization::testStreamRead() {
 	UASSERT(is.rdbuf()->in_avail() == 0);
 }
 
-void TestSerialization::testStreamWrite() {
+
+void TestSerialization::testStreamWrite()
+{
 	std::ostringstream os(std::ios_base::binary);
 	std::string data;
 
@@ -328,35 +340,37 @@ void TestSerialization::testStreamWrite() {
 	UASSERT(!memcmp(&data[0], test_serialized_data, sizeof(test_serialized_data)));
 }
 
-void TestSerialization::testFloatFormat() {
+
+void TestSerialization::testFloatFormat()
+{
 	FloatType type = getFloatSerializationType();
 	u32 i;
 	f32 fs, fm;
 
 	// Check precision of float calculations on this platform
 	const std::unordered_map<f32, u32> float_results = {
-		{ 0.0f, 0x00000000UL },
-		{ 1.0f, 0x3F800000UL },
+		{  0.0f, 0x00000000UL },
+		{  1.0f, 0x3F800000UL },
 		{ -1.0f, 0xBF800000UL },
-		{ 0.1f, 0x3DCCCCCDUL },
+		{  0.1f, 0x3DCCCCCDUL },
 		{ -0.1f, 0xBDCCCCCDUL },
 		{ 1945329.25f, 0x49ED778AUL },
 		{ -23298764.f, 0xCBB1C166UL },
-		{ 0.5f, 0x3F000000UL },
+		{  0.5f, 0x3F000000UL },
 		{ -0.5f, 0xBF000000UL }
 	};
 	for (const auto &v : float_results) {
 		i = f32Tou32Slow(v.first);
 		if (std::abs((s64)v.second - i) > 32) {
 			printf("Inaccurate float values on %.9g, expected 0x%X, actual 0x%X\n",
-					v.first, v.second, i);
+				v.first, v.second, i);
 			UASSERT(false);
 		}
 
 		fs = u32Tof32Slow(v.second);
 		if (std::fabs(v.first - fs) > std::fabs(v.first * 0.000005f)) {
 			printf("Inaccurate float values on 0x%X, expected %.9g, actual 0x%.9g\n",
-					v.second, v.first, fs);
+				v.second, v.first, fs);
 			UASSERT(false);
 		}
 	}
@@ -385,12 +399,12 @@ void TestSerialization::testFloatFormat() {
 		fs = u32Tof32Slow(i);
 		if (fm != fs) {
 			printf("u32Tof32Slow failed on 0x%X, expected %.9g, actual %.9g\n",
-					i, fm, fs);
+				i, fm, fs);
 			return false;
 		}
 		if (f32Tou32Slow(fs) != i) {
 			printf("f32Tou32Slow failed on %.9g, expected 0x%X, actual 0x%X\n",
-					fs, i, f32Tou32Slow(fs));
+				fs, i, f32Tou32Slow(fs));
 			return false;
 		}
 		return true;
@@ -411,134 +425,15 @@ void TestSerialization::testFloatFormat() {
 }
 
 const u8 TestSerialization::test_serialized_data[12 * 11 - 2] = {
-	0x11,
-	0x22,
-	0x33,
-	0x44,
-	0x55,
-	0x66,
-	0x77,
-	0x88,
-	0x99,
-	0xaa,
-	0xbb,
-	0xcc,
-	0xdd,
-	0xee,
-	0xff,
-	0x80,
-	0x75,
-	0x30,
-	0xff,
-	0xff,
-	0xff,
-	0xfa,
-	0xff,
-	0xff,
-	0xff,
-	0xff,
-	0xff,
-	0xff,
-	0xff,
-	0xd5,
-	0x00,
-	0x00,
-	0xd1,
-	0x1e,
-	0xee,
-	0x1e,
-	0x5b,
-	0xc0,
-	0x80,
-	0x00,
-	0x02,
-	0x80,
-	0x7F,
-	0xFF,
-	0xFD,
-	0x80,
-	0x00,
-	0x07,
-	0x66,
-	0x6f,
-	0x6f,
-	0x62,
-	0x61,
-	0x72,
-	0x21,
-	0x01,
-	0xf4,
-	0x01,
-	0xf4,
-	0x10,
-	0x6f,
-	0x02,
-	0x5c,
-	0xff,
-	0xe2,
-	0x00,
-	0x00,
-	0x07,
-	0x80,
-	0x00,
-	0x00,
-	0x04,
-	0x38,
-	0xff,
-	0xff,
-	0xfe,
-	0x70,
-	0x00,
-	0x61,
-	0xa8,
-	0x36,
-	0x11,
-	0x51,
-	0x70,
-	0x5f,
-	0x00,
-	0x07,
-	0xa1,
-	0x20,
-	0x00,
-	0x98,
-	0xf5,
-	0x08,
-	0xff,
-	0xfd,
-	0x0f,
-	0xe4,
-	0xff,
-	0x80,
-	0x32,
-	0x80,
-	0x00,
-	0x00,
-	0x00,
-	0x17,
-	0x73,
-	0x6f,
-	0x6d,
-	0x65,
-	0x20,
-	0x6c,
-	0x6f,
-	0x6e,
-	0x67,
-	0x65,
-	0x72,
-	0x20,
-	0x73,
-	0x74,
-	0x72,
-	0x69,
-	0x6e,
-	0x67,
-	0x20,
-	0x68,
-	0x65,
-	0x72,
-	0x65,
-	0xF0,
-	0x0D,
+	0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc,
+	0xdd, 0xee, 0xff, 0x80, 0x75, 0x30, 0xff, 0xff, 0xff, 0xfa, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xd5, 0x00, 0x00, 0xd1, 0x1e, 0xee, 0x1e,
+	0x5b, 0xc0, 0x80, 0x00, 0x02, 0x80, 0x7F, 0xFF, 0xFD, 0x80, 0x00, 0x07,
+	0x66, 0x6f, 0x6f, 0x62, 0x61, 0x72, 0x21, 0x01, 0xf4, 0x01, 0xf4, 0x10,
+	0x6f, 0x02, 0x5c, 0xff, 0xe2, 0x00, 0x00, 0x07, 0x80, 0x00, 0x00, 0x04,
+	0x38, 0xff, 0xff, 0xfe, 0x70, 0x00, 0x61, 0xa8, 0x36, 0x11, 0x51, 0x70,
+	0x5f, 0x00, 0x07, 0xa1, 0x20, 0x00, 0x98, 0xf5, 0x08, 0xff,
+	0xfd, 0x0f, 0xe4, 0xff, 0x80, 0x32, 0x80, 0x00, 0x00, 0x00, 0x17, 0x73,
+	0x6f, 0x6d, 0x65, 0x20, 0x6c, 0x6f, 0x6e, 0x67, 0x65, 0x72, 0x20, 0x73,
+	0x74, 0x72, 0x69, 0x6e, 0x67, 0x20, 0x68, 0x65, 0x72, 0x65, 0xF0, 0x0D,
 };

@@ -30,7 +30,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "common/c_content.h"
 #include <json/json.h>
 
-void ToolGroupCap::toJson(Json::Value &object) const {
+
+void ToolGroupCap::toJson(Json::Value &object) const
+{
 	object["maxlevel"] = maxlevel;
 	object["uses"] = uses;
 
@@ -40,30 +42,41 @@ void ToolGroupCap::toJson(Json::Value &object) const {
 	object["times"] = std::move(times_object);
 }
 
-void ToolGroupCap::fromJson(const Json::Value &json) {
-	if (json.isObject()) {
-		if (json["maxlevel"].isInt())
-			maxlevel = json["maxlevel"].asInt();
-		if (json["uses"].isInt())
-			uses = json["uses"].asInt();
-		const Json::Value &times_object = json["times"];
-		if (times_object.isArray()) {
-			Json::ArrayIndex size = times_object.size();
-			for (Json::ArrayIndex i = 0; i < size; ++i)
-				if (times_object[i].isDouble())
-					times[i] = times_object[i].asFloat();
-		}
+void ToolGroupCap::fromJson(const Json::Value &json)
+{
+	if (!json.isObject())
+		return;
+
+	if (json["maxlevel"].isInt())
+		maxlevel = json["maxlevel"].asInt();
+
+	if (json["uses"].isInt())
+		uses = json["uses"].asInt();
+
+	const Json::Value &times_object = json["times"];
+
+	if (!times_object.isArray())
+		return;
+
+	Json::ArrayIndex size = times_object.size();
+
+	for (Json::ArrayIndex i = 0; i < size; ++i) {
+		if (times_object[i].isDouble())
+			times[i] = times_object[i].asFloat();
 	}
 }
 
-void ToolCapabilities::serialize(std::ostream &os, u16 protocol_version) const {
+void ToolCapabilities::serialize(std::ostream &os, u16 protocol_version) const
+{
 	if (protocol_version >= 38)
 		writeU8(os, 5);
 	else
 		writeU8(os, 4); // proto == 37
+
 	writeF32(os, full_punch_interval);
 	writeS16(os, max_drop_level);
 	writeU32(os, groupcaps.size());
+
 	for (const auto &groupcap : groupcaps) {
 		const std::string *name = &groupcap.first;
 		const ToolGroupCap *cap = &groupcap.second;
@@ -88,7 +101,8 @@ void ToolCapabilities::serialize(std::ostream &os, u16 protocol_version) const {
 		writeU16(os, rangelim(punch_attack_uses, 0, U16_MAX));
 }
 
-void ToolCapabilities::deSerialize(std::istream &is) {
+void ToolCapabilities::deSerialize(std::istream &is)
+{
 	int version = readU8(is);
 	if (version < 4)
 		throw SerializationError("unsupported ToolCapabilities version");
@@ -97,13 +111,14 @@ void ToolCapabilities::deSerialize(std::istream &is) {
 	max_drop_level = readS16(is);
 	groupcaps.clear();
 	u32 groupcaps_size = readU32(is);
+
 	for (u32 i = 0; i < groupcaps_size; i++) {
 		std::string name = deSerializeString16(is);
 		ToolGroupCap cap;
 		cap.uses = readS16(is);
 		cap.maxlevel = readS16(is);
 		u32 times_size = readU32(is);
-		for (u32 i = 0; i < times_size; i++) {
+		for(u32 i = 0; i < times_size; i++) {
 			int level = readS16(is);
 			float time = readF32(is);
 			cap.times[level] = time;
@@ -122,64 +137,79 @@ void ToolCapabilities::deSerialize(std::istream &is) {
 		punch_attack_uses = readU16(is);
 }
 
-void ToolCapabilities::serializeJson(std::ostream &os) const {
+void ToolCapabilities::serializeJson(std::ostream &os) const
+{
 	Json::Value root;
 	root["full_punch_interval"] = full_punch_interval;
 	root["max_drop_level"] = max_drop_level;
 	root["punch_attack_uses"] = punch_attack_uses;
 
 	Json::Value groupcaps_object;
+
 	for (const auto &groupcap : groupcaps) {
 		groupcap.second.toJson(groupcaps_object[groupcap.first]);
 	}
+
 	root["groupcaps"] = std::move(groupcaps_object);
 
 	Json::Value damage_groups_object;
+
 	for (const auto &damagegroup : damageGroups) {
 		damage_groups_object[damagegroup.first] = damagegroup.second;
 	}
+
 	root["damage_groups"] = std::move(damage_groups_object);
 
 	fastWriteJson(root, os);
 }
 
-void ToolCapabilities::deserializeJson(std::istream &is) {
+void ToolCapabilities::deserializeJson(std::istream &is)
+{
 	Json::Value root;
 	is >> root;
-	if (root.isObject()) {
-		if (root["full_punch_interval"].isDouble())
-			full_punch_interval = root["full_punch_interval"].asFloat();
-		if (root["max_drop_level"].isInt())
-			max_drop_level = root["max_drop_level"].asInt();
-		if (root["punch_attack_uses"].isInt())
-			punch_attack_uses = root["punch_attack_uses"].asInt();
 
-		Json::Value &groupcaps_object = root["groupcaps"];
-		if (groupcaps_object.isObject()) {
-			Json::ValueIterator gciter;
-			for (gciter = groupcaps_object.begin();
-					gciter != groupcaps_object.end(); ++gciter) {
-				ToolGroupCap groupcap;
-				groupcap.fromJson(*gciter);
-				groupcaps[gciter.key().asString()] = groupcap;
-			}
-		}
+	if (!root.isObject())
+		return;
 
-		Json::Value &damage_groups_object = root["damage_groups"];
-		if (damage_groups_object.isObject()) {
-			Json::ValueIterator dgiter;
-			for (dgiter = damage_groups_object.begin();
-					dgiter != damage_groups_object.end(); ++dgiter) {
-				Json::Value &value = *dgiter;
-				if (value.isInt())
-					damageGroups[dgiter.key().asString()] =
-							value.asInt();
-			}
-		}
+	if (root["full_punch_interval"].isDouble())
+		full_punch_interval = root["full_punch_interval"].asFloat();
+
+	if (root["max_drop_level"].isInt())
+		max_drop_level = root["max_drop_level"].asInt();
+
+	if (root["punch_attack_uses"].isInt())
+		punch_attack_uses = root["punch_attack_uses"].asInt();
+
+	deserializeJsonGroupcaps(root["groupcaps"]);
+	deserializeJsonDamageGroups(root["damage_groups"]);
+}
+
+void ToolCapabilities::deserializeJsonGroupcaps(Json::Value &json)
+{
+	if (!json.isObject())
+		return;
+
+	for (Json::ValueIterator iter = json.begin(); iter != json.end(); ++iter) {
+		ToolGroupCap value;
+		value.fromJson(*iter);
+		groupcaps[iter.key().asString()] = value;
 	}
 }
 
-void WearBarParams::serialize(std::ostream &os) const {
+void ToolCapabilities::deserializeJsonDamageGroups(Json::Value &json)
+{
+	if (!json.isObject())
+		return;
+
+	for (Json::ValueIterator iter = json.begin(); iter != json.end(); ++iter) {
+		Json::Value &value = *iter;
+		if (value.isInt())
+			damageGroups[iter.key().asString()] = value.asInt();
+	}
+}
+
+void WearBarParams::serialize(std::ostream &os) const
+{
 	writeU8(os, 1); // Version for future-proofing
 	writeU8(os, blend);
 	writeU16(os, colorStops.size());
@@ -189,7 +219,8 @@ void WearBarParams::serialize(std::ostream &os) const {
 	}
 }
 
-WearBarParams WearBarParams::deserialize(std::istream &is) {
+WearBarParams WearBarParams::deserialize(std::istream &is)
+{
 	u8 version = readU8(is);
 	if (version > 1)
 		throw SerializationError("unsupported WearBarParams version");
@@ -211,7 +242,8 @@ WearBarParams WearBarParams::deserialize(std::istream &is) {
 	return WearBarParams(colorStops, blend);
 }
 
-void WearBarParams::serializeJson(std::ostream &os) const {
+void WearBarParams::serializeJson(std::ostream &os) const
+{
 	Json::Value root;
 	Json::Value color_stops;
 	for (const std::pair<f32, video::SColor> item : colorStops) {
@@ -223,7 +255,8 @@ void WearBarParams::serializeJson(std::ostream &os) const {
 	fastWriteJson(root, os);
 }
 
-std::optional<WearBarParams> WearBarParams::deserializeJson(std::istream &is) {
+std::optional<WearBarParams> WearBarParams::deserializeJson(std::istream &is)
+{
 	Json::Value root;
 	is >> root;
 	if (!root.isObject() || !root["color_stops"].isObject() || !root["blend"].isString())
@@ -296,7 +329,8 @@ video::SColor WearBarParams::getWearBarColor(f32 durabilityPercent) {
 	throw std::logic_error("invalid blend value");
 }
 
-u32 calculateResultWear(const u32 uses, const u16 initial_wear) {
+u32 calculateResultWear(const u32 uses, const u16 initial_wear)
+{
 	if (uses == 0) {
 		// Trivial case: Infinite uses
 		return 0;
@@ -332,9 +366,9 @@ u32 calculateResultWear(const u32 uses, const u16 initial_wear) {
 	  114*504 + 16*505 = 65536
 	*/
 	u32 result_wear;
-	u32 wear_normal = ((U16_MAX + 1) / uses);
+	u32 wear_normal = ((U16_MAX+1) / uses);
 	// Will be non-zero if its not evenly divisible
-	u16 blocks_oversize = (U16_MAX + 1) % uses;
+	u16 blocks_oversize = (U16_MAX+1) % uses;
 	// Whether to add one extra wear point in case
 	// of oversized wear.
 	u16 wear_extra = 0;
@@ -350,9 +384,8 @@ u32 calculateResultWear(const u32 uses, const u16 initial_wear) {
 		   player.
 		*/
 		u16 wear_extra_at = blocks_normal * wear_normal;
-		if (initial_wear >= wear_extra_at) {
+		if (initial_wear >= wear_extra_at)
 			wear_extra = 1;
-		}
 	}
 	result_wear = wear_normal + wear_extra;
 	return result_wear;
@@ -360,16 +393,18 @@ u32 calculateResultWear(const u32 uses, const u16 initial_wear) {
 
 DigParams getDigParams(const ItemGroupList &groups,
 		const ToolCapabilities *tp,
-		const u16 initial_wear) {
+		const u16 initial_wear)
+{
+
 	// Group dig_immediate defaults to fixed time and no wear
 	if (tp->groupcaps.find("dig_immediate") == tp->groupcaps.cend()) {
 		switch (itemgroup_get(groups, "dig_immediate")) {
-			case 2:
-				return DigParams(true, 0.5, 0, "dig_immediate");
-			case 3:
-				return DigParams(true, 0, 0, "dig_immediate");
-			default:
-				break;
+		case 2:
+			return DigParams(true, 0.5, 0, "dig_immediate");
+		case 3:
+			return DigParams(true, 0, 0, "dig_immediate");
+		default:
+			break;
 		}
 	}
 
@@ -396,6 +431,7 @@ DigParams getDigParams(const ItemGroupList &groups,
 
 		if (leveldiff > 1)
 			time /= leveldiff;
+
 		if (!result_diggable || time < result_time) {
 			result_time = time;
 			result_diggable = true;
@@ -413,7 +449,8 @@ DigParams getDigParams(const ItemGroupList &groups,
 
 HitParams getHitParams(const ItemGroupList &armor_groups,
 		const ToolCapabilities *tp, float time_from_last_punch,
-		u16 initial_wear) {
+		u16 initial_wear)
+{
 	s32 damage = 0;
 	float result_wear = 0.0f;
 	float punch_interval_multiplier =
@@ -431,12 +468,13 @@ HitParams getHitParams(const ItemGroupList &armor_groups,
 	// Keep damage in sane bounds for simplicity
 	damage = rangelim(damage, -U16_MAX, U16_MAX);
 
-	u32 wear_i = (u32)result_wear;
-	return { damage, wear_i };
+	u32 wear_i = (u32) result_wear;
+	return {damage, wear_i};
 }
 
 HitParams getHitParams(const ItemGroupList &armor_groups,
-		const ToolCapabilities *tp) {
+		const ToolCapabilities *tp)
+{
 	return getHitParams(armor_groups, tp, 1000000);
 }
 
@@ -445,7 +483,8 @@ PunchDamageResult getPunchDamage(
 		const ToolCapabilities *toolcap,
 		const ItemStack *punchitem,
 		float time_from_last_punch,
-		u16 initial_wear) {
+		u16 initial_wear
+){
 	bool do_hit = true;
 	{
 		if (do_hit && punchitem) {
@@ -455,13 +494,14 @@ PunchDamageResult getPunchDamage(
 		}
 
 		if (do_hit) {
-			if (itemgroup_get(armor_groups, "immortal"))
+			if(itemgroup_get(armor_groups, "immortal"))
 				do_hit = false;
 		}
 	}
 
 	PunchDamageResult result;
-	if (do_hit) {
+	if(do_hit)
+	{
 		HitParams hitparams = getHitParams(armor_groups, toolcap,
 				time_from_last_punch,
 				punchitem ? punchitem->wear : 0);
@@ -474,12 +514,15 @@ PunchDamageResult getPunchDamage(
 }
 
 f32 getToolRange(const ItemStack &wielded_item, const ItemStack &hand_item,
-		const IItemDefManager *itemdef_manager) {
+		const IItemDefManager *itemdef_manager)
+{
 	const std::string &wielded_meta_range = wielded_item.metadata.getString("range");
 	const std::string &hand_meta_range = hand_item.metadata.getString("range");
 
-	f32 max_d = wielded_meta_range.empty() ? wielded_item.getDefinition(itemdef_manager).range : stof(wielded_meta_range);
-	f32 max_d_hand = hand_meta_range.empty() ? hand_item.getDefinition(itemdef_manager).range : stof(hand_meta_range);
+	f32 max_d = wielded_meta_range.empty() ? wielded_item.getDefinition(itemdef_manager).range :
+			stof(wielded_meta_range);
+	f32 max_d_hand = hand_meta_range.empty() ? hand_item.getDefinition(itemdef_manager).range :
+			stof(hand_meta_range);
 
 	if (max_d < 0 && max_d_hand >= 0)
 		max_d = max_d_hand;

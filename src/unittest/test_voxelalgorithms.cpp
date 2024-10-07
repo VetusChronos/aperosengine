@@ -38,26 +38,28 @@ public:
 
 static TestVoxelAlgorithms g_test_instance;
 
-void TestVoxelAlgorithms::runTests(IGameDef *gamedef) {
+void TestVoxelAlgorithms::runTests(IGameDef *gamedef)
+{
 	TEST(testVoxelLineIterator);
 	TEST(testLighting, gamedef);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestVoxelAlgorithms::testVoxelLineIterator() {
+void TestVoxelAlgorithms::testVoxelLineIterator()
+{
 	// Test some lines
 	std::vector<core::line3d<f32>> lines;
 	for (f32 x = -9.1f; x < 9.0f; x += 3.124f)
-		for (f32 y = -9.2f; y < 9.0f; y += 3.123f)
-			for (f32 z = -9.3f; z < 9.0f; z += 3.122f) {
-				lines.emplace_back(-x, -y, -z, x, y, z);
-			}
+	for (f32 y = -9.2f; y < 9.0f; y += 3.123f)
+	for (f32 z = -9.3f; z < 9.0f; z += 3.122f) {
+		lines.emplace_back(-x, -y, -z, x, y, z);
+	}
 	for (f32 x = -3.0f; x < 3.1f; x += 0.5f)
-		for (f32 y = -3.0f; y < 3.1f; y += 0.5f)
-			for (f32 z = -3.0f; z < 3.1f; z += 0.5f) {
-				lines.emplace_back(-x, -y, -z, x, y, z);
-			}
+	for (f32 y = -3.0f; y < 3.1f; y += 0.5f)
+	for (f32 z = -3.0f; z < 3.1f; z += 0.5f) {
+		lines.emplace_back(-x, -y, -z, x, y, z);
+	}
 	lines.emplace_back(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	// Test every line
 	for (auto l : lines) {
@@ -71,7 +73,8 @@ void TestVoxelAlgorithms::testVoxelLineIterator() {
 		// Values for testing
 		v3s16 end_voxel = floatToInt(l.end, 1.0f);
 		v3s16 voxel_vector = end_voxel - start_voxel;
-		int nodecount = abs(voxel_vector.X) + abs(voxel_vector.Y) + abs(voxel_vector.Z);
+		int nodecount = abs(voxel_vector.X) + abs(voxel_vector.Y)
+			+ abs(voxel_vector.Z);
 		int actual_nodecount = 0;
 		v3s16 old_voxel = iterator.m_current_node_pos;
 
@@ -85,7 +88,7 @@ void TestVoxelAlgorithms::testVoxelLineIterator() {
 			v3f voxel_center = intToFloat(iterator.m_current_node_pos, 1);
 			constexpr f32 eps = 1.0e-5f;
 			aabb3f box(voxel_center - v3f(0.5f + eps),
-					voxel_center + v3f(0.5f + eps));
+				voxel_center + v3f(0.5f + eps));
 			UASSERT(box.intersectsWithLine(l));
 			// Update old voxel
 			old_voxel = new_voxel;
@@ -98,7 +101,8 @@ void TestVoxelAlgorithms::testVoxelLineIterator() {
 	}
 }
 
-void TestVoxelAlgorithms::testLighting(IGameDef *gamedef) {
+void TestVoxelAlgorithms::testLighting(IGameDef *gamedef)
+{
 	v3s16 pmin(-32, -32, -32);
 	v3s16 pmax(31, 31, 31);
 	v3s16 bpmin = getNodeBlockPos(pmin), bpmax = getNodeBlockPos(pmax);
@@ -106,26 +110,26 @@ void TestVoxelAlgorithms::testLighting(IGameDef *gamedef) {
 
 	// Make a 21x21x21 hollow box centered at the origin.
 	{
-		std::map<v3s16, MapBlock *> modified_blocks;
+		std::map<v3s16, MapBlock*> modified_blocks;
 		MMVManip vm(&map);
 		vm.initialEmerge(bpmin, bpmax, false);
 		s32 volume = vm.m_area.getVolume();
 		for (s32 i = 0; i < volume; i++)
 			vm.m_data[i] = MapNode(CONTENT_AIR);
 		for (s16 z = -10; z <= 10; z++)
-			for (s16 y = -10; y <= 10; y++)
-				for (s16 x = -10; x <= 10; x++)
-					vm.setNodeNoEmerge(v3s16(x, y, z), MapNode(t_CONTENT_STONE));
+		for (s16 y = -10; y <= 10; y++)
+		for (s16 x = -10; x <= 10; x++)
+			vm.setNodeNoEmerge(v3s16(x, y, z), MapNode(t_CONTENT_STONE));
 		for (s16 z = -9; z <= 9; z++)
-			for (s16 y = -9; y <= 9; y++)
-				for (s16 x = -9; x <= 9; x++)
-					vm.setNodeNoEmerge(v3s16(x, y, z), MapNode(CONTENT_AIR));
+		for (s16 y = -9; y <= 9; y++)
+		for (s16 x = -9; x <= 9; x++)
+			vm.setNodeNoEmerge(v3s16(x, y, z), MapNode(CONTENT_AIR));
 		voxalgo::blit_back_with_light(&map, &vm, &modified_blocks);
 	}
 
 	// Place two holes on the edges a torch in the center.
 	{
-		std::map<v3s16, MapBlock *> modified_blocks;
+		std::map<v3s16, MapBlock*> modified_blocks;
 		map.addNodeAndUpdate(v3s16(-10, 0, 0), MapNode(CONTENT_AIR), modified_blocks);
 		map.addNodeAndUpdate(v3s16(9, 10, -9), MapNode(t_CONTENT_WATER), modified_blocks);
 		map.addNodeAndUpdate(v3s16(0, 0, 0), MapNode(t_CONTENT_TORCH), modified_blocks);

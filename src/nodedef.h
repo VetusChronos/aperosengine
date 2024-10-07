@@ -46,13 +46,15 @@ class NodeResolver;
 class TestSchematic;
 #endif
 
-enum ContentParamType : u8 {
+enum ContentParamType : u8
+{
 	CPT_NONE,
 	CPT_LIGHT,
 	ContentParamType_END // Dummy for validity check
 };
 
-enum ContentParamType2 : u8 {
+enum ContentParamType2 : u8
+{
 	CPT2_NONE,
 	// Need 8-bit param2
 	CPT2_FULL,
@@ -86,14 +88,16 @@ enum ContentParamType2 : u8 {
 	ContentParamType2_END
 };
 
-enum LiquidType : u8 {
+enum LiquidType : u8
+{
 	LIQUID_NONE,
 	LIQUID_FLOWING,
 	LIQUID_SOURCE,
 	LiquidType_END // Dummy for validity check
 };
 
-enum NodeBoxType : u8 {
+enum NodeBoxType : u8
+{
 	NODEBOX_REGULAR, // Regular block; allows buildable_to
 	NODEBOX_FIXED, // Static separately defined box(es)
 	NODEBOX_WALLMOUNTED, // Box for wall mounted nodes; (top, bottom, side)
@@ -101,7 +105,8 @@ enum NodeBoxType : u8 {
 	NODEBOX_CONNECTED, // optionally draws nodeboxes if a neighbor node attaches
 };
 
-struct NodeBoxConnected {
+struct NodeBoxConnected
+{
 	std::vector<aabb3f> connect_top;
 	std::vector<aabb3f> connect_bottom;
 	std::vector<aabb3f> connect_front;
@@ -118,7 +123,8 @@ struct NodeBoxConnected {
 	std::vector<aabb3f> disconnected_sides;
 };
 
-struct NodeBox {
+struct NodeBox
+{
 	enum NodeBoxType type;
 	// NODEBOX_REGULAR (no parameters)
 	// NODEBOX_FIXED
@@ -131,7 +137,8 @@ struct NodeBox {
 	// (kept externally to not bloat the structure)
 	std::shared_ptr<NodeBoxConnected> connected;
 
-	NodeBox() { reset(); }
+	NodeBox()
+	{ reset(); }
 	~NodeBox() = default;
 
 	inline NodeBoxConnected &getConnected() {
@@ -187,7 +194,8 @@ public:
 	void readSettings();
 };
 
-enum NodeDrawType : u8 {
+enum NodeDrawType : u8
+{
 	// A basic solid block
 	NDT_NORMAL,
 	// Nothing is drawn
@@ -235,9 +243,9 @@ enum NodeDrawType : u8 {
 };
 
 // Mesh options for NDT_PLANTLIKE with CPT2_MESHOPTIONS
-static const u8 MO_MASK_STYLE = 0x07;
-static const u8 MO_BIT_RANDOM_OFFSET = 0x08;
-static const u8 MO_BIT_SCALE_SQRT2 = 0x10;
+static const u8 MO_MASK_STYLE          = 0x07;
+static const u8 MO_BIT_RANDOM_OFFSET   = 0x08;
+static const u8 MO_BIT_SCALE_SQRT2     = 0x10;
 static const u8 MO_BIT_RANDOM_OFFSET_Y = 0x20;
 enum PlantlikeStyle {
 	PLANT_STYLE_CROSS,
@@ -262,11 +270,13 @@ enum AlphaMode : u8 {
 	AlphaMode_END // Dummy for validity check
 };
 
+
 /*
 	Stand-alone definition of a TileSpec (basically a server-side TileSpec)
 */
 
-struct TileDef {
+struct TileDef
+{
 	std::string name = "";
 	bool backface_culling = true; // Takes effect only in special cases
 	bool tileable_horizontal = true;
@@ -280,7 +290,8 @@ struct TileDef {
 
 	struct TileAnimationParams animation;
 
-	TileDef() {
+	TileDef()
+	{
 		animation.type = TAT_NONE;
 	}
 
@@ -295,7 +306,8 @@ struct TileDef {
 //       tiles can be overridden.
 #define CF_SPECIAL_COUNT 6
 
-struct ContentFeatures {
+struct ContentFeatures
+{
 	// PROTOCOL_VERSION >= 37. This is legacy and should not be increased anymore,
 	// write checks that depend directly on the protocol version instead.
 	static const u8 CONTENTFEATURES_VERSION = 13;
@@ -429,6 +441,8 @@ struct ContentFeatures {
 	NodeBox node_box;
 	NodeBox selection_box;
 	NodeBox collision_box;
+	// If selection box is bigger then (-BS,-BS,-BS)/2 and (BS,BS,BS)/2 edges
+	bool bigSelectionBox;
 
 	// --- SOUND PROPERTIES ---
 
@@ -457,37 +471,39 @@ struct ContentFeatures {
 	/*
 		Some handy methods
 	*/
-	void setDefaultAlphaMode() {
+	void setDefaultAlphaMode()
+	{
 		switch (drawtype) {
-			case NDT_NORMAL:
-			case NDT_LIQUID:
-			case NDT_FLOWINGLIQUID:
-			case NDT_NODEBOX:
-			case NDT_MESH:
-				alpha = ALPHAMODE_OPAQUE;
-				break;
-			default:
-				alpha = ALPHAMODE_CLIP;
-				break;
+		case NDT_NORMAL:
+		case NDT_LIQUID:
+		case NDT_FLOWINGLIQUID:
+		case NDT_NODEBOX:
+		case NDT_MESH:
+			alpha = ALPHAMODE_OPAQUE;
+			break;
+		default:
+			alpha = ALPHAMODE_CLIP;
+			break;
 		}
 	}
 
-	bool needsBackfaceCulling() const {
+	bool needsBackfaceCulling() const
+	{
 		switch (drawtype) {
-			case NDT_TORCHLIKE:
-			case NDT_SIGNLIKE:
-			case NDT_FIRELIKE:
-			case NDT_RAILLIKE:
-			case NDT_PLANTLIKE:
-			case NDT_PLANTLIKE_ROOTED:
-			case NDT_MESH:
-				return false;
-			default:
-				return true;
+		case NDT_TORCHLIKE:
+		case NDT_SIGNLIKE:
+		case NDT_FIRELIKE:
+		case NDT_RAILLIKE:
+		case NDT_PLANTLIKE:
+		case NDT_PLANTLIKE_ROOTED:
+		case NDT_MESH:
+			return false;
+		default:
+			return true;
 		}
 	}
 
-	bool isLiquid() const {
+	bool isLiquid() const{
 		return (liquid_type != LIQUID_NONE);
 	}
 
@@ -499,7 +515,7 @@ struct ContentFeatures {
 		if (!isLiquidRender() || !f.isLiquidRender())
 			return false;
 		return liquid_alternative_flowing_id == f.liquid_alternative_flowing_id &&
-				liquid_alternative_source_id == f.liquid_alternative_source_id;
+			liquid_alternative_source_id == f.liquid_alternative_source_id;
 	}
 
 	ContentLightingFlags getLightingFlags() const {
@@ -511,13 +527,14 @@ struct ContentFeatures {
 		return flags;
 	}
 
-	int getGroup(const std::string &group) const {
+	int getGroup(const std::string &group) const
+	{
 		return itemgroup_get(groups, group);
 	}
 
 #ifndef SERVER
 	void updateTextures(ITextureSource *tsrc, IShaderSource *shdsrc,
-			scene::IMeshManipulator *meshmanip, Client *client, const TextureSettings &tsettings);
+		scene::IMeshManipulator *meshmanip, Client *client, const TextureSettings &tsettings);
 #endif
 
 private:
@@ -553,8 +570,10 @@ public:
 	 * @return properties of the given content type, or \ref CONTENT_UNKNOWN
 	 * if the given content type is not registered.
 	 */
-	inline const ContentFeatures &get(content_t c) const {
-		return (c < m_content_features.size() && !m_content_features[c].name.empty()) ? m_content_features[c] : m_content_features[CONTENT_UNKNOWN];
+	inline const ContentFeatures& get(content_t c) const {
+		return
+			(c < m_content_features.size() && !m_content_features[c].name.empty()) ?
+				m_content_features[c] : m_content_features[CONTENT_UNKNOWN];
 	}
 
 	/*!
@@ -563,7 +582,7 @@ public:
 	 * @return properties of the given node or @ref CONTENT_UNKNOWN if the
 	 * given content type is not registered.
 	 */
-	inline const ContentFeatures &get(const MapNode &n) const {
+	inline const ContentFeatures& get(const MapNode &n) const {
 		return get(n.getContent());
 	}
 
@@ -582,7 +601,7 @@ public:
 	 * @return properties of the given node or @ref CONTENT_UNKNOWN if
 	 * not found
 	 */
-	const ContentFeatures &get(const std::string &name) const;
+	const ContentFeatures& get(const std::string &name) const;
 
 	/*!
 	 * Returns the content ID for the given name.
@@ -773,6 +792,11 @@ private:
 	 */
 	void fixSelectionBoxIntUnion();
 
+	/*!
+	 * Calculate ContentFeatures bigSelectonBox value.
+	 */
+	void calcBigSelectionBox(content_t id, const ContentFeatures &def);
+
 	//! Features indexed by ID.
 	std::vector<ContentFeatures> m_content_features;
 
@@ -844,10 +868,10 @@ public:
 	void cloneTo(NodeResolver *res) const;
 
 	bool getIdFromNrBacklog(content_t *result_out,
-			const std::string &node_alt, content_t c_fallback,
-			bool error_on_fallback = true);
+		const std::string &node_alt, content_t c_fallback,
+		bool error_on_fallback = true);
 	bool getIdsFromNrBacklog(std::vector<content_t> *result_out,
-			bool all_required = false, content_t c_fallback = CONTENT_IGNORE);
+		bool all_required = false, content_t c_fallback = CONTENT_IGNORE);
 
 	inline bool isResolveDone() const { return m_resolve_done; }
 	void reset(bool resolve_done = false);

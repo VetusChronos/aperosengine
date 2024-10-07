@@ -22,15 +22,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "irrlichttypes.h"
 #include <IGUIEnvironment.h>
-#include "gui/guiFormSpecMenu.h"
-#include "util/enriched_string.h"
-#include "util/pointedthing.h"
 #include "game.h"
 
 using namespace irr;
 class Client;
+class EnrichedString;
 class GUIChatConsole;
+class GUIFormSpecMenu;
 struct MapDrawControl;
+struct PointedThing;
 
 /*
  * This object intend to contain the core UI elements
@@ -40,7 +40,8 @@ struct MapDrawControl;
  *   - chat texts
  *   - hud flags
  */
-class GameUI {
+class GameUI
+{
 	// Temporary between coding time to move things here
 	friend class Game;
 
@@ -52,7 +53,8 @@ public:
 	~GameUI() = default;
 
 	// Flags that can, or may, change during main game loop
-	struct Flags {
+	struct Flags
+	{
 		bool show_chat = true;
 		bool show_hud = true;
 		bool show_minimal_debug = false;
@@ -71,14 +73,16 @@ public:
 	inline void setInfoText(const std::wstring &str) { m_infotext = str; }
 	inline void clearInfoText() { m_infotext.clear(); }
 
-	inline void showStatusText(const std::wstring &str) {
+	inline void showStatusText(const std::wstring &str)
+	{
 		m_statustext = str;
 		m_statustext_time = 0.0f;
 	}
 	void showTranslatedStatusText(const char *str);
 	inline void clearStatusText() { m_statustext.clear(); }
 
-	bool isChatVisible() {
+	bool isChatVisible()
+	{
 		return m_flags.show_chat && m_recent_chat_count != 0 && m_profiler_current_page == 0;
 	}
 	void setChatText(const EnrichedString &chat_text, u32 recent_chat_count);
@@ -90,7 +94,8 @@ public:
 	void toggleHud();
 	void toggleProfiler();
 
-	GUIFormSpecMenu *&updateFormspec(const std::string &formname) {
+	GUIFormSpecMenu *&updateFormspec(const std::string &formname)
+	{
 		m_formname = formname;
 		return m_formspec;
 	}
@@ -105,7 +110,7 @@ private:
 
 	float m_drawtime_avg = 0;
 
-	gui::IGUIStaticText *m_guitext = nullptr; // First line of debug text
+	gui::IGUIStaticText *m_guitext = nullptr;  // First line of debug text
 	gui::IGUIStaticText *m_guitext2 = nullptr; // Second line of debug text
 
 	gui::IGUIStaticText *m_guitext_info = nullptr; // At the middle of the screen
@@ -118,7 +123,7 @@ private:
 
 	gui::IGUIStaticText *m_guitext_chat = nullptr; // Chat text
 	u32 m_recent_chat_count = 0;
-	core::rect<s32> m_current_chat_size{ 0, 0, 0, 0 };
+	core::rect<s32> m_current_chat_size{0, 0, 0, 0};
 
 	gui::IGUIStaticText *m_guitext_profiler = nullptr; // Profiler text
 	u8 m_profiler_current_page = 0;

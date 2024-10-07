@@ -32,7 +32,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	The crafting method depends on the inventory list
 	that the crafting input comes from.
 */
-enum CraftMethod {
+enum CraftMethod
+{
 	// Crafting grid
 	CRAFT_METHOD_NORMAL,
 	// Cooking something in a furnace
@@ -46,7 +47,8 @@ enum CraftMethod {
 	the earlier it is tried at crafting, and the less likely is a collision.
 	Changing order causes changes in behavior, so know what you do.
  */
-enum CraftHashType {
+enum CraftHashType
+{
 	// Hashes the normalized names of the recipe's elements.
 	// Only recipes without group usage can be found here,
 	// because groups can't be guessed efficiently.
@@ -60,12 +62,13 @@ enum CraftHashType {
 	CRAFT_HASH_TYPE_UNHASHED
 
 };
-const int craft_hash_type_max = (int)CRAFT_HASH_TYPE_UNHASHED;
+const int craft_hash_type_max = (int) CRAFT_HASH_TYPE_UNHASHED;
 
 /*
 	Input: The contents of the crafting slots, arranged in matrix form
 */
-struct CraftInput {
+struct CraftInput
+{
 	CraftMethod method = CRAFT_METHOD_NORMAL;
 	unsigned int width = 0;
 	std::vector<ItemStack> items;
@@ -73,8 +76,9 @@ struct CraftInput {
 	CraftInput() = default;
 
 	CraftInput(CraftMethod method_, unsigned int width_,
-			const std::vector<ItemStack> &items_) :
-			method(method_), width(width_), items(items_) {}
+			const std::vector<ItemStack> &items_):
+		method(method_), width(width_), items(items_)
+	{}
 
 	// Returns true if all items are empty.
 	bool empty() const;
@@ -85,7 +89,8 @@ struct CraftInput {
 /*
 	Output: Result of crafting operation
 */
-struct CraftOutput {
+struct CraftOutput
+{
 	// Used for normal crafting and cooking, itemstring
 	std::string item = "";
 	// Used for cooking (cook time) and fuel (burn time), seconds
@@ -93,8 +98,9 @@ struct CraftOutput {
 
 	CraftOutput() = default;
 
-	CraftOutput(const std::string &item_, float time_) :
-			item(item_), time(time_) {}
+	CraftOutput(const std::string &item_, float time_):
+		item(item_), time(time_)
+	{}
 	std::string dump() const;
 };
 
@@ -108,20 +114,23 @@ struct CraftOutput {
 	replacement pair, the crafting input slot that contained a water
 	bucket will contain an empty bucket after crafting.
 */
-struct CraftReplacements {
+struct CraftReplacements
+{
 	// List of replacements
-	std::vector<std::pair<std::string, std::string>> pairs;
+	std::vector<std::pair<std::string, std::string> > pairs;
 
 	CraftReplacements() = default;
-	CraftReplacements(const std::vector<std::pair<std::string, std::string>> &pairs_) :
-			pairs(pairs_) {}
+	CraftReplacements(const std::vector<std::pair<std::string, std::string> > &pairs_):
+		pairs(pairs_)
+	{}
 	std::string dump() const;
 };
 
 /*
 	Crafting definition base class
 */
-class CraftDefinition {
+class CraftDefinition
+{
 public:
 	/*
 		Craft recipe priorities, from low to high
@@ -130,7 +139,8 @@ public:
 		If a recipe with higher priority than a previous found one is
 		encountered, it is selected instead.
 	*/
-	enum RecipePriority {
+	enum RecipePriority
+	{
 		PRIORITY_NO_RECIPE,
 		PRIORITY_TOOLREPAIR,
 		PRIORITY_SHAPELESS_AND_GROUPS,
@@ -143,23 +153,25 @@ public:
 	virtual ~CraftDefinition() = default;
 
 	// Returns type of crafting definition
-	virtual std::string getName() const = 0;
+	virtual std::string getName() const=0;
 
 	// Checks whether the recipe is applicable
-	virtual bool check(const CraftInput &input, IGameDef *gamedef) const = 0;
-	RecipePriority getPriority() const {
+	virtual bool check(const CraftInput &input, IGameDef *gamedef) const=0;
+	RecipePriority getPriority() const
+	{
 		return priority;
 	}
 	// Returns the output structure, meaning depends on crafting method
 	// The implementation can assume that check(input) returns true
-	virtual CraftOutput getOutput(const CraftInput &input, IGameDef *gamedef) const = 0;
+	virtual CraftOutput getOutput(const CraftInput &input, IGameDef *gamedef) const=0;
 	// the inverse of the above
-	virtual CraftInput getInput(const CraftOutput &output, IGameDef *gamedef) const = 0;
+	virtual CraftInput getInput(const CraftOutput &output, IGameDef *gamedef) const=0;
 	// Decreases count of every input item
 	virtual void decrementInput(CraftInput &input,
-			std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const = 0;
+		std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const=0;
 
-	CraftHashType getHashType() const {
+	CraftHashType getHashType() const
+	{
 		return hash_type;
 	}
 	virtual u64 getHash(CraftHashType type) const = 0;
@@ -167,7 +179,7 @@ public:
 	// to be called after all mods are loaded, so that we catch all aliases
 	virtual void initHash(IGameDef *gamedef) = 0;
 
-	virtual std::string dump() const = 0;
+	virtual std::string dump() const=0;
 
 protected:
 	CraftHashType hash_type;
@@ -180,14 +192,15 @@ protected:
 	Supported crafting method: CRAFT_METHOD_NORMAL.
 	Requires the input items to be arranged exactly like in the recipe.
 */
-class CraftDefinitionShaped : public CraftDefinition {
+class CraftDefinitionShaped: public CraftDefinition
+{
 public:
 	CraftDefinitionShaped() = delete;
 	CraftDefinitionShaped(
-			const std::string &output_,
-			unsigned int width_,
-			const std::vector<std::string> &recipe_,
-			const CraftReplacements &replacements_);
+		const std::string &output_,
+		unsigned int width_,
+		const std::vector<std::string> &recipe_,
+		const CraftReplacements &replacements_);
 
 	virtual ~CraftDefinitionShaped() = default;
 
@@ -196,7 +209,7 @@ public:
 	virtual CraftOutput getOutput(const CraftInput &input, IGameDef *gamedef) const;
 	virtual CraftInput getInput(const CraftOutput &output, IGameDef *gamedef) const;
 	virtual void decrementInput(CraftInput &input,
-			std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const;
+		std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const;
 
 	virtual u64 getHash(CraftHashType type) const;
 
@@ -224,13 +237,14 @@ private:
 	Supported crafting method: CRAFT_METHOD_NORMAL.
 	Input items can arranged in any way.
 */
-class CraftDefinitionShapeless : public CraftDefinition {
+class CraftDefinitionShapeless: public CraftDefinition
+{
 public:
 	CraftDefinitionShapeless() = delete;
 	CraftDefinitionShapeless(
-			const std::string &output_,
-			const std::vector<std::string> &recipe_,
-			const CraftReplacements &replacements_);
+		const std::string &output_,
+		const std::vector<std::string> &recipe_,
+		const CraftReplacements &replacements_);
 
 	virtual ~CraftDefinitionShapeless() = default;
 
@@ -239,7 +253,7 @@ public:
 	virtual CraftOutput getOutput(const CraftInput &input, IGameDef *gamedef) const;
 	virtual CraftInput getInput(const CraftOutput &output, IGameDef *gamedef) const;
 	virtual void decrementInput(CraftInput &input,
-			std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const;
+		std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const;
 
 	virtual u64 getHash(CraftHashType type) const;
 
@@ -266,7 +280,8 @@ private:
 	Put two damaged tools into the crafting grid, get one tool back.
 	There should only be one crafting definition of this type.
 */
-class CraftDefinitionToolRepair : public CraftDefinition {
+class CraftDefinitionToolRepair: public CraftDefinition
+{
 public:
 	CraftDefinitionToolRepair() = delete;
 	CraftDefinitionToolRepair(float additional_wear_);
@@ -278,11 +293,12 @@ public:
 	virtual CraftOutput getOutput(const CraftInput &input, IGameDef *gamedef) const;
 	virtual CraftInput getInput(const CraftOutput &output, IGameDef *gamedef) const;
 	virtual void decrementInput(CraftInput &input,
-			std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const;
+		std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const;
 
 	virtual u64 getHash(CraftHashType type) const { return 2; }
 
-	virtual void initHash(IGameDef *gamedef) {
+	virtual void initHash(IGameDef *gamedef)
+	{
 		hash_type = CRAFT_HASH_TYPE_COUNT;
 	}
 
@@ -301,14 +317,15 @@ private:
 	A cooking (in furnace) definition
 	Supported crafting method: CRAFT_METHOD_COOKING.
 */
-class CraftDefinitionCooking : public CraftDefinition {
+class CraftDefinitionCooking: public CraftDefinition
+{
 public:
 	CraftDefinitionCooking() = delete;
 	CraftDefinitionCooking(
-			const std::string &output_,
-			const std::string &recipe_,
-			float cooktime_,
-			const CraftReplacements &replacements_);
+		const std::string &output_,
+		const std::string &recipe_,
+		float cooktime_,
+		const CraftReplacements &replacements_);
 
 	virtual ~CraftDefinitionCooking() = default;
 
@@ -317,7 +334,7 @@ public:
 	virtual CraftOutput getOutput(const CraftInput &input, IGameDef *gamedef) const;
 	virtual CraftInput getInput(const CraftOutput &output, IGameDef *gamedef) const;
 	virtual void decrementInput(CraftInput &input,
-			std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const;
+		std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const;
 
 	virtual u64 getHash(CraftHashType type) const;
 
@@ -344,13 +361,14 @@ private:
 	A fuel (for furnace) definition
 	Supported crafting method: CRAFT_METHOD_FUEL.
 */
-class CraftDefinitionFuel : public CraftDefinition {
+class CraftDefinitionFuel: public CraftDefinition
+{
 public:
 	CraftDefinitionFuel() = delete;
 	CraftDefinitionFuel(
-			const std::string &recipe_,
-			float burntime_,
-			const CraftReplacements &replacements_);
+		const std::string &recipe_,
+		float burntime_,
+		const CraftReplacements &replacements_);
 
 	virtual ~CraftDefinitionFuel() = default;
 
@@ -359,7 +377,7 @@ public:
 	virtual CraftOutput getOutput(const CraftInput &input, IGameDef *gamedef) const;
 	virtual CraftInput getInput(const CraftOutput &output, IGameDef *gamedef) const;
 	virtual void decrementInput(CraftInput &input,
-			std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const;
+		std::vector<ItemStack> &output_replacements, IGameDef *gamedef) const;
 
 	virtual u64 getHash(CraftHashType type) const;
 
@@ -383,7 +401,8 @@ private:
 /*
 	Crafting definition manager
 */
-class ICraftDefManager {
+class ICraftDefManager
+{
 public:
 	ICraftDefManager() = default;
 	virtual ~ICraftDefManager() = default;
@@ -402,16 +421,17 @@ public:
 	 */
 	virtual bool getCraftResult(CraftInput &input, CraftOutput &output,
 			std::vector<ItemStack> &output_replacements,
-			bool decrementInput, IGameDef *gamedef) const = 0;
+			bool decrementInput, IGameDef *gamedef) const=0;
 
-	virtual std::vector<CraftDefinition *> getCraftRecipes(CraftOutput &output,
-			IGameDef *gamedef, unsigned limit = 0) const = 0;
+	virtual std::vector<CraftDefinition*> getCraftRecipes(CraftOutput &output,
+			IGameDef *gamedef, unsigned limit=0) const=0;
 
 	// Print crafting recipes for debugging
-	virtual std::string dump() const = 0;
+	virtual std::string dump() const=0;
 };
 
-class IWritableCraftDefManager : public ICraftDefManager {
+class IWritableCraftDefManager : public ICraftDefManager
+{
 public:
 	IWritableCraftDefManager() = default;
 	virtual ~IWritableCraftDefManager() = default;
@@ -419,25 +439,25 @@ public:
 	// The main crafting function
 	virtual bool getCraftResult(CraftInput &input, CraftOutput &output,
 			std::vector<ItemStack> &output_replacements,
-			bool decrementInput, IGameDef *gamedef) const = 0;
-	virtual std::vector<CraftDefinition *> getCraftRecipes(CraftOutput &output,
-			IGameDef *gamedef, unsigned limit = 0) const = 0;
+			bool decrementInput, IGameDef *gamedef) const=0;
+	virtual std::vector<CraftDefinition*> getCraftRecipes(CraftOutput &output,
+			IGameDef *gamedef, unsigned limit=0) const=0;
 
 	virtual bool clearCraftsByOutput(const CraftOutput &output, IGameDef *gamedef) = 0;
 	virtual bool clearCraftsByInput(const CraftInput &input, IGameDef *gamedef) = 0;
 
 	// Print crafting recipes for debugging
-	virtual std::string dump() const = 0;
+	virtual std::string dump() const=0;
 
 	// Add a crafting definition.
 	// After calling this, the pointer belongs to the manager.
 	virtual void registerCraft(CraftDefinition *def, IGameDef *gamedef) = 0;
 
 	// Delete all crafting definitions
-	virtual void clear() = 0;
+	virtual void clear()=0;
 
 	// To be called after all mods are loaded, so that we catch all aliases
 	virtual void initHashes(IGameDef *gamedef) = 0;
 };
 
-IWritableCraftDefManager *createCraftDefManager();
+IWritableCraftDefManager* createCraftDefManager();

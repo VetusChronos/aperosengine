@@ -31,7 +31,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	For map data (blocks, nodes, sectors).
 
 	NOTE: The goal is to increment this so that saved maps will be
-		  loadable by any version. Other compatibility is not
+	      loadable by any version. Other compatibility is not
 		  maintained.
 
 	0: original networked test with 1-byte nodes
@@ -87,20 +87,23 @@ inline bool ser_ver_supported(s32 v) {
 */
 
 void compressZlib(const u8 *data, size_t data_size, std::ostream &os, int level = -1);
-inline void compressZlib(std::string_view data, std::ostream &os, int level = -1) {
-	compressZlib(reinterpret_cast<const u8 *>(data.data()), data.size(), os, level);
+inline void compressZlib(std::string_view data, std::ostream &os, int level = -1)
+{
+	compressZlib(reinterpret_cast<const u8*>(data.data()), data.size(), os, level);
 }
 void decompressZlib(std::istream &is, std::ostream &os, size_t limit = 0);
 
 void compressZstd(const u8 *data, size_t data_size, std::ostream &os, int level = 0);
-inline void compressZstd(std::string_view data, std::ostream &os, int level = 0) {
-	compressZstd(reinterpret_cast<const u8 *>(data.data()), data.size(), os, level);
+inline void compressZstd(std::string_view data, std::ostream &os, int level = 0)
+{
+	compressZstd(reinterpret_cast<const u8*>(data.data()), data.size(), os, level);
 }
 void decompressZstd(std::istream &is, std::ostream &os);
 
 // These choose between zstd, zlib and a self-made one according to version
 void compress(const u8 *data, u32 size, std::ostream &os, u8 version, int level = -1);
-inline void compress(std::string_view data, std::ostream &os, u8 version, int level = -1) {
-	compress(reinterpret_cast<const u8 *>(data.data()), data.size(), os, version, level);
+inline void compress(std::string_view data, std::ostream &os, u8 version, int level = -1)
+{
+	compress(reinterpret_cast<const u8*>(data.data()), data.size(), os, version, level);
 }
 void decompress(std::istream &is, std::ostream &os, u8 version);

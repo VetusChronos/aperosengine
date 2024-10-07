@@ -24,6 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "threading/semaphore.h"
 #include "threading/thread.h"
 
+
 class TestThreading : public TestBase {
 public:
 	TestThreading() { TestManager::registerTestModule(this); }
@@ -37,7 +38,8 @@ public:
 
 static TestThreading g_test_instance;
 
-void TestThreading::runTests(IGameDef *gamedef) {
+void TestThreading::runTests(IGameDef *gamedef)
+{
 	TEST(testStartStopWait);
 	TEST(testAtomicSemaphoreThread);
 	TEST(testTLS);
@@ -46,12 +48,14 @@ void TestThreading::runTests(IGameDef *gamedef) {
 class SimpleTestThread : public Thread {
 public:
 	SimpleTestThread(unsigned int interval) :
-			Thread("SimpleTest"),
-			m_interval(interval) {
+		Thread("SimpleTest"),
+		m_interval(interval)
+	{
 	}
 
 private:
-	void *run() {
+	void *run()
+	{
 		void *retval = this;
 
 		if (isCurrentThread() == false)
@@ -66,7 +70,8 @@ private:
 	unsigned int m_interval;
 };
 
-void TestThreading::testStartStopWait() {
+void TestThreading::testStartStopWait()
+{
 	void *thread_retval;
 	SimpleTestThread *thread = new SimpleTestThread(25);
 
@@ -106,16 +111,20 @@ void TestThreading::testStartStopWait() {
 	delete thread;
 }
 
+
+
 class AtomicTestThread : public Thread {
 public:
 	AtomicTestThread(std::atomic<u32> &v, Semaphore &trigger) :
-			Thread("AtomicTest"),
-			val(v),
-			trigger(trigger) {
+		Thread("AtomicTest"),
+		val(v),
+		trigger(trigger)
+	{
 	}
 
 private:
-	void *run() {
+	void *run()
+	{
 		trigger.wait();
 		for (u32 i = 0; i < 0x10000; ++i)
 			++val;
@@ -126,7 +135,9 @@ private:
 	Semaphore &trigger;
 };
 
-void TestThreading::testAtomicSemaphoreThread() {
+
+void TestThreading::testAtomicSemaphoreThread()
+{
 	std::atomic<u32> val;
 	val = 0;
 	Semaphore trigger;
@@ -148,12 +159,14 @@ void TestThreading::testAtomicSemaphoreThread() {
 	UASSERT(val == num_threads * 0x10000);
 }
 
+
+
 static std::atomic<bool> g_tls_broken;
 
 class TLSTestThread : public Thread {
 public:
-	TLSTestThread() :
-			Thread("TLSTest") {
+	TLSTestThread() : Thread("TLSTest")
+	{
 	}
 
 private:
@@ -167,7 +180,7 @@ private:
 				const u8 expect = (i % 2) ? 0xa1 : 0x1a;
 				if (buffer[i] != expect) {
 					std::cout << "At offset " << i << " expected " << (int)expect
-							  << " but found " << (int)buffer[i] << '\n';
+						<< " but found " << (int)buffer[i] << '\n';
 					g_tls_broken = true;
 					break;
 				}
@@ -211,7 +224,8 @@ private:
 	* <https://github.com/minetest/minetest/issues/12022> (2022)
 	* <https://github.com/minetest/minetest/issues/14140> (2023)
 */
-void TestThreading::testTLS() {
+void TestThreading::testTLS()
+{
 	constexpr int num_threads = 10;
 
 	for (int j = 0; j < num_threads; j++) {

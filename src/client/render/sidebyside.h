@@ -21,7 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 #include "stereo.h"
 
-class DrawImageStep : public RenderStep {
+class DrawImageStep : public RenderStep
+{
 public:
 	DrawImageStep(u8 texture_index, v2f offset);
 
@@ -30,7 +31,6 @@ public:
 
 	void reset(PipelineContext &context) override {}
 	void run(PipelineContext &context) override;
-
 private:
 	u8 texture_index;
 	v2f offset;

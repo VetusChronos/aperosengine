@@ -23,7 +23,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class LocalPlayer;
 
-class LuaLocalPlayer : public ModApiBase {
+class LuaLocalPlayer : public ModApiBase
+{
 private:
 	static const luaL_Reg methods[];
 

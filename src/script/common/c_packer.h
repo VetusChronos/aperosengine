@@ -34,15 +34,16 @@ extern "C" {
 	states and cannot be used for persistence or network transfer.
 */
 
-#define INSTR_SETTABLE (-10)
-#define INSTR_POP (-11)
-#define INSTR_PUSHREF (-12)
+#define INSTR_SETTABLE     (-10)
+#define INSTR_POP          (-11)
+#define INSTR_PUSHREF      (-12)
 #define INSTR_SETMETATABLE (-13)
 
 /**
  * Represents a single instruction that pushes a new value or operates with existing ones.
  */
-struct PackedInstr {
+struct PackedInstr
+{
 	s16 type; // LUA_T* or INSTR_*
 	u16 set_into; // set into table on stack
 	bool keep_ref; // referenced later by INSTR_PUSHREF?
@@ -74,8 +75,7 @@ struct PackedInstr {
 	*/
 	std::string sdata;
 
-	PackedInstr() :
-			type(0), set_into(0), keep_ref(false), pop(false) {}
+	PackedInstr() : type(0), set_into(0), keep_ref(false), pop(false) {}
 };
 
 /**
@@ -83,7 +83,8 @@ struct PackedInstr {
  * including all of its contents. It is made up of a linear stream of
  * instructions that build the final value when executed.
  */
-struct PackedValue {
+struct PackedValue
+{
 	std::vector<PackedInstr> i;
 	// Indicates whether there are any userdata pointers that need to be deallocated
 	bool contains_userdata = false;

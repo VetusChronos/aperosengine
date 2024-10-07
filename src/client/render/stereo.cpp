@@ -24,19 +24,24 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "constants.h"
 #include "settings.h"
 
-OffsetCameraStep::OffsetCameraStep(float eye_offset) {
+OffsetCameraStep::OffsetCameraStep(float eye_offset)
+{
 	move.setTranslation(core::vector3df(eye_offset, 0.0f, 0.0f));
 }
 
-OffsetCameraStep::OffsetCameraStep(bool right_eye) {
+
+OffsetCameraStep::OffsetCameraStep(bool right_eye)
+{
 	float eye_offset = BS * g_settings->getFloat("3d_paralax_strength", -0.087f, 0.087f) * (right_eye ? 1 : -1);
 	move.setTranslation(core::vector3df(eye_offset, 0.0f, 0.0f));
 }
 
-void OffsetCameraStep::reset(PipelineContext &context) {
+void OffsetCameraStep::reset(PipelineContext &context)
+{
 	base_transform = context.client->getCamera()->getCameraNode()->getRelativeTransformation();
 }
 
-void OffsetCameraStep::run(PipelineContext &context) {
+void OffsetCameraStep::run(PipelineContext &context)
+{
 	context.client->getCamera()->getCameraNode()->setPosition((base_transform * move).getTranslation());
 }

@@ -27,7 +27,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // Return number of accepted items to be moved
 int ScriptApiDetached::detached_inventory_AllowMove(
 		const MoveAction &ma, int count,
-		ServerActiveObject *player) {
+		ServerActiveObject *player)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -40,13 +41,13 @@ int ScriptApiDetached::detached_inventory_AllowMove(
 	// inv
 	InvRef::create(L, ma.from_inv);
 	lua_pushstring(L, ma.from_list.c_str()); // from_list
-	lua_pushinteger(L, ma.from_i + 1); // from_index
-	lua_pushstring(L, ma.to_list.c_str()); // to_list
-	lua_pushinteger(L, ma.to_i + 1); // to_index
-	lua_pushinteger(L, count); // count
-	objectrefGetOrCreate(L, player); // player
+	lua_pushinteger(L, ma.from_i + 1);       // from_index
+	lua_pushstring(L, ma.to_list.c_str());   // to_list
+	lua_pushinteger(L, ma.to_i + 1);         // to_index
+	lua_pushinteger(L, count);               // count
+	objectrefGetOrCreate(L, player);         // player
 	PCALL_RES(lua_pcall(L, 7, 1, error_handler));
-	if (!lua_isnumber(L, -1))
+	if(!lua_isnumber(L, -1))
 		throw LuaError("allow_move should return a number. name=" + ma.from_inv.name);
 	int ret = luaL_checkinteger(L, -1);
 	lua_pop(L, 2); // Pop integer and error handler
@@ -56,7 +57,8 @@ int ScriptApiDetached::detached_inventory_AllowMove(
 // Return number of accepted items to be put
 int ScriptApiDetached::detached_inventory_AllowPut(
 		const MoveAction &ma, const ItemStack &stack,
-		ServerActiveObject *player) {
+		ServerActiveObject *player)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -66,11 +68,11 @@ int ScriptApiDetached::detached_inventory_AllowPut(
 		return stack.count; // All will be accepted
 
 	// Call function(inv, listname, index, stack, player)
-	InvRef::create(L, ma.to_inv); // inv
+	InvRef::create(L, ma.to_inv);          // inv
 	lua_pushstring(L, ma.to_list.c_str()); // listname
-	lua_pushinteger(L, ma.to_i + 1); // index
-	LuaItemStack::create(L, stack); // stack
-	objectrefGetOrCreate(L, player); // player
+	lua_pushinteger(L, ma.to_i + 1);       // index
+	LuaItemStack::create(L, stack);      // stack
+	objectrefGetOrCreate(L, player);     // player
 	PCALL_RES(lua_pcall(L, 5, 1, error_handler));
 	if (!lua_isnumber(L, -1))
 		throw LuaError("allow_put should return a number. name=" + ma.to_inv.name);
@@ -82,7 +84,8 @@ int ScriptApiDetached::detached_inventory_AllowPut(
 // Return number of accepted items to be taken
 int ScriptApiDetached::detached_inventory_AllowTake(
 		const MoveAction &ma, const ItemStack &stack,
-		ServerActiveObject *player) {
+		ServerActiveObject *player)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -92,11 +95,11 @@ int ScriptApiDetached::detached_inventory_AllowTake(
 		return stack.count; // All will be accepted
 
 	// Call function(inv, listname, index, stack, player)
-	InvRef::create(L, ma.from_inv); // inv
+	InvRef::create(L, ma.from_inv);          // inv
 	lua_pushstring(L, ma.from_list.c_str()); // listname
-	lua_pushinteger(L, ma.from_i + 1); // index
-	LuaItemStack::create(L, stack); // stack
-	objectrefGetOrCreate(L, player); // player
+	lua_pushinteger(L, ma.from_i + 1);       // index
+	LuaItemStack::create(L, stack);      // stack
+	objectrefGetOrCreate(L, player);     // player
 	PCALL_RES(lua_pcall(L, 5, 1, error_handler));
 	if (!lua_isnumber(L, -1))
 		throw LuaError("allow_take should return a number. name=" + ma.from_inv.name);
@@ -108,7 +111,8 @@ int ScriptApiDetached::detached_inventory_AllowTake(
 // Report moved items
 void ScriptApiDetached::detached_inventory_OnMove(
 		const MoveAction &ma, int count,
-		ServerActiveObject *player) {
+		ServerActiveObject *player)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -121,19 +125,20 @@ void ScriptApiDetached::detached_inventory_OnMove(
 	// inv
 	InvRef::create(L, ma.from_inv);
 	lua_pushstring(L, ma.from_list.c_str()); // from_list
-	lua_pushinteger(L, ma.from_i + 1); // from_index
-	lua_pushstring(L, ma.to_list.c_str()); // to_list
-	lua_pushinteger(L, ma.to_i + 1); // to_index
-	lua_pushinteger(L, count); // count
-	objectrefGetOrCreate(L, player); // player
+	lua_pushinteger(L, ma.from_i + 1);       // from_index
+	lua_pushstring(L, ma.to_list.c_str());   // to_list
+	lua_pushinteger(L, ma.to_i + 1);         // to_index
+	lua_pushinteger(L, count);               // count
+	objectrefGetOrCreate(L, player);         // player
 	PCALL_RES(lua_pcall(L, 7, 0, error_handler));
-	lua_pop(L, 1); // Pop error handler
+	lua_pop(L, 1);  // Pop error handler
 }
 
 // Report put items
 void ScriptApiDetached::detached_inventory_OnPut(
 		const MoveAction &ma, const ItemStack &stack,
-		ServerActiveObject *player) {
+		ServerActiveObject *player)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -146,17 +151,18 @@ void ScriptApiDetached::detached_inventory_OnPut(
 	// inv
 	InvRef::create(L, ma.to_inv);
 	lua_pushstring(L, ma.to_list.c_str()); // listname
-	lua_pushinteger(L, ma.to_i + 1); // index
-	LuaItemStack::create(L, stack); // stack
-	objectrefGetOrCreate(L, player); // player
+	lua_pushinteger(L, ma.to_i + 1);       // index
+	LuaItemStack::create(L, stack);        // stack
+	objectrefGetOrCreate(L, player);       // player
 	PCALL_RES(lua_pcall(L, 5, 0, error_handler));
-	lua_pop(L, 1); // Pop error handler
+	lua_pop(L, 1);  // Pop error handler
 }
 
 // Report taken items
 void ScriptApiDetached::detached_inventory_OnTake(
 		const MoveAction &ma, const ItemStack &stack,
-		ServerActiveObject *player) {
+		ServerActiveObject *player)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -169,11 +175,11 @@ void ScriptApiDetached::detached_inventory_OnTake(
 	// inv
 	InvRef::create(L, ma.from_inv);
 	lua_pushstring(L, ma.from_list.c_str()); // listname
-	lua_pushinteger(L, ma.from_i + 1); // index
-	LuaItemStack::create(L, stack); // stack
-	objectrefGetOrCreate(L, player); // player
+	lua_pushinteger(L, ma.from_i + 1);       // index
+	LuaItemStack::create(L, stack);          // stack
+	objectrefGetOrCreate(L, player);         // player
 	PCALL_RES(lua_pcall(L, 5, 0, error_handler));
-	lua_pop(L, 1); // Pop error handler
+	lua_pop(L, 1);  // Pop error handler
 }
 
 // Retrieves core.detached_inventories[name][callbackname]
@@ -181,7 +187,8 @@ void ScriptApiDetached::detached_inventory_OnTake(
 // If that is a function, returns true and pushes the
 // function onto the stack
 bool ScriptApiDetached::getDetachedInventoryCallback(
-		const std::string &name, const char *callbackname) {
+		const std::string &name, const char *callbackname)
+{
 	lua_State *L = getStack();
 
 	lua_getglobal(L, "core");
@@ -192,7 +199,7 @@ bool ScriptApiDetached::getDetachedInventoryCallback(
 	lua_remove(L, -2);
 	// Should be a table
 	if (lua_type(L, -1) != LUA_TTABLE) {
-		errorstream << "Detached inventory \"" << name << "\" not defined" << '\n';
+		errorstream<<"Detached inventory \""<<name<<"\" not defined"<<'\n';
 		lua_pop(L, 1);
 		return false;
 	}
@@ -212,7 +219,7 @@ bool ScriptApiDetached::getDetachedInventoryCallback(
 	}
 
 	errorstream << "Detached inventory \"" << name << "\" callback \""
-				<< callbackname << "\" is not a function" << '\n';
+		<< callbackname << "\" is not a function" << '\n';
 	lua_pop(L, 1);
 	return false;
 }

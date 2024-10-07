@@ -37,8 +37,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "lua_api/l_settings.h"
 #include "lua_api/l_client_sound.h"
 
-ClientScripting::ClientScripting(Client *client) :
-		ScriptApiBase(ScriptingType::Client) {
+ClientScripting::ClientScripting(Client *client):
+	ScriptApiBase(ScriptingType::Client)
+{
 	setGameDef(client);
 
 	SCRIPTAPI_PRECHECKHEADER
@@ -62,7 +63,8 @@ ClientScripting::ClientScripting(Client *client) :
 	infostream << "SCRIPTAPI: Initialized client game modules" << '\n';
 }
 
-void ClientScripting::InitializeModApi(lua_State *L, int top) {
+void ClientScripting::InitializeModApi(lua_State *L, int top)
+{
 	LuaItemStack::Register(L);
 	ItemStackMetaRef::Register(L);
 	LuaRaycast::Register(L);
@@ -85,14 +87,17 @@ void ClientScripting::InitializeModApi(lua_State *L, int top) {
 	ModApiClientSound::Initialize(L, top);
 }
 
-void ClientScripting::on_client_ready(LocalPlayer *localplayer) {
+void ClientScripting::on_client_ready(LocalPlayer *localplayer)
+{
 	LuaLocalPlayer::create(getStack(), localplayer);
 }
 
-void ClientScripting::on_camera_ready(Camera *camera) {
+void ClientScripting::on_camera_ready(Camera *camera)
+{
 	LuaCamera::create(getStack(), camera);
 }
 
-void ClientScripting::on_minimap_ready(Minimap *minimap) {
+void ClientScripting::on_minimap_ready(Minimap *minimap)
+{
 	LuaMinimap::create(getStack(), minimap);
 }

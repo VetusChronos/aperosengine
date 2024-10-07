@@ -26,7 +26,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "profiler.h"
 
-class TestServerActiveObjectMgr : public TestBase {
+
+class TestServerActiveObjectMgr : public TestBase
+{
 public:
 	TestServerActiveObjectMgr() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestServerActiveObjectMgr"; }
@@ -42,7 +44,8 @@ public:
 
 static TestServerActiveObjectMgr g_test_instance;
 
-void TestServerActiveObjectMgr::runTests(IGameDef *gamedef) {
+void TestServerActiveObjectMgr::runTests(IGameDef *gamedef)
+{
 	TEST(testFreeID);
 	TEST(testRegisterObject)
 	TEST(testRemoveObject)
@@ -52,7 +55,8 @@ void TestServerActiveObjectMgr::runTests(IGameDef *gamedef) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestServerActiveObjectMgr::testFreeID() {
+void TestServerActiveObjectMgr::testFreeID()
+{
 	server::ActiveObjectMgr saomgr;
 	std::vector<u16> aoids;
 
@@ -78,7 +82,8 @@ void TestServerActiveObjectMgr::testFreeID() {
 	saomgr.clear();
 }
 
-void TestServerActiveObjectMgr::testRegisterObject() {
+void TestServerActiveObjectMgr::testRegisterObject()
+{
 	server::ActiveObjectMgr saomgr;
 	auto sao_u = std::make_unique<MockServerActiveObject>();
 	auto sao = sao_u.get();
@@ -99,7 +104,8 @@ void TestServerActiveObjectMgr::testRegisterObject() {
 	saomgr.clear();
 }
 
-void TestServerActiveObjectMgr::testRemoveObject() {
+void TestServerActiveObjectMgr::testRemoveObject()
+{
 	server::ActiveObjectMgr saomgr;
 	auto sao_u = std::make_unique<MockServerActiveObject>();
 	auto sao = sao_u.get();
@@ -114,14 +120,15 @@ void TestServerActiveObjectMgr::testRemoveObject() {
 	saomgr.clear();
 }
 
-void TestServerActiveObjectMgr::testGetObjectsInsideRadius() {
+void TestServerActiveObjectMgr::testGetObjectsInsideRadius()
+{
 	server::ActiveObjectMgr saomgr;
 	static const v3f sao_pos[] = {
-		v3f(10, 40, 10),
-		v3f(740, 100, -304),
-		v3f(-200, 100, -304),
-		v3f(740, -740, -304),
-		v3f(1500, -740, -304),
+			v3f(10, 40, 10),
+			v3f(740, 100, -304),
+			v3f(-200, 100, -304),
+			v3f(740, -740, -304),
+			v3f(1500, -740, -304),
 	};
 
 	for (const auto &p : sao_pos) {
@@ -151,14 +158,15 @@ void TestServerActiveObjectMgr::testGetObjectsInsideRadius() {
 	saomgr.clear();
 }
 
-void TestServerActiveObjectMgr::testGetAddedActiveObjectsAroundPos() {
+void TestServerActiveObjectMgr::testGetAddedActiveObjectsAroundPos()
+{
 	server::ActiveObjectMgr saomgr;
 	static const v3f sao_pos[] = {
-		v3f(10, 40, 10),
-		v3f(740, 100, -304),
-		v3f(-200, 100, -304),
-		v3f(740, -740, -304),
-		v3f(1500, -740, -304),
+			v3f(10, 40, 10),
+			v3f(740, 100, -304),
+			v3f(-200, 100, -304),
+			v3f(740, -740, -304),
+			v3f(1500, -740, -304),
 	};
 
 	for (const auto &p : sao_pos) {

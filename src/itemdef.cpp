@@ -38,31 +38,37 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <map>
 #include <set>
 
-TouchInteraction::TouchInteraction() {
+TouchInteraction::TouchInteraction()
+{
 	pointed_nothing = TouchInteractionMode_USER;
-	pointed_node = TouchInteractionMode_USER;
-	pointed_object = TouchInteractionMode_USER;
+	pointed_node    = TouchInteractionMode_USER;
+	pointed_object  = TouchInteractionMode_USER;
 }
 
-TouchInteractionMode TouchInteraction::getMode(PointedThingType pointed_type) const {
+TouchInteractionMode TouchInteraction::getMode(const ItemDefinition &selected_def,
+		PointedThingType pointed_type) const
+{
 	TouchInteractionMode result;
 	switch (pointed_type) {
-		case POINTEDTHING_NOTHING:
-			result = pointed_nothing;
-			break;
-		case POINTEDTHING_NODE:
-			result = pointed_node;
-			break;
-		case POINTEDTHING_OBJECT:
-			result = pointed_object;
-			break;
-		default:
-			FATAL_ERROR("Invalid PointedThingType given to TouchInteraction::getMode");
+	case POINTEDTHING_NOTHING:
+		result = pointed_nothing;
+		break;
+	case POINTEDTHING_NODE:
+		result = pointed_node;
+		break;
+	case POINTEDTHING_OBJECT:
+		result = pointed_object;
+		break;
+	default:
+		FATAL_ERROR("Invalid PointedThingType given to TouchInteraction::getMode");
 	}
 
 	if (result == TouchInteractionMode_USER) {
-		if (pointed_type == POINTEDTHING_OBJECT)
-			result = g_settings->get("touch_punch_gesture") == "long_tap" ? LONG_DIG_SHORT_PLACE : SHORT_DIG_LONG_PLACE;
+		if (pointed_type == POINTEDTHING_OBJECT && !selected_def.usable)
+			// Only apply when we're actually able to punch the object, i.e. when
+			// the selected item has no on_use callback defined.
+			result = g_settings->get("touch_punch_gesture") == "long_tap" ?
+					LONG_DIG_SHORT_PLACE : SHORT_DIG_LONG_PLACE;
 		else
 			result = LONG_DIG_SHORT_PLACE;
 	}
@@ -70,13 +76,15 @@ TouchInteractionMode TouchInteraction::getMode(PointedThingType pointed_type) co
 	return result;
 }
 
-void TouchInteraction::serialize(std::ostream &os) const {
+void TouchInteraction::serialize(std::ostream &os) const
+{
 	writeU8(os, pointed_nothing);
 	writeU8(os, pointed_node);
 	writeU8(os, pointed_object);
 }
 
-void TouchInteraction::deSerialize(std::istream &is) {
+void TouchInteraction::deSerialize(std::istream &is)
+{
 	u8 tmp = readU8(is);
 	if (is.eof())
 		throw SerializationError("");
@@ -99,17 +107,20 @@ void TouchInteraction::deSerialize(std::istream &is) {
 /*
 	ItemDefinition
 */
-ItemDefinition::ItemDefinition() {
+ItemDefinition::ItemDefinition()
+{
 	resetInitial();
 }
 
-ItemDefinition::ItemDefinition(const ItemDefinition &def) {
+ItemDefinition::ItemDefinition(const ItemDefinition &def)
+{
 	resetInitial();
 	*this = def;
 }
 
-ItemDefinition &ItemDefinition::operator=(const ItemDefinition &def) {
-	if (this == &def)
+ItemDefinition& ItemDefinition::operator=(const ItemDefinition &def)
+{
+	if(this == &def)
 		return *this;
 
 	reset();
@@ -145,18 +156,21 @@ ItemDefinition &ItemDefinition::operator=(const ItemDefinition &def) {
 	return *this;
 }
 
-ItemDefinition::~ItemDefinition() {
+ItemDefinition::~ItemDefinition()
+{
 	reset();
 }
 
-void ItemDefinition::resetInitial() {
+void ItemDefinition::resetInitial()
+{
 	// Initialize pointers to NULL so reset() does not delete undefined pointers
 	tool_capabilities = NULL;
 	wear_bar_params = std::nullopt;
 	reset();
 }
 
-void ItemDefinition::reset() {
+void ItemDefinition::reset()
+{
 	type = ITEM_NONE;
 	name.clear();
 	description.clear();
@@ -187,7 +201,8 @@ void ItemDefinition::reset() {
 	touch_interaction = TouchInteraction();
 }
 
-void ItemDefinition::serialize(std::ostream &os, u16 protocol_version) const {
+void ItemDefinition::serialize(std::ostream &os, u16 protocol_version) const
+{
 	// protocol_version >= 37
 	u8 version = 6;
 	writeU8(os, version);
@@ -263,7 +278,8 @@ void ItemDefinition::serialize(std::ostream &os, u16 protocol_version) const {
 	}
 }
 
-void ItemDefinition::deSerialize(std::istream &is, u16 protocol_version) {
+void ItemDefinition::deSerialize(std::istream &is, u16 protocol_version)
+{
 	// Reset everything
 	reset();
 
@@ -295,7 +311,7 @@ void ItemDefinition::deSerialize(std::istream &is, u16 protocol_version) {
 
 	groups.clear();
 	u32 groups_size = readU16(is);
-	for (u32 i = 0; i < groups_size; i++) {
+	for(u32 i=0; i<groups_size; i++){
 		std::string name = deSerializeString16(is);
 		int value = readS16(is);
 		groups[name] = value;
@@ -346,9 +362,9 @@ void ItemDefinition::deSerialize(std::istream &is, u16 protocol_version) {
 		if (readU8(is)) {
 			wear_bar_params = WearBarParams::deserialize(is);
 		}
-	} catch (SerializationError &e) {
-	};
+	} catch(SerializationError &e) {};
 }
+
 
 /*
 	CItemDefManager
@@ -356,16 +372,19 @@ void ItemDefinition::deSerialize(std::istream &is, u16 protocol_version) {
 
 // SUGG: Support chains of aliases?
 
-class CItemDefManager : public IWritableItemDefManager {
+class CItemDefManager: public IWritableItemDefManager
+{
 #ifndef SERVER
-	struct ClientCached {
+	struct ClientCached
+	{
 		video::ITexture *inventory_texture;
 		ItemMesh wield_mesh;
 		Palette *palette;
 
-		ClientCached() :
-				inventory_texture(NULL),
-				palette(NULL) {}
+		ClientCached():
+			inventory_texture(NULL),
+			palette(NULL)
+		{}
 
 		~ClientCached() {
 			if (wield_mesh.mesh)
@@ -377,20 +396,24 @@ class CItemDefManager : public IWritableItemDefManager {
 #endif
 
 public:
-	CItemDefManager() {
+	CItemDefManager()
+	{
+
 #ifndef SERVER
 		m_main_thread = std::this_thread::get_id();
 #endif
 		clear();
 	}
 
-	virtual ~CItemDefManager() {
+	virtual ~CItemDefManager()
+	{
 		for (auto &item_definition : m_item_definitions) {
 			delete item_definition.second;
 		}
 		m_item_definitions.clear();
 	}
-	virtual const ItemDefinition &get(const std::string &name_) const {
+	virtual const ItemDefinition& get(const std::string &name_) const
+	{
 		// Convert name according to possible alias
 		std::string name = getAlias(name_);
 		// Get the definition
@@ -400,13 +423,15 @@ public:
 		assert(i != m_item_definitions.cend());
 		return *(i->second);
 	}
-	virtual const std::string &getAlias(const std::string &name) const {
+	virtual const std::string &getAlias(const std::string &name) const
+	{
 		auto it = m_aliases.find(name);
 		if (it != m_aliases.cend())
 			return it->second;
 		return name;
 	}
-	virtual void getAll(std::set<std::string> &result) const {
+	virtual void getAll(std::set<std::string> &result) const
+	{
 		result.clear();
 		for (const auto &item_definition : m_item_definitions) {
 			result.insert(item_definition.first);
@@ -416,7 +441,8 @@ public:
 			result.insert(alias.first);
 		}
 	}
-	virtual bool isKnown(const std::string &name_) const {
+	virtual bool isKnown(const std::string &name_) const
+	{
 		// Convert name according to possible alias
 		std::string name = getAlias(name_);
 		// Get the definition
@@ -424,7 +450,8 @@ public:
 	}
 #ifndef SERVER
 public:
-	ClientCached *createClientCachedDirect(const ItemStack &item, Client *client) const {
+	ClientCached* createClientCachedDirect(const ItemStack &item, Client *client) const
+	{
 		// This is not thread-safe
 		sanity_check(std::this_thread::get_id() == m_main_thread);
 
@@ -443,7 +470,7 @@ public:
 			return it->second.get();
 
 		infostream << "Lazily creating item texture and mesh for \""
-				   << cache_key << "\"" << '\n';
+				<< cache_key << "\"" << '\n';
 
 		ITextureSource *tsrc = client->getTextureSource();
 
@@ -464,8 +491,9 @@ public:
 	}
 
 	// Get item inventory texture
-	virtual video::ITexture *getInventoryTexture(const ItemStack &item,
-			Client *client) const {
+	virtual video::ITexture* getInventoryTexture(const ItemStack &item,
+			Client *client) const
+	{
 		ClientCached *cc = createClientCachedDirect(item, client);
 		if (!cc)
 			return nullptr;
@@ -473,7 +501,8 @@ public:
 	}
 
 	// Get item wield mesh
-	virtual ItemMesh *getWieldMesh(const ItemStack &item, Client *client) const {
+	virtual ItemMesh* getWieldMesh(const ItemStack &item, Client *client) const
+	{
 		ClientCached *cc = createClientCachedDirect(item, client);
 		if (!cc)
 			return nullptr;
@@ -481,7 +510,8 @@ public:
 	}
 
 	// Get item palette
-	virtual Palette *getPalette(const ItemStack &item, Client *client) const {
+	virtual Palette* getPalette(const ItemStack &item, Client *client) const
+	{
 		ClientCached *cc = createClientCachedDirect(item, client);
 		if (!cc)
 			return nullptr;
@@ -489,7 +519,8 @@ public:
 	}
 
 	virtual video::SColor getItemstackColor(const ItemStack &stack,
-			Client *client) const {
+		Client *client) const
+	{
 		// Look for direct color definition
 		const std::string &colorstring = stack.metadata.getString("color", 0);
 		video::SColor directcolor;
@@ -504,17 +535,17 @@ public:
 		return get(stack.name).color;
 	}
 #endif
-	void applyTextureOverrides(const std::vector<TextureOverride> &overrides) {
+	void applyTextureOverrides(const std::vector<TextureOverride> &overrides)
+	{
 		infostream << "ItemDefManager::applyTextureOverrides(): Applying "
-					  "overrides to textures"
-				   << '\n';
+			"overrides to textures" << '\n';
 
-		for (const TextureOverride &texture_override : overrides) {
+		for (const TextureOverride& texture_override : overrides) {
 			if (m_item_definitions.find(texture_override.id) == m_item_definitions.end()) {
 				continue; // Ignore unknown item
 			}
 
-			ItemDefinition *itemdef = m_item_definitions[texture_override.id];
+			ItemDefinition* itemdef = m_item_definitions[texture_override.id];
 
 			if (texture_override.hasTarget(OverrideTarget::INVENTORY))
 				itemdef->inventory_image = texture_override.texture;
@@ -523,8 +554,10 @@ public:
 				itemdef->wield_image = texture_override.texture;
 		}
 	}
-	void clear() {
-		for (auto &i : m_item_definitions) {
+	void clear()
+	{
+		for (auto &i : m_item_definitions)
+		{
 			delete i.second;
 		}
 		m_item_definitions.clear();
@@ -537,59 +570,63 @@ public:
 		//   "air" is the air node
 		//   "ignore" is the ignore node
 
-		ItemDefinition *hand_def = new ItemDefinition;
+		ItemDefinition* hand_def = new ItemDefinition;
 		hand_def->name.clear();
 		hand_def->wield_image = "wieldhand.png";
 		hand_def->tool_capabilities = new ToolCapabilities;
 		m_item_definitions.insert(std::make_pair("", hand_def));
 
-		ItemDefinition *unknown_def = new ItemDefinition;
+		ItemDefinition* unknown_def = new ItemDefinition;
 		unknown_def->type = ITEM_NODE;
 		unknown_def->name = "unknown";
 		m_item_definitions.insert(std::make_pair("unknown", unknown_def));
 
-		ItemDefinition *air_def = new ItemDefinition;
+		ItemDefinition* air_def = new ItemDefinition;
 		air_def->type = ITEM_NODE;
 		air_def->name = "air";
 		m_item_definitions.insert(std::make_pair("air", air_def));
 
-		ItemDefinition *ignore_def = new ItemDefinition;
+		ItemDefinition* ignore_def = new ItemDefinition;
 		ignore_def->type = ITEM_NODE;
 		ignore_def->name = "ignore";
 		m_item_definitions.insert(std::make_pair("ignore", ignore_def));
 	}
-	virtual void registerItem(const ItemDefinition &def) {
+	virtual void registerItem(const ItemDefinition &def)
+	{
 		TRACESTREAM(<< "ItemDefManager: registering " << def.name << '\n');
 		// Ensure that the "" item (the hand) always has ToolCapabilities
 		if (def.name.empty())
 			FATAL_ERROR_IF(!def.tool_capabilities, "Hand does not have ToolCapabilities");
 
-		if (m_item_definitions.count(def.name) == 0)
+		if(m_item_definitions.count(def.name) == 0)
 			m_item_definitions[def.name] = new ItemDefinition(def);
 		else
 			*(m_item_definitions[def.name]) = def;
 
 		// Remove conflicting alias if it exists
 		bool alias_removed = (m_aliases.erase(def.name) != 0);
-		if (alias_removed)
-			infostream << "ItemDefManager: erased alias " << def.name
-					   << " because item was defined" << '\n';
+		if(alias_removed)
+			infostream<<"ItemDefManager: erased alias "<<def.name
+					<<" because item was defined"<<'\n';
 	}
-	virtual void unregisterItem(const std::string &name) {
-		verbosestream << "ItemDefManager: unregistering \"" << name << "\"" << '\n';
+	virtual void unregisterItem(const std::string &name)
+	{
+		verbosestream<<"ItemDefManager: unregistering \""<<name<<"\""<<'\n';
 
 		delete m_item_definitions[name];
 		m_item_definitions.erase(name);
 	}
 	virtual void registerAlias(const std::string &name,
-			const std::string &convert_to) {
+			const std::string &convert_to)
+	{
 		if (m_item_definitions.find(name) == m_item_definitions.end()) {
 			TRACESTREAM(<< "ItemDefManager: setting alias " << name
-						<< " -> " << convert_to << '\n');
+				<< " -> " << convert_to << '\n');
 			m_aliases[name] = convert_to;
 		}
 	}
-	void serialize(std::ostream &os, u16 protocol_version) {
+	void serialize(std::ostream &os, u16 protocol_version)
+	{
 		writeU8(os, 0); // version
 		u16 count = m_item_definitions.size();
 		writeU16(os, count);
@@ -609,15 +646,17 @@ public:
 			os << serializeString16(it.second);
 		}
 	}
-	void deSerialize(std::istream &is, u16 protocol_version) {
+	void deSerialize(std::istream &is, u16 protocol_version)
+	{
 		// Clear everything
 		clear();
 
-		if (readU8(is) != 0)
+		if(readU8(is) != 0)
 			throw SerializationError("unsupported ItemDefManager version");
 
 		u16 count = readU16(is);
-		for (u16 i = 0; i < count; i++) {
+		for(u16 i=0; i<count; i++)
+		{
 			// Deserialize a string and grab an ItemDefinition from it
 			std::istringstream tmp_is(deSerializeString16(is), std::ios::binary);
 			ItemDefinition def;
@@ -626,7 +665,8 @@ public:
 			registerItem(def);
 		}
 		u16 num_aliases = readU16(is);
-		for (u16 i = 0; i < num_aliases; i++) {
+		for(u16 i=0; i<num_aliases; i++)
+		{
 			std::string name = deSerializeString16(is);
 			std::string convert_to = deSerializeString16(is);
 			registerAlias(name, convert_to);
@@ -635,7 +675,7 @@ public:
 
 private:
 	// Key is name
-	std::map<std::string, ItemDefinition *> m_item_definitions;
+	std::map<std::string, ItemDefinition*> m_item_definitions;
 	// Aliases
 	StringMap m_aliases;
 #ifndef SERVER
@@ -646,6 +686,7 @@ private:
 #endif
 };
 
-IWritableItemDefManager *createItemDefManager() {
+IWritableItemDefManager* createItemDefManager()
+{
 	return new CItemDefManager();
 }

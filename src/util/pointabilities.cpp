@@ -23,9 +23,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "exceptions.h"
 #include <sstream>
 
-PointabilityType Pointabilities::deSerializePointabilityType(std::istream &is) {
+PointabilityType Pointabilities::deSerializePointabilityType(std::istream &is)
+{
 	PointabilityType pointable_type = static_cast<PointabilityType>(readU8(is));
-	switch (pointable_type) {
+	switch(pointable_type) {
 		case PointabilityType::POINTABLE:
 		case PointabilityType::POINTABLE_NOT:
 		case PointabilityType::POINTABLE_BLOCKING:
@@ -38,12 +39,14 @@ PointabilityType Pointabilities::deSerializePointabilityType(std::istream &is) {
 	return pointable_type;
 }
 
-void Pointabilities::serializePointabilityType(std::ostream &os, PointabilityType pointable_type) {
+void Pointabilities::serializePointabilityType(std::ostream &os, PointabilityType pointable_type)
+{
 	writeU8(os, static_cast<u8>(pointable_type));
 }
 
-std::string Pointabilities::toStringPointabilityType(PointabilityType pointable_type) {
-	switch (pointable_type) {
+std::string Pointabilities::toStringPointabilityType(PointabilityType pointable_type)
+{
+	switch(pointable_type) {
 		case PointabilityType::POINTABLE:
 			return "true";
 		case PointabilityType::POINTABLE_NOT:
@@ -55,29 +58,33 @@ std::string Pointabilities::toStringPointabilityType(PointabilityType pointable_
 }
 
 std::optional<PointabilityType> Pointabilities::matchNode(const std::string &name,
-		const ItemGroupList &groups) const {
+	const ItemGroupList &groups) const
+{
 	auto i = nodes.find(name);
 	return i == nodes.end() ? matchGroups(groups, node_groups) : i->second;
 }
 
 std::optional<PointabilityType> Pointabilities::matchObject(const std::string &name,
-		const ItemGroupList &groups) const {
+	const ItemGroupList &groups) const
+{
 	auto i = objects.find(name);
 	return i == objects.end() ? matchGroups(groups, object_groups) : i->second;
 }
 
-std::optional<PointabilityType> Pointabilities::matchPlayer(const ItemGroupList &groups) const {
+std::optional<PointabilityType> Pointabilities::matchPlayer(const ItemGroupList &groups) const
+{
 	return matchGroups(groups, object_groups);
 }
 
 std::optional<PointabilityType> Pointabilities::matchGroups(const ItemGroupList &groups,
-		const std::unordered_map<std::string, PointabilityType> &pointable_groups) {
+	const std::unordered_map<std::string, PointabilityType> &pointable_groups)
+{
 	// prefers POINTABLE over POINTABLE_NOT over POINTABLE_BLOCKING
 	bool blocking = false;
 	bool not_pointable = false;
 	for (auto const &ability : pointable_groups) {
 		if (itemgroup_get(groups, ability.first) > 0) {
-			switch (ability.second) {
+			switch(ability.second) {
 				case PointabilityType::POINTABLE:
 					return PointabilityType::POINTABLE;
 				case PointabilityType::POINTABLE_NOT:
@@ -97,7 +104,8 @@ std::optional<PointabilityType> Pointabilities::matchGroups(const ItemGroupList 
 }
 
 void Pointabilities::serializeTypeMap(std::ostream &os,
-		const std::unordered_map<std::string, PointabilityType> &map) {
+	const std::unordered_map<std::string, PointabilityType> &map)
+{
 	writeU32(os, map.size());
 	for (const auto &entry : map) {
 		os << serializeString16(entry.first);
@@ -106,7 +114,8 @@ void Pointabilities::serializeTypeMap(std::ostream &os,
 }
 
 void Pointabilities::deSerializeTypeMap(std::istream &is,
-		std::unordered_map<std::string, PointabilityType> &map) {
+	std::unordered_map<std::string, PointabilityType> &map)
+{
 	map.clear();
 	u32 size = readU32(is);
 	for (u32 i = 0; i < size; i++) {
@@ -116,7 +125,8 @@ void Pointabilities::deSerializeTypeMap(std::istream &is,
 	}
 }
 
-void Pointabilities::serialize(std::ostream &os) const {
+void Pointabilities::serialize(std::ostream &os) const
+{
 	writeU8(os, 0); // version
 	serializeTypeMap(os, nodes);
 	serializeTypeMap(os, node_groups);
@@ -124,7 +134,8 @@ void Pointabilities::serialize(std::ostream &os) const {
 	serializeTypeMap(os, object_groups);
 }
 
-void Pointabilities::deSerialize(std::istream &is) {
+void Pointabilities::deSerialize(std::istream &is)
+{
 	int version = readU8(is);
 	if (version != 0)
 		throw SerializationError("unsupported Pointabilities version");

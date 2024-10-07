@@ -20,6 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include "irrlichttypes_extrabloated.h"
+#include "irr_ptr.h"
 #include "util/numeric.h"
 #include "client/tile.h"
 #include "voxel.h"
@@ -36,13 +37,15 @@ class ITextureSource;
 	Mesh making stuff
 */
 
+
 class MapBlock;
 struct MinimapMapblock;
 
-struct MeshMakeData {
+struct MeshMakeData
+{
 	VoxelManipulator m_vmanip;
-	v3s16 m_blockpos = v3s16(-1337, -1337, -1337);
-	v3s16 m_crack_pos_relative = v3s16(-1337, -1337, -1337);
+	v3s16 m_blockpos = v3s16(-1337,-1337,-1337);
+	v3s16 m_crack_pos_relative = v3s16(-1337,-1337,-1337);
 	bool m_smooth_lighting = false;
 	u16 side_length;
 
@@ -69,20 +72,22 @@ struct MeshMakeData {
 };
 
 // represents a triangle as indexes into the vertex buffer in SMeshBuffer
-class MeshTriangle {
+class MeshTriangle
+{
 public:
 	scene::SMeshBuffer *buffer;
 	u16 p1, p2, p3;
 	v3f centroid;
 	float areaSQ;
 
-	void updateAttributes() {
+	void updateAttributes()
+	{
 		v3f v1 = buffer->getPosition(p1);
 		v3f v2 = buffer->getPosition(p2);
 		v3f v3 = buffer->getPosition(p3);
 
 		centroid = (v1 + v2 + v3) / 3;
-		areaSQ = (v2 - v1).crossProduct(v3 - v1).getLengthSQ() / 4;
+		areaSQ = (v2-v1).crossProduct(v3-v1).getLengthSQ() / 4;
 	}
 
 	v3f getNormal() const {
@@ -90,7 +95,7 @@ public:
 		v3f v2 = buffer->getPosition(p2);
 		v3f v3 = buffer->getPosition(p3);
 
-		return (v2 - v1).crossProduct(v3 - v1);
+		return (v2-v1).crossProduct(v3-v1);
 	}
 };
 
@@ -98,19 +103,22 @@ public:
  * Implements a binary space partitioning tree
  * See also: https://en.wikipedia.org/wiki/Binary_space_partitioning
  */
-class MapBlockBspTree {
+class MapBlockBspTree
+{
 public:
 	MapBlockBspTree() {}
 
 	void buildTree(const std::vector<MeshTriangle> *triangles, u16 side_lingth);
 
-	void traverse(v3f viewpoint, std::vector<s32> &output) const {
+	void traverse(v3f viewpoint, std::vector<s32> &output) const
+	{
 		traverse(root, viewpoint, output);
 	}
 
 private:
 	// Tree node definition;
-	struct TreeNode {
+	struct TreeNode
+	{
 		v3f normal;
 		v3f origin;
 		std::vector<s32> triangle_refs;
@@ -119,8 +127,10 @@ private:
 
 		TreeNode() = default;
 		TreeNode(v3f normal, v3f origin, const std::vector<s32> &triangle_refs, s32 front_ref, s32 back_ref) :
-				normal(normal), origin(origin), triangle_refs(triangle_refs), front_ref(front_ref), back_ref(back_ref) {}
+				normal(normal), origin(origin), triangle_refs(triangle_refs), front_ref(front_ref), back_ref(back_ref)
+		{}
 	};
+
 
 	s32 buildTree(v3f normal, v3f origin, float delta, const std::vector<s32> &list, u32 depth);
 	void traverse(s32 node, v3f viewpoint, std::vector<s32> &output) const;
@@ -135,25 +145,24 @@ private:
  *
  * Attach alternate `Indices` to an existing mesh buffer, to make it possible to use different
  * indices with the same vertex buffer.
- *
- * Irrlicht does not currently support this: `CMeshBuffer` ties together a single vertex buffer
- * and a single index buffer. There's no way to share these between mesh buffers.
- *
  */
-class PartialMeshBuffer {
+class PartialMeshBuffer
+{
 public:
-	PartialMeshBuffer(scene::SMeshBuffer *buffer, std::vector<u16> &&vertex_indexes) :
-			m_buffer(buffer), m_vertex_indexes(std::move(vertex_indexes)) {}
+	PartialMeshBuffer(scene::SMeshBuffer *buffer, std::vector<u16> &&vertex_indices) :
+			m_buffer(buffer), m_indices(make_irr<scene::SIndexBuffer>())
+	{
+		m_indices->Data = std::move(vertex_indices);
+		m_indices->setHardwareMappingHint(scene::EHM_STATIC);
+	}
 
-	scene::IMeshBuffer *getBuffer() const { return m_buffer; }
-	const std::vector<u16> &getVertexIndexes() const { return m_vertex_indexes; }
+	auto *getBuffer() const { return m_buffer; }
 
-	void beforeDraw() const;
-	void afterDraw() const;
+	void draw(video::IVideoDriver *driver) const;
 
 private:
 	scene::SMeshBuffer *m_buffer;
-	mutable std::vector<u16> m_vertex_indexes;
+	irr_ptr<scene::SIndexBuffer> m_indices;
 };
 
 /*
@@ -167,7 +176,8 @@ private:
 	- animated flowing liquids [not implemented]
 	- animating vertex positions for e.g. axles [not implemented]
 */
-class MapBlockMesh {
+class MapBlockMesh
+{
 public:
 	// Builds the mesh given
 	MapBlockMesh(Client *client, MeshMakeData *data, v3s16 camera_offset);
@@ -181,26 +191,31 @@ public:
 	// Returns true if anything has been changed.
 	bool animate(bool faraway, float time, int crack, u32 daynight_ratio);
 
-	scene::IMesh *getMesh() {
-		return m_mesh[0];
+	scene::IMesh *getMesh()
+	{
+		return m_mesh[0].get();
 	}
 
-	scene::IMesh *getMesh(u8 layer) {
-		return m_mesh[layer];
+	scene::IMesh *getMesh(u8 layer)
+	{
+		return m_mesh[layer].get();
 	}
 
-	std::vector<MinimapMapblock *> moveMinimapMapblocks() {
-		std::vector<MinimapMapblock *> minimap_mapblocks;
+	std::vector<MinimapMapblock*> moveMinimapMapblocks()
+	{
+		std::vector<MinimapMapblock*> minimap_mapblocks;
 		minimap_mapblocks.swap(m_minimap_mapblocks);
 		return minimap_mapblocks;
 	}
 
-	bool isAnimationForced() const {
+	bool isAnimationForced() const
+	{
 		return m_animation_force_timer == 0;
 	}
 
-	void decreaseAnimationForceTimer() {
-		if (m_animation_force_timer > 0)
+	void decreaseAnimationForceTimer()
+	{
+		if(m_animation_force_timer > 0)
 			m_animation_force_timer--;
 	}
 
@@ -215,7 +230,8 @@ public:
 	void consolidateTransparentBuffers();
 
 	/// get the list of transparent buffers
-	const std::vector<PartialMeshBuffer> &getTransparentBuffers() const {
+	const std::vector<PartialMeshBuffer> &getTransparentBuffers() const
+	{
 		return this->m_transparent_buffers;
 	}
 
@@ -226,8 +242,8 @@ private:
 		TileLayer tile;
 	};
 
-	scene::IMesh *m_mesh[MAX_TILE_LAYERS];
-	std::vector<MinimapMapblock *> m_minimap_mapblocks;
+	irr_ptr<scene::IMesh> m_mesh[MAX_TILE_LAYERS];
+	std::vector<MinimapMapblock*> m_minimap_mapblocks;
 	ITextureSource *m_tsrc;
 	IShaderSource *m_shdrsrc;
 
@@ -257,7 +273,7 @@ private:
 	// For each mesh and mesh buffer, stores pre-baked colors
 	// of sunlit vertices
 	// Keys are pairs of (mesh index, buffer index in the mesh)
-	std::map<std::pair<u8, u32>, std::map<u32, video::SColor>> m_daynight_diffs;
+	std::map<std::pair<u8, u32>, std::map<u32, video::SColor > > m_daynight_diffs;
 
 	// list of all semitransparent triangles in the mapblock
 	std::vector<MeshTriangle> m_transparent_triangles;
@@ -265,6 +281,8 @@ private:
 	MapBlockBspTree m_bsp_tree;
 	// Ordered list of references to parts of transparent buffers to draw
 	std::vector<PartialMeshBuffer> m_transparent_buffers;
+	// Is m_transparent_buffers currently in consolidated form?
+	bool m_transparent_buffers_consolidated = false;
 };
 
 /*!

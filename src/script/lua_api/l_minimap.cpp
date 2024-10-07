@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+
 #include "lua_api/l_minimap.h"
 #include "lua_api/l_internal.h"
 #include "common/c_converter.h"
@@ -24,11 +25,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/minimap.h"
 #include "settings.h"
 
-LuaMinimap::LuaMinimap(Minimap *m) :
-		m_minimap(m) {
+LuaMinimap::LuaMinimap(Minimap *m) : m_minimap(m)
+{
 }
 
-void LuaMinimap::create(lua_State *L, Minimap *m) {
+void LuaMinimap::create(lua_State *L, Minimap *m)
+{
 	LuaMinimap *o = new LuaMinimap(m);
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;
 	luaL_getmetatable(L, className);
@@ -46,7 +48,8 @@ void LuaMinimap::create(lua_State *L, Minimap *m) {
 	lua_setfield(L, uitable, "minimap");
 }
 
-int LuaMinimap::l_get_pos(lua_State *L) {
+int LuaMinimap::l_get_pos(lua_State *L)
+{
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 
@@ -54,7 +57,8 @@ int LuaMinimap::l_get_pos(lua_State *L) {
 	return 1;
 }
 
-int LuaMinimap::l_set_pos(lua_State *L) {
+int LuaMinimap::l_set_pos(lua_State *L)
+{
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 
@@ -62,7 +66,8 @@ int LuaMinimap::l_set_pos(lua_State *L) {
 	return 1;
 }
 
-int LuaMinimap::l_get_angle(lua_State *L) {
+int LuaMinimap::l_get_angle(lua_State *L)
+{
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 
@@ -70,7 +75,8 @@ int LuaMinimap::l_get_angle(lua_State *L) {
 	return 1;
 }
 
-int LuaMinimap::l_set_angle(lua_State *L) {
+int LuaMinimap::l_set_angle(lua_State *L)
+{
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 
@@ -78,7 +84,8 @@ int LuaMinimap::l_set_angle(lua_State *L) {
 	return 1;
 }
 
-int LuaMinimap::l_get_mode(lua_State *L) {
+int LuaMinimap::l_get_mode(lua_State *L)
+{
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 
@@ -86,7 +93,8 @@ int LuaMinimap::l_get_mode(lua_State *L) {
 	return 1;
 }
 
-int LuaMinimap::l_set_mode(lua_State *L) {
+int LuaMinimap::l_set_mode(lua_State *L)
+{
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 
@@ -98,7 +106,8 @@ int LuaMinimap::l_set_mode(lua_State *L) {
 	return 1;
 }
 
-int LuaMinimap::l_set_shape(lua_State *L) {
+int LuaMinimap::l_set_shape(lua_State *L)
+{
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 	if (!lua_isnumber(L, 2))
@@ -108,7 +117,8 @@ int LuaMinimap::l_set_shape(lua_State *L) {
 	return 0;
 }
 
-int LuaMinimap::l_get_shape(lua_State *L) {
+int LuaMinimap::l_get_shape(lua_State *L)
+{
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 
@@ -116,7 +126,8 @@ int LuaMinimap::l_get_shape(lua_State *L) {
 	return 1;
 }
 
-int LuaMinimap::l_show(lua_State *L) {
+int LuaMinimap::l_show(lua_State *L)
+{
 	// If minimap is disabled by config, don't show it.
 	if (!g_settings->getBool("enable_minimap"))
 		return 1;
@@ -133,7 +144,8 @@ int LuaMinimap::l_show(lua_State *L) {
 	return 1;
 }
 
-int LuaMinimap::l_hide(lua_State *L) {
+int LuaMinimap::l_hide(lua_State *L)
+{
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 
@@ -146,7 +158,8 @@ int LuaMinimap::l_hide(lua_State *L) {
 	return 1;
 }
 
-Minimap *LuaMinimap::getobject(LuaMinimap *ref) {
+Minimap* LuaMinimap::getobject(LuaMinimap *ref)
+{
 	return ref->m_minimap;
 }
 
@@ -156,10 +169,11 @@ int LuaMinimap::gc_object(lua_State *L) {
 	return 0;
 }
 
-void LuaMinimap::Register(lua_State *L) {
+void LuaMinimap::Register(lua_State *L)
+{
 	static const luaL_Reg metamethods[] = {
-		{ "__gc", gc_object },
-		{ 0, 0 }
+		{"__gc", gc_object},
+		{0, 0}
 	};
 	registerClass(L, className, methods, metamethods);
 }
@@ -176,5 +190,5 @@ const luaL_Reg LuaMinimap::methods[] = {
 	luamethod(LuaMinimap, set_mode),
 	luamethod(LuaMinimap, set_shape),
 	luamethod(LuaMinimap, get_shape),
-	{ 0, 0 }
+	{0,0}
 };

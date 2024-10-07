@@ -52,6 +52,12 @@ aperosengine.register_node("testnodes:fill_positioning_reference", {
 	groups = {dig_immediate = 3},
 })
 
+aperosengine.register_node("testnodes:modifier_mask", {
+	description = S("[mask Modifier Test Node"),
+	tiles = {"testnodes_128x128_rgb.png^[mask:testnodes_mask_WRGBKW.png"},
+	groups = {dig_immediate = 3},
+})
+
 -- Node texture transparency test
 
 local alphas = { 64, 128, 191 }
@@ -251,7 +257,7 @@ The following nodes can be used to demonstrate the TGA format support.
 
 AperosEngine supports TGA types 1, 2, 3 & 10. While adding the support for
 TGA type 9 (RLE-compressed, color-mapped) is easy, it is not advisable
-to do so, as it is not backwards compatible with any AperosEngine;
+to do so, as it is not backwards compatible with any AperosEngine pre-5.5;
 content creators should therefore either use TGA type 1 or 10, or PNG.
 
 TODO: Types 1, 2 & 10 should have two test nodes each (i.e. bottom-top

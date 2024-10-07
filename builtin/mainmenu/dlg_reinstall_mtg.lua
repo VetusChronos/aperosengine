@@ -78,7 +78,7 @@ local function get_formspec(dialogdata)
 		"container[0.375,5.825]",
 		"style[dismiss;bgcolor=red]",
 		"button[0,0;4,0.8;dismiss;", fgettext("Dismiss"), "]",
-		"button[4.25,0;8,0.8;reinstall;", fgettext("Reinstall AperosVoxel Game"), "]",
+		"button[4.25,0;8,0.8;reinstall;", fgettext("Reinstall AperosVoxel"), "]",
 		"container_end[]",
 	})
 end
@@ -91,7 +91,7 @@ local function buttonhandler(this, fields)
 
 		local maintab = ui.find_by_name("maintab")
 
-		local dlg = create_contentdb_dlg(nil, "aperosvoxel/aperosvoxel")
+		local dlg = create_contentdb_dlg(nil, "vetuschronos/aperosvoxel")
 		dlg:set_parent(maintab)
 		maintab:hide()
 		dlg:show()
@@ -112,7 +112,7 @@ local function eventhandler(event)
 		return true
 	elseif event == "MenuQuit" then
 		-- Don't allow closing the dialog with ESC, but still allow exiting
-		-- Minetest.
+		-- AperosEngine.
 		core.close()
 		return true
 	end

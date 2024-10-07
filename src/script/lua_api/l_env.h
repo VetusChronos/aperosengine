@@ -20,36 +20,39 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include "lua_api/l_base.h"
-#include "serverenvironment.h"
 #include "raycast.h"
+
+class ServerScripting;
 
 // base class containing helpers
 class ModApiEnvBase : public ModApiBase {
 protected:
+
 	static void collectNodeIds(lua_State *L, int idx,
-			const NodeDefManager *ndef, std::vector<content_t> &filter);
+		const NodeDefManager *ndef, std::vector<content_t> &filter);
 
 	static void checkArea(v3s16 &minp, v3s16 &maxp);
 
 	// F must be (v3s16 pos) -> MapNode
 	template <typename F>
 	static int findNodeNear(lua_State *L, v3s16 pos, int radius,
-			const std::vector<content_t> &filter, int start_radius, F &&getNode);
+		const std::vector<content_t> &filter, int start_radius, F &&getNode);
 
 	// F must be (G callback) -> void
 	// with G being (v3s16 p, MapNode n) -> bool
 	// and behave like Map::forEachNodeInArea
 	template <typename F>
-	static int findNodesInArea(lua_State *L, const NodeDefManager *ndef,
-			const std::vector<content_t> &filter, bool grouped, F &&iterate);
+	static int findNodesInArea(lua_State *L,  const NodeDefManager *ndef,
+		const std::vector<content_t> &filter, bool grouped, F &&iterate);
 
 	// F must be (v3s16 pos) -> MapNode
 	template <typename F>
 	static int findNodesInAreaUnderAir(lua_State *L, v3s16 minp, v3s16 maxp,
-			const std::vector<content_t> &filter, F &&getNode);
+		const std::vector<content_t> &filter, F &&getNode);
 
 	static const EnumString es_ClearObjectsMode[];
 	static const EnumString es_BlockStatusType[];
+
 };
 
 class ModApiEnv : public ModApiEnvBase {
@@ -61,6 +64,10 @@ private:
 	// bulk_set_node([pos1, pos2, ...], node)
 	// pos = {x=num, y=num, z=num}
 	static int l_bulk_set_node(lua_State *L);
+
+	// bulk_swap_node([pos1, pos2, ...], node)
+	// pos = {x=num, y=num, z=num}
+	static int l_bulk_swap_node(lua_State *L);
 
 	static int l_add_node(lua_State *L);
 
@@ -231,7 +238,7 @@ private:
 	static int l_compare_block_status(lua_State *L);
 
 	// get_translated_string(lang_code, string)
-	static int l_get_translated_string(lua_State *L);
+	static int l_get_translated_string(lua_State * L);
 
 public:
 	static void Initialize(lua_State *L, int top);
@@ -244,6 +251,7 @@ public:
  */
 class ModApiEnvVM : public ModApiEnvBase {
 private:
+
 	// get_node_or_nil(pos)
 	static int l_get_node_or_nil(lua_State *L);
 
@@ -278,76 +286,9 @@ public:
 	static void InitializeEmerge(lua_State *L, int top);
 };
 
-class LuaABM : public ActiveBlockModifier {
-private:
-	int m_id;
-
-	std::vector<std::string> m_trigger_contents;
-	std::vector<std::string> m_required_neighbors;
-	float m_trigger_interval;
-	u32 m_trigger_chance;
-	bool m_simple_catch_up;
-	s16 m_min_y;
-	s16 m_max_y;
-
-public:
-	LuaABM(lua_State *L, int id,
-			const std::vector<std::string> &trigger_contents,
-			const std::vector<std::string> &required_neighbors,
-			float trigger_interval, u32 trigger_chance, bool simple_catch_up, s16 min_y, s16 max_y) :
-			m_id(id),
-			m_trigger_contents(trigger_contents),
-			m_required_neighbors(required_neighbors),
-			m_trigger_interval(trigger_interval),
-			m_trigger_chance(trigger_chance),
-			m_simple_catch_up(simple_catch_up),
-			m_min_y(min_y),
-			m_max_y(max_y) {
-	}
-	virtual const std::vector<std::string> &getTriggerContents() const {
-		return m_trigger_contents;
-	}
-	virtual const std::vector<std::string> &getRequiredNeighbors() const {
-		return m_required_neighbors;
-	}
-	virtual float getTriggerInterval() {
-		return m_trigger_interval;
-	}
-	virtual u32 getTriggerChance() {
-		return m_trigger_chance;
-	}
-	virtual bool getSimpleCatchUp() {
-		return m_simple_catch_up;
-	}
-	virtual s16 getMinY() {
-		return m_min_y;
-	}
-	virtual s16 getMaxY() {
-		return m_max_y;
-	}
-	virtual void trigger(ServerEnvironment *env, v3s16 p, MapNode n,
-			u32 active_object_count, u32 active_object_count_wider);
-};
-
-class LuaLBM : public LoadingBlockModifierDef {
-private:
-	int m_id;
-
-public:
-	LuaLBM(lua_State *L, int id,
-			const std::set<std::string> &trigger_contents,
-			const std::string &name,
-			bool run_at_every_load) :
-			m_id(id) {
-		this->run_at_every_load = run_at_every_load;
-		this->trigger_contents = trigger_contents;
-		this->name = name;
-	}
-	virtual void trigger(ServerEnvironment *env, v3s16 p, MapNode n, float dtime_s);
-};
-
 //! Lua wrapper for RaycastState objects
-class LuaRaycast : public ModApiBase {
+class LuaRaycast : public ModApiBase
+{
 private:
 	static const luaL_Reg methods[];
 	//! Inner state
@@ -363,15 +304,15 @@ private:
 	 * Returns the next pointed thing on the ray.
 	 */
 	static int l_next(lua_State *L);
-
 public:
 	//! Constructor with the same arguments as RaycastState.
 	LuaRaycast(
-			const core::line3d<f32> &shootline,
-			bool objects_pointable,
-			bool liquids_pointable,
-			const std::optional<Pointabilities> &pointabilities) :
-			state(shootline, objects_pointable, liquids_pointable, pointabilities) {}
+		const core::line3d<f32> &shootline,
+		bool objects_pointable,
+		bool liquids_pointable,
+		const std::optional<Pointabilities> &pointabilities) :
+		state(shootline, objects_pointable, liquids_pointable, pointabilities)
+	{}
 
 	//! Creates a LuaRaycast and leaves it on top of the stack.
 	static int create_object(lua_State *L);

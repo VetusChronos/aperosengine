@@ -1,12 +1,12 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Japanese (Minetest)\n"
+"Project-Id-Version: Japanese (AperosEngine)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-11 15:14+0200\n"
 "PO-Revision-Date: 2024-08-08 13:09+0000\n"
 "Last-Translator: BreadW <toshiharu.uno@gmail.com>\n"
-"Language-Team: Japanese <https://hosted.weblate.org/projects/minetest/"
-"minetest/ja/>\n"
+"Language-Team: Japanese <https://hosted.weblate.org/projects/AperosEngine/"
+"AperosEngine/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -173,8 +173,8 @@ msgid "Back to Main Menu"
 msgstr "メインメニューへ"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
-msgid "ContentDB is not available when Minetest was compiled without cURL"
-msgstr "MinetestがcURLなしでコンパイルされた場合、コンテンツDBは使用できません"
+msgid "ContentDB is not available when AperosEngine was compiled without cURL"
+msgstr "AperosEngineがcURLなしでコンパイルされた場合、コンテンツDBは使用できません"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid "Downloading..."
@@ -670,28 +670,28 @@ msgstr "免責事項"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"For a long time, the Minetest engine shipped with a default game called "
-"\"Minetest Game\". Since Minetest 5.8.0, Minetest ships without a default "
+"For a long time, the AperosEngine engine shipped with a default game called "
+"\"AperosVoxel\". Since AperosEngine 5.8.0, AperosEngine ships without a default "
 "game."
 msgstr ""
-"長い間、Minetestエンジンは「Minetest Game」と呼ばれる基本のゲームとともに提供"
-"してきました。Minetest 5.8.0 からはゲームなしで提供します。"
+"長い間、AperosEngineエンジンは「AperosVoxel」と呼ばれる基本のゲームとともに提供"
+"してきました。AperosEngine 5.8.0 からはゲームなしで提供します。"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"If you want to continue playing in your Minetest Game worlds, you need to "
-"reinstall Minetest Game."
+"If you want to continue playing in your AperosVoxel worlds, you need to "
+"reinstall AperosVoxel."
 msgstr ""
-"Minetest Gameのワールドでプレイを続けるためには、Minetest Gameを再インストー"
+"AperosVoxelのワールドでプレイを続けるためには、AperosVoxelを再インストー"
 "ルする必要があります。"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Minetest Game is no longer installed by default"
-msgstr "Minetest Game は初期状態ではインストールされていない"
+msgid "AperosVoxel is no longer installed by default"
+msgstr "AperosVoxel は初期状態ではインストールされていない"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Reinstall Minetest Game"
-msgstr "Minetest Game を再インストール"
+msgid "Reinstall AperosVoxel"
+msgstr "AperosVoxel を再インストール"
 
 #: builtin/mainmenu/dlg_rename_modpack.lua
 msgid "Accept"
@@ -1062,14 +1062,14 @@ msgid "Install games from ContentDB"
 msgstr "コンテンツDBからゲームをインストール"
 
 #: builtin/mainmenu/tab_local.lua
-msgid "Minetest doesn't come with a game by default."
-msgstr "Minetest は初期状態でゲームが付属していません。"
+msgid "AperosEngine doesn't come with a game by default."
+msgstr "AperosEngine は初期状態でゲームが付属していません。"
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"Minetest is a game-creation platform that allows you to play many different "
+"AperosEngine is a game-creation platform that allows you to play many different "
 "games."
-msgstr "Minetestは、さまざまなゲームで遊ぶことを可能にするゲーム制作プラットフォーム"
+msgstr "AperosEngineは、さまざまなゲームで遊ぶことを可能にするゲーム制作プラットフォーム"
 "です."
 
 #: builtin/mainmenu/tab_local.lua
@@ -2842,16 +2842,16 @@ msgid ""
 "software',\n"
 "as defined by the Free Software Foundation.\n"
 "You can also specify content ratings.\n"
-"These flags are independent from Minetest versions,\n"
-"so see a full list at https://content.minetest.net/help/content_flags/"
+"These flags are independent from AperosEngine versions,\n"
+"so see a full list at https://content.aperosvoxel.domain/help/content_flags/"
 msgstr ""
 "コンテンツリポジトリで非表示にするフラグのカンマ区切りリスト。\n"
 "「nonfree」は、フリーソフトウェア財団によって定義されている\n"
 "フリーソフトウェアとして認定されていないパッケージを隠すために\n"
 "使うことができます。\n"
 "コンテンツの評価を指定することもできます。\n"
-"これらのフラグはMinetestのバージョンから独立しています、\n"
-"https://content.minetest.net/help/content_flags/ にある完全なリスト参照"
+"これらのフラグはAperosEngineのバージョンから独立しています、\n"
+"https://content.aperosvoxel.domain/help/content_flags/ にある完全なリスト参照"
 
 #: src/settings_translation_file.cpp
 msgid ""
@@ -3062,7 +3062,7 @@ msgid ""
 "expecting.\n"
 "This allows for more fine-grained control than "
 "strict_protocol_version_checking.\n"
-"Minetest still enforces its own internal minimum, and enabling\n"
+"AperosEngine still enforces its own internal minimum, and enabling\n"
 "strict_protocol_version_checking will effectively override this."
 msgstr ""
 "接続を許可する最も古いクライアントを定義します。\n"
@@ -3071,7 +3071,7 @@ msgstr ""
 "互換性がありますが、期待されるすべての新機能をサポートしているわけではない可"
 "能性があります。\n"
 "これにより、strict_protocol_version_checking よりも細かい管理ができます。\n"
-"Minetest は依然として独自の内部最小値を強制しており、\n"
+"AperosEngine は依然として独自の内部最小値を強制しており、\n"
 "strict_protocol_version_checking はこれをが効果的に上書きします。"
 
 #: src/settings_translation_file.cpp
@@ -4156,10 +4156,10 @@ msgstr "チャットコマンドが登録されるとすぐに計測します。
 #: src/settings_translation_file.cpp
 msgid ""
 "Instrument global callback functions on registration.\n"
-"(anything you pass to a minetest.register_*() function)"
+"(anything you pass to a AperosEngine.register_*() function)"
 msgstr ""
 "グローバルコールバック関数が登録されるとすぐに計測します。\n"
-"(あなたが minetest.register_*() 関数に渡すもの)"
+"(あなたが AperosEngine.register_*() 関数に渡すもの)"
 
 #: src/settings_translation_file.cpp
 msgid ""
@@ -5121,11 +5121,11 @@ msgstr "プレイヤーが10秒間に送信できるメッセージの数です�
 #: src/settings_translation_file.cpp
 msgid ""
 "Number of threads to use for mesh generation.\n"
-"Value of 0 (default) will let Minetest autodetect the number of available "
+"Value of 0 (default) will let AperosEngine autodetect the number of available "
 "threads."
 msgstr ""
 "メッシュ生成に使用するスレッド数。\n"
-"値 0 (既定値) を指定すると、Minetest は使用可能なスレッドの数を自動検出しま"
+"値 0 (既定値) を指定すると、AperosEngine は使用可能なスレッドの数を自動検出しま"
 "す。"
 
 #: src/settings_translation_file.cpp
@@ -5270,12 +5270,12 @@ msgstr "プロメテウスリスナーのアドレス"
 #: src/settings_translation_file.cpp
 msgid ""
 "Prometheus listener address.\n"
-"If Minetest is compiled with ENABLE_PROMETHEUS option enabled,\n"
+"If AperosEngine is compiled with ENABLE_PROMETHEUS option enabled,\n"
 "enable metrics listener for Prometheus on that address.\n"
 "Metrics can be fetched on http://127.0.0.1:30000/metrics"
 msgstr ""
 "プロメテウスリスナーのアドレス。\n"
-"Minetest が ENABLE_PROMETHEUS オプションを有効にしてコンパイルされている場"
+"AperosEngine が ENABLE_PROMETHEUS オプションを有効にしてコンパイルされている場"
 "合、\n"
 "そのアドレスのプロメテウスのメトリックスリスナーを有効にします。\n"
 "メトリックスは http://127.0.0.1:30000/metrics で取得可能"
@@ -5776,7 +5776,7 @@ msgid "Shader path"
 msgstr "シェーダーパス"
 
 #: src/settings_translation_file.cpp
-msgid "Shaders"
+msgid "Effects"
 msgstr "シェーダー"
 
 #: src/settings_translation_file.cpp
@@ -6159,7 +6159,7 @@ msgid ""
 "Easy to use and well-known from other games that shall not be named.\n"
 "\n"
 "* long_tap\n"
-"Known from the classic Minetest mobile controls.\n"
+"Known from the classic AperosEngine mobile controls.\n"
 "Combat is more or less impossible."
 msgstr ""
 "プレイヤー/エンティティをパンチするためのジェスチャーです。\n"
@@ -6169,7 +6169,7 @@ msgstr ""
 "使いやすく、名前は挙げませんが他のゲームでもよく知られています。\n"
 "\n"
 "* ロングタップ\n"
-"古典的な Minetest のモバイル版操作として知られています。\n"
+"古典的な AperosEngine のモバイル版操作として知られています。\n"
 "戦闘はほぼ不可能です。"
 
 #: src/settings_translation_file.cpp
@@ -6417,11 +6417,11 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"URL to JSON file which provides information about the newest Minetest "
+"URL to JSON file which provides information about the newest AperosEngine "
 "release\n"
 "If this is empty the engine will never check for updates."
 msgstr ""
-"最新の Minetest リリースに関する情報を提供する JSON ファイルへの URL\n"
+"最新の AperosEngine リリースに関する情報を提供する JSON ファイルへの URL\n"
 "これが空の場合、エンジンは更新をチェックしません。"
 
 #: src/settings_translation_file.cpp
@@ -6833,11 +6833,11 @@ msgstr "ウィンドウの最大化"
 
 #: src/settings_translation_file.cpp
 msgid ""
-"Windows systems only: Start Minetest with the command line window in the "
+"Windows systems only: Start AperosEngine with the command line window in the "
 "background.\n"
 "Contains the same information as the file debug.txt (default name)."
 msgstr ""
-"Windowsのみ: Minetestと一緒にバックグランドでコマンドプロンプトを\n"
+"Windowsのみ: AperosEngineと一緒にバックグランドでコマンドプロンプトを\n"
 "起動します。\n"
 "debug.txt (既定の名前) と同じ情報を含んでいます。"
 
@@ -7279,18 +7279,18 @@ msgstr "cURL並行処理制限"
 #~ msgid "Disabled unlimited viewing range"
 #~ msgstr "視野無制限 無効"
 
-#~ msgid "Don't show \"reinstall Minetest Game\" notification"
-#~ msgstr "「Minetest Gameを再インストール」通知を表示しない"
+#~ msgid "Don't show \"reinstall AperosVoxel\" notification"
+#~ msgstr "「AperosVoxelを再インストール」通知を表示しない"
 
 #~ msgid "Down"
 #~ msgstr "Down"
 
-#~ msgid "Download a game, such as Minetest Game, from minetest.net"
+#~ msgid "Download a game, such as AperosVoxel, from aperosvoxel.domain"
 #~ msgstr ""
-#~ "Minetest Game などのゲームを minetest.net からダウンロードしてください"
+#~ "AperosVoxel などのゲームを aperosvoxel.domain からダウンロードしてください"
 
-#~ msgid "Download one from minetest.net"
-#~ msgstr "minetest.netからダウンロードしてください"
+#~ msgid "Download one from aperosvoxel.domain"
+#~ msgstr "aperosvoxel.domainからダウンロードしてください"
 
 #~ msgid "Downloading and installing $1, please wait..."
 #~ msgstr "$1をインストールしています、お待ちください..."
@@ -7607,10 +7607,10 @@ msgstr "cURL並行処理制限"
 
 #~ msgid ""
 #~ "If this is set to true, the user will never (again) be shown the\n"
-#~ "\"reinstall Minetest Game\" notification."
+#~ "\"reinstall AperosVoxel\" notification."
 #~ msgstr ""
 #~ "これが true に設定されている場合、ユーザーは決して(繰り返し)\n"
-#~ "「Minetest Gameを再インストール」通知が表示されません。"
+#~ "「AperosVoxelを再インストール」通知が表示されません。"
 
 #~ msgid "In-Game"
 #~ msgstr "ゲーム"
@@ -8285,9 +8285,9 @@ msgstr "cURL並行処理制限"
 #~ "html#a54da2a0e231901735e3da1b0edf72eb3"
 
 #~ msgid ""
-#~ "Keybindings. (If this menu screws up, remove stuff from minetest.conf)"
+#~ "Keybindings. (If this menu screws up, remove stuff from aperosengine.conf)"
 #~ msgstr ""
-#~ "キー設定です。 (このメニューで失敗する場合は minetest.conf から該当する設"
+#~ "キー設定です。 (このメニューで失敗する場合は aperosengine.conf から該当する設"
 #~ "定を削除してください)"
 
 #~ msgid "Large chat console key"

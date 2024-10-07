@@ -36,7 +36,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "settings.h"
 #include "profiler.h"
 
-ClientParticleTexture::ClientParticleTexture(const ServerParticleTexture &p, ITextureSource *tsrc) {
+ClientParticleTexture::ClientParticleTexture(const ServerParticleTexture& p, ITextureSource *tsrc)
+{
 	tex = p;
 	// note: getTextureForMesh not needed here because we don't use texture filtering
 	ref = tsrc->getTexture(p.string);
@@ -53,7 +54,8 @@ Particle::Particle(
 		v2f texsize,
 		video::SColor color,
 		ParticleSpawner *parent,
-		std::unique_ptr<ClientParticleTexture> owned_texture) :
+		std::unique_ptr<ClientParticleTexture> owned_texture
+	) :
 		m_expiration(p.expirationtime),
 
 		m_base_color(color),
@@ -67,15 +69,18 @@ Particle::Particle(
 		m_p(p),
 
 		m_parent(parent),
-		m_owned_texture(std::move(owned_texture)) {
+		m_owned_texture(std::move(owned_texture))
+{
 }
 
-Particle::~Particle() {
+Particle::~Particle()
+{
 	if (m_buffer)
 		m_buffer->release(m_index);
 }
 
-bool Particle::attachToBuffer(ParticleBuffer *buffer) {
+bool Particle::attachToBuffer(ParticleBuffer *buffer)
+{
 	auto index_opt = buffer->allocate();
 	if (index_opt.has_value()) {
 		m_index = index_opt.value();
@@ -85,21 +90,22 @@ bool Particle::attachToBuffer(ParticleBuffer *buffer) {
 	return false;
 }
 
-void Particle::step(float dtime, ClientEnvironment *env) {
+void Particle::step(float dtime, ClientEnvironment *env)
+{
 	m_time += dtime;
 
 	// apply drag (not handled by collisionMoveSimple) and brownian motion
 	v3f av = vecAbsolute(m_velocity);
 	av -= av * (m_p.drag * dtime);
-	m_velocity = av * vecSign(m_velocity) + v3f(m_p.jitter.pickWithin()) * dtime;
+	m_velocity = av*vecSign(m_velocity) + v3f(m_p.jitter.pickWithin())*dtime;
 
 	if (m_p.collisiondetection) {
 		aabb3f box(v3f(-m_p.size / 2.0f), v3f(m_p.size / 2.0f));
 		v3f p_pos = m_pos * BS;
 		v3f p_velocity = m_velocity * BS;
 		collisionMoveResult r = collisionMoveSimple(env, env->getGameDef(), BS * 0.5f,
-				box, 0.0f, dtime, &p_pos, &p_velocity, m_acceleration * BS, nullptr,
-				m_p.object_collision);
+			box, 0.0f, dtime, &p_pos, &p_velocity, m_acceleration * BS, nullptr,
+			m_p.object_collision);
 
 		f32 bounciness = m_p.bounce.pickWithin();
 		if (r.collides && (m_p.collision_removal || bounciness > 0)) {
@@ -152,7 +158,7 @@ void Particle::step(float dtime, ClientEnvironment *env) {
 	// animate particle alpha in accordance with settings
 	float alpha = 1.f;
 	if (m_texture.tex != nullptr)
-		alpha = m_texture.tex->alpha.blend(m_time / (m_expiration + 0.1f));
+		alpha = m_texture.tex -> alpha.blend(m_time / (m_expiration+0.1f));
 
 	// Update lighting
 	auto col = updateLight(env);
@@ -162,14 +168,16 @@ void Particle::step(float dtime, ClientEnvironment *env) {
 	updateVertices(env, col);
 }
 
-video::SColor Particle::updateLight(ClientEnvironment *env) {
+video::SColor Particle::updateLight(ClientEnvironment *env)
+{
 	u8 light = 0;
 	bool pos_ok;
 
 	v3s16 p = v3s16(
-			floor(m_pos.X + 0.5),
-			floor(m_pos.Y + 0.5),
-			floor(m_pos.Z + 0.5));
+		floor(m_pos.X+0.5),
+		floor(m_pos.Y+0.5),
+		floor(m_pos.Z+0.5)
+	);
 	MapNode n = env->getClientMap().getNode(p, &pos_ok);
 	if (pos_ok)
 		light = n.getLightBlend(env->getDayNightRatio(),
@@ -179,12 +187,13 @@ video::SColor Particle::updateLight(ClientEnvironment *env) {
 
 	u8 m_light = decode_light(light + m_p.glow);
 	return video::SColor(255,
-			m_light * m_base_color.getRed() / 255,
-			m_light * m_base_color.getGreen() / 255,
-			m_light * m_base_color.getBlue() / 255);
+		m_light * m_base_color.getRed() / 255,
+		m_light * m_base_color.getGreen() / 255,
+		m_light * m_base_color.getBlue() / 255);
 }
 
-void Particle::updateVertices(ClientEnvironment *env, video::SColor color) {
+void Particle::updateVertices(ClientEnvironment *env, video::SColor color)
+{
 	f32 tx0, tx1, ty0, ty1;
 	v2f scale;
 
@@ -194,7 +203,7 @@ void Particle::updateVertices(ClientEnvironment *env, video::SColor color) {
 	video::S3DVertex *vertices = m_buffer->getVertices(m_index);
 
 	if (m_texture.tex != nullptr)
-		scale = m_texture.tex->scale.blend(m_time / (m_expiration + 0.1));
+		scale = m_texture.tex -> scale.blend(m_time / (m_expiration+0.1));
 	else
 		scale = v2f(1.f, 1.f);
 
@@ -204,7 +213,7 @@ void Particle::updateVertices(ClientEnvironment *env, video::SColor color) {
 		v2u32 framesize;
 		texcoord = m_p.animation.getTextureCoords(texsize, m_animation_frame);
 		m_p.animation.determineParams(texsize, NULL, NULL, &framesize);
-		framesize_f = v2f(framesize.X / (float)texsize.X, framesize.Y / (float)texsize.Y);
+		framesize_f = v2f(framesize.X / (float) texsize.X, framesize.Y / (float) texsize.Y);
 
 		tx0 = m_texpos.X + texcoord.X;
 		tx1 = m_texpos.X + texcoord.X + framesize_f.X * m_texsize.X;
@@ -218,16 +227,16 @@ void Particle::updateVertices(ClientEnvironment *env, video::SColor color) {
 	}
 
 	auto half = m_p.size * .5f,
-		 hx = half * scale.X,
-		 hy = half * scale.Y;
+	     hx   = half * scale.X,
+	     hy   = half * scale.Y;
 	vertices[0] = video::S3DVertex(-hx, -hy,
-			0, 0, 0, 0, color, tx0, ty1);
+		0, 0, 0, 0, color, tx0, ty1);
 	vertices[1] = video::S3DVertex(hx, -hy,
-			0, 0, 0, 0, color, tx1, ty1);
+		0, 0, 0, 0, color, tx1, ty1);
 	vertices[2] = video::S3DVertex(hx, hy,
-			0, 0, 0, 0, color, tx1, ty0);
+		0, 0, 0, 0, color, tx1, ty0);
 	vertices[3] = video::S3DVertex(-hx, hy,
-			0, 0, 0, 0, color, tx0, ty0);
+		0, 0, 0, 0, color, tx0, ty0);
 
 	// Update position -- see #10398
 	auto *player = env->getLocalPlayer();
@@ -238,8 +247,7 @@ void Particle::updateVertices(ClientEnvironment *env, video::SColor color) {
 		if (m_p.vertical) {
 			v3f ppos = player->getPosition() / BS;
 			vertex.Pos.rotateXZBy(std::atan2(ppos.Z - m_pos.Z, ppos.X - m_pos.X) /
-							core::DEGTORAD +
-					90);
+				core::DEGTORAD + 90);
 		} else {
 			vertex.Pos.rotateYZBy(player->getPitch());
 			vertex.Pos.rotateXZBy(player->getYaw());
@@ -257,14 +265,16 @@ ParticleSpawner::ParticleSpawner(
 		const ParticleSpawnerParameters &params,
 		u16 attached_id,
 		std::vector<ClientParticleTexture> &&texpool,
-		ParticleManager *p_manager) :
+		ParticleManager *p_manager
+	) :
 		m_active(0),
 		m_particlemanager(p_manager),
 		m_time(0.0f),
 		m_player(player),
 		p(params),
 		m_texpool(std::move(texpool)),
-		m_attached_id(attached_id) {
+		m_attached_id(attached_id)
+{
 	m_spawntimes.reserve(p.amount + 1);
 	for (u16 i = 0; i <= p.amount; i++) {
 		float spawntime = myrand_float() * p.time;
@@ -284,36 +294,37 @@ ParticleSpawner::ParticleSpawner(
 }
 
 namespace {
-GenericCAO *findObjectByID(ClientEnvironment *env, u16 id) {
-	if (id == 0)
-		return nullptr;
-	return env->getGenericCAO(id);
+	GenericCAO *findObjectByID(ClientEnvironment *env, u16 id) {
+		if (id == 0)
+			return nullptr;
+		return env->getGenericCAO(id);
+	}
 }
-} //namespace
 
 void ParticleSpawner::spawnParticle(ClientEnvironment *env, float radius,
-		const core::matrix4 *attached_absolute_pos_rot_matrix) {
+	const core::matrix4 *attached_absolute_pos_rot_matrix)
+{
 	float fac = 0;
 	if (p.time != 0) { // ensure safety from divide-by-zeroes
-		fac = m_time / (p.time + 0.1f);
+		fac = m_time / (p.time+0.1f);
 	}
 
-	auto r_pos = p.pos.blend(fac);
-	auto r_vel = p.vel.blend(fac);
-	auto r_acc = p.acc.blend(fac);
-	auto r_drag = p.drag.blend(fac);
+	auto r_pos    = p.pos.blend(fac);
+	auto r_vel    = p.vel.blend(fac);
+	auto r_acc    = p.acc.blend(fac);
+	auto r_drag   = p.drag.blend(fac);
 	auto r_radius = p.radius.blend(fac);
 	auto r_jitter = p.jitter.blend(fac);
 	auto r_bounce = p.bounce.blend(fac);
-	v3f attractor_origin = p.attractor_origin.blend(fac);
-	v3f attractor_direction = p.attractor_direction.blend(fac);
-	auto attractor_obj = findObjectByID(env, p.attractor_attachment);
+	v3f  attractor_origin    = p.attractor_origin.blend(fac);
+	v3f  attractor_direction = p.attractor_direction.blend(fac);
+	auto attractor_obj           = findObjectByID(env, p.attractor_attachment);
 	auto attractor_direction_obj = findObjectByID(env, p.attractor_direction_attachment);
 
-	auto r_exp = p.exptime.blend(fac);
-	auto r_size = p.size.blend(fac);
+	auto r_exp     = p.exptime.blend(fac);
+	auto r_size    = p.size.blend(fac);
 	auto r_attract = p.attract.blend(fac);
-	auto attract = r_attract.pickWithin();
+	auto attract   = r_attract.pickWithin();
 
 	v3f ppos = m_player->getPosition() / BS;
 	v3f pos = r_pos.pickWithin();
@@ -331,7 +342,7 @@ void ParticleSpawner::spawnParticle(ClientEnvironment *env, float radius,
 		pos.Z += camera_offset.Z;
 	}
 
-	if (pos.getDistanceFromSQ(ppos) > radius * radius)
+	if (pos.getDistanceFromSQ(ppos) > radius*radius)
 		return;
 
 	// Parameters for the single particle we're about to spawn
@@ -365,10 +376,10 @@ void ParticleSpawner::spawnParticle(ClientEnvironment *env, float radius,
 		v3f mag = sphere_radius;
 		mag.normalize();
 
-		v3f ofs = v3f(l, 0, 0);
-		ofs.rotateXZBy(myrand_range(0.f, 360.f));
-		ofs.rotateYZBy(myrand_range(0.f, 360.f));
-		ofs.rotateXYBy(myrand_range(0.f, 360.f));
+		v3f ofs = v3f(l,0,0);
+		ofs.rotateXZBy(myrand_range(0.f,360.f));
+		ofs.rotateYZBy(myrand_range(0.f,360.f));
+		ofs.rotateXYBy(myrand_range(0.f,360.f));
 
 		pp.pos += ofs * mag;
 	}
@@ -389,7 +400,7 @@ void ParticleSpawner::spawnParticle(ClientEnvironment *env, float radius,
 
 			case ParticleParamTypes::AttractorKind::line: {
 				// https://github.com/minetest/minetest/issues/11505#issuecomment-915612700
-				const auto &lorigin = attractor_origin;
+				const auto& lorigin = attractor_origin;
 				v3f ldir = attractor_direction;
 				ldir.normalize();
 				auto origin_to_point = pp.pos - lorigin;
@@ -405,7 +416,7 @@ void ParticleSpawner::spawnParticle(ClientEnvironment *env, float radius,
 
 			case ParticleParamTypes::AttractorKind::plane: {
 				// https://github.com/minetest/minetest/issues/11505#issuecomment-915612700
-				const v3f &porigin = attractor_origin;
+				const v3f& porigin = attractor_origin;
 				v3f normal = attractor_direction;
 				normal.normalize();
 				v3f point_to_origin = porigin - pp.pos;
@@ -444,15 +455,15 @@ void ParticleSpawner::spawnParticle(ClientEnvironment *env, float radius,
 
 	if (p.node.getContent() != CONTENT_IGNORE) {
 		const ContentFeatures &f =
-				m_particlemanager->m_env->getGameDef()->ndef()->get(p.node);
+			m_particlemanager->m_env->getGameDef()->ndef()->get(p.node);
 		if (!ParticleManager::getNodeParticleParams(p.node, f, pp, &texture.ref,
-					texpos, texsize, &color, p.node_tile))
+				texpos, texsize, &color, p.node_tile))
 			return;
 	} else {
 		if (m_texpool.size() == 0)
 			return;
 		texture = ClientParticleTexRef(m_texpool[m_texpool.size() == 1 ? 0
-																	   : myrand_range(0, m_texpool.size() - 1)]);
+				: myrand_range(0, m_texpool.size()-1)]);
 		texpos = v2f(0.0f, 0.0f);
 		texsize = v2f(1.0f, 1.0f);
 		if (texture.tex->animated)
@@ -463,14 +474,14 @@ void ParticleSpawner::spawnParticle(ClientEnvironment *env, float radius,
 	if (pp.animation.type != TAT_NONE) {
 		// FIXME: this should be moved into a TileAnimationParams class method
 		if (pp.animation.type == TAT_VERTICAL_FRAMES &&
-				pp.animation.vertical_frames.length < 0) {
-			auto &a = pp.animation.vertical_frames;
+			pp.animation.vertical_frames.length < 0) {
+			auto& a = pp.animation.vertical_frames;
 			// we add a tiny extra value to prevent the first frame
 			// from flickering back on just before the particle dies
 			a.length = (pp.expirationtime / -a.length) + 0.1;
 		} else if (pp.animation.type == TAT_SHEET_2D &&
-				pp.animation.sheet_2d.frame_length < 0) {
-			auto &a = pp.animation.sheet_2d;
+				   pp.animation.sheet_2d.frame_length < 0) {
+			auto& a = pp.animation.sheet_2d;
 			auto frames = a.frames_w * a.frames_h;
 			auto runtime = (pp.expirationtime / -a.frame_length) + 0.1;
 			pp.animation.sheet_2d.frame_length = frames / runtime;
@@ -488,10 +499,12 @@ void ParticleSpawner::spawnParticle(ClientEnvironment *env, float radius,
 			texpos,
 			texsize,
 			color,
-			this));
+			this
+		));
 }
 
-void ParticleSpawner::step(float dtime, ClientEnvironment *env) {
+void ParticleSpawner::step(float dtime, ClientEnvironment *env)
+{
 	m_time += dtime;
 
 	static thread_local const float radius =
@@ -509,7 +522,7 @@ void ParticleSpawner::step(float dtime, ClientEnvironment *env) {
 
 	if (p.time != 0) {
 		// Spawner exists for a predefined timespan
-		for (auto i = m_spawntimes.begin(); i != m_spawntimes.end();) {
+		for (auto i = m_spawntimes.begin(); i != m_spawntimes.end(); ) {
 			if ((*i) <= m_time && p.amount > 0) {
 				--p.amount;
 
@@ -541,17 +554,19 @@ void ParticleSpawner::step(float dtime, ClientEnvironment *env) {
 	ParticleBuffer
 */
 
-ParticleBuffer::ParticleBuffer(ClientEnvironment *env, const video::SMaterial &material) :
-		scene::ISceneNode(
-				env->getGameDef()->getSceneManager()->getRootSceneNode(),
-				env->getGameDef()->getSceneManager()),
-		m_mesh_buffer(make_irr<scene::SMeshBuffer>()) {
+ParticleBuffer::ParticleBuffer(ClientEnvironment *env, const video::SMaterial &material)
+	: scene::ISceneNode(
+			env->getGameDef()->getSceneManager()->getRootSceneNode(),
+			env->getGameDef()->getSceneManager()),
+	m_mesh_buffer(make_irr<scene::SMeshBuffer>())
+{
 	m_mesh_buffer->getMaterial() = material;
 }
 
 static constexpr u16 quad_indices[] = { 0, 1, 2, 2, 3, 0 };
 
-std::optional<u16> ParticleBuffer::allocate() {
+std::optional<u16> ParticleBuffer::allocate()
+{
 	u16 index;
 
 	m_usage_timer = 0;
@@ -559,7 +574,7 @@ std::optional<u16> ParticleBuffer::allocate() {
 	if (!m_free_list.empty()) {
 		index = m_free_list.back();
 		m_free_list.pop_back();
-		auto *vertices = static_cast<video::S3DVertex *>(m_mesh_buffer->getVertices());
+		auto *vertices = static_cast<video::S3DVertex*>(m_mesh_buffer->getVertices());
 		u16 *indices = m_mesh_buffer->getIndices();
 		// reset vertices, because it is only written in Particle::step()
 		for (u16 i = 0; i < 4; i++)
@@ -575,13 +590,14 @@ std::optional<u16> ParticleBuffer::allocate() {
 	// append new vertices
 	// note: Our buffer never gets smaller, but ParticleManager will delete
 	//       us after a while.
-	std::array<video::S3DVertex, 4> vertices{};
+	std::array<video::S3DVertex, 4> vertices {};
 	m_mesh_buffer->append(&vertices.front(), 4, quad_indices, 6);
 	index = m_count++;
 	return index;
 }
 
-void ParticleBuffer::release(u16 index) {
+void ParticleBuffer::release(u16 index)
+{
 	assert(index < m_count);
 	u16 *indices = m_mesh_buffer->getIndices();
 	for (u16 i = 0; i < 6; i++)
@@ -589,20 +605,23 @@ void ParticleBuffer::release(u16 index) {
 	m_free_list.push_back(index);
 }
 
-video::S3DVertex *ParticleBuffer::getVertices(u16 index) {
+video::S3DVertex *ParticleBuffer::getVertices(u16 index)
+{
 	if (index >= m_count)
 		return nullptr;
 	m_bounding_box_dirty = true;
 	return &(static_cast<video::S3DVertex *>(m_mesh_buffer->getVertices())[4 * index]);
 }
 
-void ParticleBuffer::OnRegisterSceneNode() {
+void ParticleBuffer::OnRegisterSceneNode()
+{
 	if (IsVisible)
 		SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT_EFFECT);
 	scene::ISceneNode::OnRegisterSceneNode();
 }
 
-const core::aabbox3df &ParticleBuffer::getBoundingBox() const {
+const core::aabbox3df &ParticleBuffer::getBoundingBox() const
+{
 	if (!m_bounding_box_dirty)
 		return m_mesh_buffer->BoundingBox;
 
@@ -622,7 +641,8 @@ const core::aabbox3df &ParticleBuffer::getBoundingBox() const {
 	return m_mesh_buffer->BoundingBox;
 }
 
-void ParticleBuffer::render() {
+void ParticleBuffer::render()
+{
 	video::IVideoDriver *driver = SceneManager->getVideoDriver();
 
 	if (isEmpty())
@@ -638,19 +658,23 @@ void ParticleBuffer::render() {
 */
 
 ParticleManager::ParticleManager(ClientEnvironment *env) :
-		m_env(env) {}
+	m_env(env)
+{}
 
-ParticleManager::~ParticleManager() {
+ParticleManager::~ParticleManager()
+{
 	clearAll();
 }
 
-void ParticleManager::step(float dtime) {
+void ParticleManager::step(float dtime)
+{
 	stepParticles(dtime);
 	stepSpawners(dtime);
 	stepBuffers(dtime);
 }
 
-void ParticleManager::stepSpawners(float dtime) {
+void ParticleManager::stepSpawners(float dtime)
+{
 	MutexAutoLock lock(m_spawner_list_lock);
 
 	for (size_t i = 0; i < m_dying_particle_spawners.size();) {
@@ -678,7 +702,8 @@ void ParticleManager::stepSpawners(float dtime) {
 	}
 }
 
-void ParticleManager::stepParticles(float dtime) {
+void ParticleManager::stepParticles(float dtime)
+{
 	MutexAutoLock lock(m_particle_list_lock);
 
 	for (size_t i = 0; i < m_particles.size();) {
@@ -699,7 +724,8 @@ void ParticleManager::stepParticles(float dtime) {
 	}
 }
 
-void ParticleManager::stepBuffers(float dtime) {
+void ParticleManager::stepBuffers(float dtime)
+{
 	constexpr float INTERVAL = 0.5f;
 	if (!m_buffer_gc.step(dtime, INTERVAL))
 		return;
@@ -708,7 +734,7 @@ void ParticleManager::stepBuffers(float dtime) {
 
 	// remove buffers that have been unused for 5 seconds
 	size_t alloc = 0;
-	for (size_t i = 0; i < m_particle_buffers.size();) {
+	for (size_t i = 0; i < m_particle_buffers.size(); ) {
 		auto &buf = m_particle_buffers[i];
 		buf->m_usage_timer += INTERVAL;
 		if (buf->isEmpty() && buf->m_usage_timer > 5.0f) {
@@ -727,7 +753,8 @@ void ParticleManager::stepBuffers(float dtime) {
 		g_profiler->avg("ParticleManager: buffer allocated size [#]", alloc);
 }
 
-void ParticleManager::clearAll() {
+void ParticleManager::clearAll()
+{
 	MutexAutoLock lock(m_spawner_list_lock);
 	MutexAutoLock lock2(m_particle_list_lock);
 
@@ -743,7 +770,8 @@ void ParticleManager::clearAll() {
 }
 
 void ParticleManager::handleParticleEvent(ClientEvent *event, Client *client,
-		LocalPlayer *player) {
+	LocalPlayer *player)
+{
 	switch (event->type) {
 		case CE_DELETE_PARTICLESPAWNER: {
 			deleteParticleSpawner(event->delete_particlespawner.id);
@@ -770,11 +798,12 @@ void ParticleManager::handleParticleEvent(ClientEvent *event, Client *client,
 
 			addParticleSpawner(event->add_particlespawner.id,
 					std::make_unique<ParticleSpawner>(
-							player,
-							p,
-							event->add_particlespawner.attached_id,
-							std::move(texpool),
-							this));
+						player,
+						p,
+						event->add_particlespawner.attached_id,
+						std::move(texpool),
+						this)
+					);
 
 			delete event->add_particlespawner.p;
 			break;
@@ -817,14 +846,14 @@ void ParticleManager::handleParticleEvent(ClientEvent *event, Client *client,
 			delete event->spawn_particle;
 			break;
 		}
-		default:
-			break;
+		default: break;
 	}
 }
 
 bool ParticleManager::getNodeParticleParams(const MapNode &n,
-		const ContentFeatures &f, ParticleParameters &p, video::ITexture **texture,
-		v2f &texpos, v2f &texsize, video::SColor *color, u8 tilenum) {
+	const ContentFeatures &f, ParticleParameters &p, video::ITexture **texture,
+	v2f &texpos, v2f &texsize, video::SColor *color, u8 tilenum)
+{
 	// No particles for "airlike" nodes
 	if (f.drawtype == NDT_AIRLIKE)
 		return false;
@@ -834,7 +863,7 @@ bool ParticleManager::getNodeParticleParams(const MapNode &n,
 	if (tilenum > 0 && tilenum <= 6)
 		texid = tilenum - 1;
 	else
-		texid = myrand_range(0, 5);
+		texid = myrand_range(0,5);
 	const TileLayer &tile = f.tiles[texid].layers[0];
 	p.animation.type = TAT_NONE;
 
@@ -844,13 +873,13 @@ bool ParticleManager::getNodeParticleParams(const MapNode &n,
 	else
 		*texture = tile.texture;
 
-	float size = (myrand_range(0, 8)) / 64.0f;
+	float size = (myrand_range(0,8)) / 64.0f;
 	p.size = BS * size;
 	if (tile.scale)
 		size /= tile.scale;
 	texsize = v2f(size * 2.0f, size * 2.0f);
-	texpos.X = (myrand_range(0, 64)) / 64.0f - texsize.X;
-	texpos.Y = (myrand_range(0, 64)) / 64.0f - texsize.Y;
+	texpos.X = (myrand_range(0,64)) / 64.0f - texsize.X;
+	texpos.Y = (myrand_range(0,64)) / 64.0f - texsize.Y;
 
 	if (tile.has_color)
 		*color = tile.color;
@@ -864,7 +893,8 @@ bool ParticleManager::getNodeParticleParams(const MapNode &n,
 // spawned during the digging of a node.
 
 void ParticleManager::addDiggingParticles(IGameDef *gamedef,
-		LocalPlayer *player, v3s16 pos, const MapNode &n, const ContentFeatures &f) {
+	LocalPlayer *player, v3s16 pos, const MapNode &n, const ContentFeatures &f)
+{
 	// No particles for "airlike" nodes
 	if (f.drawtype == NDT_AIRLIKE)
 		return;
@@ -878,7 +908,8 @@ void ParticleManager::addDiggingParticles(IGameDef *gamedef,
 // function, called from Game::handleDigging() in game.cpp.
 
 void ParticleManager::addNodeParticle(IGameDef *gamedef,
-		LocalPlayer *player, v3s16 pos, const MapNode &n, const ContentFeatures &f) {
+	LocalPlayer *player, v3s16 pos, const MapNode &n, const ContentFeatures &f)
+{
 	ParticleParameters p;
 	video::ITexture *ref = nullptr;
 	v2f texpos, texsize;
@@ -891,71 +922,76 @@ void ParticleManager::addNodeParticle(IGameDef *gamedef,
 
 	// Physics
 	p.vel = v3f(
-			myrand_range(-1.5f, 1.5f),
-			myrand_range(0.f, 3.f),
-			myrand_range(-1.5f, 1.5f));
+		myrand_range(-1.5f,1.5f),
+		myrand_range(0.f,3.f),
+		myrand_range(-1.5f,1.5f)
+	);
 	p.acc = v3f(
-			0.0f,
-			-player->movement_gravity * player->physics_override.gravity / BS,
-			0.0f);
+		0.0f,
+		-player->movement_gravity * player->physics_override.gravity / BS,
+		0.0f
+	);
 	p.pos = v3f(
-			(f32)pos.X + myrand_range(0.f, .5f) - .25f,
-			(f32)pos.Y + myrand_range(0.f, .5f) - .25f,
-			(f32)pos.Z + myrand_range(0.f, .5f) - .25f);
+		(f32)pos.X + myrand_range(0.f, .5f) - .25f,
+		(f32)pos.Y + myrand_range(0.f, .5f) - .25f,
+		(f32)pos.Z + myrand_range(0.f, .5f) - .25f
+	);
 
 	addParticle(std::make_unique<Particle>(
-			p,
-			ClientParticleTexRef(ref),
-			texpos,
-			texsize,
-			color));
+		p,
+		ClientParticleTexRef(ref),
+		texpos,
+		texsize,
+		color));
 }
 
-void ParticleManager::reserveParticleSpace(size_t max_estimate) {
+void ParticleManager::reserveParticleSpace(size_t max_estimate)
+{
 	MutexAutoLock lock(m_particle_list_lock);
 
 	m_particles.reserve(m_particles.size() + max_estimate);
 }
 
-video::SMaterial ParticleManager::getMaterialForParticle(const ClientParticleTexRef &texture) {
+video::SMaterial ParticleManager::getMaterialForParticle(const ClientParticleTexRef &texture)
+{
 	// translate blend modes to GL blend functions
 	video::E_BLEND_FACTOR bfsrc, bfdst;
 	video::E_BLEND_OPERATION blendop;
-	const auto blendmode = texture.tex ? texture.tex->blendmode : ParticleParamTypes::BlendMode::alpha;
+	const auto blendmode = texture.tex ? texture.tex->blendmode :
+						   ParticleParamTypes::BlendMode::alpha;
 
 	switch (blendmode) {
 		case ParticleParamTypes::BlendMode::add:
 			bfsrc = video::EBF_SRC_ALPHA;
 			bfdst = video::EBF_DST_ALPHA;
 			blendop = video::EBO_ADD;
-			break;
+		break;
 
 		case ParticleParamTypes::BlendMode::sub:
 			bfsrc = video::EBF_SRC_ALPHA;
 			bfdst = video::EBF_DST_ALPHA;
 			blendop = video::EBO_REVSUBTRACT;
-			break;
+		break;
 
 		case ParticleParamTypes::BlendMode::screen:
 			bfsrc = video::EBF_ONE;
 			bfdst = video::EBF_ONE_MINUS_SRC_COLOR;
 			blendop = video::EBO_ADD;
-			break;
+		break;
 
 		default: // includes ParticleParamTypes::BlendMode::alpha
 			bfsrc = video::EBF_SRC_ALPHA;
 			bfdst = video::EBF_ONE_MINUS_SRC_ALPHA;
 			blendop = video::EBO_ADD;
-			break;
+		break;
 	}
 
 	video::SMaterial material;
 
 	// Texture
-	material.Lighting = false;
 	material.BackfaceCulling = false;
 	material.FogEnable = true;
-	material.forEachTexture([](auto &tex) {
+	material.forEachTexture([] (auto &tex) {
 		tex.MinFilter = video::ETMINF_NEAREST_MIPMAP_NEAREST;
 		tex.MagFilter = video::ETMAGF_NEAREST;
 	});
@@ -976,7 +1012,8 @@ video::SMaterial ParticleManager::getMaterialForParticle(const ClientParticleTex
 	return material;
 }
 
-bool ParticleManager::addParticle(std::unique_ptr<Particle> toadd) {
+bool ParticleManager::addParticle(std::unique_ptr<Particle> toadd)
+{
 	MutexAutoLock lock(m_particle_list_lock);
 
 	auto material = getMaterialForParticle(toadd->getTextureRef());
@@ -1012,20 +1049,22 @@ bool ParticleManager::addParticle(std::unique_ptr<Particle> toadd) {
 	return true;
 }
 
-void ParticleManager::addParticleSpawner(u64 id, std::unique_ptr<ParticleSpawner> toadd) {
+void ParticleManager::addParticleSpawner(u64 id, std::unique_ptr<ParticleSpawner> toadd)
+{
 	MutexAutoLock lock(m_spawner_list_lock);
 
 	auto &slot = m_particle_spawners[id];
 	if (slot) {
 		// do not kill spawners here. children are still alive
 		errorstream << "ParticleManager: Failed to add spawner with id " << id
-					<< ". Id already in use." << '\n';
+				<< ". Id already in use." << '\n';
 		return;
 	}
 	slot = std::move(toadd);
 }
 
-void ParticleManager::deleteParticleSpawner(u64 id) {
+void ParticleManager::deleteParticleSpawner(u64 id)
+{
 	MutexAutoLock lock(m_spawner_list_lock);
 
 	auto it = m_particle_spawners.find(id);

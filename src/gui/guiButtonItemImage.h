@@ -27,7 +27,8 @@ using namespace irr;
 class Client;
 class GUIItemImage;
 
-class GUIButtonItemImage : public GUIButton {
+class GUIButtonItemImage : public GUIButton
+{
 public:
 	//! constructor
 	GUIButtonItemImage(gui::IGUIEnvironment *environment, gui::IGUIElement *parent,

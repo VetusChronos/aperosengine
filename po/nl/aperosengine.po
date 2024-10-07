@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Dutch (Minetest)\n"
+"Project-Id-Version: Dutch (AperosEngine)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-11 15:14+0200\n"
 "PO-Revision-Date: 2023-10-22 17:18+0000\n"
 "Last-Translator: Bas Huis <bassimhuis@gmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/minetest/minetest/"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/AperosEngine/AperosEngine/"
 "nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -176,9 +176,9 @@ msgid "Back to Main Menu"
 msgstr "Terug naar hoofdmenu"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
-msgid "ContentDB is not available when Minetest was compiled without cURL"
+msgid "ContentDB is not available when AperosEngine was compiled without cURL"
 msgstr ""
-"ContentDB is niet beschikbaar wanneer Minetest compileert is zonder cURL"
+"ContentDB is niet beschikbaar wanneer AperosEngine compileert is zonder cURL"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid "Downloading..."
@@ -685,23 +685,23 @@ msgstr ""
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"For a long time, the Minetest engine shipped with a default game called "
-"\"Minetest Game\". Since Minetest 5.8.0, Minetest ships without a default "
+"For a long time, the AperosEngine engine shipped with a default game called "
+"\"AperosVoxel\". Since AperosEngine 5.8.0, AperosEngine ships without a default "
 "game."
 msgstr ""
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"If you want to continue playing in your Minetest Game worlds, you need to "
-"reinstall Minetest Game."
+"If you want to continue playing in your AperosVoxel worlds, you need to "
+"reinstall AperosVoxel."
 msgstr ""
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Minetest Game is no longer installed by default"
+msgid "AperosVoxel is no longer installed by default"
 msgstr ""
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Reinstall Minetest Game"
+msgid "Reinstall AperosVoxel"
 msgstr ""
 
 #: builtin/mainmenu/dlg_rename_modpack.lua
@@ -1083,12 +1083,12 @@ msgid "Install games from ContentDB"
 msgstr "Installeer spellen van ContentDB"
 
 #: builtin/mainmenu/tab_local.lua
-msgid "Aperos Engine doesn't come with the AperosVoxel by default."
+msgid "AperosEngine doesn't come with a game by default."
 msgstr ""
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"Aperos Engine is a game creation platform that allows you to create different games."
+"AperosEngine is a game-creation platform that allows you to play many different "
 "games."
 msgstr ""
 
@@ -2907,7 +2907,7 @@ msgid ""
 "software',\n"
 "as defined by the Free Software Foundation.\n"
 "You can also specify content ratings.\n"
-"These flags are independent from Minetest versions,\n"
+"These flags are independent from AperosEngine versions,\n"
 "so see a full list at https://content.aperosvoxel.domain/help/content_flags/"
 msgstr ""
 "Door komma's gescheiden lijst met vlaggen om te verbergen in de "
@@ -2916,7 +2916,7 @@ msgstr ""
 "kwalificeren als 'vrije software', \n"
 "zoals gedefinieerd door de Free Software Foundation. \n"
 "U kunt ook inhoudsclassificaties specificeren. \n"
-"Deze vlaggen zijn onafhankelijk van Minetest-versies, \n"
+"Deze vlaggen zijn onafhankelijk van AperosEngine-versies, \n"
 "zie dus een volledige lijst op https://content.aperosvoxel.domain/help/"
 "content_flags/"
 
@@ -3132,7 +3132,7 @@ msgid ""
 "expecting.\n"
 "This allows for more fine-grained control than "
 "strict_protocol_version_checking.\n"
-"Minetest still enforces its own internal minimum, and enabling\n"
+"AperosEngine still enforces its own internal minimum, and enabling\n"
 "strict_protocol_version_checking will effectively override this."
 msgstr ""
 "Zet dit aan om verbindingen van oudere cliënten te weigeren.\n"
@@ -4259,10 +4259,10 @@ msgstr "Profileer chatcommando's bij het registreren."
 #: src/settings_translation_file.cpp
 msgid ""
 "Instrument global callback functions on registration.\n"
-"(anything you pass to a minetest.register_*() function)"
+"(anything you pass to a AperosEngine.register_*() function)"
 msgstr ""
 "Profileer algemene callback-functies bij het registreren.\n"
-"(alles dat mbv een van de minetest.register_*() functies geregistreerd wordt"
+"(alles dat mbv een van de AperosEngine.register_*() functies geregistreerd wordt"
 
 #: src/settings_translation_file.cpp
 msgid ""
@@ -5269,7 +5269,7 @@ msgstr "Aantal berichten dat een speler per 10 seconden mag verzenden."
 #: src/settings_translation_file.cpp
 msgid ""
 "Number of threads to use for mesh generation.\n"
-"Value of 0 (default) will let Minetest autodetect the number of available "
+"Value of 0 (default) will let AperosEngine autodetect the number of available "
 "threads."
 msgstr ""
 
@@ -5439,12 +5439,12 @@ msgstr "Adres om te luisteren naar Prometheus"
 #: src/settings_translation_file.cpp
 msgid ""
 "Prometheus listener address.\n"
-"If Minetest is compiled with ENABLE_PROMETHEUS option enabled,\n"
+"If AperosEngine is compiled with ENABLE_PROMETHEUS option enabled,\n"
 "enable metrics listener for Prometheus on that address.\n"
 "Metrics can be fetched on http://127.0.0.1:30000/metrics"
 msgstr ""
 "Adres om te luisteren naar Prometheus.\n"
-"Indien Minetest gecompileerd werd met de optie ENABLE_PROMETHEUS,\n"
+"Indien AperosEngine gecompileerd werd met de optie ENABLE_PROMETHEUS,\n"
 "dan zal dit adres gebruikt worden om naar Prometheus te luisteren.\n"
 "Meetwaarden kunnen opgehaald worden op http://127.0.0.1:30000/metrics"
 
@@ -5940,7 +5940,7 @@ msgid "Shader path"
 msgstr "Shader pad"
 
 #: src/settings_translation_file.cpp
-msgid "Shaders"
+msgid "Effects"
 msgstr "Shaders"
 
 #: src/settings_translation_file.cpp
@@ -6335,14 +6335,14 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"The gesture for punching players/entities.\n"
+"The gesture for for punching players/entities.\n"
 "This can be overridden by games and mods.\n"
 "\n"
 "* short_tap\n"
 "Easy to use and well-known from other games that shall not be named.\n"
 "\n"
 "* long_tap\n"
-"Known from the classic Minetest mobile controls.\n"
+"Known from the classic AperosEngine mobile controls.\n"
 "Combat is more or less impossible."
 msgstr ""
 
@@ -6617,7 +6617,7 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"URL to JSON file which provides information about the newest Minetest "
+"URL to JSON file which provides information about the newest AperosEngine "
 "release\n"
 "If this is empty the engine will never check for updates."
 msgstr ""
@@ -7033,11 +7033,11 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"Windows systems only: Start Minetest with the command line window in the "
+"Windows systems only: Start AperosEngine with the command line window in the "
 "background.\n"
 "Contains the same information as the file debug.txt (default name)."
 msgstr ""
-"Enkel Windows systemen: Start Minetest met een commando (DOS-prompt) window "
+"Enkel Windows systemen: Start AperosEngine met een commando (DOS-prompt) window "
 "in de achtergrond.\n"
 "Bevat dezelfde informatie als het bestand debug.txt (standaard naam)."
 
@@ -7446,8 +7446,8 @@ msgstr "Maximaal parallellisme in cURL"
 #~ msgid "Down"
 #~ msgstr "Omlaag"
 
-#~ msgid "Download a game, such as Minetest Game, from aperosvoxel.domain"
-#~ msgstr "Download een subspel, zoals Minetest Game, van aperosvoxel.domain"
+#~ msgid "Download a game, such as AperosVoxel, from aperosvoxel.domain"
+#~ msgstr "Download een subspel, zoals AperosVoxel, van aperosvoxel.domain"
 
 #~ msgid "Download one from aperosvoxel.domain"
 #~ msgstr "Laad er een van aperosvoxel.domain"
@@ -8449,10 +8449,10 @@ msgstr "Maximaal parallellisme in cURL"
 #~ "html#a54da2a0e231901735e3da1b0edf72eb3"
 
 #~ msgid ""
-#~ "Keybindings. (If this menu screws up, remove stuff from minetest.conf)"
+#~ "Keybindings. (If this menu screws up, remove stuff from aperosengine.conf)"
 #~ msgstr ""
 #~ "Sneltoetsen. (Als dit menu stuk gaat, verwijder dan instellingen uit "
-#~ "aperosvoxel.conf)"
+#~ "aperosengine.conf)"
 
 #~ msgid "Large chat console key"
 #~ msgstr "Grote chatconsole-toets"

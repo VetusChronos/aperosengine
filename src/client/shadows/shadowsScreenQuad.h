@@ -23,7 +23,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <IShaderConstantSetCallBack.h>
 #include "client/shader.h"
 
-class shadowScreenQuad {
+class shadowScreenQuad
+{
 public:
 	shadowScreenQuad();
 
@@ -35,15 +36,15 @@ private:
 	video::SMaterial Material;
 };
 
-class shadowScreenQuadCB : public video::IShaderConstantSetCallBack {
+class shadowScreenQuadCB : public video::IShaderConstantSetCallBack
+{
 public:
 	virtual void OnSetConstants(video::IMaterialRendererServices *services,
 			s32 userData);
-
 private:
-	CachedPixelShaderSetting<s32> m_sm_client_map_setting{ "ShadowMapClientMap" };
+	CachedPixelShaderSetting<s32> m_sm_client_map_setting{"ShadowMapClientMap"};
 	CachedPixelShaderSetting<s32>
-			m_sm_client_map_trans_setting{ "ShadowMapClientMapTraslucent" };
+		m_sm_client_map_trans_setting{"ShadowMapClientMapTraslucent"};
 	CachedPixelShaderSetting<s32>
-			m_sm_dynamic_sampler_setting{ "ShadowMapSamplerdynamic" };
+		m_sm_dynamic_sampler_setting{"ShadowMapSamplerdynamic"};
 };

@@ -26,38 +26,42 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "lua_api/l_item.h"
 #include "irrlichttypes_bloated.h"
 
-class ItemStackMetaRef : public MetaDataRef {
+class ItemStackMetaRef : public MetaDataRef
+{
 private:
 	LuaItemStack *istack;
 
 	static const luaL_Reg methods[];
 
-	virtual IMetadata *getmeta(bool auto_create);
+	virtual IMetadata* getmeta(bool auto_create);
 
 	virtual void clearMeta();
 
 	virtual void reportMetadataChange(const std::string *name = nullptr);
 
-	void setToolCapabilities(const ToolCapabilities &caps) {
+	void setToolCapabilities(const ToolCapabilities &caps)
+	{
 		istack->getItem().metadata.setToolCapabilities(caps);
 	}
 
-	void clearToolCapabilities() {
+	void clearToolCapabilities()
+	{
 		istack->getItem().metadata.clearToolCapabilities();
 	}
 
-	void setWearBarParams(const WearBarParams &params) {
+	void setWearBarParams(const WearBarParams &params)
+	{
 		istack->getItem().metadata.setWearBarParams(params);
 	}
 
-	void clearWearBarParams() {
+	void clearWearBarParams()
+	{
 		istack->getItem().metadata.clearWearBarParams();
 	}
 
 	// Exported functions
 	static int l_set_tool_capabilities(lua_State *L);
 	static int l_set_wear_bar_params(lua_State *L);
-
 public:
 	// takes a reference
 	ItemStackMetaRef(LuaItemStack *istack);

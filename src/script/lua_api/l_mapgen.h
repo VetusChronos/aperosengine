@@ -22,16 +22,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "lua_api/l_base.h"
 #include "irr_v3d.h"
 
-typedef u16 biome_t; // copy from mg_biome.h to avoid an unnecessary include
+typedef u16 biome_t;  // copy from mg_biome.h to avoid an unnecessary include
 
 class MMVManip;
 class BiomeManager;
 class BiomeGen;
 class Mapgen;
 
-class ModApiMapgen : public ModApiBase {
+class ModApiMapgen : public ModApiBase
+{
 	friend class LuaVoxelManip;
-
 private:
 	// get_biome_id(biomename)
 	// returns the biome id as used in biomemap and returned by 'get_biome_data()'

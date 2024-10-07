@@ -6,13 +6,16 @@
 #include "util/string.h"
 #include <string>
 #include <vector>
+#include <ITexture.h>
 
 GUIAnimatedImage::GUIAnimatedImage(gui::IGUIEnvironment *env, gui::IGUIElement *parent,
-		s32 id, const core::rect<s32> &rectangle) :
-		gui::IGUIElement(gui::EGUIET_ELEMENT, env, parent, id, rectangle) {
+	s32 id, const core::rect<s32> &rectangle) :
+	gui::IGUIElement(gui::EGUIET_ELEMENT, env, parent, id, rectangle)
+{
 }
 
-void GUIAnimatedImage::draw() {
+void GUIAnimatedImage::draw()
+{
 	if (m_texture == nullptr)
 		return;
 
@@ -32,9 +35,9 @@ void GUIAnimatedImage::draw() {
 
 	if (m_middle.getArea() == 0) {
 		const video::SColor color(255, 255, 255, 255);
-		const video::SColor colors[] = { color, color, color, color };
+		const video::SColor colors[] = {color, color, color, color};
 		draw2DImageFilterScaled(driver, m_texture, AbsoluteRect, rect, cliprect,
-				colors, true);
+			colors, true);
 	} else {
 		draw2DImage9Slice(driver, m_texture, AbsoluteRect, rect, m_middle, cliprect);
 	}

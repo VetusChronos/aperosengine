@@ -1347,7 +1347,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
 
         if ((source & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE ||
                 /*
-                 * CUSTOM ADDITION FOR MINETEST
+                 * CUSTOM ADDITION FOR APEROSENGINE
                  * should be upstreamed
                  */
                 (source & InputDevice.SOURCE_MOUSE_RELATIVE) == InputDevice.SOURCE_MOUSE_RELATIVE) {

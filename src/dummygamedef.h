@@ -29,14 +29,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class DummyGameDef : public IGameDef {
 public:
-	DummyGameDef() :
-			m_itemdef(createItemDefManager()),
-			m_nodedef(createNodeDefManager()),
-			m_craftdef(createCraftDefManager()),
-			m_mod_storage_database(new Database_Dummy()) {
+	DummyGameDef():
+		m_itemdef(createItemDefManager()),
+		m_nodedef(createNodeDefManager()),
+		m_craftdef(createCraftDefManager()),
+		m_mod_storage_database(new Database_Dummy())
+	{
 	}
 
-	~DummyGameDef() {
+	~DummyGameDef()
+	{
 		delete m_mod_storage_database;
 		delete m_craftdef;
 		delete m_nodedef;
@@ -45,23 +47,26 @@ public:
 
 	IItemDefManager *getItemDefManager() override { return m_itemdef; }
 	const NodeDefManager *getNodeDefManager() override { return m_nodedef; }
-	NodeDefManager *getWritableNodeDefManager() { return m_nodedef; }
+	NodeDefManager* getWritableNodeDefManager() { return m_nodedef; }
 	ICraftDefManager *getCraftDefManager() override { return m_craftdef; }
 
-	u16 allocateUnknownNodeId(const std::string &name) override {
+	u16 allocateUnknownNodeId(const std::string &name) override
+	{
 		return m_nodedef->allocateDummy(name);
 	}
 
-	const std::vector<ModSpec> &getMods() const override {
+	const std::vector<ModSpec> &getMods() const override
+	{
 		static std::vector<ModSpec> emptymodspec;
 		return emptymodspec;
 	}
-	const ModSpec *getModSpec(const std::string &modname) const override { return nullptr; }
+	const ModSpec* getModSpec(const std::string &modname) const override { return nullptr; }
 	ModStorageDatabase *getModStorageDatabase() override { return m_mod_storage_database; }
 
 	bool joinModChannel(const std::string &channel) override { return false; }
 	bool leaveModChannel(const std::string &channel) override { return false; }
-	bool sendModChannelMessage(const std::string &channel, const std::string &message) override {
+	bool sendModChannelMessage(const std::string &channel, const std::string &message) override
+	{
 		return false;
 	}
 	ModChannel *getModChannel(const std::string &channel) override { return nullptr; }

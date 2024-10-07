@@ -21,9 +21,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "irrlichttypes.h"
 
-class MtEvent {
+class MtEvent
+{
 public:
-	enum Type : u8 {
+	enum Type : u8
+	{
 		VIEW_BOBBING_STEP = 0,
 		CAMERA_PUNCH_LEFT,
 		CAMERA_PUNCH_RIGHT,
@@ -40,16 +42,17 @@ public:
 };
 
 // An event with no parameters and customizable name
-class SimpleTriggerEvent : public MtEvent {
+class SimpleTriggerEvent : public MtEvent
+{
 	Type type;
 
 public:
-	SimpleTriggerEvent(Type type) :
-			type(type) {}
+	SimpleTriggerEvent(Type type) : type(type) {}
 	Type getType() const override { return type; }
 };
 
-class MtEventReceiver {
+class MtEventReceiver
+{
 public:
 	virtual ~MtEventReceiver() = default;
 	virtual void onEvent(MtEvent *e) = 0;
@@ -57,7 +60,8 @@ public:
 
 typedef void (*event_receive_func)(MtEvent *e, void *data);
 
-class MtEventManager {
+class MtEventManager
+{
 public:
 	virtual ~MtEventManager() = default;
 	virtual void put(MtEvent *e) = 0;

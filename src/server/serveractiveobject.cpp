@@ -22,30 +22,34 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "inventorymanager.h"
 #include "constants.h" // BS
 
-ServerActiveObject::ServerActiveObject(ServerEnvironment *env, v3f pos) :
-		ActiveObject(0),
-		m_env(env),
-		m_base_position(pos) {
+ServerActiveObject::ServerActiveObject(ServerEnvironment *env, v3f pos):
+	ActiveObject(0),
+	m_env(env),
+	m_base_position(pos)
+{
 }
 
-float ServerActiveObject::getMinimumSavedMovement() {
-	return 2.0 * BS;
+float ServerActiveObject::getMinimumSavedMovement()
+{
+	return 2.0*BS;
 }
 
-ItemStack ServerActiveObject::getWieldedItem(ItemStack *selected, ItemStack *hand) const {
+ItemStack ServerActiveObject::getWieldedItem(ItemStack *selected, ItemStack *hand) const
+{
 	*selected = ItemStack();
-	if (hand) {
+	if (hand)
 		*hand = ItemStack();
-	}
 
 	return ItemStack();
 }
 
-bool ServerActiveObject::setWieldedItem(const ItemStack &item) {
+bool ServerActiveObject::setWieldedItem(const ItemStack &item)
+{
 	return false;
 }
 
-std::string ServerActiveObject::generateUpdateInfantCommand(u16 infant_id, u16 protocol_version) {
+std::string ServerActiveObject::generateUpdateInfantCommand(u16 infant_id, u16 protocol_version)
+{
 	std::ostringstream os(std::ios::binary);
 	// command
 	writeU8(os, AO_CMD_SPAWN_INFANT);
@@ -58,42 +62,47 @@ std::string ServerActiveObject::generateUpdateInfantCommand(u16 infant_id, u16 p
 		// See also: ClientEnvironment::addActiveObject
 		os << serializeString32(getClientInitializationData(protocol_version));
 	}
-
 	return os.str();
 }
 
-void ServerActiveObject::dumpAOMessagesToQueue(std::queue<ActiveObjectMessage> &queue) {
+void ServerActiveObject::dumpAOMessagesToQueue(std::queue<ActiveObjectMessage> &queue)
+{
 	while (!m_messages_out.empty()) {
 		queue.push(std::move(m_messages_out.front()));
 		m_messages_out.pop();
 	}
 }
 
-void ServerActiveObject::markForRemoval() {
+void ServerActiveObject::markForRemoval()
+{
 	if (!m_pending_removal) {
 		onMarkedForRemoval();
 		m_pending_removal = true;
 	}
 }
 
-void ServerActiveObject::markForDeactivation() {
+void ServerActiveObject::markForDeactivation()
+{
 	if (!m_pending_deactivation) {
 		onMarkedForDeactivation();
 		m_pending_deactivation = true;
 	}
 }
 
-InventoryLocation ServerActiveObject::getInventoryLocation() const {
+InventoryLocation ServerActiveObject::getInventoryLocation() const
+{
 	return InventoryLocation();
 }
 
-void ServerActiveObject::invalidateEffectiveObservers() {
+void ServerActiveObject::invalidateEffectiveObservers()
+{
 	m_effective_observers.reset();
 }
 
 using Observers = ServerActiveObject::Observers;
 
-const Observers &ServerActiveObject::getEffectiveObservers() {
+const Observers &ServerActiveObject::getEffectiveObservers()
+{
 	if (m_effective_observers) // cached
 		return *m_effective_observers;
 
@@ -109,25 +118,23 @@ const Observers &ServerActiveObject::getEffectiveObservers() {
 	// Avoid .clear() to free the allocated memory.
 	m_effective_observers = std::unordered_set<std::string>();
 	for (const auto &observer_name : *m_observers) {
-		if (parent_observers->count(observer_name) > 0) {
+		if (parent_observers->count(observer_name) > 0)
 			(*m_effective_observers)->insert(observer_name);
-		}
 	}
-
 	return *m_effective_observers;
 }
 
-const Observers& ServerActiveObject::recalculateEffectiveObservers() {
+const Observers& ServerActiveObject::recalculateEffectiveObservers()
+{
 	// Invalidate final observers for this object and all of its parents.
-	for (auto obj = this; obj != nullptr; obj = obj->getParent()) {
+	for (auto obj = this; obj != nullptr; obj = obj->getParent())
 		obj->invalidateEffectiveObservers();
-	}
-
 	// getEffectiveObservers will now be forced to recalculate.
 	return getEffectiveObservers();
 }
 
-bool ServerActiveObject::isEffectivelyObservedBy(const std::string &player_name) {
+bool ServerActiveObject::isEffectivelyObservedBy(const std::string &player_name)
+{
 	auto effective_observers = getEffectiveObservers();
 	return !effective_observers || effective_observers->count(player_name) > 0;
 }

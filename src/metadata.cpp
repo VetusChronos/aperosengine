@@ -24,7 +24,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	IMetadata
 */
 
-bool IMetadata::operator==(const IMetadata &other) const {
+bool IMetadata::operator==(const IMetadata &other) const
+{
 	StringMap this_map_, other_map_;
 	const StringMap &this_map = getStrings(&this_map_);
 	const StringMap &other_map = other.getStrings(&other_map_);
@@ -42,7 +43,8 @@ bool IMetadata::operator==(const IMetadata &other) const {
 }
 
 const std::string &IMetadata::getString(const std::string &name, std::string *place,
-		u16 recursion) const {
+		u16 recursion) const
+{
 	const std::string *raw = getStringRaw(name, place);
 	if (!raw) {
 		static const std::string empty_string = std::string("");
@@ -53,7 +55,8 @@ const std::string &IMetadata::getString(const std::string &name, std::string *pl
 }
 
 bool IMetadata::getStringToRef(const std::string &name,
-		std::string &str, u16 recursion) const {
+		std::string &str, u16 recursion) const
+{
 	const std::string *raw = getStringRaw(name, &str);
 	if (!raw)
 		return false;
@@ -65,7 +68,8 @@ bool IMetadata::getStringToRef(const std::string &name,
 }
 
 const std::string &IMetadata::resolveString(const std::string &str, std::string *place,
-		u16 recursion, bool deprecated) const {
+		u16 recursion, bool deprecated) const
+{
 	if (recursion <= 1 && str_starts_with(str, "${") && str.back() == '}') {
 		if (deprecated) {
 			warningstream << "Deprecated use of recursive resolution syntax in metadata: ";
@@ -83,28 +87,34 @@ const std::string &IMetadata::resolveString(const std::string &str, std::string 
 	SimpleMetadata
 */
 
-void SimpleMetadata::clear() {
+void SimpleMetadata::clear()
+{
 	m_stringvars.clear();
 	m_modified = true;
 }
 
-bool SimpleMetadata::empty() const {
+bool SimpleMetadata::empty() const
+{
 	return m_stringvars.empty();
 }
 
-size_t SimpleMetadata::size() const {
+size_t SimpleMetadata::size() const
+{
 	return m_stringvars.size();
 }
 
-bool SimpleMetadata::contains(const std::string &name) const {
+bool SimpleMetadata::contains(const std::string &name) const
+{
 	return m_stringvars.find(name) != m_stringvars.end();
 }
 
-const StringMap &SimpleMetadata::getStrings(StringMap *) const {
+const StringMap &SimpleMetadata::getStrings(StringMap *) const
+{
 	return m_stringvars;
 }
 
-const std::vector<std::string> &SimpleMetadata::getKeys(std::vector<std::string> *place) const {
+const std::vector<std::string> &SimpleMetadata::getKeys(std::vector<std::string> *place) const
+{
 	place->clear();
 	place->reserve(m_stringvars.size());
 	for (const auto &pair : m_stringvars)
@@ -112,12 +122,14 @@ const std::vector<std::string> &SimpleMetadata::getKeys(std::vector<std::string>
 	return *place;
 }
 
-const std::string *SimpleMetadata::getStringRaw(const std::string &name, std::string *) const {
+const std::string *SimpleMetadata::getStringRaw(const std::string &name, std::string *) const
+{
 	const auto found = m_stringvars.find(name);
 	return found != m_stringvars.cend() ? &found->second : nullptr;
 }
 
-bool SimpleMetadata::setString(const std::string &name, std::string_view var) {
+bool SimpleMetadata::setString(const std::string &name, std::string_view var)
+{
 	if (var.empty()) {
 		if (m_stringvars.erase(name) == 0)
 			return false;

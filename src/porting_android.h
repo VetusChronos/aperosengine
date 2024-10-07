@@ -56,8 +56,7 @@ void shareFileAndroid(const std::string &path);
  * 1. Text input (single/multi-line text and password field)
  * 2. Selection input (combo box)
  */
-enum AndroidDialogType { TEXT_INPUT,
-	SELECTION_INPUT };
+enum AndroidDialogType { TEXT_INPUT, SELECTION_INPUT };
 
 /*
  * WORKAROUND for not working callbacks from Java -> C++
@@ -71,9 +70,7 @@ AndroidDialogType getLastInputDialogType();
  * 2. The dialog has its input sent.
  * 3. The dialog is canceled/dismissed.
  */
-enum AndroidDialogState { DIALOG_SHOWN,
-	DIALOG_INPUTTED,
-	DIALOG_CANCELED };
+enum AndroidDialogState { DIALOG_SHOWN, DIALOG_INPUTTED, DIALOG_CANCELED };
 
 /*
  * WORKAROUND for not working callbacks from Java -> C++
@@ -97,6 +94,7 @@ std::string getInputDialogMessage();
  */
 int getInputDialogSelection();
 
+
 bool hasPhysicalKeyboardAndroid();
 
 #ifndef SERVER
@@ -104,4 +102,4 @@ float getDisplayDensity();
 v2u32 getDisplaySize();
 #endif
 
-} //namespace porting
+}

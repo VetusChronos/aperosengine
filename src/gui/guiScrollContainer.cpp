@@ -23,8 +23,8 @@ GUIScrollContainer::GUIScrollContainer(gui::IGUIEnvironment *env,
 		gui::IGUIElement *parent, s32 id, const core::rect<s32> &rectangle,
 		const std::string &orientation, f32 scrollfactor) :
 		gui::IGUIElement(gui::EGUIET_ELEMENT, env, parent, id, rectangle),
-		m_scrollbar(nullptr),
-		m_scrollfactor(scrollfactor) {
+		m_scrollbar(nullptr), m_scrollfactor(scrollfactor)
+{
 	if (orientation == "vertical")
 		m_orientation = VERTICAL;
 	else if (orientation == "horizontal")
@@ -33,7 +33,8 @@ GUIScrollContainer::GUIScrollContainer(gui::IGUIEnvironment *env,
 		m_orientation = UNDEFINED;
 }
 
-bool GUIScrollContainer::OnEvent(const SEvent &event) {
+bool GUIScrollContainer::OnEvent(const SEvent &event)
+{
 	if (event.EventType == EET_MOUSE_INPUT_EVENT &&
 			event.MouseInput.Event == EMIE_MOUSE_WHEEL &&
 			!event.MouseInput.isLeftPressed() && m_scrollbar) {
@@ -55,7 +56,8 @@ bool GUIScrollContainer::OnEvent(const SEvent &event) {
 	return IGUIElement::OnEvent(event);
 }
 
-void GUIScrollContainer::draw() {
+void GUIScrollContainer::draw()
+{
 	if (isVisible()) {
 		for (auto child : Children)
 			if (child->isNotClipped() ||
@@ -65,7 +67,8 @@ void GUIScrollContainer::draw() {
 	}
 }
 
-void GUIScrollContainer::updateScrolling() {
+void GUIScrollContainer::updateScrolling()
+{
 	s32 pos = m_scrollbar->getPos();
 	core::rect<s32> rect = getRelativePosition();
 

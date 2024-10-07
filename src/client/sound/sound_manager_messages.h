@@ -26,58 +26,24 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 namespace sound {
 
 namespace sound_manager_messages_to_mgr {
-struct PauseAll {};
-struct ResumeAll {};
+	struct PauseAll {};
+	struct ResumeAll {};
 
-struct UpdateListener {
-	v3f pos_;
-	v3f vel_;
-	v3f at_;
-	v3f up_;
-};
-struct SetListenerGain {
-	f32 gain;
-};
+	struct UpdateListener { v3f pos_; v3f vel_; v3f at_; v3f up_; };
+	struct SetListenerGain { f32 gain; };
 
-struct LoadSoundFile {
-	std::string name;
-	std::string filepath;
-};
-struct LoadSoundData {
-	std::string name;
-	std::string filedata;
-};
-struct AddSoundToGroup {
-	std::string sound_name;
-	std::string group_name;
-};
+	struct LoadSoundFile { std::string name; std::string filepath; };
+	struct LoadSoundData { std::string name; std::string filedata; };
+	struct AddSoundToGroup { std::string sound_name; std::string group_name; };
 
-struct PlaySound {
-	sound_handle_t id;
-	SoundSpec spec;
-};
-struct PlaySoundAt {
-	sound_handle_t id;
-	SoundSpec spec;
-	v3f pos_;
-	v3f vel_;
-};
-struct StopSound {
-	sound_handle_t sound;
-};
-struct FadeSound {
-	sound_handle_t soundid;
-	f32 step;
-	f32 target_gain;
-};
-struct UpdateSoundPosVel {
-	sound_handle_t sound;
-	v3f pos_;
-	v3f vel_;
-};
+	struct PlaySound { sound_handle_t id; SoundSpec spec; };
+	struct PlaySoundAt { sound_handle_t id; SoundSpec spec; v3f pos_; v3f vel_; };
+	struct StopSound { sound_handle_t sound; };
+	struct FadeSound { sound_handle_t soundid; f32 step; f32 target_gain; };
+	struct UpdateSoundPosVel { sound_handle_t sound; v3f pos_; v3f vel_; };
 
-struct PleaseStop {};
-} //namespace sound_manager_messages_to_mgr
+	struct PleaseStop {};
+}
 
 using SoundManagerMsgToMgr = std::variant<
 		std::monostate,
@@ -98,21 +64,21 @@ using SoundManagerMsgToMgr = std::variant<
 		sound_manager_messages_to_mgr::FadeSound,
 		sound_manager_messages_to_mgr::UpdateSoundPosVel,
 
-		sound_manager_messages_to_mgr::PleaseStop>;
+		sound_manager_messages_to_mgr::PleaseStop
+	>;
 
 namespace sound_manager_messages_to_proxy {
-struct ReportRemovedSound {
-	sound_handle_t id;
-};
+	struct ReportRemovedSound { sound_handle_t id; };
 
-struct Stopped {};
-} //namespace sound_manager_messages_to_proxy
+	struct Stopped {};
+}
 
 using SoundManagerMsgToProxy = std::variant<
 		std::monostate,
 
 		sound_manager_messages_to_proxy::ReportRemovedSound,
 
-		sound_manager_messages_to_proxy::Stopped>;
+		sound_manager_messages_to_proxy::Stopped
+	>;
 
 } // namespace sound

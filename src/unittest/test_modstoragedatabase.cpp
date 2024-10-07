@@ -34,7 +34,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #endif
 #include "filesys.h"
 
-namespace {
+namespace
+{
 // Anonymous namespace to create classes that are only
 // visible to this file
 //
@@ -42,16 +43,17 @@ namespace {
 // allow us to run the same tests on different databases and
 // database acquisition strategies.
 
-class ModStorageDatabaseProvider {
+class ModStorageDatabaseProvider
+{
 public:
 	virtual ~ModStorageDatabaseProvider() = default;
 	virtual ModStorageDatabase *getModStorageDatabase() = 0;
 };
 
-class FixedProvider : public ModStorageDatabaseProvider {
+class FixedProvider : public ModStorageDatabaseProvider
+{
 public:
-	FixedProvider(ModStorageDatabase *db) :
-			m_db(db) {}
+	FixedProvider(ModStorageDatabase *db): m_db(db) {}
 
 	~FixedProvider() = default;
 
@@ -61,18 +63,20 @@ private:
 	ModStorageDatabase *m_db;
 };
 
-class FilesProvider : public ModStorageDatabaseProvider {
+class FilesProvider : public ModStorageDatabaseProvider
+{
 public:
-	FilesProvider(const std::string &dir) :
-			m_dir(dir) {}
+	FilesProvider(const std::string &dir): m_dir(dir) {}
 
-	~FilesProvider() {
+	~FilesProvider()
+	{
 		if (m_db)
 			m_db->endSave();
 		delete m_db;
 	}
 
-	ModStorageDatabase *getModStorageDatabase() override {
+	ModStorageDatabase *getModStorageDatabase() override
+	{
 		if (m_db)
 			m_db->endSave();
 		delete m_db;
@@ -86,18 +90,20 @@ private:
 	ModStorageDatabase *m_db = nullptr;
 };
 
-class SQLite3Provider : public ModStorageDatabaseProvider {
+class SQLite3Provider : public ModStorageDatabaseProvider
+{
 public:
-	SQLite3Provider(const std::string &dir) :
-			m_dir(dir) {}
+	SQLite3Provider(const std::string &dir): m_dir(dir) {}
 
-	~SQLite3Provider() {
+	~SQLite3Provider()
+	{
 		if (m_db)
 			m_db->endSave();
 		delete m_db;
 	}
 
-	ModStorageDatabase *getModStorageDatabase() override {
+	ModStorageDatabase *getModStorageDatabase() override
+	{
 		if (m_db)
 			m_db->endSave();
 		delete m_db;
@@ -112,7 +118,8 @@ private:
 };
 
 #if USE_POSTGRESQL
-void clearPostgreSQLDatabase(const std::string &connect_string) {
+void clearPostgreSQLDatabase(const std::string &connect_string)
+{
 	ModStorageDatabasePostgreSQL db(connect_string);
 	std::vector<std::string> modnames;
 	db.beginSave();
@@ -122,18 +129,20 @@ void clearPostgreSQLDatabase(const std::string &connect_string) {
 	db.endSave();
 }
 
-class PostgreSQLProvider : public ModStorageDatabaseProvider {
+class PostgreSQLProvider : public ModStorageDatabaseProvider
+{
 public:
-	PostgreSQLProvider(const std::string &connect_string) :
-			m_connect_string(connect_string) {}
+	PostgreSQLProvider(const std::string &connect_string): m_connect_string(connect_string) {}
 
-	~PostgreSQLProvider() {
+	~PostgreSQLProvider()
+	{
 		if (m_db)
 			m_db->endSave();
 		delete m_db;
 	}
 
-	ModStorageDatabase *getModStorageDatabase() override {
+	ModStorageDatabase *getModStorageDatabase() override
+	{
 		if (m_db)
 			m_db->endSave();
 		delete m_db;
@@ -147,9 +156,10 @@ private:
 	ModStorageDatabase *m_db = nullptr;
 };
 #endif // USE_POSTGRESQL
-} //namespace
+}
 
-class TestModStorageDatabase : public TestBase {
+class TestModStorageDatabase : public TestBase
+{
 public:
 	TestModStorageDatabase() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestModStorageDatabase"; }
@@ -171,7 +181,8 @@ private:
 
 static TestModStorageDatabase g_test_instance;
 
-void TestModStorageDatabase::runTests(IGameDef *gamedef) {
+void TestModStorageDatabase::runTests(IGameDef *gamedef)
+{
 	// fixed directory, for persistence
 	thread_local const std::string test_dir = getTestTempDirectory();
 
@@ -236,7 +247,7 @@ void TestModStorageDatabase::runTests(IGameDef *gamedef) {
 	delete mod_storage_provider;
 
 #if USE_POSTGRESQL
-	const char *env_postgresql_connect_string = getenv("MINETEST_POSTGRESQL_CONNECT_STRING");
+	const char *env_postgresql_connect_string = getenv("APEROSENGINE_POSTGRESQL_CONNECT_STRING");
 	if (env_postgresql_connect_string) {
 		std::string connect_string(env_postgresql_connect_string);
 
@@ -265,7 +276,8 @@ void TestModStorageDatabase::runTests(IGameDef *gamedef) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestModStorageDatabase::runTestsForCurrentDB() {
+void TestModStorageDatabase::runTestsForCurrentDB()
+{
 	TEST(testRecallFail);
 	TEST(testCreate);
 	TEST(testRecall);
@@ -276,7 +288,8 @@ void TestModStorageDatabase::runTestsForCurrentDB() {
 	TEST(testRecallFail);
 }
 
-void TestModStorageDatabase::testRecallFail() {
+void TestModStorageDatabase::testRecallFail()
+{
 	ModStorageDatabase *mod_storage_db = mod_storage_provider->getModStorageDatabase();
 	StringMap recalled;
 	std::vector<std::string> recalled_keys;
@@ -289,12 +302,14 @@ void TestModStorageDatabase::testRecallFail() {
 	UASSERT(!mod_storage_db->hasModEntry("mod1", "key1"));
 }
 
-void TestModStorageDatabase::testCreate() {
+void TestModStorageDatabase::testCreate()
+{
 	ModStorageDatabase *mod_storage_db = mod_storage_provider->getModStorageDatabase();
 	UASSERT(mod_storage_db->setModEntry("mod1", "key1", "value1"));
 }
 
-void TestModStorageDatabase::testRecall() {
+void TestModStorageDatabase::testRecall()
+{
 	ModStorageDatabase *mod_storage_db = mod_storage_provider->getModStorageDatabase();
 	StringMap recalled;
 	std::vector<std::string> recalled_keys;
@@ -310,12 +325,14 @@ void TestModStorageDatabase::testRecall() {
 	UASSERT(mod_storage_db->hasModEntry("mod1", "key1"));
 }
 
-void TestModStorageDatabase::testChange() {
+void TestModStorageDatabase::testChange()
+{
 	ModStorageDatabase *mod_storage_db = mod_storage_provider->getModStorageDatabase();
 	UASSERT(mod_storage_db->setModEntry("mod1", "key1", "value2"));
 }
 
-void TestModStorageDatabase::testRecallChanged() {
+void TestModStorageDatabase::testRecallChanged()
+{
 	ModStorageDatabase *mod_storage_db = mod_storage_provider->getModStorageDatabase();
 	StringMap recalled;
 	mod_storage_db->getModEntries("mod1", &recalled);
@@ -327,7 +344,8 @@ void TestModStorageDatabase::testRecallChanged() {
 	UASSERT(mod_storage_db->hasModEntry("mod1", "key1"));
 }
 
-void TestModStorageDatabase::testListMods() {
+void TestModStorageDatabase::testListMods()
+{
 	ModStorageDatabase *mod_storage_db = mod_storage_provider->getModStorageDatabase();
 	UASSERT(mod_storage_db->setModEntry("mod2", "key1", "value1"));
 	UASSERT(mod_storage_db->setModEntry("mod2", "key2", "value1"));
@@ -338,7 +356,8 @@ void TestModStorageDatabase::testListMods() {
 	UASSERT(std::find(mod_list.cbegin(), mod_list.cend(), "mod2") != mod_list.cend());
 }
 
-void TestModStorageDatabase::testRemove() {
+void TestModStorageDatabase::testRemove()
+{
 	ModStorageDatabase *mod_storage_db = mod_storage_provider->getModStorageDatabase();
 	UASSERT(mod_storage_db->removeModEntry("mod1", "key1"));
 	UASSERT(!mod_storage_db->removeModEntries("mod1"));

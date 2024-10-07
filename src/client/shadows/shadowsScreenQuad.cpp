@@ -18,10 +18,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 #include "shadowsScreenQuad.h"
+#include <IVideoDriver.h>
 
-shadowScreenQuad::shadowScreenQuad() {
+shadowScreenQuad::shadowScreenQuad()
+{
 	Material.Wireframe = false;
-	Material.Lighting = false;
 
 	video::SColor color(0x0);
 	Vertices[0] = video::S3DVertex(
@@ -38,15 +39,17 @@ shadowScreenQuad::shadowScreenQuad() {
 			1.0f, 1.0f, 0.0f, 0, 0, 1, color, 1.0f, 0.0f);
 }
 
-void shadowScreenQuad::render(video::IVideoDriver *driver) {
-	u16 indices[6] = { 0, 1, 2, 3, 4, 5 };
+void shadowScreenQuad::render(video::IVideoDriver *driver)
+{
+	u16 indices[6] = {0, 1, 2, 3, 4, 5};
 	driver->setMaterial(Material);
 	driver->setTransform(video::ETS_WORLD, core::matrix4());
 	driver->drawIndexedTriangleList(&Vertices[0], 6, &indices[0], 2);
 }
 
 void shadowScreenQuadCB::OnSetConstants(
-		video::IMaterialRendererServices *services, s32 userData) {
+		video::IMaterialRendererServices *services, s32 userData)
+{
 	s32 TextureId = 0;
 	m_sm_client_map_setting.set(&TextureId, services);
 

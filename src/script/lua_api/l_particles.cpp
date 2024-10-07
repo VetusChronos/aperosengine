@@ -26,7 +26,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "server.h"
 #include "particles.h"
 
-void LuaParticleParams::readTexValue(lua_State *L, ServerParticleTexture &tex) {
+void LuaParticleParams::readTexValue(lua_State* L, ServerParticleTexture& tex)
+{
 	StackUnroller unroll(L);
 
 	tex.animated = false;
@@ -41,7 +42,7 @@ void LuaParticleParams::readTexValue(lua_State *L, ServerParticleTexture &tex) {
 	lua_pop(L, 1);
 
 	lua_getfield(L, -1, "animation");
-	if (!lua_isnil(L, -1)) {
+	if (! lua_isnil(L, -1)) {
 		tex.animated = true;
 		tex.animation = read_animation_definition(L, -1);
 	}
@@ -53,10 +54,12 @@ void LuaParticleParams::readTexValue(lua_State *L, ServerParticleTexture &tex) {
 
 	LuaParticleParams::readTweenTable(L, "alpha", tex.alpha);
 	LuaParticleParams::readTweenTable(L, "scale", tex.scale);
+
 }
 
 // add_particle({...})
-int ModApiParticles::l_add_particle(lua_State *L) {
+int ModApiParticles::l_add_particle(lua_State *L)
+{
 	NO_MAP_LOCK_REQUIRED;
 
 	// Get parameters
@@ -66,7 +69,7 @@ int ModApiParticles::l_add_particle(lua_State *L) {
 	if (lua_gettop(L) > 1) // deprecated
 	{
 		log_deprecated(L, "Deprecated add_particle call with "
-						  "individual parameters instead of definition");
+			"individual parameters instead of definition");
 		p.pos = check_v3f(L, 1);
 		p.vel = check_v3f(L, 2);
 		p.acc = check_v3f(L, 3);
@@ -76,7 +79,9 @@ int ModApiParticles::l_add_particle(lua_State *L) {
 		p.texture.string = luaL_checkstring(L, 7);
 		if (lua_gettop(L) == 8) // only spawn for a single player
 			playername = luaL_checkstring(L, 8);
-	} else if (lua_istable(L, 1)) {
+	}
+	else if (lua_istable(L, 1))
+	{
 		lua_getfield(L, 1, "pos");
 		if (lua_istable(L, -1))
 			p.pos = check_v3f(L, -1);
@@ -86,7 +91,7 @@ int ModApiParticles::l_add_particle(lua_State *L) {
 		if (lua_istable(L, -1)) {
 			p.vel = check_v3f(L, -1);
 			log_deprecated(L, "The use of vel is deprecated. "
-							  "Use velocity instead");
+				"Use velocity instead");
 		}
 		lua_pop(L, 1);
 
@@ -99,7 +104,7 @@ int ModApiParticles::l_add_particle(lua_State *L) {
 		if (lua_istable(L, -1)) {
 			p.acc = check_v3f(L, -1);
 			log_deprecated(L, "The use of acc is deprecated. "
-							  "Use acceleration instead");
+				"Use acceleration instead");
 		}
 		lua_pop(L, 1);
 
@@ -109,14 +114,14 @@ int ModApiParticles::l_add_particle(lua_State *L) {
 		lua_pop(L, 1);
 
 		p.expirationtime = getfloatfield_default(L, 1, "expirationtime",
-				p.expirationtime);
+			p.expirationtime);
 		p.size = getfloatfield_default(L, 1, "size", p.size);
 		p.collisiondetection = getboolfield_default(L, 1,
-				"collisiondetection", p.collisiondetection);
+			"collisiondetection", p.collisiondetection);
 		p.collision_removal = getboolfield_default(L, 1,
-				"collision_removal", p.collision_removal);
+			"collision_removal", p.collision_removal);
 		p.object_collision = getboolfield_default(L, 1,
-				"object_collision", p.object_collision);
+			"object_collision", p.object_collision);
 		p.vertical = getboolfield_default(L, 1, "vertical", p.vertical);
 
 		lua_getfield(L, 1, "animation");
@@ -159,7 +164,8 @@ int ModApiParticles::l_add_particle(lua_State *L) {
 }
 
 // add_particlespawner({...})
-int ModApiParticles::l_add_particlespawner(lua_State *L) {
+int ModApiParticles::l_add_particlespawner(lua_State *L)
+{
 	NO_MAP_LOCK_REQUIRED;
 
 	// Get parameters
@@ -171,7 +177,7 @@ int ModApiParticles::l_add_particlespawner(lua_State *L) {
 	if (lua_gettop(L) > 1) //deprecated
 	{
 		log_deprecated(L, "Deprecated add_particlespawner call with "
-						  "individual parameters instead of definition");
+			"individual parameters instead of definition");
 		p.amount = luaL_checknumber(L, 1);
 		p.time = luaL_checknumber(L, 2);
 		auto minpos = check_v3f(L, 3);
@@ -194,7 +200,9 @@ int ModApiParticles::l_add_particlespawner(lua_State *L) {
 		p.texture.string = luaL_checkstring(L, 14);
 		if (lua_gettop(L) == 15) // only spawn for a single player
 			playername = luaL_checkstring(L, 15);
-	} else if (lua_istable(L, 1)) {
+	}
+	else if (lua_istable(L, 1))
+	{
 		p.amount = getintfield_default(L, 1, "amount", p.amount);
 		p.time = getfloatfield_default(L, 1, "time", p.time);
 
@@ -216,12 +224,12 @@ int ModApiParticles::l_add_particlespawner(lua_State *L) {
 			luaL_checktype(L, -1, LUA_TTABLE);
 			lua_getfield(L, -1, "kind");
 			LuaParticleParams::readLuaValue(L, p.attractor_kind);
-			lua_pop(L, 1);
+			lua_pop(L,1);
 
 			lua_getfield(L, -1, "die_on_contact");
 			if (!lua_isnil(L, -1))
 				p.attractor_kill = readParam<bool>(L, -1);
-			lua_pop(L, 1);
+			lua_pop(L,1);
 
 			if (p.attractor_kind != AttractorKind::none) {
 				LuaParticleParams::readTweenTable(L, "strength", p.attract);
@@ -235,15 +243,15 @@ int ModApiParticles::l_add_particlespawner(lua_State *L) {
 		} else {
 			p.attractor_kind = AttractorKind::none;
 		}
-		lua_pop(L, 1);
+		lua_pop(L,1);
 		LuaParticleParams::readTweenTable(L, "radius", p.radius);
 
 		p.collisiondetection = getboolfield_default(L, 1,
-				"collisiondetection", p.collisiondetection);
+			"collisiondetection", p.collisiondetection);
 		p.collision_removal = getboolfield_default(L, 1,
-				"collision_removal", p.collision_removal);
+			"collision_removal", p.collision_removal);
 		p.object_collision = getboolfield_default(L, 1,
-				"object_collision", p.object_collision);
+			"object_collision", p.object_collision);
 
 		lua_getfield(L, 1, "animation");
 		p.animation = read_animation_definition(L, -1);
@@ -271,10 +279,10 @@ int ModApiParticles::l_add_particlespawner(lua_State *L) {
 			size_t tl = lua_objlen(L, -1);
 			p.texpool.reserve(tl);
 			for (size_t i = 0; i < tl; ++i) {
-				lua_pushinteger(L, i + 1), lua_gettable(L, -2);
+				lua_pushinteger(L, i+1), lua_gettable(L, -2);
 				p.texpool.emplace_back();
 				LuaParticleParams::readTexValue(L, p.texpool.back());
-				lua_pop(L, 1);
+				lua_pop(L,1);
 			}
 		}
 		lua_pop(L, 1);
@@ -295,7 +303,8 @@ int ModApiParticles::l_add_particlespawner(lua_State *L) {
 
 // delete_particlespawner(id, player)
 // player (string) is optional
-int ModApiParticles::l_delete_particlespawner(lua_State *L) {
+int ModApiParticles::l_delete_particlespawner(lua_State *L)
+{
 	NO_MAP_LOCK_REQUIRED;
 
 	// Get parameters
@@ -309,8 +318,10 @@ int ModApiParticles::l_delete_particlespawner(lua_State *L) {
 	return 1;
 }
 
-void ModApiParticles::Initialize(lua_State *L, int top) {
+void ModApiParticles::Initialize(lua_State *L, int top)
+{
 	API_FCT(add_particle);
 	API_FCT(add_particlespawner);
 	API_FCT(delete_particlespawner);
 }
+

@@ -137,7 +137,7 @@ LUA_API lua_CFunction lua_atpanic (lua_State *L, lua_CFunction panicf) {
 }
 
 
-/* MINETEST-SPECIFIC CHANGE */
+/* APEROSENGINE-SPECIFIC CHANGE */
 LUA_API lua_CFunctionwrapper lua_atccall (lua_State *L,
                                           lua_CFunctionwrapper wrapf) {
   lua_CFunctionwrapper old;

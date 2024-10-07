@@ -26,7 +26,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "inventory.h"
 #include "metadata.h"
 
-class PlayerMetaRef : public MetaDataRef {
+class PlayerMetaRef : public MetaDataRef
+{
 private:
 	IMetadata *metadata = nullptr;
 
@@ -39,8 +40,7 @@ private:
 	virtual void reportMetadataChange(const std::string *name = nullptr);
 
 public:
-	PlayerMetaRef(IMetadata *metadata) :
-			metadata(metadata) {}
+	PlayerMetaRef(IMetadata *metadata) : metadata(metadata) {}
 	~PlayerMetaRef() = default;
 
 	// Creates an ItemStackMetaRef and leaves it on top of stack

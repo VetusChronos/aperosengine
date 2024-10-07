@@ -20,7 +20,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/shadows/shadowsshadercallbacks.h"
 #include "client/renderingengine.h"
 
-void ShadowConstantSetter::onSetConstants(video::IMaterialRendererServices *services) {
+void ShadowConstantSetter::onSetConstants(video::IMaterialRendererServices *services)
+{
 	auto *shadow = RenderingEngine::get_shadow_renderer();
 	if (!shadow)
 		return;
@@ -38,6 +39,9 @@ void ShadowConstantSetter::onSetConstants(video::IMaterialRendererServices *serv
 
 	f32 ShadowStrength = shadow->getShadowStrength();
 	m_shadow_strength.set(&ShadowStrength, services);
+
+	video::SColor ShadowTint = shadow->getShadowTint();
+	m_shadow_tint.set(ShadowTint, services);
 
 	f32 timeOfDay = shadow->getTimeOfDay();
 	m_time_of_day.set(&timeOfDay, services);
@@ -64,7 +68,8 @@ void ShadowConstantSetter::onSetConstants(video::IMaterialRendererServices *serv
 }
 
 void ShadowDepthShaderCB::OnSetConstants(
-		video::IMaterialRendererServices *services, s32 userData) {
+		video::IMaterialRendererServices *services, s32 userData)
+{
 	video::IVideoDriver *driver = services->getVideoDriver();
 
 	core::matrix4 lightMVP = driver->getTransform(video::ETS_PROJECTION);

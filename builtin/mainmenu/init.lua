@@ -15,13 +15,20 @@
 --with this program; if not, write to the Free Software Foundation, Inc.,
 --51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-mt_color_grey  = "#AAAAAA"
-mt_color_blue  = "#6389FF"
-mt_color_lightblue  = "#99CCFF"
-mt_color_green = "#72FF63"
-mt_color_dark_green = "#25C191"
-mt_color_orange  = "#FF8800"
-mt_color_red = "#FF3300"
+apr_color_grey  = "#AAAAAA"
+apr_color_blue  = "#6389FF"
+apr_color_lightblue  = "#99CCFF"
+apr_color_green = "#72FF63"
+apr_color_dark_green = "#25C191"
+apr_color_orange  = "#FF8800"
+apr_color_red = "#FF3300"
+
+MAIN_TAB_W = 15.5
+MAIN_TAB_H = 7.1
+TABHEADER_H = 0.85
+GAMEBAR_H = 1.25
+GAMEBAR_OFFSET_DESKTOP = 0.375
+GAMEBAR_OFFSET_TOUCH = 0.15
 
 local menupath = core.get_mainmenu_path()
 local basepath = core.get_builtin_path()
@@ -89,7 +96,7 @@ local function init_globals()
 	mm_game_theme.set_engine() -- This is just a fallback.
 
 	-- Create main tabview
-	local tv_main = tabview_create("maintab", {x = 15.5, y = 7.1}, {x = 0, y = 0})
+	local tv_main = tabview_create("maintab", {x = MAIN_TAB_W, y = MAIN_TAB_H}, {x = 0, y = 0})
 
 	tv_main:set_autosave_tab(true)
 	tv_main:add(tabs.local_game)
@@ -123,7 +130,7 @@ local function init_globals()
 	ui.update()
 
 	check_reinstall_mtg()
-	--check_new_version()
+	check_new_version()
 end
 
 init_globals()

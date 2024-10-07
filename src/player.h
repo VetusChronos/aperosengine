@@ -22,13 +22,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "irrlichttypes_bloated.h"
 #include "inventory.h"
 #include "constants.h"
-#include "network/networkprotocol.h"
 #include "util/basic_macros.h"
 #include "util/string.h"
-#include <list>
 #include <mutex>
 #include <functional>
-#include <tuple>
 #include <string>
 
 #define PLAYERNAME_SIZE 20
@@ -38,7 +35,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 bool is_valid_player_name(std::string_view name);
 
-struct PlayerFovSpec {
+struct PlayerFovSpec
+{
 	f32 fov;
 
 	// Whether to multiply the client's FOV or to override it
@@ -52,27 +50,30 @@ struct PlayerFovSpec {
 		// transition_time is compared here since that could be relevant
 		// when aborting a running transition.
 		return fov == other.fov && is_multiplier == other.is_multiplier &&
-				transition_time == other.transition_time;
+			transition_time == other.transition_time;
 	}
 	inline bool operator!=(const PlayerFovSpec &other) const {
 		return !(*this == other);
 	}
 };
 
-struct PlayerControl {
+struct PlayerControl
+{
 	PlayerControl() = default;
 
 	PlayerControl(
-			bool a_up, bool a_down, bool a_left, bool a_right,
-			bool a_jump, bool a_aux1, bool a_sneak,
-			bool a_zoom,
-			bool a_dig, bool a_place,
-			float a_pitch, float a_yaw,
-			float a_movement_speed, float a_movement_direction) {
+		bool a_up, bool a_down, bool a_left, bool a_right,
+		bool a_jump, bool a_aux1, bool a_sneak,
+		bool a_zoom,
+		bool a_dig, bool a_place,
+		float a_pitch, float a_yaw,
+		float a_movement_speed, float a_movement_direction
+	)
+	{
 		// Encode direction keys into a single value so nobody uses it accidentally
 		// as movement_{speed,direction} is supposed to be the source of truth.
-		direction_keys = (a_up & 1) | ((a_down & 1) << 1) |
-				((a_left & 1) << 2) | ((a_right & 1) << 3);
+		direction_keys = (a_up&1) | ((a_down&1) << 1) |
+			((a_left&1) << 2) | ((a_right&1) << 3);
 		jump = a_jump;
 		aux1 = a_aux1;
 		sneak = a_sneak;
@@ -85,6 +86,11 @@ struct PlayerControl {
 		movement_direction = a_movement_direction;
 	}
 
+	// Sets movement_speed and movement_direction according to direction_keys
+	// if direction_keys != 0, otherwise leaves them unchanged to preserve
+	// joystick input.
+	void setMovementFromKeys();
+
 #ifndef SERVER
 	// For client use
 	u32 getKeysPressed() const;
@@ -93,6 +99,7 @@ struct PlayerControl {
 
 	// For server use
 	void unpackKeysPressed(u32 keypress_bits);
+	v2f getMovement() const;
 
 	u8 direction_keys = 0;
 	bool jump = false;
@@ -101,14 +108,15 @@ struct PlayerControl {
 	bool zoom = false;
 	bool dig = false;
 	bool place = false;
-	// Note: These four are NOT available on the server
+	// Note: These two are NOT available on the server
 	float pitch = 0.0f;
 	float yaw = 0.0f;
 	float movement_speed = 0.0f;
 	float movement_direction = 0.0f;
 };
 
-struct PlayerPhysicsOverride {
+struct PlayerPhysicsOverride
+{
 	float speed = 1.f;
 	float jump = 1.f;
 	float gravity = 1.f;
@@ -129,22 +137,10 @@ struct PlayerPhysicsOverride {
 	float acceleration_fast = 1.f;
 	float speed_walk = 1.f;
 
-private:
-	auto tie() const {
-		// Make sure to add new members to this list!
-		return std::tie(
-				speed, jump, gravity, sneak, sneak_glitch, new_move, speed_climb, speed_crouch,
-				liquid_fluidity, liquid_fluidity_smooth, liquid_sink, acceleration_default,
-				acceleration_air, speed_fast, acceleration_fast, speed_walk);
-	}
-
-public:
-	bool operator==(const PlayerPhysicsOverride &other) const {
-		return tie() == other.tie();
-	};
+	bool operator==(const PlayerPhysicsOverride &other) const;
 	bool operator!=(const PlayerPhysicsOverride &other) const {
-		return tie() != other.tie();
-	};
+		return !(*this == other);
+	}
 };
 
 class Map;
@@ -152,19 +148,24 @@ struct CollisionInfo;
 struct HudElement;
 class Environment;
 
-class Player {
+class Player
+{
 public:
+
 	Player(const std::string &name, IItemDefManager *idef);
 	virtual ~Player() = 0;
 
 	DISABLE_CLASS_COPY(Player);
 
-	virtual void move(f32 dtime, Environment *env, f32 pos_max_d) {}
+	virtual void move(f32 dtime, Environment *env, f32 pos_max_d)
+	{}
 	virtual void move(f32 dtime, Environment *env, f32 pos_max_d,
-			std::vector<CollisionInfo> *collision_info) {}
+			std::vector<CollisionInfo> *collision_info)
+	{}
 
 	// in BS-space
-	inline void setSpeed(v3f speed) {
+	inline void setSpeed(v3f speed)
+	{
 		m_speed = speed;
 	}
 
@@ -173,12 +174,13 @@ public:
 
 	const std::string& getName() const { return m_name; }
 
-	u32 getFreeHudID() {
+	u32 getFreeHudID()
+	{
 		size_t size = hud.size();
 		for (size_t i = 0; i != size; i++) {
-			if (!hud[i]) return i;
+			if (!hud[i])
+				return i;
 		}
-		
 		return size;
 	}
 
@@ -208,34 +210,39 @@ public:
 	std::string formspec_prepend;
 
 	PlayerControl control;
-	const PlayerControl &getPlayerControl() { return control; }
+	const PlayerControl& getPlayerControl() { return control; }
 
 	PlayerPhysicsOverride physics_override;
 
 	// Returns non-empty `selected` ItemStack. `hand` is a fallback, if specified
 	ItemStack &getWieldedItem(ItemStack *selected, ItemStack *hand) const;
 	void setWieldIndex(u16 index);
-	u16 getWieldIndex() const { return m_wield_index; }
+	u16 getWieldIndex();
 
-	bool setFov(const PlayerFovSpec &spec) {
+	bool setFov(const PlayerFovSpec &spec)
+	{
 		if (m_fov_override_spec == spec)
 			return false;
 		m_fov_override_spec = spec;
 		return true;
 	}
 
-	const PlayerFovSpec &getFov() const {
+	const PlayerFovSpec &getFov() const
+	{
 		return m_fov_override_spec;
 	}
 
-	HudElement *getHud(u32 id);
-	void hudApply(std::function<void(const std::vector<HudElement *> &)> f);
-	u32 addHud(HudElement *hud);
-	HudElement *removeHud(u32 id);
-	void clearHud();
+	HudElement* getHud(u32 id);
+	void        hudApply(std::function<void(const std::vector<HudElement*>&)> f);
+	u32         addHud(HudElement* hud);
+	HudElement* removeHud(u32 id);
+	void        clearHud();
 
 	u32 hud_flags;
 	s32 hud_hotbar_itemcount;
+
+	// Get actual usable number of hotbar items (clamped to size of "main" list)
+	u16 getMaxHotbarItemcount();
 
 protected:
 	std::string m_name;

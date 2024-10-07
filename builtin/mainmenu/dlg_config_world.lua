@@ -126,7 +126,7 @@ local function get_formspec(data)
 	local retval =
 		"size[11.5,7.5,true]" ..
 		"label[0.5,0;" .. fgettext("World:") .. "]" ..
-		"label[1.75,0;" .. data.worldspec.name .. "]"
+		"label[1.75,0;" .. core.formspec_escape(data.worldspec.name) .. "]"
 
 	if mod.is_modpack or mod.type == "game" then
 		local info = core.formspec_escape(
@@ -148,19 +148,19 @@ local function get_formspec(data)
 			for i, dep_name in ipairs(hard_deps) do
 				local dep = enabled_mods_by_name[dep_name]
 				if not dep then
-					hard_deps[i] = mt_color_red .. dep_name .. " " .. fgettext("(Unsatisfied)")
+					hard_deps[i] = apr_color_red .. dep_name .. " " .. fgettext("(Unsatisfied)")
 				elseif with_error[dep.virtual_path] then
-					hard_deps[i] = mt_color_orange .. dep_name .. " " .. fgettext("(Enabled, has error)")
+					hard_deps[i] = apr_color_orange .. dep_name .. " " .. fgettext("(Enabled, has error)")
 				else
-					hard_deps[i] = mt_color_green .. dep_name
+					hard_deps[i] = apr_color_green .. dep_name
 				end
 			end
 			for i, dep_name in ipairs(soft_deps) do
 				local dep = enabled_mods_by_name[dep_name]
 				if dep and with_error[dep.virtual_path] then
-					soft_deps[i] = mt_color_orange .. dep_name .. " " .. fgettext("(Enabled, has error)")
+					soft_deps[i] = apr_color_orange .. dep_name .. " " .. fgettext("(Enabled, has error)")
 				elseif dep then
-					soft_deps[i] = mt_color_green .. dep_name
+					soft_deps[i] = apr_color_green .. dep_name
 				end
 			end
 		end

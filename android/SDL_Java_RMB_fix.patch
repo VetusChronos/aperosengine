@@ -9,7 +9,7 @@ index fd5a056e3..83e3cf657 100644
 -        if ((source & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE) {
 +        if ((source & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE ||
 +                /*
-+                 * CUSTOM ADDITION FOR MINETEST
++                 * CUSTOM ADDITION FOR APEROSENGINE
 +                 * should be upstreamed
 +                 */
 +                (source & InputDevice.SOURCE_MOUSE_RELATIVE) == InputDevice.SOURCE_MOUSE_RELATIVE) {

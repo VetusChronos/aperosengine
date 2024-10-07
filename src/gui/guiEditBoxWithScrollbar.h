@@ -9,12 +9,14 @@
 
 class ISimpleTextureSource;
 
-class GUIEditBoxWithScrollBar : public GUIEditBox {
+class GUIEditBoxWithScrollBar : public GUIEditBox
+{
 public:
+
 	//! constructor
-	GUIEditBoxWithScrollBar(const wchar_t *text, bool border, IGUIEnvironment *environment,
-			IGUIElement *parent, s32 id, const core::rect<s32> &rectangle,
-			ISimpleTextureSource *tsrc, bool writable = true, bool has_vscrollbar = true);
+	GUIEditBoxWithScrollBar(const wchar_t* text, bool border, IGUIEnvironment* environment,
+		IGUIElement* parent, s32 id, const core::rect<s32>& rectangle,
+		ISimpleTextureSource *tsrc, bool writable = true, bool has_vscrollbar = true);
 
 	//! destructor
 	virtual ~GUIEditBoxWithScrollBar() {}
@@ -60,4 +62,6 @@ protected:
 	ISimpleTextureSource *m_tsrc;
 };
 
+
 #endif // GUIEDITBOXWITHSCROLLBAR_HEADER
+

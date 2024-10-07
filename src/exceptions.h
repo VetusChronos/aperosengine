@@ -22,97 +22,86 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <exception>
 #include <string>
 
-class BaseException : public std::exception {
+
+class BaseException : public std::exception
+{
 public:
-	BaseException(const std::string &s) noexcept :
-			m_s(s) {}
+	BaseException(const std::string &s) noexcept: m_s(s) {}
 	~BaseException() throw() = default;
 
-	virtual const char *what() const noexcept {
+	virtual const char * what() const noexcept
+	{
 		return m_s.c_str();
 	}
-
 protected:
 	std::string m_s;
 };
 
 class AlreadyExistsException : public BaseException {
 public:
-	AlreadyExistsException(const std::string &s) :
-			BaseException(s) {}
+	AlreadyExistsException(const std::string &s): BaseException(s) {}
 };
 
 class VersionMismatchException : public BaseException {
 public:
-	VersionMismatchException(const std::string &s) :
-			BaseException(s) {}
+	VersionMismatchException(const std::string &s): BaseException(s) {}
 };
 
 class FileNotGoodException : public BaseException {
 public:
-	FileNotGoodException(const std::string &s) :
-			BaseException(s) {}
+	FileNotGoodException(const std::string &s): BaseException(s) {}
 };
 
 class DatabaseException : public BaseException {
 public:
-	DatabaseException(const std::string &s) :
-			BaseException(s) {}
+	DatabaseException(const std::string &s): BaseException(s) {}
 };
 
 class SerializationError : public BaseException {
 public:
-	SerializationError(const std::string &s) :
-			BaseException(s) {}
+	SerializationError(const std::string &s): BaseException(s) {}
 };
 
 class PacketError : public BaseException {
 public:
-	PacketError(const std::string &s) :
-			BaseException(s) {}
+	PacketError(const std::string &s): BaseException(s) {}
 };
 
 class SettingNotFoundException : public BaseException {
 public:
-	SettingNotFoundException(const std::string &s) :
-			BaseException(s) {}
+	SettingNotFoundException(const std::string &s): BaseException(s) {}
 };
 
 class ItemNotFoundException : public BaseException {
 public:
-	ItemNotFoundException(const std::string &s) :
-			BaseException(s) {}
+	ItemNotFoundException(const std::string &s): BaseException(s) {}
 };
 
 class ServerError : public BaseException {
 public:
-	ServerError(const std::string &s) :
-			BaseException(s) {}
+	ServerError(const std::string &s): BaseException(s) {}
 };
 
 class ClientStateError : public BaseException {
 public:
-	ClientStateError(const std::string &s) :
-			BaseException(s) {}
+	ClientStateError(const std::string &s): BaseException(s) {}
 };
 
 class PrngException : public BaseException {
 public:
-	PrngException(const std::string &s) :
-			BaseException(s) {}
+	PrngException(const std::string &s): BaseException(s) {}
 };
 
 class ShaderException : public BaseException {
 public:
-	ShaderException(const std::string &s) :
-			BaseException(s) {}
+	ShaderException(const std::string &s): BaseException(s) {}
 };
 
 class ModError : public BaseException {
 public:
-	ModError(const std::string &s) :
-			BaseException(s) {}
+	ModError(const std::string &s): BaseException(s) {}
 };
+
 
 /*
 	Some "old-style" interrupts:
@@ -120,18 +109,23 @@ public:
 
 class InvalidNoiseParamsException : public BaseException {
 public:
-	InvalidNoiseParamsException() :
-			BaseException("One or more noise parameters were invalid or require "
-						  "too much memory") {}
+	InvalidNoiseParamsException():
+		BaseException("One or more noise parameters were invalid or require "
+			"too much memory")
+	{}
 
-	InvalidNoiseParamsException(const std::string &s) :
-			BaseException(s) {}
+	InvalidNoiseParamsException(const std::string &s):
+		BaseException(s)
+	{}
 };
 
-class InvalidPositionException : public BaseException {
+class InvalidPositionException : public BaseException
+{
 public:
-	InvalidPositionException() :
-			BaseException("Somebody tried to get/set something in a nonexistent position.") {}
-	InvalidPositionException(const std::string &s) :
-			BaseException(s) {}
+	InvalidPositionException():
+		BaseException("Somebody tried to get/set something in a nonexistent position.")
+	{}
+	InvalidPositionException(const std::string &s):
+		BaseException(s)
+	{}
 };

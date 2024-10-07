@@ -24,7 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <stack>
 #include <unordered_set>
 
-#include "irrlichttypes_extrabloated.h"
+#include "irrlichttypes_bloated.h"
 #include "irr_ptr.h"
 #include "inventory.h"
 #include "inventorymanager.h"
@@ -32,11 +32,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "guiInventoryList.h"
 #include "guiScrollBar.h"
 #include "guiTable.h"
-#include "network/networkprotocol.h"
-#include "client/joystick_controller.h"
 #include "util/string.h"
 #include "util/enriched_string.h"
 #include "StyleSpec.h"
+#include <ICursorControl.h> // gui::ECURSOR_ICON
 #include <IGUIStaticText.h>
 
 class InventoryManager;
@@ -44,6 +43,7 @@ class ISimpleTextureSource;
 class Client;
 class GUIScrollContainer;
 class ISoundManager;
+class JoystickController;
 
 enum FormspecFieldType {
 	f_Button,
@@ -65,7 +65,8 @@ enum FormspecQuitMode {
 	quit_mode_cancel
 };
 
-enum ButtonEventType : u8 {
+enum ButtonEventType : u8
+{
 	BET_LEFT,
 	BET_RIGHT,
 	BET_MIDDLE,
@@ -77,7 +78,8 @@ enum ButtonEventType : u8 {
 	BET_OTHER
 };
 
-struct TextDest {
+struct TextDest
+{
 	virtual ~TextDest() = default;
 
 	// This is deprecated I guess? -celeron55
@@ -87,7 +89,8 @@ struct TextDest {
 	std::string m_formname;
 };
 
-class IFormSource {
+class IFormSource
+{
 public:
 	virtual ~IFormSource() = default;
 	virtual const std::string &getForm() const = 0;
@@ -95,35 +98,40 @@ public:
 	virtual std::string resolveText(const std::string &str) { return str; }
 };
 
-class GUIFormSpecMenu : public GUIModalMenu {
-	struct ListRingSpec {
+class GUIFormSpecMenu : public GUIModalMenu
+{
+	struct ListRingSpec
+	{
 		ListRingSpec() = default;
 
 		ListRingSpec(const InventoryLocation &a_inventoryloc,
-				const std::string &a_listname) :
-				inventoryloc(a_inventoryloc),
-				listname(a_listname) {
+				const std::string &a_listname):
+			inventoryloc(a_inventoryloc),
+			listname(a_listname)
+		{
 		}
 
 		InventoryLocation inventoryloc;
 		std::string listname;
 	};
 
-	struct FieldSpec {
+	struct FieldSpec
+	{
 		FieldSpec() = default;
 
 		FieldSpec(const std::string &name, const std::wstring &label,
 				const std::wstring &default_text, s32 id, int priority = 0,
 				gui::ECURSOR_ICON cursor_icon = ECI_NORMAL) :
-				fname(name),
-				flabel(label),
-				fdefault(unescape_enriched(translate_string(default_text))),
-				fid(id),
-				send(false),
-				ftype(f_Unknown),
-				is_exit(false),
-				priority(priority),
-				fcursor_icon(cursor_icon) {
+			fname(name),
+			flabel(label),
+			fdefault(unescape_enriched(translate_string(default_text))),
+			fid(id),
+			send(false),
+			ftype(f_Unknown),
+			is_exit(false),
+			priority(priority),
+			fcursor_icon(cursor_icon)
+		{
 		}
 
 		std::string fname;
@@ -141,13 +149,15 @@ class GUIFormSpecMenu : public GUIModalMenu {
 		std::string sound;
 	};
 
-	struct TooltipSpec {
+	struct TooltipSpec
+	{
 		TooltipSpec() = default;
 		TooltipSpec(const std::wstring &a_tooltip, irr::video::SColor a_bgcolor,
-				irr::video::SColor a_color) :
-				tooltip(translate_string(a_tooltip)),
-				bgcolor(a_bgcolor),
-				color(a_color) {
+				irr::video::SColor a_color):
+			tooltip(translate_string(a_tooltip)),
+			bgcolor(a_bgcolor),
+			color(a_color)
+		{
 		}
 
 		std::wstring tooltip;
@@ -157,61 +167,69 @@ class GUIFormSpecMenu : public GUIModalMenu {
 
 public:
 	GUIFormSpecMenu(JoystickController *joystick,
-			gui::IGUIElement *parent, s32 id,
+			gui::IGUIElement* parent, s32 id,
 			IMenuManager *menumgr,
 			Client *client,
 			gui::IGUIEnvironment *guienv,
 			ISimpleTextureSource *tsrc,
 			ISoundManager *sound_manager,
-			IFormSource *fs_src,
-			TextDest *txt_dst,
+			IFormSource* fs_src,
+			TextDest* txt_dst,
 			const std::string &formspecPrepend,
 			bool remap_dbl_click = true);
 
 	~GUIFormSpecMenu();
 
 	static void create(GUIFormSpecMenu *&cur_formspec, Client *client,
-			gui::IGUIEnvironment *guienv, JoystickController *joystick, IFormSource *fs_src,
-			TextDest *txt_dest, const std::string &formspecPrepend,
-			ISoundManager *sound_manager);
+		gui::IGUIEnvironment *guienv, JoystickController *joystick, IFormSource *fs_src,
+		TextDest *txt_dest, const std::string &formspecPrepend,
+		ISoundManager *sound_manager);
 
 	void setFormSpec(const std::string &formspec_string,
-			const InventoryLocation &current_inventory_location) {
+			const InventoryLocation &current_inventory_location)
+	{
 		m_formspec_string = formspec_string;
 		m_current_inventory_location = current_inventory_location;
 		m_is_form_regenerated = false;
 		regenerateGui(m_screensize_old);
 	}
 
-	const InventoryLocation &getFormspecLocation() {
+	const InventoryLocation &getFormspecLocation()
+	{
 		return m_current_inventory_location;
 	}
 
-	void setFormspecPrepend(const std::string &formspecPrepend) {
+	void setFormspecPrepend(const std::string &formspecPrepend)
+	{
 		m_formspec_prepend = formspecPrepend;
 	}
 
 	// form_src is deleted by this GUIFormSpecMenu
-	void setFormSource(IFormSource *form_src) {
+	void setFormSource(IFormSource *form_src)
+	{
 		delete m_form_src;
 		m_form_src = form_src;
 	}
 
 	// text_dst is deleted by this GUIFormSpecMenu
-	void setTextDest(TextDest *text_dst) {
+	void setTextDest(TextDest *text_dst)
+	{
 		delete m_text_dst;
 		m_text_dst = text_dst;
 	}
 
-	void allowClose(bool value) {
+	void allowClose(bool value)
+	{
 		m_allowclose = value;
 	}
 
-	void setDebugView(bool value) {
+	void setDebugView(bool value)
+	{
 		m_show_debug = value;
 	}
 
-	void lockSize(bool lock, v2u32 basescreensize = v2u32(0, 0)) {
+	void lockSize(bool lock,v2u32 basescreensize=v2u32(0,0))
+	{
 		m_lock = lock;
 		m_lockscreensize = basescreensize;
 	}
@@ -219,27 +237,33 @@ public:
 	void removeTooltip();
 	void setInitialFocus();
 
-	void setFocus(const std::string &elementname) {
+	void setFocus(const std::string &elementname)
+	{
 		m_focused_element = elementname;
 	}
 
-	Client *getClient() const {
+	Client *getClient() const
+	{
 		return m_client;
 	}
 
-	const GUIInventoryList::ItemSpec *getSelectedItem() const {
+	const GUIInventoryList::ItemSpec *getSelectedItem() const
+	{
 		return m_selected_item;
 	}
 
-	u16 getSelectedAmount() const {
+	u16 getSelectedAmount() const
+	{
 		return m_selected_amount;
 	}
 
-	bool doTooltipAppendItemname() const {
+	bool doTooltipAppendItemname() const
+	{
 		return m_tooltip_append_itemname;
 	}
 
-	void addHoveredItemTooltip(const std::string &name) {
+	void addHoveredItemTooltip(const std::string &name)
+	{
 		m_hovered_item_tooltips.emplace_back(name);
 	}
 
@@ -256,14 +280,14 @@ public:
 
 	s16 getNextInventoryRing(const InventoryLocation &inventoryloc, const std::string &listname);
 
-	void acceptInput(FormspecQuitMode quitmode = quit_mode_no);
-	bool preprocessEvent(const SEvent &event);
-	bool OnEvent(const SEvent &event);
+	void acceptInput(FormspecQuitMode quitmode=quit_mode_no);
+	bool preprocessEvent(const SEvent& event);
+	bool OnEvent(const SEvent& event);
 	bool doPause;
 	bool pausesGame() { return doPause; }
 
-	GUITable *getTable(const std::string &tablename);
-	std::vector<std::string> *getDropDownValues(const std::string &name);
+	GUITable* getTable(const std::string &tablename);
+	std::vector<std::string>* getDropDownValues(const std::string &name);
 
 	// This will only return a meaningful value if called after drawMenu().
 	core::rect<s32> getAbsoluteRect();
@@ -272,9 +296,15 @@ public:
 	void getAndroidUIInput();
 #endif
 
+	// Returns the fixed formspec coordinate size for the given parameters.
+	static double getFixedImgsize(double screen_dpi, double gui_scaling);
+	// Returns the preferred non-fixed formspec coordinate size for the given parameters.
+	static double getImgsize(v2u32 avail_screensize, double screen_dpi, double gui_scaling);
+
 protected:
-	v2s32 getBasePos() const {
-		return padding + offset + AbsoluteRect.UpperLeftCorner;
+	v2s32 getBasePos() const
+	{
+			return padding + offset + AbsoluteRect.UpperLeftCorner;
 	}
 	std::wstring getLabelByID(s32 id);
 	std::string getNameByID(s32 id);
@@ -283,16 +313,16 @@ protected:
 	v2s32 getRealCoordinateBasePos(const std::vector<std::string> &v_pos);
 	v2s32 getRealCoordinateGeometry(const std::vector<std::string> &v_geom);
 	bool precheckElement(const std::string &name, const std::string &element,
-			size_t args_min, size_t args_max, std::vector<std::string> &parts);
+		size_t args_min, size_t args_max, std::vector<std::string> &parts);
 
 	std::unordered_map<std::string, std::vector<StyleSpec>> theme_by_type;
 	std::unordered_map<std::string, std::vector<StyleSpec>> theme_by_name;
 	std::unordered_set<std::string> property_warned;
 
 	StyleSpec getDefaultStyleForElement(const std::string &type,
-			const std::string &name = "", const std::string &parent_type = "");
+			const std::string &name="", const std::string &parent_type="");
 	std::array<StyleSpec, StyleSpec::NUM_STATES> getStyleForElement(const std::string &type,
-			const std::string &name = "", const std::string &parent_type = "");
+			const std::string &name="", const std::string &parent_type="");
 
 	v2s32 padding;
 	v2f32 spacing;
@@ -360,13 +390,13 @@ protected:
 	video::SColor m_default_tooltip_color;
 
 private:
-	IFormSource *m_form_src;
-	TextDest *m_text_dst;
-	std::string m_last_formname;
-	u16 m_formspec_version = 1;
+	IFormSource               *m_form_src;
+	TextDest                  *m_text_dst;
+	std::string                m_last_formname;
+	u16                        m_formspec_version = 1;
 	std::optional<std::string> m_focused_element = std::nullopt;
-	JoystickController *m_joystick;
-	bool m_show_debug = false;
+	JoystickController        *m_joystick;
+	bool                       m_show_debug = false;
 
 	struct parserData {
 		bool explicit_size;
@@ -396,13 +426,12 @@ private:
 			GUIScrollBar::ArrowVisibility arrow_visiblity = GUIScrollBar::DEFAULT;
 		} scrollbar_options;
 
-		// Used to restore table selection/scroll/treeview state
+		// used to restore table selection/scroll/treeview state
 		std::unordered_map<std::string, GUITable::DynamicData> table_dyndata;
 		std::string type;
 	};
 
-	static const std::unordered_map<std::string, std::function<void(GUIFormSpecMenu*, 
-		GUIFormSpecMenu::parserData *data, const std::string &description)>> element_parsers;
+	static const std::unordered_map<std::string, std::function<void(GUIFormSpecMenu*, GUIFormSpecMenu::parserData *data, const std::string &description)>> element_parsers;
 
 	struct fs_key_pending {
 		bool key_up;
@@ -417,7 +446,7 @@ private:
 
 	void removeAll();
 
-	void parseElement(parserData *data, const std::string &element);
+	void parseElement(parserData* data, const std::string &element);
 
 	void parseSize(parserData* data, const std::string &element);
 	void parseContainer(parserData* data, const std::string &element);
@@ -476,7 +505,7 @@ private:
 	void tryClose();
 
 	void showTooltip(const std::wstring &text, const irr::video::SColor &color,
-			const irr::video::SColor &bgcolor);
+		const irr::video::SColor &bgcolor);
 
 	/**
 	 * In formspec version < 2 the elements were not ordered properly. Some element
@@ -490,21 +519,28 @@ private:
 
 	// used by getAbsoluteRect
 	s32 m_tabheader_upper_edge = 0;
+
+	// Determines the size (in pixels) of formspec coordinate units.
+	double calculateImgsize(const parserData &data);
 };
 
-class FormspecFormSource : public IFormSource {
+class FormspecFormSource: public IFormSource
+{
 public:
-	FormspecFormSource(const std::string &formspec) :
-			m_formspec(formspec) {
+	FormspecFormSource(const std::string &formspec):
+		m_formspec(formspec)
+	{
 	}
 
 	~FormspecFormSource() = default;
 
-	void setForm(const std::string &formspec) {
+	void setForm(const std::string &formspec)
+	{
 		m_formspec = formspec;
 	}
 
-	const std::string &getForm() const {
+	const std::string &getForm() const
+	{
 		return m_formspec;
 	}
 

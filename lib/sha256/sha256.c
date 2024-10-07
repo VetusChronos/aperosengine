@@ -1,5 +1,5 @@
 /* 
-* sha256.c modified by Yuna Sato (YunaSatoy)
+* sha256.c modified by Vetus (Chronos)
 * based on libcrypto/sha/sha256.c (see LICENSE.md) 
 */
 

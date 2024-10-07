@@ -9,7 +9,7 @@ class ISimpleTextureSource;
 class GUIAnimatedImage : public gui::IGUIElement {
 public:
 	GUIAnimatedImage(gui::IGUIEnvironment *env, gui::IGUIElement *parent,
-			s32 id, const core::rect<s32> &rectangle);
+		s32 id, const core::rect<s32> &rectangle);
 
 	virtual void draw() override;
 

@@ -26,17 +26,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "network/networkprotocol.h"
 #include "irrlichttypes.h"
 
-enum ModChannelState : u8 {
+enum ModChannelState : u8
+{
 	MODCHANNEL_STATE_INIT,
 	MODCHANNEL_STATE_READ_WRITE,
 	MODCHANNEL_STATE_READ_ONLY,
 	MODCHANNEL_STATE_MAX,
 };
 
-class ModChannel {
+class ModChannel
+{
 public:
-	ModChannel(const std::string &name) :
-			m_name(name) {}
+	ModChannel(const std::string &name) : m_name(name) {}
 	~ModChannel() = default;
 
 	const std::string &getName() const { return m_name; }
@@ -52,7 +53,8 @@ private:
 	std::vector<u16> m_client_consumers;
 };
 
-enum ModChannelSignal : u8 {
+enum ModChannelSignal : u8
+{
 	MODCHANNEL_SIGNAL_JOIN_OK,
 	MODCHANNEL_SIGNAL_JOIN_FAILURE,
 	MODCHANNEL_SIGNAL_LEAVE_OK,
@@ -61,7 +63,8 @@ enum ModChannelSignal : u8 {
 	MODCHANNEL_SIGNAL_SET_STATE,
 };
 
-class ModChannelMgr {
+class ModChannelMgr
+{
 public:
 	ModChannelMgr() = default;
 	~ModChannelMgr() = default;

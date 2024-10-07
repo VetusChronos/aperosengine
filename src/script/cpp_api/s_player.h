@@ -30,7 +30,8 @@ struct ToolCapabilities;
 struct PlayerHPChangeReason;
 class ServerActiveObject;
 
-class ScriptApiPlayer : virtual public ScriptApiBase {
+class ScriptApiPlayer : virtual public ScriptApiBase
+{
 public:
 	virtual ~ScriptApiPlayer() = default;
 
@@ -56,34 +57,33 @@ public:
 	// Player inventory callbacks
 	// Return number of accepted items to be moved
 	int player_inventory_AllowMove(
-			const MoveAction &ma, int count,
-			ServerActiveObject *player);
+		const MoveAction &ma, int count,
+		ServerActiveObject *player);
 	// Return number of accepted items to be put
 	int player_inventory_AllowPut(
-			const MoveAction &ma, const ItemStack &stack,
-			ServerActiveObject *player);
+		const MoveAction &ma, const ItemStack &stack,
+		ServerActiveObject *player);
 	// Return number of accepted items to be taken
 	int player_inventory_AllowTake(
-			const MoveAction &ma, const ItemStack &stack,
-			ServerActiveObject *player);
+		const MoveAction &ma, const ItemStack &stack,
+		ServerActiveObject *player);
 	// Report moved items
 	void player_inventory_OnMove(
-			const MoveAction &ma, int count,
-			ServerActiveObject *player);
+		const MoveAction &ma, int count,
+		ServerActiveObject *player);
 	// Report put items
 	void player_inventory_OnPut(
-			const MoveAction &ma, const ItemStack &stack,
-			ServerActiveObject *player);
+		const MoveAction &ma, const ItemStack &stack,
+		ServerActiveObject *player);
 	// Report taken items
 	void player_inventory_OnTake(
-			const MoveAction &ma, const ItemStack &stack,
-			ServerActiveObject *player);
-
+		const MoveAction &ma, const ItemStack &stack,
+		ServerActiveObject *player);
 private:
 	void pushPutTakeArguments(
-			const char *method, const InventoryLocation &loc,
-			const std::string &listname, int index, const ItemStack &stack,
-			ServerActiveObject *player);
+		const char *method, const InventoryLocation &loc,
+		const std::string &listname, int index, const ItemStack &stack,
+		ServerActiveObject *player);
 	void pushMoveArguments(const MoveAction &ma,
-			int count, ServerActiveObject *player);
+		int count, ServerActiveObject *player);
 };

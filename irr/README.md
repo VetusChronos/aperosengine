@@ -1,7 +1,7 @@
 IrrlichtMt version 1.9
 ======================
 
-IrrlichtMt is the 3D engine of [Aperos Engine](https://github.com/yunasatoy/aperosengine).
+IrrlichtMt is the 3D engine of [Aperos Engine](https://github.com/vetuschronos/aperosengine).
 It is based on the [Irrlicht Engine](https://irrlicht.sourceforge.io/) but is now developed independently.
 It is intentionally not compatible to upstream and is planned to be eventually absorbed into Aperos Engine.
 

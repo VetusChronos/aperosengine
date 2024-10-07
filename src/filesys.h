@@ -41,9 +41,11 @@ namespace irr::io {
 class IFileSystem;
 }
 
-namespace fs {
+namespace fs
+{
 
-struct DirListNode {
+struct DirListNode
+{
 	std::string name;
 	bool dir;
 };
@@ -61,7 +63,8 @@ bool IsDir(const std::string &path);
 
 bool IsExecutable(const std::string &path);
 
-inline bool IsFile(const std::string &path) {
+inline bool IsFile(const std::string &path)
+{
 	return PathExists(path) && !IsDir(path);
 }
 
@@ -87,7 +90,7 @@ std::string CreateTempFile();
 std::string CreateTempDir();
 
 /* Returns a list of subdirectories, including the path itself, but excluding
-	   hidden directories (whose names start with . or _)
+       hidden directories (whose names start with . or _)
 */
 void GetRecursiveDirs(std::vector<std::string> &dirs, const std::string &dir);
 std::vector<std::string> GetRecursiveDirs(const std::string &dir);
@@ -100,9 +103,9 @@ std::vector<std::string> GetRecursiveDirs(const std::string &dir);
    ignore - paths that start with these charcters will not be listed.
 */
 void GetRecursiveSubPaths(const std::string &path,
-		std::vector<std::string> &dst,
-		bool list_files,
-		const std::set<char> &ignore = {});
+		  std::vector<std::string> &dst,
+		  bool list_files,
+		  const std::set<char> &ignore = {});
 
 // Only pass full paths to this one. True on success.
 bool RecursiveDeleteContent(const std::string &path);
@@ -168,9 +171,9 @@ bool Rename(const std::string &from, const std::string &to);
  * @param log_error log failure to errorstream?
  * @param log_warn log failure to warningstream?
  * @return true if success
- */
+*/
 bool OpenStream(std::filebuf &stream, const char *filename,
-		std::ios::openmode mode, bool log_error, bool log_warn);
+	std::ios::openmode mode, bool log_error, bool log_warn);
 
 } // namespace fs
 
@@ -185,9 +188,10 @@ bool OpenStream(std::filebuf &stream, const char *filename,
  * @param log if true, failure to open the file will be logged to errorstream
  * @param mode additional mode bits (e.g. std::ios::app)
  * @return file stream, will be !good in case of error
- */
+*/
 inline std::ofstream open_ofstream(const char *name, bool log,
-		std::ios::openmode mode = std::ios::openmode()) {
+	std::ios::openmode mode = std::ios::openmode())
+{
 	mode |= std::ios::out | std::ios::binary;
 	if (!(mode & std::ios::app))
 		mode |= std::ios::trunc;
@@ -206,9 +210,10 @@ inline std::ofstream open_ofstream(const char *name, bool log,
  * @param log if true, failure to open the file will be logged to errorstream
  * @param mode additional mode bits (e.g. std::ios::ate)
  * @return file stream, will be !good in case of error
- */
+*/
 inline std::ifstream open_ifstream(const char *name, bool log,
-		std::ios::openmode mode = std::ios::openmode()) {
+	std::ios::openmode mode = std::ios::openmode())
+{
 	mode |= std::ios::in | std::ios::binary;
 	std::ifstream ifs;
 	if (!fs::OpenStream(*ifs.rdbuf(), name, mode, log, false))

@@ -31,16 +31,19 @@ namespace sound {
 /**
  * Class for the openal device and context
  */
-class SoundManagerSingleton {
+class SoundManagerSingleton
+{
 public:
 	struct AlcDeviceDeleter {
-		void operator()(ALCdevice *p) {
+		void operator()(ALCdevice *p)
+		{
 			alcCloseDevice(p);
 		}
 	};
 
 	struct AlcContextDeleter {
-		void operator()(ALCcontext *p) {
+		void operator()(ALCcontext *p)
+		{
 			alcMakeContextCurrent(nullptr);
 			alcDestroyContext(p);
 		}
@@ -49,7 +52,7 @@ public:
 	using unique_ptr_alcdevice = std::unique_ptr<ALCdevice, AlcDeviceDeleter>;
 	using unique_ptr_alccontext = std::unique_ptr<ALCcontext, AlcContextDeleter>;
 
-	unique_ptr_alcdevice m_device;
+	unique_ptr_alcdevice  m_device;
 	unique_ptr_alccontext m_context;
 
 public:

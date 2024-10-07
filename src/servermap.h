@@ -33,8 +33,21 @@ class IRollbackManager;
 class EmergeManager;
 class ServerEnvironment;
 struct BlockMakeData;
-
 class MetricsBackend;
+
+// TODO: this could wrap all calls to MapDatabase, including locking
+struct MapDatabaseAccessor {
+	/// Lock, to be taken for any operation
+	std::mutex mutex;
+	/// Main database
+	MapDatabase *dbase = nullptr;
+	/// Fallback database for read operations
+	MapDatabase *dbase_ro = nullptr;
+
+	/// Load a block, taking dbase_ro into account.
+	/// @note call locked
+	void loadBlock(v3s16 blockpos, std::string &ret);
+};
 
 /*
 	ServerMap
@@ -42,7 +55,8 @@ class MetricsBackend;
 	This is the only map class that is able to generate map.
 */
 
-class ServerMap : public Map {
+class ServerMap : public Map
+{
 public:
 	/*
 		savedir: directory to which map data should be saved
@@ -64,7 +78,7 @@ public:
 	bool blockpos_over_mapgen_limit(v3s16 p);
 	bool initBlockMake(v3s16 blockpos, BlockMakeData *data);
 	void finishBlockMake(BlockMakeData *data,
-			std::map<v3s16, MapBlock *> *changed_blocks);
+		std::map<v3s16, MapBlock*> *changed_blocks);
 
 	/*
 		Get a block from somewhere.
@@ -74,13 +88,13 @@ public:
 	MapBlock *createBlock(v3s16 p);
 
 	/*
-		Forcefully get a block from somewhere.
+		Forcefully get a block from somewhere (blocking!).
 		- Memory
 		- Load from disk
 		- Create blank filled with CONTENT_IGNORE
 
 	*/
-	MapBlock *emergeBlock(v3s16 p, bool create_blank = true) override;
+	MapBlock *emergeBlock(v3s16 p, bool create_blank=true) override;
 
 	/*
 		Try to get a block.
@@ -93,7 +107,7 @@ public:
 	bool isBlockInQueue(v3s16 pos);
 
 	void addNodeAndUpdate(v3s16 p, MapNode n,
-			std::map<v3s16, MapBlock *> &modified_blocks,
+			std::map<v3s16, MapBlock*> &modified_blocks,
 			bool remove_metadata) override;
 
 	/*
@@ -113,9 +127,16 @@ public:
 
 	bool saveBlock(MapBlock *block) override;
 	static bool saveBlock(MapBlock *block, MapDatabase *db, int compression_level = -1);
+
+	// Load block in a synchronous fashion
 	MapBlock *loadBlock(v3s16 p);
-	// Database version
-	void loadBlock(std::string *blob, v3s16 p3d, MapSector *sector, bool save_after_load = false);
+	/// Load a block that was already read from disk. Used by EmergeManager.
+	/// @return non-null block (but can be blank)
+	MapBlock *loadBlock(const std::string &blob, v3s16 p, bool save_after_load=false);
+
+	// Helper for deserializing blocks from disk
+	// @throws SerializationError
+	static void deSerializeBlock(MapBlock *block, std::istream &is);
 
 	// Blocks are removed from the map but not deleted from memory until
 	// deleteDetachedBlocks() is called, since pointers to them may still exist
@@ -131,7 +152,7 @@ public:
 	// For debug printing
 	void PrintInfo(std::ostream &out) override;
 
-	bool isSavingEnabled() { return m_map_saving_enabled; }
+	bool isSavingEnabled(){ return m_map_saving_enabled; }
 
 	u64 getSeed();
 
@@ -143,9 +164,9 @@ public:
 	 * changed), true otherwise.
 	 */
 	bool repairBlockLight(v3s16 blockpos,
-			std::map<v3s16, MapBlock *> *modified_blocks);
+		std::map<v3s16, MapBlock *> *modified_blocks);
 
-	void transformLiquids(std::map<v3s16, MapBlock *> &modified_blocks,
+	void transformLiquids(std::map<v3s16, MapBlock*> & modified_blocks,
 			ServerEnvironment *env);
 
 	void transforming_liquid_add(v3s16 p);
@@ -153,6 +174,7 @@ public:
 	MapSettingsManager settings_mgr;
 
 protected:
+
 	void reportMetrics(u64 save_time_us, u32 saved_blocks, u32 all_blocks) override;
 
 private:
@@ -183,8 +205,8 @@ private:
 		This is reset to false when written on disk.
 	*/
 	bool m_map_metadata_changed = true;
-	MapDatabase *dbase = nullptr;
-	MapDatabase *dbase_ro = nullptr;
+
+	MapDatabaseAccessor m_db;
 
 	// Map metrics
 	MetricGaugePtr m_loaded_blocks_gauge;

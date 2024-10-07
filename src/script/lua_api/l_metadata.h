@@ -29,7 +29,8 @@ class IMetadata;
 	NodeMetaRef
 */
 
-class MetaDataRef : public ModApiBase {
+class MetaDataRef : public ModApiBase
+{
 public:
 	virtual ~MetaDataRef() = default;
 

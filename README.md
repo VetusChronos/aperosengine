@@ -3,9 +3,9 @@ AperosVoxel Engine
 
 [![License](https://img.shields.io/badge/license-LGPLv2.1%2B-blue.svg)](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html)
 
-AperosVoxel is a free open-source voxel game engine with easy modding and game creation.
+Aperos (Voxel) Engine is a free open source voxel game engine focusing on ease of modding and game creation.
 
-AperosVoxel is based on [Minetest](https://minetest.net):
+Aperos Engine is based on [Minetest](https://minetest.net):
 
 > Copyright (C) 2010-2024 Perttu Ahola <celeron55@gmail.com>
 and contributors of the Minetest (see source file comments). 
@@ -30,7 +30,7 @@ Table of Contents
 
 Further documentation
 ---------------------
-- GitHub: https://github.com/yunasatoy/aperosengine/
+- GitHub: https://github.com/vetuschronos/aperosengine/
 - [Developer documentation](docs/locales/en/developing/)
 - [docs/](docs/locales/en/) directory of source distribution
 
@@ -73,7 +73,7 @@ Some can be changed in the key config dialog in the settings tab.
 | F3                            | Cycle through debug information screens                        |
 | F6                            | Cycle through profiler info screens                            |
 | F10                           | Show/hide console                                              |
-| F2                           | Take screenshot                                                |
+| F2                            | Take screenshot                                                |
 
 Paths
 -----
@@ -107,12 +107,12 @@ Worlds can be found as separate folders in: `user/worlds/`
 Configuration file
 ------------------
 - Default location:
-    `user/aperosvoxel.conf`
+    `user/aperosengine.conf`
 - This file is created by closing AperosEngine for the first time.
 - A specific file can be specified on the command line:
     `--config <path-to-file>`
 - A run-in-place build will look for the configuration file in
-    `location_of_exe/../aperosvoxel.conf` and also `location_of_exe/../../aperosvoxel.conf`
+    `location_of_exe/../aperosengine.conf` and also `location_of_exe/../../aperosengine.conf`
 
 Command-line options
 --------------------

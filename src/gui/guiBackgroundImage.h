@@ -22,12 +22,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 class ISimpleTextureSource;
 
-class GUIBackgroundImage : public gui::IGUIElement {
+
+class GUIBackgroundImage : public gui::IGUIElement
+{
 public:
 	GUIBackgroundImage(gui::IGUIEnvironment *env, gui::IGUIElement *parent, s32 id,
-			const core::rect<s32> &rectangle, const std::string &name,
-			const core::rect<s32> &middle, ISimpleTextureSource *tsrc, bool autoclip,
-			v2s32 autoclip_offset);
+		const core::rect<s32> &rectangle, const std::string &name,
+		const core::rect<s32> &middle, ISimpleTextureSource *tsrc, bool autoclip,
+		v2s32 autoclip_offset);
 
 	virtual void draw() override;
 

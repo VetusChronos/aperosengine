@@ -22,7 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "l_internal.h"
 #include "server.h"
 
-int ModApiStorage::l_get_mod_storage(lua_State *L) {
+int ModApiStorage::l_get_mod_storage(lua_State *L)
+{
 	// Note that this is wrapped in Lua, see builtin/common/mod_storage.lua
 	std::string mod_name = readParam<std::string>(L, 1);
 
@@ -35,26 +36,31 @@ int ModApiStorage::l_get_mod_storage(lua_State *L) {
 	return 1;
 }
 
-void ModApiStorage::Initialize(lua_State *L, int top) {
+void ModApiStorage::Initialize(lua_State *L, int top)
+{
 	API_FCT(get_mod_storage);
 }
 
-void StorageRef::create(lua_State *L, const std::string &mod_name, ModStorageDatabase *db) {
+void StorageRef::create(lua_State *L, const std::string &mod_name, ModStorageDatabase *db)
+{
 	StorageRef *o = new StorageRef(mod_name, db);
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;
 	luaL_getmetatable(L, className);
 	lua_setmetatable(L, -2);
 }
 
-void StorageRef::Register(lua_State *L) {
+void StorageRef::Register(lua_State *L)
+{
 	registerMetadataClass(L, className, methods);
 }
 
-IMetadata *StorageRef::getmeta(bool auto_create) {
+IMetadata* StorageRef::getmeta(bool auto_create)
+{
 	return &m_object;
 }
 
-void StorageRef::clearMeta() {
+void StorageRef::clearMeta()
+{
 	m_object.clear();
 }
 
@@ -72,5 +78,5 @@ const luaL_Reg StorageRef::methods[] = {
 	luamethod(MetaDataRef, to_table),
 	luamethod(MetaDataRef, from_table),
 	luamethod(MetaDataRef, equals),
-	{ 0, 0 }
+	{0,0}
 };

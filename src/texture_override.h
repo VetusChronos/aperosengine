@@ -26,7 +26,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 typedef u16 override_t;
 
 //! Bitmask enum specifying what a texture override should apply to
-enum class OverrideTarget : override_t {
+enum class OverrideTarget : override_t
+{
 	INVALID = 0,
 	TOP = 1 << 0,
 	BOTTOM = 1 << 1,
@@ -50,7 +51,8 @@ enum class OverrideTarget : override_t {
 	ITEM_TARGETS = INVENTORY | WIELD,
 };
 
-struct TextureOverride {
+struct TextureOverride
+{
 	std::string id;
 	std::string texture;
 	override_t target = 0;
@@ -58,13 +60,15 @@ struct TextureOverride {
 
 	// Helper function for checking if an OverrideTarget is found in
 	// a TextureOverride without casting
-	inline bool hasTarget(OverrideTarget overrideTarget) const {
+	inline bool hasTarget(OverrideTarget overrideTarget) const
+	{
 		return (target & static_cast<override_t>(overrideTarget)) != 0;
 	}
 };
 
 //! Class that provides texture override information from a texture pack
-class TextureOverrideSource {
+class TextureOverrideSource
+{
 public:
 	TextureOverrideSource(const std::string &filepath);
 

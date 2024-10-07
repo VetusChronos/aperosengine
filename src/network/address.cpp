@@ -57,30 +57,35 @@ typedef int socket_t;
 	Address
 */
 
-Address::Address() {
+Address::Address()
+{
 	memset(&m_address, 0, sizeof(m_address));
 }
 
-Address::Address(u32 address, u16 port) {
+Address::Address(u32 address, u16 port)
+{
 	memset(&m_address, 0, sizeof(m_address));
 	setAddress(address);
 	setPort(port);
 }
 
-Address::Address(u8 a, u8 b, u8 c, u8 d, u16 port) {
+Address::Address(u8 a, u8 b, u8 c, u8 d, u16 port)
+{
 	memset(&m_address, 0, sizeof(m_address));
 	setAddress(a, b, c, d);
 	setPort(port);
 }
 
-Address::Address(const IPv6AddressBytes *ipv6_bytes, u16 port) {
+Address::Address(const IPv6AddressBytes *ipv6_bytes, u16 port)
+{
 	memset(&m_address, 0, sizeof(m_address));
 	setAddress(ipv6_bytes);
 	setPort(port);
 }
 
 // Equality (address family, IP and port must be equal)
-bool Address::operator==(const Address &other) const {
+bool Address::operator==(const Address &other) const
+{
 	if (other.m_addr_family != m_addr_family || other.m_port != m_port)
 		return false;
 
@@ -90,24 +95,25 @@ bool Address::operator==(const Address &other) const {
 
 	if (m_addr_family == AF_INET6) {
 		return memcmp(m_address.ipv6.s6_addr,
-					   other.m_address.ipv6.s6_addr, 16) == 0;
+				other.m_address.ipv6.s6_addr, 16) == 0;
 	}
 
 	return false;
 }
 
-void Address::Resolve(const char *name, Address *fallback) {
+void Address::Resolve(const char *name, Address *fallback)
+{
 	if (!name || name[0] == 0) {
 		if (m_addr_family == AF_INET)
 			setAddress(static_cast<u32>(0));
 		else if (m_addr_family == AF_INET6)
-			setAddress(static_cast<IPv6AddressBytes *>(nullptr));
+			setAddress(static_cast<IPv6AddressBytes*>(nullptr));
 		if (fallback)
 			*fallback = Address();
 		return;
 	}
 
-	const auto &copy_from_ai = [](const struct addrinfo *ai, Address *to) {
+	const auto &copy_from_ai = [] (const struct addrinfo *ai, Address *to) {
 		if (ai->ai_family == AF_INET) {
 			struct sockaddr_in *t = (struct sockaddr_in *)ai->ai_addr;
 			to->m_addr_family = AF_INET;
@@ -153,35 +159,40 @@ void Address::Resolve(const char *name, Address *fallback) {
 }
 
 // IP address -> textual representation
-std::string Address::serializeString() const {
+std::string Address::serializeString() const
+{
 	char str[INET6_ADDRSTRLEN];
-	if (inet_ntop(m_addr_family, (void *)&m_address, str, sizeof(str)) == nullptr)
+	if (inet_ntop(m_addr_family, (void*) &m_address, str, sizeof(str)) == nullptr)
 		return "";
 	return str;
 }
 
-bool Address::isAny() const {
+bool Address::isAny() const
+{
 	if (m_addr_family == AF_INET) {
 		return m_address.ipv4.s_addr == 0;
 	} else if (m_addr_family == AF_INET6) {
-		static const char zero[16] = { 0 };
+		static const char zero[16] = {0};
 		return memcmp(m_address.ipv6.s6_addr, zero, 16) == 0;
 	}
 
 	return false;
 }
 
-void Address::setAddress(u32 address) {
+void Address::setAddress(u32 address)
+{
 	m_addr_family = AF_INET;
 	m_address.ipv4.s_addr = htonl(address);
 }
 
-void Address::setAddress(u8 a, u8 b, u8 c, u8 d) {
+void Address::setAddress(u8 a, u8 b, u8 c, u8 d)
+{
 	u32 addr = (a << 24) | (b << 16) | (c << 8) | d;
 	setAddress(addr);
 }
 
-void Address::setAddress(const IPv6AddressBytes *ipv6_bytes) {
+void Address::setAddress(const IPv6AddressBytes *ipv6_bytes)
+{
 	m_addr_family = AF_INET6;
 	if (ipv6_bytes)
 		memcpy(m_address.ipv6.s6_addr, ipv6_bytes->bytes, 16);
@@ -189,11 +200,13 @@ void Address::setAddress(const IPv6AddressBytes *ipv6_bytes) {
 		memset(m_address.ipv6.s6_addr, 0, 16);
 }
 
-void Address::setPort(u16 port) {
+void Address::setPort(u16 port)
+{
 	m_port = port;
 }
 
-void Address::print(std::ostream &s) const {
+void Address::print(std::ostream& s) const
+{
 	if (m_addr_family == AF_INET6)
 		s << "[" << serializeString() << "]:" << m_port;
 	else if (m_addr_family == AF_INET)
@@ -202,19 +215,18 @@ void Address::print(std::ostream &s) const {
 		s << "(undefined)";
 }
 
-bool Address::isLocalhost() const {
+bool Address::isLocalhost() const
+{
 	if (m_addr_family == AF_INET6) {
 		static const u8 localhost_bytes[] = {
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
-		};
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 		static const u8 mapped_ipv4_localhost[] = {
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0x7f, 0, 0, 0
-		};
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0x7f, 0, 0, 0};
 
 		auto *addr = m_address.ipv6.s6_addr;
 
 		return memcmp(addr, localhost_bytes, 16) == 0 ||
-				memcmp(addr, mapped_ipv4_localhost, 13) == 0;
+			memcmp(addr, mapped_ipv4_localhost, 13) == 0;
 	} else if (m_addr_family == AF_INET) {
 		auto addr = ntohl(m_address.ipv4.s_addr);
 		return (addr >> 24) == 0x7f;

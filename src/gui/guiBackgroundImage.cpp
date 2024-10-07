@@ -19,20 +19,20 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "client/guiscalingfilter.h"
 #include "log.h"
 #include "client/texturesource.h"
+#include <ITexture.h>
 
 GUIBackgroundImage::GUIBackgroundImage(gui::IGUIEnvironment *env,
-		gui::IGUIElement *parent, s32 id, const core::rect<s32> &rectangle,
-		const std::string &name, const core::rect<s32> &middle,
-		ISimpleTextureSource *tsrc, bool autoclip, v2s32 autoclip_offset) :
-		gui::IGUIElement(gui::EGUIET_ELEMENT, env, parent, id, rectangle),
-		m_name(name),
-		m_middle(middle),
-		m_tsrc(tsrc),
-		m_autoclip(autoclip),
-		m_autoclip_offset(autoclip_offset) {
+	gui::IGUIElement *parent, s32 id, const core::rect<s32> &rectangle,
+	const std::string &name, const core::rect<s32> &middle,
+	ISimpleTextureSource *tsrc, bool autoclip, v2s32 autoclip_offset) :
+	gui::IGUIElement(gui::EGUIET_ELEMENT, env, parent, id, rectangle),
+	m_name(name), m_middle(middle), m_tsrc(tsrc), m_autoclip(autoclip),
+	m_autoclip_offset(autoclip_offset)
+{
 }
 
-void GUIBackgroundImage::draw() {
+void GUIBackgroundImage::draw()
+{
 	if (!IsVisible)
 		return;
 
@@ -40,7 +40,7 @@ void GUIBackgroundImage::draw() {
 
 	if (!texture) {
 		errorstream << "GUIBackgroundImage::draw() Unable to load texture:"
-					<< '\n';
+				<< '\n';
 		errorstream << "\t" << m_name << '\n';
 		return;
 	}
@@ -61,7 +61,7 @@ void GUIBackgroundImage::draw() {
 
 	if (m_middle.getArea() == 0) {
 		const video::SColor color(255, 255, 255, 255);
-		const video::SColor colors[] = { color, color, color, color };
+		const video::SColor colors[] = {color, color, color, color};
 		draw2DImageFilterScaled(driver, texture, rect, srcrect, nullptr, colors, true);
 	} else {
 		draw2DImage9Slice(driver, texture, rect, srcrect, m_middle);

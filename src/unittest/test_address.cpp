@@ -23,7 +23,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "settings.h"
 #include "network/socket.h"
 
-class TestAddress : public TestBase {
+class TestAddress : public TestBase
+{
 public:
 	TestAddress() { TestManager::registerTestModule(this); }
 
@@ -38,13 +39,15 @@ public:
 
 static TestAddress g_test_instance;
 
-void TestAddress::runTests(IGameDef *gamedef) {
+void TestAddress::runTests(IGameDef *gamedef)
+{
 	TEST(testBasic);
 	TEST(testIsLocalhost);
 	TEST(testResolve);
 }
 
-void TestAddress::testBasic() {
+void TestAddress::testBasic()
+{
 	Address tmp;
 
 	UASSERT(!tmp.isValid());
@@ -55,13 +58,14 @@ void TestAddress::testBasic() {
 	UASSERTEQ(int, tmp.getFamily(), AF_INET);
 	UASSERT(tmp.isAny());
 
-	tmp = Address(static_cast<IPv6AddressBytes *>(nullptr), 0);
+	tmp = Address(static_cast<IPv6AddressBytes*>(nullptr), 0);
 	UASSERT(tmp.isValid());
 	UASSERTEQ(int, tmp.getFamily(), AF_INET6);
 	UASSERT(tmp.isAny());
 }
 
-void TestAddress::testIsLocalhost() {
+void TestAddress::testIsLocalhost()
+{
 	// v4
 	UASSERT(Address(127, 0, 0, 1, 0).isLocalhost());
 	UASSERT(Address(127, 254, 12, 99, 0).isLocalhost());
@@ -75,16 +79,17 @@ void TestAddress::testIsLocalhost() {
 
 	// v6
 	auto ipv6Bytes = std::make_unique<IPv6AddressBytes>();
-	std::vector<u8> ipv6RawAddr = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+	std::vector<u8> ipv6RawAddr = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 	memcpy(ipv6Bytes->bytes, &ipv6RawAddr[0], 16);
 	UASSERT(Address(ipv6Bytes.get(), 0).isLocalhost())
 
-	ipv6RawAddr = { 16, 34, 0, 0, 0, 0, 29, 0, 0, 0, 188, 0, 0, 0, 0, 14 };
+	ipv6RawAddr = {16, 34, 0, 0, 0, 0, 29, 0, 0, 0, 188, 0, 0, 0, 0, 14};
 	memcpy(ipv6Bytes->bytes, &ipv6RawAddr[0], 16);
 	UASSERT(!Address(ipv6Bytes.get(), 0).isLocalhost())
 }
 
-void TestAddress::testResolve() {
+void TestAddress::testResolve()
+{
 	// Empty test
 	{
 		Address tmp(1, 2, 3, 4, 5);
@@ -109,6 +114,6 @@ void TestAddress::testResolve() {
 		UASSERTCMP(int, !=, result.getFamily(), fallback.getFamily());
 	} else if (g_settings->getBool("enable_ipv6")) {
 		warningstream << "Couldn't verify Address::Resolve fallback (no IPv6?)"
-					  << '\n';
+			<< '\n';
 	}
 }

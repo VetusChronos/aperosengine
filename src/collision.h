@@ -27,24 +27,27 @@ class IGameDef;
 class Environment;
 class ActiveObject;
 
-enum CollisionType {
+enum CollisionType
+{
 	COLLISION_NODE,
 	COLLISION_OBJECT,
 };
 
-enum CollisionAxis {
+enum CollisionAxis
+{
 	COLLISION_AXIS_NONE = -1,
 	COLLISION_AXIS_X,
 	COLLISION_AXIS_Y,
 	COLLISION_AXIS_Z,
 };
 
-struct CollisionInfo {
+struct CollisionInfo
+{
 	CollisionInfo() = default;
 
 	CollisionType type = COLLISION_NODE;
 	CollisionAxis axis = COLLISION_AXIS_NONE;
-	v3s16 node_p = v3s16(-32768, -32768, -32768); // COLLISION_NODE
+	v3s16 node_p = v3s16(-32768,-32768,-32768); // COLLISION_NODE
 	ActiveObject *object = nullptr; // COLLISION_OBJECT
 	v3f new_pos;
 	v3f old_speed;
@@ -52,7 +55,8 @@ struct CollisionInfo {
 	int plane = -1;
 };
 
-struct collisionMoveResult {
+struct collisionMoveResult
+{
 	collisionMoveResult() = default;
 
 	bool touching_ground = false;
@@ -61,15 +65,20 @@ struct collisionMoveResult {
 	std::vector<CollisionInfo> collisions;
 };
 
-// Moves using a single iteration; speed should not exceed pos_max_d/dtime
-collisionMoveResult collisionMoveSimple(Environment *env, IGameDef *gamedef,
+/// @brief Moves using a single iteration; speed should not exceed pos_max_d/dtime
+/// @param self (optional) ActiveObject to ignore in the collision detection.
+collisionMoveResult collisionMoveSimple(Environment *env,IGameDef *gamedef,
 		f32 pos_max_d, const aabb3f &box_0,
 		f32 stepheight, f32 dtime,
 		v3f *pos_f, v3f *speed_f,
-		v3f accel_f, ActiveObject *self = NULL,
-		bool collide_with_objects = true);
+		v3f accel_f, ActiveObject *self=NULL,
+		bool collide_with_objects=true);
 
-// check if box is in collision on actual position
+/// @brief A simpler version of "collisionMoveSimple" that only checks whether
+///        a collision occurs at the given position.
+/// @param self (optional) ActiveObject to ignore in the collision detection.
+/// @returns `true` when `box_0` truly intersects with a node or object.
+///          Touching faces are not counted as intersection.
 bool collision_check_intersection(Environment *env, IGameDef *gamedef,
 		const aabb3f &box_0, const v3f &pos_f, ActiveObject *self = nullptr,
 		bool collide_with_objects = true);

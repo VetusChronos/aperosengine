@@ -31,10 +31,11 @@ using namespace gui;
 GUIButtonItemImage::GUIButtonItemImage(gui::IGUIEnvironment *environment,
 		gui::IGUIElement *parent, s32 id, core::rect<s32> rectangle,
 		ISimpleTextureSource *tsrc, const std::string &item, Client *client,
-		bool noclip) :
-		GUIButton(environment, parent, id, rectangle, tsrc, noclip) {
+		bool noclip)
+		: GUIButton (environment, parent, id, rectangle, tsrc, noclip)
+{
 	m_image = new GUIItemImage(environment, this, id,
-			core::rect<s32>(0, 0, rectangle.getWidth(), rectangle.getHeight()),
+			core::rect<s32>(0,0,rectangle.getWidth(),rectangle.getHeight()),
 			item, getActiveFont(), client);
 	sendToBack(m_image);
 
@@ -44,7 +45,8 @@ GUIButtonItemImage::GUIButtonItemImage(gui::IGUIEnvironment *environment,
 GUIButtonItemImage *GUIButtonItemImage::addButton(IGUIEnvironment *environment,
 		const core::rect<s32> &rectangle, ISimpleTextureSource *tsrc,
 		IGUIElement *parent, s32 id, const wchar_t *text, const std::string &item,
-		Client *client) {
+		Client *client)
+{
 	GUIButtonItemImage *button = new GUIButtonItemImage(environment,
 			parent ? parent : environment->getRootGUIElement(),
 			id, rectangle, tsrc, item, client);

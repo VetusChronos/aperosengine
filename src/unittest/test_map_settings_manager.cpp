@@ -1,4 +1,4 @@
-/*
+ /*
 Minetest
 Copyright (C) 2010-2014 kwolekr, Ryan Kwolek <kwolekr@aperosvoxel.domain>
 
@@ -42,7 +42,8 @@ public:
 
 static TestMapSettingsManager g_test_instance;
 
-void TestMapSettingsManager::runTests(IGameDef *gamedef) {
+void TestMapSettingsManager::runTests(IGameDef *gamedef)
+{
 	TEST(testMapSettingsManager);
 	TEST(testMapMetaSaveLoad);
 	TEST(testMapMetaFailures);
@@ -50,7 +51,9 @@ void TestMapSettingsManager::runTests(IGameDef *gamedef) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void check_noise_params(const NoiseParams *np1, const NoiseParams *np2) {
+
+void check_noise_params(const NoiseParams *np1, const NoiseParams *np2)
+{
 	UASSERTEQ(float, np1->offset, np2->offset);
 	UASSERTEQ(float, np1->scale, np2->scale);
 	UASSERT(np1->spread == np2->spread);
@@ -61,7 +64,9 @@ void check_noise_params(const NoiseParams *np1, const NoiseParams *np2) {
 	UASSERTEQ(u32, np1->flags, np2->flags);
 }
 
-void TestMapSettingsManager::makeUserConfig() {
+
+void TestMapSettingsManager::makeUserConfig()
+{
 	delete Settings::getLayer(SL_GLOBAL);
 	Settings *conf = Settings::createLayer(SL_GLOBAL);
 
@@ -74,15 +79,17 @@ void TestMapSettingsManager::makeUserConfig() {
 	conf->set("mgv5_np_ground", "-43, 40, (80,  80,  80),  983240, 4, 0.55, 2.0");
 }
 
-std::string TestMapSettingsManager::makeMetaFile(bool make_corrupt) {
+
+std::string TestMapSettingsManager::makeMetaFile(bool make_corrupt)
+{
 	std::string metafile = getTestTempFile();
 
 	const char *metafile_contents =
-			"mg_name = v5\n"
-			"seed = 1234\n"
-			"mg_flags = light\n"
-			"mgv5_np_filler_depth = 20, 1, (150, 150, 150), 261, 4, 0.7,  1.0\n"
-			"mgv5_np_height = 20, 10, (250, 250, 250), 84174,  4, 0.5,  1.0\n";
+		"mg_name = v5\n"
+		"seed = 1234\n"
+		"mg_flags = light\n"
+		"mgv5_np_filler_depth = 20, 1, (150, 150, 150), 261, 4, 0.7,  1.0\n"
+		"mgv5_np_height = 20, 10, (250, 250, 250), 84174,  4, 0.5,  1.0\n";
 
 	FILE *f = fopen(metafile.c_str(), "wb");
 	UASSERT(f != NULL);
@@ -96,7 +103,9 @@ std::string TestMapSettingsManager::makeMetaFile(bool make_corrupt) {
 	return metafile;
 }
 
-void TestMapSettingsManager::testMapSettingsManager() {
+
+void TestMapSettingsManager::testMapSettingsManager()
+{
 	makeUserConfig();
 
 	std::string test_mapmeta_path = makeMetaFile(false);
@@ -126,8 +135,8 @@ void TestMapSettingsManager::testMapSettingsManager() {
 	NoiseParams script_np_filler_depth(0, 100, v3f(200, 100, 200), 261, 4, 0.7, 2.0);
 	NoiseParams script_np_factor(0, 100, v3f(50, 50, 50), 920381, 3, 0.45, 2.0);
 	NoiseParams script_np_height(0, 100, v3f(450, 450, 450), 84174, 4, 0.5, 2.0);
-	NoiseParams meta_np_height(20, 10, v3f(250, 250, 250), 84174, 4, 0.5, 1.0);
-	NoiseParams user_np_ground(-43, 40, v3f(80, 80, 80), 983240, 4, 0.55, 2.0, NOISE_FLAG_EASED);
+	NoiseParams meta_np_height(20, 10, v3f(250, 250, 250), 84174,  4, 0.5,  1.0);
+	NoiseParams user_np_ground(-43, 40, v3f(80,  80,  80),  983240, 4, 0.55, 2.0, NOISE_FLAG_EASED);
 
 	mgr.setMapSettingNoiseParams("mgv5_np_filler_depth", &script_np_filler_depth, true);
 	mgr.setMapSettingNoiseParams("mgv5_np_height", &script_np_height);
@@ -188,8 +197,11 @@ void TestMapSettingsManager::testMapSettingsManager() {
 #endif
 }
 
-void TestMapSettingsManager::testMapMetaSaveLoad() {
-	std::string path = getTestTempDirectory() + DIR_DELIM + "foobar" + DIR_DELIM + "map_meta.txt";
+
+void TestMapSettingsManager::testMapMetaSaveLoad()
+{
+	std::string path = getTestTempDirectory()
+		+ DIR_DELIM + "foobar" + DIR_DELIM + "map_meta.txt";
 
 	makeUserConfig();
 	Settings &conf = *Settings::getLayer(SL_GLOBAL);
@@ -228,7 +240,9 @@ void TestMapSettingsManager::testMapMetaSaveLoad() {
 	UASSERTEQ(s16, params2.water_level, 5);
 }
 
-void TestMapSettingsManager::testMapMetaFailures() {
+
+void TestMapSettingsManager::testMapMetaFailures()
+{
 	std::string test_mapmeta_path;
 
 	// Check to see if it'll fail on a non-existent map meta file

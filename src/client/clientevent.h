@@ -20,7 +20,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include <string>
-#include "irrlichttypes_bloated.h"
+#include "irrlichttypes.h"
+#include "client/hud.h" // HudElementStat
 
 struct ParticleParameters;
 struct ParticleSpawnerParameters;
@@ -29,11 +30,12 @@ struct SunParams;
 struct MoonParams;
 struct StarParams;
 
-enum ClientEventType : u8 {
+enum ClientEventType : u8
+{
 	CE_NONE,
 	CE_PLAYER_DAMAGE,
 	CE_PLAYER_FORCE_MOVE,
-	CE_DEATHSCREEN,
+	CE_DEATHSCREEN_LEGACY,
 	CE_SHOW_FORMSPEC,
 	CE_SHOW_LOCAL_FORMSPEC,
 	CE_SPAWN_PARTICLE,
@@ -51,7 +53,8 @@ enum ClientEventType : u8 {
 	CLIENTEVENT_MAX,
 };
 
-struct ClientEventHudAdd {
+struct ClientEventHudAdd
+{
 	u32 server_id;
 	u8 type;
 	v2f pos, scale;
@@ -64,7 +67,8 @@ struct ClientEventHudAdd {
 	s16 z_index;
 };
 
-struct ClientEventHudChange {
+struct ClientEventHudChange
+{
 	u32 id;
 	HudElementStat stat;
 	v2f v2fdata;
@@ -74,9 +78,11 @@ struct ClientEventHudChange {
 	v2s32 v2s32data;
 };
 
-struct ClientEvent {
+struct ClientEvent
+{
 	ClientEventType type;
-	union {
+	union
+	{
 		// struct{
 		//} none;
 		struct
@@ -89,13 +95,6 @@ struct ClientEvent {
 			f32 pitch;
 			f32 yaw;
 		} player_force_move;
-		struct
-		{
-			bool set_camera_point_target;
-			f32 camera_point_target_x;
-			f32 camera_point_target_y;
-			f32 camera_point_target_z;
-		} deathscreen;
 		struct
 		{
 			std::string *formspec;
@@ -131,6 +130,7 @@ struct ClientEvent {
 			f32 density;
 			u32 color_bright;
 			u32 color_ambient;
+			u32 color_shadow;
 			f32 height;
 			f32 thickness;
 			f32 speed_x;

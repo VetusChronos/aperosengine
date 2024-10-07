@@ -22,15 +22,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <iostream>
 #include "irrlichttypes_bloated.h"
 
-enum TileAnimationType : u8 {
+enum TileAnimationType : u8
+{
 	TAT_NONE = 0,
 	TAT_VERTICAL_FRAMES = 1,
 	TAT_SHEET_2D = 2,
 };
 
-struct TileAnimationParams {
+struct TileAnimationParams
+{
 	enum TileAnimationType type = TileAnimationType::TAT_NONE;
-	union {
+	union
+	{
 		// struct {
 		// } none;
 		struct
@@ -41,8 +44,8 @@ struct TileAnimationParams {
 		} vertical_frames;
 		struct
 		{
-			int frames_w; // number of frames left-to-right
-			int frames_h; // number of frames top-to-bottom
+			int frames_w;       // number of frames left-to-right
+			int frames_h;       // number of frames top-to-bottom
 			float frame_length; // seconds
 		} sheet_2d;
 	};

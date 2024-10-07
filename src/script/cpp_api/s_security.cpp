@@ -32,26 +32,26 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <algorithm>
 #include <iostream>
 
-#define SECURE_API(lib, name)                \
+
+#define SECURE_API(lib, name) \
 	lua_pushcfunction(L, sl_##lib##_##name); \
 	lua_setfield(L, -2, #name);
 
-static inline void copy_safe(lua_State *L, const char *list[], unsigned len, int from = -2, int to = -1) {
-	if (from < 0)
-		from = lua_gettop(L) + from + 1;
-	if (to < 0)
-		to = lua_gettop(L) + to + 1;
+
+static inline void copy_safe(lua_State *L, const char *list[], unsigned len, int from=-2, int to=-1)
+{
+	if (from < 0) from = lua_gettop(L) + from + 1;
+	if (to   < 0) to   = lua_gettop(L) + to   + 1;
 	for (unsigned i = 0; i < (len / sizeof(list[0])); i++) {
 		lua_getfield(L, from, list[i]);
-		lua_setfield(L, to, list[i]);
+		lua_setfield(L, to,   list[i]);
 	}
 }
 
-static void shallow_copy_table(lua_State *L, int from = -2, int to = -1) {
-	if (from < 0)
-		from = lua_gettop(L) + from + 1;
-	if (to < 0)
-		to = lua_gettop(L) + to + 1;
+static void shallow_copy_table(lua_State *L, int from=-2, int to=-1)
+{
+	if (from < 0) from = lua_gettop(L) + from + 1;
+	if (to   < 0) to   = lua_gettop(L) + to   + 1;
 	lua_pushnil(L);
 	while (lua_next(L, from) != 0) {
 		assert(lua_type(L, -1) != LUA_TTABLE);
@@ -64,15 +64,18 @@ static void shallow_copy_table(lua_State *L, int from = -2, int to = -1) {
 }
 
 // Pushes the original version of a library function on the stack, from the old version
-static inline void push_original(lua_State *L, const char *lib, const char *func) {
+static inline void push_original(lua_State *L, const char *lib, const char *func)
+{
 	lua_rawgeti(L, LUA_REGISTRYINDEX, CUSTOM_RIDX_GLOBALS_BACKUP);
 	lua_getfield(L, -1, lib);
-	lua_remove(L, -2); // Remove globals_backup
+	lua_remove(L, -2);  // Remove globals_backup
 	lua_getfield(L, -1, func);
-	lua_remove(L, -2); // Remove lib
+	lua_remove(L, -2);  // Remove lib
 }
 
-void ScriptApiSecurity::initializeSecurity() {
+
+void ScriptApiSecurity::initializeSecurity()
+{
 	static const char *whitelist[] = {
 		"assert",
 		"core",
@@ -106,7 +109,12 @@ void ScriptApiSecurity::initializeSecurity() {
 		"string",
 		"table",
 		"math",
-		"bit"
+		"bit",
+		// Not sure if completely safe. But if someone enables tracy, they'll
+		// know what they do.
+#if BUILD_WITH_TRACY
+		"tracy",
+#endif
 	};
 	static const char *io_whitelist[] = {
 		"close",
@@ -166,6 +174,7 @@ void ScriptApiSecurity::initializeSecurity() {
 	lua_rawgeti(L, LUA_REGISTRYINDEX, CUSTOM_RIDX_GLOBALS_BACKUP);
 	int old_globals = lua_gettop(L);
 
+
 	// Copy safe base functions
 	lua_getglobal(L, "_G");
 	copy_safe(L, whitelist, sizeof(whitelist));
@@ -178,6 +187,7 @@ void ScriptApiSecurity::initializeSecurity() {
 	SECURE_API(g, require);
 	lua_pop(L, 1);
 
+
 	// Copy safe libraries
 	for (const char *libname : whitelist_tables) {
 		lua_getfield(L, old_globals, libname);
@@ -187,6 +197,7 @@ void ScriptApiSecurity::initializeSecurity() {
 		lua_setglobal(L, libname);
 		lua_pop(L, 1);
 	}
+
 
 	// Copy safe IO functions
 	lua_getfield(L, old_globals, "io");
@@ -200,7 +211,8 @@ void ScriptApiSecurity::initializeSecurity() {
 	SECURE_API(io, lines);
 
 	lua_setglobal(L, "io");
-	lua_pop(L, 1); // Pop old IO
+	lua_pop(L, 1);  // Pop old IO
+
 
 	// Copy safe OS functions
 	lua_getfield(L, old_globals, "os");
@@ -213,21 +225,23 @@ void ScriptApiSecurity::initializeSecurity() {
 	SECURE_API(os, setlocale);
 
 	lua_setglobal(L, "os");
-	lua_pop(L, 1); // Pop old OS
+	lua_pop(L, 1);  // Pop old OS
+
 
 	// Copy safe debug functions
 	lua_getfield(L, old_globals, "debug");
 	lua_newtable(L);
 	copy_safe(L, debug_whitelist, sizeof(debug_whitelist));
 	lua_setglobal(L, "debug");
-	lua_pop(L, 1); // Pop old debug
+	lua_pop(L, 1);  // Pop old debug
+
 
 	// Copy safe package fields
 	lua_getfield(L, old_globals, "package");
 	lua_newtable(L);
 	copy_safe(L, package_whitelist, sizeof(package_whitelist));
 	lua_setglobal(L, "package");
-	lua_pop(L, 1); // Pop old package
+	lua_pop(L, 1);  // Pop old package
 
 #if USE_LUAJIT
 	// Copy safe jit functions, if they exist
@@ -237,7 +251,7 @@ void ScriptApiSecurity::initializeSecurity() {
 		copy_safe(L, jit_whitelist, sizeof(jit_whitelist));
 		lua_setglobal(L, "jit");
 	}
-	lua_pop(L, 1); // Pop old jit
+	lua_pop(L, 1);  // Pop old jit
 #endif
 
 	// Get rid of 'core' in the old globals, we don't want anyone thinking it's
@@ -246,6 +260,7 @@ void ScriptApiSecurity::initializeSecurity() {
 	lua_setfield(L, old_globals, "core");
 
 	lua_pop(L, 1); // Pop globals_backup
+
 
 	/*
 	 * In addition to copying the tables in whitelist_tables, we also need to
@@ -260,7 +275,8 @@ void ScriptApiSecurity::initializeSecurity() {
 	lua_pop(L, 1); // Pop empty string
 }
 
-void ScriptApiSecurity::initializeSecurityClient() {
+void ScriptApiSecurity::initializeSecurityClient()
+{
 	static const char *whitelist[] = {
 		"assert",
 		"core",
@@ -292,6 +308,11 @@ void ScriptApiSecurity::initializeSecurityClient() {
 		"table",
 		"math",
 		"bit",
+		// Not sure if completely safe. But if someone enables tracy, they'll
+		// know what they do.
+#if BUILD_WITH_TRACY
+		"tracy",
+#endif
 	};
 	static const char *os_whitelist[] = {
 		"clock",
@@ -339,19 +360,22 @@ void ScriptApiSecurity::initializeSecurityClient() {
 	SECURE_API(g, require);
 	lua_pop(L, 2);
 
+
+
 	// Copy safe OS functions
 	lua_getglobal(L, "os");
 	lua_newtable(L);
 	copy_safe(L, os_whitelist, sizeof(os_whitelist));
 	lua_setfield(L, -3, "os");
-	lua_pop(L, 1); // Pop old OS
+	lua_pop(L, 1);  // Pop old OS
+
 
 	// Copy safe debug functions
 	lua_getglobal(L, "debug");
 	lua_newtable(L);
 	copy_safe(L, debug_whitelist, sizeof(debug_whitelist));
 	lua_setfield(L, -3, "debug");
-	lua_pop(L, 1); // Pop old debug
+	lua_pop(L, 1);  // Pop old debug
 
 #if USE_LUAJIT
 	// Copy safe jit functions, if they exist
@@ -359,42 +383,46 @@ void ScriptApiSecurity::initializeSecurityClient() {
 	lua_newtable(L);
 	copy_safe(L, jit_whitelist, sizeof(jit_whitelist));
 	lua_setfield(L, -3, "jit");
-	lua_pop(L, 1); // Pop old jit
+	lua_pop(L, 1);  // Pop old jit
 #endif
 
 	// Set the environment to the one we created earlier
 	setLuaEnv(L, thread);
 }
 
-int ScriptApiSecurity::getThread(lua_State *L) {
+int ScriptApiSecurity::getThread(lua_State *L)
+{
 #if LUA_VERSION_NUM <= 501
-	int is_main = lua_pushthread(L); // Push the main thread
+	int is_main = lua_pushthread(L);  // Push the main thread
 	FATAL_ERROR_IF(!is_main, "Security: ScriptApi's Lua state "
-							 "isn't the main Lua thread!");
+		"isn't the main Lua thread!");
 	return lua_gettop(L);
 #endif
 	return 0;
 }
 
-void ScriptApiSecurity::createEmptyEnv(lua_State *L) {
-	lua_newtable(L); // Create new environment
+void ScriptApiSecurity::createEmptyEnv(lua_State *L)
+{
+	lua_newtable(L);  // Create new environment
 	lua_pushvalue(L, -1);
-	lua_setfield(L, -2, "_G"); // Create the _G loop
+	lua_setfield(L, -2, "_G");  // Create the _G loop
 }
 
-void ScriptApiSecurity::setLuaEnv(lua_State *L, int thread) {
-#if LUA_VERSION_NUM >= 502 // Lua >= 5.2
+void ScriptApiSecurity::setLuaEnv(lua_State *L, int thread)
+{
+#if LUA_VERSION_NUM >= 502  // Lua >= 5.2
 	// Set the global environment
 	lua_rawseti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
-#else // Lua <= 5.1
+#else  // Lua <= 5.1
 	// Set the environment of the main thread
 	FATAL_ERROR_IF(!lua_setfenv(L, thread), "Security: Unable to set "
-											"environment of the main Lua thread!");
-	lua_pop(L, 1); // Pop thread
+		"environment of the main Lua thread!");
+	lua_pop(L, 1);  // Pop thread
 #endif
 }
 
-bool ScriptApiSecurity::isSecure(lua_State *L) {
+bool ScriptApiSecurity::isSecure(lua_State *L)
+{
 #ifndef SERVER
 	auto script = ModApiBase::getScriptApiBase(L);
 	// CSM keeps no globals backup but is always secure
@@ -407,7 +435,8 @@ bool ScriptApiSecurity::isSecure(lua_State *L) {
 	return secure;
 }
 
-bool ScriptApiSecurity::safeLoadString(lua_State *L, const std::string &code, const char *chunk_name) {
+bool ScriptApiSecurity::safeLoadString(lua_State *L, const std::string &code, const char *chunk_name)
+{
 	if (code.size() > 0 && code[0] == LUA_SIGNATURE[0]) {
 		lua_pushliteral(L, "Bytecode prohibited when mod security is enabled.");
 		return false;
@@ -417,7 +446,8 @@ bool ScriptApiSecurity::safeLoadString(lua_State *L, const std::string &code, co
 	return true;
 }
 
-bool ScriptApiSecurity::safeLoadFile(lua_State *L, const char *path, const char *display_name) {
+bool ScriptApiSecurity::safeLoadFile(lua_State *L, const char *path, const char *display_name)
+{
 	FILE *fp;
 	char *chunk_name;
 	if (!display_name)
@@ -451,7 +481,7 @@ bool ScriptApiSecurity::safeLoadFile(lua_State *L, const char *path, const char 
 		lua_pushfstring(L, "%s: %s", path, strerror(errno));
 		if (path) {
 			std::fclose(fp);
-			delete[] chunk_name;
+			delete [] chunk_name;
 		}
 		return false;
 	}
@@ -463,7 +493,7 @@ bool ScriptApiSecurity::safeLoadFile(lua_State *L, const char *path, const char 
 		lua_pushfstring(L, "%s: %s", path, strerror(errno));
 		if (path) {
 			std::fclose(fp);
-			delete[] chunk_name;
+			delete [] chunk_name;
 		}
 		return false;
 	}
@@ -474,17 +504,19 @@ bool ScriptApiSecurity::safeLoadFile(lua_State *L, const char *path, const char 
 	if (num_read != size) {
 		lua_pushliteral(L, "Error reading file to load.");
 		if (path)
-			delete[] chunk_name;
+			delete [] chunk_name;
 		return false;
 	}
 
 	bool result = safeLoadString(L, code, chunk_name);
 	if (path)
-		delete[] chunk_name;
+		delete [] chunk_name;
 	return result;
 }
 
-bool checkModNameWhitelisted(const std::string &mod_name, const std::string &setting) {
+
+bool checkModNameWhitelisted(const std::string &mod_name, const std::string &setting)
+{
 	assert(str_starts_with(setting, "secure."));
 
 	if (mod_name.empty())
@@ -497,25 +529,28 @@ bool checkModNameWhitelisted(const std::string &mod_name, const std::string &set
 	return CONTAINS(mod_list, mod_name);
 }
 
-bool ScriptApiSecurity::checkWhitelisted(lua_State *L, const std::string &setting) {
+
+bool ScriptApiSecurity::checkWhitelisted(lua_State *L, const std::string &setting)
+{
 	std::string mod_name = ScriptApiBase::getCurrentModName(L);
 	return checkModNameWhitelisted(mod_name, setting);
 }
 
+
 bool ScriptApiSecurity::checkPath(lua_State *L, const char *path,
-		bool write_required, bool *write_allowed) {
+		bool write_required, bool *write_allowed)
+{
 	if (write_allowed)
 		*write_allowed = false;
 
-	std::string str; // Transient
+	std::string str;  // Transient
 
 	std::string abs_path = fs::AbsolutePath(path);
 
 	if (!abs_path.empty()) {
 		// Don't allow accessing the settings file
 		str = fs::AbsolutePath(g_settings_path);
-		if (str == abs_path)
-			return false;
+		if (str == abs_path) return false;
 	}
 
 	// If we couldn't find the absolute path (path doesn't exist) then
@@ -528,7 +563,7 @@ bool ScriptApiSecurity::checkPath(lua_State *L, const char *path,
 		cur_path = fs::RemoveLastPathComponent(cur_path, &component);
 		if (component == "..") {
 			// Parent components can't be allowed or we could allow something like
-			// /home/user/minetest/worlds/foo/noexist/../../../../../../etc/passwd.
+			// /home/user/aperosengine/worlds/foo/noexist/../../../../../../etc/passwd.
 			// If we have previous non-relative elements in the path we might be
 			// able to remove them so that things like worlds/foo/noexist/../auth.txt
 			// could be allowed, but those paths will be interpreted as nonexistent
@@ -556,8 +591,7 @@ bool ScriptApiSecurity::checkPath(lua_State *L, const char *path,
 	if (!mod_name.empty()) {
 		// Builtin can access anything
 		if (mod_name == BUILTIN_MOD_NAME) {
-			if (write_allowed)
-				*write_allowed = true;
+			if (write_allowed) *write_allowed = true;
 			return true;
 		}
 
@@ -593,8 +627,7 @@ bool ScriptApiSecurity::checkPath(lua_State *L, const char *path,
 							log_deprecated(L, message, 1);
 						}
 					}
-					if (write_allowed)
-						*write_allowed = !is_trusted && !is_dangerous_file;
+					if (write_allowed) *write_allowed = !is_trusted && !is_dangerous_file;
 					return true;
 				}
 			}
@@ -626,8 +659,7 @@ bool ScriptApiSecurity::checkPath(lua_State *L, const char *path,
 	// Allow read/write access to all mod common dirs
 	str = fs::AbsolutePath(gamedef->getModDataPath());
 	if (!str.empty() && fs::PathStartsWith(abs_path, str)) {
-		if (write_allowed)
-			*write_allowed = true;
+		if (write_allowed) *write_allowed = true;
 		return true;
 	}
 
@@ -645,8 +677,7 @@ bool ScriptApiSecurity::checkPath(lua_State *L, const char *path,
 		}
 		// Allow all other paths in world path
 		if (fs::PathStartsWith(abs_path, str)) {
-			if (write_allowed)
-				*write_allowed = true;
+			if (write_allowed) *write_allowed = true;
 			return true;
 		}
 	}
@@ -655,7 +686,9 @@ bool ScriptApiSecurity::checkPath(lua_State *L, const char *path,
 	return false;
 }
 
-int ScriptApiSecurity::sl_g_dofile(lua_State *L) {
+
+int ScriptApiSecurity::sl_g_dofile(lua_State *L)
+{
 	int nret = sl_g_loadfile(L);
 	if (nret != 1) {
 		lua_error(L);
@@ -668,7 +701,9 @@ int ScriptApiSecurity::sl_g_dofile(lua_State *L) {
 	return lua_gettop(L) - (top_precall - 1);
 }
 
-int ScriptApiSecurity::sl_g_load(lua_State *L) {
+
+int ScriptApiSecurity::sl_g_load(lua_State *L)
+{
 	size_t len;
 	const char *buf;
 	std::string code;
@@ -705,7 +740,9 @@ int ScriptApiSecurity::sl_g_load(lua_State *L) {
 	return 1;
 }
 
-int ScriptApiSecurity::sl_g_loadfile(lua_State *L) {
+
+int ScriptApiSecurity::sl_g_loadfile(lua_State *L)
+{
 #ifndef SERVER
 	ScriptApiBase *script = ModApiBase::getScriptApiBase(L);
 
@@ -746,7 +783,9 @@ int ScriptApiSecurity::sl_g_loadfile(lua_State *L) {
 	return 1;
 }
 
-int ScriptApiSecurity::sl_g_loadstring(lua_State *L) {
+
+int ScriptApiSecurity::sl_g_loadstring(lua_State *L)
+{
 	const char *chunk_name = "=(load)";
 
 	luaL_checktype(L, 1, LUA_TSTRING);
@@ -767,12 +806,16 @@ int ScriptApiSecurity::sl_g_loadstring(lua_State *L) {
 	return 1;
 }
 
-int ScriptApiSecurity::sl_g_require(lua_State *L) {
+
+int ScriptApiSecurity::sl_g_require(lua_State *L)
+{
 	lua_pushliteral(L, "require() is disabled when mod security is on.");
 	return lua_error(L);
 }
 
-int ScriptApiSecurity::sl_io_open(lua_State *L) {
+
+int ScriptApiSecurity::sl_io_open(lua_State *L)
+{
 	bool with_mode = lua_gettop(L) > 1;
 
 	luaL_checktype(L, 1, LUA_TSTRING);
@@ -783,8 +826,8 @@ int ScriptApiSecurity::sl_io_open(lua_State *L) {
 		luaL_checktype(L, 2, LUA_TSTRING);
 		const char *mode = lua_tostring(L, 2);
 		write_requested = strchr(mode, 'w') != NULL ||
-				strchr(mode, '+') != NULL ||
-				strchr(mode, 'a') != NULL;
+			strchr(mode, '+') != NULL ||
+			strchr(mode, 'a') != NULL;
 	}
 	CHECK_SECURE_PATH_INTERNAL(L, path, write_requested, NULL);
 
@@ -798,7 +841,9 @@ int ScriptApiSecurity::sl_io_open(lua_State *L) {
 	return 2;
 }
 
-int ScriptApiSecurity::sl_io_input(lua_State *L) {
+
+int ScriptApiSecurity::sl_io_input(lua_State *L)
+{
 	if (lua_isstring(L, 1)) {
 		const char *path = lua_tostring(L, 1);
 		CHECK_SECURE_PATH_INTERNAL(L, path, false, NULL);
@@ -810,7 +855,9 @@ int ScriptApiSecurity::sl_io_input(lua_State *L) {
 	return 1;
 }
 
-int ScriptApiSecurity::sl_io_output(lua_State *L) {
+
+int ScriptApiSecurity::sl_io_output(lua_State *L)
+{
 	if (lua_isstring(L, 1)) {
 		const char *path = lua_tostring(L, 1);
 		CHECK_SECURE_PATH_INTERNAL(L, path, true, NULL);
@@ -822,7 +869,9 @@ int ScriptApiSecurity::sl_io_output(lua_State *L) {
 	return 1;
 }
 
-int ScriptApiSecurity::sl_io_lines(lua_State *L) {
+
+int ScriptApiSecurity::sl_io_lines(lua_State *L)
+{
 	if (lua_isstring(L, 1)) {
 		const char *path = lua_tostring(L, 1);
 		CHECK_SECURE_PATH_INTERNAL(L, path, false, NULL);
@@ -837,7 +886,9 @@ int ScriptApiSecurity::sl_io_lines(lua_State *L) {
 	return lua_gettop(L) - top_precall;
 }
 
-int ScriptApiSecurity::sl_os_rename(lua_State *L) {
+
+int ScriptApiSecurity::sl_os_rename(lua_State *L)
+{
 	luaL_checktype(L, 1, LUA_TSTRING);
 	const char *path1 = lua_tostring(L, 1);
 	CHECK_SECURE_PATH_INTERNAL(L, path1, true, NULL);
@@ -853,7 +904,9 @@ int ScriptApiSecurity::sl_os_rename(lua_State *L) {
 	return 2;
 }
 
-int ScriptApiSecurity::sl_os_remove(lua_State *L) {
+
+int ScriptApiSecurity::sl_os_remove(lua_State *L)
+{
 	luaL_checktype(L, 1, LUA_TSTRING);
 	const char *path = lua_tostring(L, 1);
 	CHECK_SECURE_PATH_INTERNAL(L, path, true, NULL);
@@ -864,7 +917,9 @@ int ScriptApiSecurity::sl_os_remove(lua_State *L) {
 	return 2;
 }
 
-int ScriptApiSecurity::sl_os_setlocale(lua_State *L) {
+
+int ScriptApiSecurity::sl_os_setlocale(lua_State *L)
+{
 	const bool cat = lua_gettop(L) > 1;
 	// Don't allow changes
 	if (!lua_isnoneornil(L, 1)) {

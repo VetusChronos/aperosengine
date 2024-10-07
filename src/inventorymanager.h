@@ -29,8 +29,9 @@ struct ItemStack;
 class Inventory;
 class IGameDef;
 
-struct InventoryLocation {
-	enum Type {
+struct InventoryLocation
+{
+	enum Type{
 		UNDEFINED,
 		CURRENT_PLAYER,
 		PLAYER,
@@ -41,51 +42,60 @@ struct InventoryLocation {
 	std::string name; // PLAYER, DETACHED
 	v3s16 p; // NODEMETA
 
-	InventoryLocation() {
+	InventoryLocation()
+	{
 		setUndefined();
 	}
-	void setUndefined() {
+	void setUndefined()
+	{
 		type = UNDEFINED;
 	}
-	void setCurrentPlayer() {
+	void setCurrentPlayer()
+	{
 		type = CURRENT_PLAYER;
 	}
-	void setPlayer(const std::string &name_) {
+	void setPlayer(const std::string &name_)
+	{
 		type = PLAYER;
 		name = name_;
 	}
-	void setNodeMeta(const v3s16 &p_) {
+	void setNodeMeta(const v3s16 &p_)
+	{
 		type = NODEMETA;
 		p = p_;
 	}
-	void setDetached(const std::string &name_) {
+	void setDetached(const std::string &name_)
+	{
 		type = DETACHED;
 		name = name_;
 	}
 
-	bool operator==(const InventoryLocation &other) const {
-		if (type != other.type)
+	bool operator==(const InventoryLocation &other) const
+	{
+		if(type != other.type)
 			return false;
-		switch (type) {
-			case UNDEFINED:
-				return false;
-			case CURRENT_PLAYER:
-				return true;
-			case PLAYER:
-				return (name == other.name);
-			case NODEMETA:
-				return (p == other.p);
-			case DETACHED:
-				return (name == other.name);
+		switch(type){
+		case UNDEFINED:
+			return false;
+		case CURRENT_PLAYER:
+			return true;
+		case PLAYER:
+			return (name == other.name);
+		case NODEMETA:
+			return (p == other.p);
+		case DETACHED:
+			return (name == other.name);
 		}
 		return false;
 	}
-	bool operator!=(const InventoryLocation &other) const {
+	bool operator!=(const InventoryLocation &other) const
+	{
 		return !(*this == other);
 	}
 
-	void applyCurrentPlayer(const std::string &name_) {
-		if (type == CURRENT_PLAYER)
+	void applyCurrentPlayer(const std::string &name_)
+	{
+		if(type == CURRENT_PLAYER)
 			setPlayer(name_);
 	}
 
@@ -97,17 +107,18 @@ struct InventoryLocation {
 
 struct InventoryAction;
 
-class InventoryManager {
+class InventoryManager
+{
 public:
 	InventoryManager() = default;
 	virtual ~InventoryManager() = default;
 
 	// Get an inventory (server and client)
-	virtual Inventory *getInventory(const InventoryLocation &loc) { return NULL; }
+	virtual Inventory* getInventory(const InventoryLocation &loc){return NULL;}
 	// Set modified (will be saved and sent over network; only on server)
 	virtual void setInventoryModified(const InventoryLocation &loc) {}
 	// Send inventory action to server (only on client)
-	virtual void inventoryAction(InventoryAction *a) {}
+	virtual void inventoryAction(InventoryAction *a){}
 };
 
 enum class IAction : u16 {
@@ -116,7 +127,8 @@ enum class IAction : u16 {
 	Craft
 };
 
-struct InventoryAction {
+struct InventoryAction
+{
 	static InventoryAction *deSerialize(std::istream &is);
 
 	virtual IAction getType() const = 0;
@@ -124,11 +136,11 @@ struct InventoryAction {
 	virtual void apply(InventoryManager *mgr, ServerActiveObject *player,
 			IGameDef *gamedef) = 0;
 	virtual void clientApply(InventoryManager *mgr, IGameDef *gamedef) = 0;
-	virtual ~InventoryAction() = default;
-	;
+	virtual ~InventoryAction() = default;;
 };
 
-struct MoveAction {
+struct MoveAction
+{
 	InventoryLocation from_inv;
 	std::string from_list;
 	s16 from_i = -1;
@@ -137,7 +149,8 @@ struct MoveAction {
 	s16 to_i = -1;
 };
 
-struct IMoveAction : public InventoryAction, public MoveAction {
+struct IMoveAction : public InventoryAction, public MoveAction
+{
 	// count=0 means "everything"
 	u16 count = 0;
 	bool move_somewhere = false;
@@ -151,11 +164,13 @@ struct IMoveAction : public InventoryAction, public MoveAction {
 
 	IMoveAction(std::istream &is, bool somewhere);
 
-	IAction getType() const {
+	IAction getType() const
+	{
 		return IAction::Move;
 	}
 
-	void serialize(std::ostream &os) const {
+	void serialize(std::ostream &os) const
+	{
 		if (!move_somewhere)
 			os << "Move ";
 		else
@@ -188,7 +203,8 @@ struct IMoveAction : public InventoryAction, public MoveAction {
 	int allowMove(int try_take_count, ServerActiveObject *player) const;
 };
 
-struct IDropAction : public InventoryAction, public MoveAction {
+struct IDropAction : public InventoryAction, public MoveAction
+{
 	// count=0 means "everything"
 	u16 count = 0;
 
@@ -196,16 +212,18 @@ struct IDropAction : public InventoryAction, public MoveAction {
 
 	IDropAction(std::istream &is);
 
-	IAction getType() const {
+	IAction getType() const
+	{
 		return IAction::Drop;
 	}
 
-	void serialize(std::ostream &os) const {
-		os << "Drop ";
-		os << count << " ";
-		os << from_inv.dump() << " ";
-		os << from_list << " ";
-		os << from_i;
+	void serialize(std::ostream &os) const
+	{
+		os<<"Drop ";
+		os<<count<<" ";
+		os<<from_inv.dump()<<" ";
+		os<<from_list<<" ";
+		os<<from_i;
 	}
 
 	void apply(InventoryManager *mgr, ServerActiveObject *player, IGameDef *gamedef);
@@ -213,7 +231,8 @@ struct IDropAction : public InventoryAction, public MoveAction {
 	void clientApply(InventoryManager *mgr, IGameDef *gamedef);
 };
 
-struct ICraftAction : public InventoryAction {
+struct ICraftAction : public InventoryAction
+{
 	// count=0 means "everything"
 	u16 count = 0;
 	InventoryLocation craft_inv;
@@ -222,14 +241,16 @@ struct ICraftAction : public InventoryAction {
 
 	ICraftAction(std::istream &is);
 
-	IAction getType() const {
+	IAction getType() const
+	{
 		return IAction::Craft;
 	}
 
-	void serialize(std::ostream &os) const {
-		os << "Craft ";
-		os << count << " ";
-		os << craft_inv.dump() << " ";
+	void serialize(std::ostream &os) const
+	{
+		os<<"Craft ";
+		os<<count<<" ";
+		os<<craft_inv.dump()<<" ";
 	}
 
 	void apply(InventoryManager *mgr, ServerActiveObject *player, IGameDef *gamedef);

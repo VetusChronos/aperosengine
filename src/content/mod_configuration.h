@@ -21,6 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "mods.h"
 
+
 /**
  * ModConfiguration is a subset of installed mods. This class
  * is used to resolve dependencies and return a sorted list of mods.
@@ -28,14 +29,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
  * This class should not be extended from, but instead used as a
  * component in other classes.
  */
-class ModConfiguration {
+class ModConfiguration
+{
 public:
 	/**
 	 * @returns true if all dependencies are fulfilled.
 	 */
 	inline bool isConsistent() const { return m_unsatisfied_mods.empty(); }
 
-	inline const std::vector<ModSpec> &getUnsatisfiedMods() const {
+	inline const std::vector<ModSpec> &getUnsatisfiedMods() const
+	{
 		return m_unsatisfied_mods;
 	}
 
@@ -70,9 +73,9 @@ public:
 	void addGameMods(const SubgameSpec &gamespec);
 
 	/**
-	 * Adds mods specified by a world.mt config
+	 * Adds mods specified by a world.apr config
 	 *
-	 * @param settings_path Path to world.mt
+	 * @param settings_path Path to world.apr
 	 * @param modPaths Map from virtual name to mod path
 	 */
 	void addModsFromConfig(const std::string &settings_path,

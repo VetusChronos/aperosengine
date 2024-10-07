@@ -40,8 +40,9 @@ extern "C" {
 #include <lualib.h>
 }
 
-EmergeScripting::EmergeScripting(EmergeThread *parent) :
-		ScriptApiBase(ScriptingType::Emerge) {
+EmergeScripting::EmergeScripting(EmergeThread *parent):
+		ScriptApiBase(ScriptingType::Emerge)
+{
 	setGameDef(parent->m_server);
 	setEmergeThread(parent);
 
@@ -67,7 +68,8 @@ EmergeScripting::EmergeScripting(EmergeThread *parent) :
 	lua_setglobal(L, "INIT");
 }
 
-void EmergeScripting::InitializeModApi(lua_State *L, int top) {
+void EmergeScripting::InitializeModApi(lua_State *L, int top)
+{
 	// Register reference classes (userdata)
 	ItemStackMetaRef::Register(L);
 	LuaAreaStore::Register(L);

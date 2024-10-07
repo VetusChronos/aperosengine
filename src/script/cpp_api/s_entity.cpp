@@ -25,7 +25,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "common/c_content.h"
 #include "server.h"
 
-bool ScriptApiEntity::luaentity_Add(u16 id, const char *name) {
+bool ScriptApiEntity::luaentity_Add(u16 id, const char *name)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.registered_entities[name]
@@ -36,8 +37,8 @@ bool ScriptApiEntity::luaentity_Add(u16 id, const char *name) {
 	lua_gettable(L, -2);
 	// Should be a table, which we will use as a prototype
 	//luaL_checktype(L, -1, LUA_TTABLE);
-	if (lua_type(L, -1) != LUA_TTABLE) {
-		errorstream << "LuaEntity name \"" << name << "\" not defined" << '\n';
+	if (lua_type(L, -1) != LUA_TTABLE){
+		errorstream<<"LuaEntity name \""<<name<<"\" not defined"<<'\n';
 		return false;
 	}
 	int prototype_table = lua_gettop(L);
@@ -70,7 +71,8 @@ bool ScriptApiEntity::luaentity_Add(u16 id, const char *name) {
 }
 
 void ScriptApiEntity::luaentity_Activate(u16 id,
-		const std::string &staticdata, u32 dtime_s) {
+		const std::string &staticdata, u32 dtime_s)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -95,7 +97,8 @@ void ScriptApiEntity::luaentity_Activate(u16 id,
 	lua_pop(L, 2); // Pop object and error handler
 }
 
-void ScriptApiEntity::luaentity_Deactivate(u16 id, bool removal) {
+void ScriptApiEntity::luaentity_Deactivate(u16 id, bool removal)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -118,7 +121,8 @@ void ScriptApiEntity::luaentity_Deactivate(u16 id, bool removal) {
 	lua_pop(L, 2); // Pop object and error handler
 }
 
-void ScriptApiEntity::luaentity_Remove(u16 id) {
+void ScriptApiEntity::luaentity_Remove(u16 id)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.luaentities table
@@ -135,7 +139,8 @@ void ScriptApiEntity::luaentity_Remove(u16 id) {
 	lua_pop(L, 2); // pop luaentities, core
 }
 
-std::string ScriptApiEntity::luaentity_GetStaticdata(u16 id) {
+std::string ScriptApiEntity::luaentity_GetStaticdata(u16 id)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -165,7 +170,8 @@ std::string ScriptApiEntity::luaentity_GetStaticdata(u16 id) {
 	return std::string(s, len);
 }
 
-void ScriptApiEntity::logDeprecationForExistingProperties(lua_State *L, int index, const std::string &name) {
+void ScriptApiEntity::logDeprecationForExistingProperties(lua_State *L, int index, const std::string &name)
+{
 	if (deprecation_warned_init_properties.find(name) != deprecation_warned_init_properties.end())
 		return;
 
@@ -184,8 +190,8 @@ void ScriptApiEntity::logDeprecationForExistingProperties(lua_State *L, int inde
 			std::ostringstream os;
 
 			os << "Reading initial object properties directly from an entity definition is deprecated, "
-			   << "move it to the 'initial_properties' table instead. "
-			   << "(Property '" << key << "' in entity '" << name << "')" << '\n';
+				<< "move it to the 'initial_properties' table instead. "
+				<< "(Property '" << key << "' in entity '" << name << "')" << '\n';
 
 			log_deprecated(L, os.str(), -1);
 
@@ -196,7 +202,8 @@ void ScriptApiEntity::logDeprecationForExistingProperties(lua_State *L, int inde
 }
 
 void ScriptApiEntity::luaentity_GetProperties(u16 id,
-		ServerActiveObject *self, ObjectProperties *prop, const std::string &entity_name) {
+		ServerActiveObject *self, ObjectProperties *prop, const std::string &entity_name)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	// Get core.luaentities[id]
@@ -216,7 +223,8 @@ void ScriptApiEntity::luaentity_GetProperties(u16 id,
 }
 
 void ScriptApiEntity::luaentity_Step(u16 id, float dtime,
-		const collisionMoveResult *moveresult) {
+	const collisionMoveResult *moveresult)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -250,13 +258,14 @@ void ScriptApiEntity::luaentity_Step(u16 id, float dtime,
 //                       tool_capabilities, direction, damage)
 bool ScriptApiEntity::luaentity_Punch(u16 id,
 		ServerActiveObject *puncher, float time_from_last_punch,
-		const ToolCapabilities *toolcap, v3f dir, s32 damage) {
+		const ToolCapabilities *toolcap, v3f dir, s32 damage)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
 
 	// Get core.luaentities[id]
-	luaentity_get(L, id);
+	luaentity_get(L,id);
 	int object = lua_gettop(L);
 	// State: object is at top of stack
 	// Get function
@@ -266,9 +275,9 @@ bool ScriptApiEntity::luaentity_Punch(u16 id,
 		return false;
 	}
 	luaL_checktype(L, -1, LUA_TFUNCTION);
-	lua_pushvalue(L, object); // self
+	lua_pushvalue(L, object);  // self
 	if (puncher)
-		objectrefGetOrCreate(L, puncher); // Puncher reference
+		objectrefGetOrCreate(L, puncher);  // Puncher reference
 	else
 		lua_pushnil(L);
 	lua_pushnumber(L, time_from_last_punch);
@@ -286,7 +295,8 @@ bool ScriptApiEntity::luaentity_Punch(u16 id,
 
 // Calls entity[field](ObjectRef self, ObjectRef sao)
 bool ScriptApiEntity::luaentity_run_simple_callback(u16 id,
-		ServerActiveObject *sao, const char *field) {
+	ServerActiveObject *sao, const char *field)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -302,9 +312,9 @@ bool ScriptApiEntity::luaentity_run_simple_callback(u16 id,
 		return false;
 	}
 	luaL_checktype(L, -1, LUA_TFUNCTION);
-	lua_pushvalue(L, object); // self
+	lua_pushvalue(L, object);  // self
 	if (sao)
-		objectrefGetOrCreate(L, sao); // sao reference
+		objectrefGetOrCreate(L, sao);  // sao reference
 	else
 		lua_pushnil(L);
 
@@ -316,23 +326,28 @@ bool ScriptApiEntity::luaentity_run_simple_callback(u16 id,
 	return retval;
 }
 
-bool ScriptApiEntity::luaentity_on_death(u16 id, ServerActiveObject *killer) {
+bool ScriptApiEntity::luaentity_on_death(u16 id, ServerActiveObject *killer)
+{
 	return luaentity_run_simple_callback(id, killer, "on_death");
 }
 
 // Calls entity:on_rightclick(ObjectRef clicker)
-void ScriptApiEntity::luaentity_Rightclick(u16 id, ServerActiveObject *clicker) {
+void ScriptApiEntity::luaentity_Rightclick(u16 id, ServerActiveObject *clicker)
+{
 	luaentity_run_simple_callback(id, clicker, "on_rightclick");
 }
 
-void ScriptApiEntity::luaentity_on_attach_child(u16 id, ServerActiveObject *child) {
+void ScriptApiEntity::luaentity_on_attach_child(u16 id, ServerActiveObject *child)
+{
 	luaentity_run_simple_callback(id, child, "on_attach_child");
 }
 
-void ScriptApiEntity::luaentity_on_detach_child(u16 id, ServerActiveObject *child) {
+void ScriptApiEntity::luaentity_on_detach_child(u16 id, ServerActiveObject *child)
+{
 	luaentity_run_simple_callback(id, child, "on_detach_child");
 }
 
-void ScriptApiEntity::luaentity_on_detach(u16 id, ServerActiveObject *parent) {
+void ScriptApiEntity::luaentity_on_detach(u16 id, ServerActiveObject *parent)
+{
 	luaentity_run_simple_callback(id, parent, "on_detach");
 }

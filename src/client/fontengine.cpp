@@ -31,14 +31,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 FontEngine *g_fontengine = nullptr;
 
 /** callback to be used on change of font size setting */
-static void font_setting_changed(const std::string &name, void *userdata) {
+static void font_setting_changed(const std::string &name, void *userdata)
+{
 	if (g_fontengine)
 		g_fontengine->readSettings();
 }
 
 /******************************************************************************/
-FontEngine::FontEngine(gui::IGUIEnvironment *env) :
-		m_env(env) {
+FontEngine::FontEngine(gui::IGUIEnvironment* env) :
+	m_env(env)
+{
 	for (u32 &i : m_default_size) {
 		i = FONT_SIZE_UNSPECIFIED;
 	}
@@ -50,25 +52,14 @@ FontEngine::FontEngine(gui::IGUIEnvironment *env) :
 	readSettings();
 
 	const char *settings[] = {
-		"font_size",
-		"font_bold",
-		"font_italic",
-		"font_size_divisible_by",
-		"mono_font_size",
-		"mono_font_size_divisible_by",
-		"font_shadow",
-		"font_shadow_alpha",
-		"font_path",
-		"font_path_bold",
-		"font_path_italic",
-		"font_path_bold_italic",
-		"mono_font_path",
-		"mono_font_path_bold",
-		"mono_font_path_italic",
+		"font_size", "font_bold", "font_italic", "font_size_divisible_by",
+		"mono_font_size", "mono_font_size_divisible_by",
+		"font_shadow", "font_shadow_alpha",
+		"font_path", "font_path_bold", "font_path_italic", "font_path_bold_italic",
+		"mono_font_path", "mono_font_path_bold", "mono_font_path_italic",
 		"mono_font_path_bold_italic",
 		"fallback_font_path",
-		"dpi_change_notifier",
-		"gui_scaling",
+		"dpi_change_notifier", "gui_scaling",
 	};
 
 	for (auto name : settings)
@@ -76,15 +67,18 @@ FontEngine::FontEngine(gui::IGUIEnvironment *env) :
 }
 
 /******************************************************************************/
-FontEngine::~FontEngine() {
+FontEngine::~FontEngine()
+{
 	cleanCache();
 }
 
 /******************************************************************************/
-void FontEngine::cleanCache() {
+void FontEngine::cleanCache()
+{
 	RecursiveMutexAutoLock l(m_font_mutex);
 
 	for (auto &font_cache_it : m_font_cache) {
+
 		for (auto &font_it : font_cache_it) {
 			font_it.second->drop();
 			font_it.second = nullptr;
@@ -94,11 +88,13 @@ void FontEngine::cleanCache() {
 }
 
 /******************************************************************************/
-irr::gui::IGUIFont *FontEngine::getFont(FontSpec spec) {
+irr::gui::IGUIFont *FontEngine::getFont(FontSpec spec)
+{
 	return getFont(spec, false);
 }
 
-irr::gui::IGUIFont *FontEngine::getFont(FontSpec spec, bool may_fail) {
+irr::gui::IGUIFont *FontEngine::getFont(FontSpec spec, bool may_fail)
+{
 	if (spec.mode == FM_Unspecified) {
 		spec.mode = m_currentMode;
 	} else if (spec.mode == _FM_Fallback) {
@@ -123,9 +119,8 @@ irr::gui::IGUIFont *FontEngine::getFont(FontSpec spec, bool may_fail) {
 
 	if (!font && !may_fail) {
 		errorstream << "AperosEngine cannot continue without a valid font. "
-					   "Please correct the 'font_path' setting or install the font "
-					   "file in the proper location."
-					<< '\n';
+			"Please correct the 'font_path' setting or install the font "
+			"file in the proper location." << '\n';
 		abort();
 	}
 
@@ -135,32 +130,38 @@ irr::gui::IGUIFont *FontEngine::getFont(FontSpec spec, bool may_fail) {
 }
 
 /******************************************************************************/
-unsigned int FontEngine::getTextHeight(const FontSpec &spec) {
+unsigned int FontEngine::getTextHeight(const FontSpec &spec)
+{
 	gui::IGUIFont *font = getFont(spec);
 
 	return font->getDimension(L"Some unimportant example String").Height;
 }
 
 /******************************************************************************/
-unsigned int FontEngine::getTextWidth(const std::wstring &text, const FontSpec &spec) {
+unsigned int FontEngine::getTextWidth(const std::wstring &text, const FontSpec &spec)
+{
 	gui::IGUIFont *font = getFont(spec);
 
 	return font->getDimension(text.c_str()).Width;
 }
 
 /** get line height for a specific font (including empty room between lines) */
-unsigned int FontEngine::getLineHeight(const FontSpec &spec) {
+unsigned int FontEngine::getLineHeight(const FontSpec &spec)
+{
 	gui::IGUIFont *font = getFont(spec);
 
-	return font->getDimension(L"Some unimportant example String").Height + font->getKerningHeight();
+	return font->getDimension(L"Some unimportant example String").Height
+			+ font->getKerningHeight();
 }
 
 /******************************************************************************/
-unsigned int FontEngine::getDefaultFontSize() {
+unsigned int FontEngine::getDefaultFontSize()
+{
 	return m_default_size[m_currentMode];
 }
 
-unsigned int FontEngine::getFontSize(FontMode mode) {
+unsigned int FontEngine::getFontSize(FontMode mode)
+{
 	if (mode == FM_Unspecified)
 		return m_default_size[FM_Standard];
 
@@ -168,10 +169,11 @@ unsigned int FontEngine::getFontSize(FontMode mode) {
 }
 
 /******************************************************************************/
-void FontEngine::readSettings() {
-	m_default_size[FM_Standard] = rangelim(g_settings->getU16("font_size"), 5, 72);
+void FontEngine::readSettings()
+{
+	m_default_size[FM_Standard]  = rangelim(g_settings->getU16("font_size"), 5, 72);
 	m_default_size[_FM_Fallback] = m_default_size[FM_Standard];
-	m_default_size[FM_Mono] = rangelim(g_settings->getU16("mono_font_size"), 5, 72);
+	m_default_size[FM_Mono]      = rangelim(g_settings->getU16("mono_font_size"), 5, 72);
 
 	m_default_bold = g_settings->getBool("font_bold");
 	m_default_italic = g_settings->getBool("font_italic");
@@ -182,7 +184,8 @@ void FontEngine::readSettings() {
 }
 
 /******************************************************************************/
-void FontEngine::updateSkin() {
+void FontEngine::updateSkin()
+{
 	gui::IGUIFont *font = getFont();
 	assert(font);
 
@@ -190,14 +193,16 @@ void FontEngine::updateSkin() {
 }
 
 /******************************************************************************/
-void FontEngine::updateFontCache() {
+void FontEngine::updateFontCache()
+{
 	/* the only font to be initialized is default one,
 	 * all others are re-initialized on demand */
 	getFont(FONT_SIZE_UNSPECIFIED, FM_Unspecified);
 }
 
 /******************************************************************************/
-gui::IGUIFont *FontEngine::initFont(const FontSpec &spec) {
+gui::IGUIFont *FontEngine::initFont(const FontSpec &spec)
+{
 	assert(spec.mode != FM_Unspecified);
 	assert(spec.size != FONT_SIZE_UNSPECIFIED);
 
@@ -213,8 +218,7 @@ gui::IGUIFont *FontEngine::initFont(const FontSpec &spec) {
 
 	// Font size in pixels for FreeType
 	u32 size = rangelim(spec.size * RenderingEngine::getDisplayDensity() *
-					g_settings->getFloat("gui_scaling"),
-			1U, 500U);
+			g_settings->getFloat("gui_scaling"), 1U, 500U);
 
 	// Constrain the font size to a certain multiple, if necessary
 	u16 divisible_by = g_settings->getU16(setting_prefix + "font_size_divisible_by");
@@ -225,7 +229,7 @@ gui::IGUIFont *FontEngine::initFont(const FontSpec &spec) {
 
 	sanity_check(size != 0);
 
-	u16 font_shadow = 0;
+	u16 font_shadow       = 0;
 	u16 font_shadow_alpha = 0;
 	g_settings->getU16NoEx(setting_prefix + "font_shadow", font_shadow);
 	g_settings->getU16NoEx(setting_prefix + "font_shadow_alpha",
@@ -248,7 +252,8 @@ gui::IGUIFont *FontEngine::initFont(const FontSpec &spec) {
 				font_shadow_alpha);
 
 		if (!font) {
-			errorstream << "FontEngine: Cannot load '" << font_path << "'. Trying to fall back to another path." << '\n';
+			errorstream << "FontEngine: Cannot load '" << font_path <<
+				"'. Trying to fall back to another path." << '\n';
 			continue;
 		}
 

@@ -36,7 +36,8 @@ public:
 
 static TestAreaStore g_test_instance;
 
-void TestAreaStore::runTests(IGameDef *gamedef) {
+void TestAreaStore::runTests(IGameDef *gamedef)
+{
 	TEST(testVectorStore);
 #if USE_SPATIAL
 	TEST(testSpatialStore);
@@ -46,19 +47,22 @@ void TestAreaStore::runTests(IGameDef *gamedef) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TestAreaStore::testVectorStore() {
+void TestAreaStore::testVectorStore()
+{
 	VectorAreaStore store;
 	genericStoreTest(&store);
 }
 
-void TestAreaStore::testSpatialStore() {
+void TestAreaStore::testSpatialStore()
+{
 #if USE_SPATIAL
 	SpatialAreaStore store;
 	genericStoreTest(&store);
 #endif
 }
 
-void TestAreaStore::genericStoreTest(AreaStore *store) {
+void TestAreaStore::genericStoreTest(AreaStore *store)
+{
 	Area a(v3s16(-10, -3, 5), v3s16(0, 29, 7));
 	Area b(v3s16(-5, -2, 5), v3s16(0, 28, 6));
 	Area c(v3s16(-7, -3, 6), v3s16(-1, 27, 7));
@@ -119,7 +123,8 @@ void TestAreaStore::genericStoreTest(AreaStore *store) {
 	store->removeArea(d.id);
 }
 
-void TestAreaStore::testSerialization() {
+void TestAreaStore::testSerialization()
+{
 	VectorAreaStore store;
 
 	Area a(v3s16(-1, 0, 1), v3s16(0, 1, 2));
@@ -134,21 +139,21 @@ void TestAreaStore::testSerialization() {
 	store.serialize(os);
 	std::string str = os.str();
 
-	std::string str_wanted("\x00" // Version
-						   "\x00\x02" // Count
-						   "\xFF\xFF\x00\x00\x00\x01" // Area A min edge
-						   "\x00\x00\x00\x01\x00\x02" // Area A max edge
-						   "\x00\x07" // Area A data length
-						   "Area AA" // Area A data
-						   "\x00\x7B\x00\x64\x00\x0A" // Area B min edge (last two swapped with max edge for sorting)
-						   "\x7D\x00\x01\xC8\x03\x15" // Area B max edge (^)
-						   "\x00\x07" // Area B data length
-						   "Area BB" // Area B data
-						   "\x00\x00\x00\x00" // ID A = 0
-						   "\x00\x00\x00\x01", // ID B = 1
+	std::string str_wanted("\x00"  // Version
+			"\x00\x02"  // Count
+			"\xFF\xFF\x00\x00\x00\x01"  // Area A min edge
+			"\x00\x00\x00\x01\x00\x02"  // Area A max edge
+			"\x00\x07"  // Area A data length
+			"Area AA"   // Area A data
+			"\x00\x7B\x00\x64\x00\x0A"  // Area B min edge (last two swapped with max edge for sorting)
+			"\x7D\x00\x01\xC8\x03\x15"  // Area B max edge (^)
+			"\x00\x07"  // Area B data length
+			"Area BB"   // Area B data
+			"\x00\x00\x00\x00"  // ID A = 0
+			"\x00\x00\x00\x01", // ID B = 1
 			1 + 2 +
-					(6 + 6 + 2 + 7) * 2 + // min/max edge, length, data
-					2 * 4); // Area IDs
+			(6 + 6 + 2 + 7) * 2 + // min/max edge, length, data
+			2 * 4); // Area IDs
 
 	UASSERTEQ(const std::string &, str, str_wanted);
 
@@ -165,3 +170,4 @@ void TestAreaStore::testSerialization() {
 
 	UASSERTEQ(u32, c.id, 2);
 }
+

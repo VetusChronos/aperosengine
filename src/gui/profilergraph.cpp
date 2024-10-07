@@ -20,9 +20,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "porting.h"
 #include "profilergraph.h"
+#include "IVideoDriver.h"
 #include "util/string.h"
 
-void ProfilerGraph::put(const Profiler::GraphValues &values) {
+void ProfilerGraph::put(const Profiler::GraphValues &values)
+{
 	m_log.emplace_back(values);
 
 	while (m_log.size() > m_log_max_size)
@@ -30,7 +32,8 @@ void ProfilerGraph::put(const Profiler::GraphValues &values) {
 }
 
 void ProfilerGraph::draw(s32 x_left, s32 y_bottom, video::IVideoDriver *driver,
-		gui::IGUIFont *font) const {
+		gui::IGUIFont *font) const
+{
 	// Do *not* use UNORDERED_MAP here as the order needs
 	// to be the same for each call to prevent flickering
 	std::map<std::string, Meta> m_meta;
@@ -55,11 +58,11 @@ void ProfilerGraph::draw(s32 x_left, s32 y_bottom, video::IVideoDriver *driver,
 	}
 
 	// Assign colors
-	static const video::SColor usable_colors[] = { video::SColor(255, 255, 100, 100),
-		video::SColor(255, 90, 225, 90),
-		video::SColor(255, 100, 100, 255),
-		video::SColor(255, 255, 150, 50),
-		video::SColor(255, 220, 220, 100) };
+	static const video::SColor usable_colors[] = {video::SColor(255, 255, 100, 100),
+			video::SColor(255, 90, 225, 90),
+			video::SColor(255, 100, 100, 255),
+			video::SColor(255, 255, 150, 50),
+			video::SColor(255, 220, 220, 100)};
 	static const u32 usable_colors_count =
 			sizeof(usable_colors) / sizeof(*usable_colors);
 	u32 next_color_i = 0;

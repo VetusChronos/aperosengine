@@ -27,23 +27,26 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "secondstage.h"
 #include "client/shadows/dynamicshadowsrender.h"
 
-struct CreatePipelineResult {
+struct CreatePipelineResult
+{
 	v2f virtual_size_scale;
-	ShadowRenderer *shadow_renderer{ nullptr };
-	RenderPipeline *pipeline{ nullptr };
+	ShadowRenderer *shadow_renderer { nullptr };
+	RenderPipeline *pipeline { nullptr };
 };
 
 void createPipeline(const std::string &stereo_mode, IrrlichtDevice *device, Client *client, Hud *hud, CreatePipelineResult &result);
 
 RenderingCore *createRenderingCore(const std::string &stereo_mode, IrrlichtDevice *device,
-		Client *client, Hud *hud) {
+		Client *client, Hud *hud)
+{
 	CreatePipelineResult created_pipeline;
 	createPipeline(stereo_mode, device, client, hud, created_pipeline);
 	return new RenderingCore(device, client, hud,
 			created_pipeline.shadow_renderer, created_pipeline.pipeline, created_pipeline.virtual_size_scale);
 }
 
-void createPipeline(const std::string &stereo_mode, IrrlichtDevice *device, Client *client, Hud *hud, CreatePipelineResult &result) {
+void createPipeline(const std::string &stereo_mode, IrrlichtDevice *device, Client *client, Hud *hud, CreatePipelineResult &result)
+{
 	result.shadow_renderer = createShadowRenderer(device, client);
 	result.virtual_size_scale = v2f(1.0f);
 	result.pipeline = new RenderPipeline();

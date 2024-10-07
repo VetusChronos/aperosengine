@@ -27,24 +27,25 @@ namespace sound {
  * The public ISoundManager interface
  */
 
-class ProxySoundManager final : public ISoundManager {
+class ProxySoundManager final : public ISoundManager
+{
 	OpenALSoundManager m_sound_manager;
 	// sound names from loadSoundData and loadSoundFile
 	std::unordered_set<std::string> m_known_sound_names;
 
-	void send(SoundManagerMsgToMgr msg) {
+	void send(SoundManagerMsgToMgr msg)
+	{
 		m_sound_manager.m_queue_to_mgr.push_back(std::move(msg));
 	}
 
-	enum class MsgResult { Ok,
-		Empty,
-		Stopped };
+	enum class MsgResult { Ok, Empty, Stopped};
 	MsgResult handleMsg(SoundManagerMsgToProxy &&msg);
 
 public:
 	ProxySoundManager(SoundManagerSingleton *smg,
 			std::unique_ptr<SoundFallbackPathProvider> fallback_path_provider) :
-			m_sound_manager(smg, std::move(fallback_path_provider)) {
+		m_sound_manager(smg, std::move(fallback_path_provider))
+	{
 		m_sound_manager.start();
 	}
 

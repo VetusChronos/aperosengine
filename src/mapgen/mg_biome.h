@@ -73,6 +73,7 @@ public:
 	virtual void resolveNodeNames();
 };
 
+
 ////
 //// BiomeGen
 ////
@@ -100,7 +101,8 @@ public:
 	virtual BiomeGen *clone(BiomeManager *biomemgr) const = 0;
 
 	// Check that the internal chunk size is what the mapgen expects, just to be sure.
-	inline void assertChunkSize(v3s16 expect) const {
+	inline void assertChunkSize(v3s16 expect) const
+	{
 		FATAL_ERROR_IF(m_csize != expect, "Chunk size mismatches");
 	}
 
@@ -126,17 +128,21 @@ public:
 	// Same as above, but uses a raw numeric index correlating to the (x,z) position.
 	virtual Biome *getBiomeAtIndex(size_t index, v3s16 pos) const = 0;
 
-	virtual s16 *getBiomeTransitions() const = 0;
+	// Returns the next lower y position at which the biome could change.
+	// You can use this to optimize calls to getBiomeAtIndex().
+	virtual s16 getNextTransitionY(s16 y) const {
+		return y == S16_MIN ? y : (y - 1);
+	};
 
 	// Result of calcBiomes bulk computation.
 	biome_t *biomemap = nullptr;
-	s16 *biome_transitions = nullptr;
 
 protected:
 	BiomeManager *m_bmgr = nullptr;
 	v3s16 m_pmin;
 	v3s16 m_csize;
 };
+
 
 ////
 //// BiomeGen implementations
@@ -148,10 +154,11 @@ protected:
 
 struct BiomeParamsOriginal : public BiomeParams {
 	BiomeParamsOriginal() :
-			np_heat(50, 50, v3f(1000.0, 1000.0, 1000.0), 5349, 3, 0.5, 2.0),
-			np_humidity(50, 50, v3f(1000.0, 1000.0, 1000.0), 842, 3, 0.5, 2.0),
-			np_heat_blend(0, 1.5, v3f(8.0, 8.0, 8.0), 13, 2, 1.0, 2.0),
-			np_humidity_blend(0, 1.5, v3f(8.0, 8.0, 8.0), 90003, 2, 1.0, 2.0) {
+		np_heat(50, 50, v3f(1000.0, 1000.0, 1000.0), 5349, 3, 0.5, 2.0),
+		np_humidity(50, 50, v3f(1000.0, 1000.0, 1000.0), 842, 3, 0.5, 2.0),
+		np_heat_blend(0, 1.5, v3f(8.0, 8.0, 8.0), 13, 2, 1.0, 2.0),
+		np_humidity_blend(0, 1.5, v3f(8.0, 8.0, 8.0), 90003, 2, 1.0, 2.0)
+	{
 	}
 
 	virtual void readParams(const Settings *settings);
@@ -163,10 +170,10 @@ struct BiomeParamsOriginal : public BiomeParams {
 	NoiseParams np_humidity_blend;
 };
 
-class BiomeGenOriginal : public BiomeGen {
+class BiomeGenOriginal final : public BiomeGen {
 public:
 	BiomeGenOriginal(BiomeManager *biomemgr,
-			const BiomeParamsOriginal *params, v3s16 chunksize);
+		const BiomeParamsOriginal *params, v3s16 chunksize);
 	virtual ~BiomeGenOriginal();
 
 	BiomeGenType getType() const { return BIOMEGEN_ORIGINAL; }
@@ -185,7 +192,7 @@ public:
 	Biome *getBiomeAtIndex(size_t index, v3s16 pos) const;
 
 	Biome *calcBiomeFromNoise(float heat, float humidity, v3s16 pos) const;
-	s16 *getBiomeTransitions() const;
+	s16 getNextTransitionY(s16 y) const;
 
 	float *heatmap;
 	float *humidmap;
@@ -197,7 +204,11 @@ private:
 	Noise *noise_humidity;
 	Noise *noise_heat_blend;
 	Noise *noise_humidity_blend;
+
+	// ordered descending
+	std::vector<s16> m_transitions_y;
 };
+
 
 ////
 //// BiomeManager
@@ -210,37 +221,42 @@ public:
 
 	BiomeManager *clone() const;
 
-	const char *getObjectTitle() const {
+	const char *getObjectTitle() const
+	{
 		return "biome";
 	}
 
-	static Biome *create(BiomeType type) {
+	static Biome *create(BiomeType type)
+	{
 		return new Biome;
 	}
 
-	BiomeGen *createBiomeGen(BiomeGenType type, BiomeParams *params, v3s16 chunksize) {
+	BiomeGen *createBiomeGen(BiomeGenType type, BiomeParams *params, v3s16 chunksize)
+	{
 		switch (type) {
-			case BIOMEGEN_ORIGINAL:
-				return new BiomeGenOriginal(this,
-						(BiomeParamsOriginal *)params, chunksize);
-			default:
-				return NULL;
+		case BIOMEGEN_ORIGINAL:
+			return new BiomeGenOriginal(this,
+				(BiomeParamsOriginal *)params, chunksize);
+		default:
+			return NULL;
 		}
 	}
 
-	static BiomeParams *createBiomeParams(BiomeGenType type) {
+	static BiomeParams *createBiomeParams(BiomeGenType type)
+	{
 		switch (type) {
-			case BIOMEGEN_ORIGINAL:
-				return new BiomeParamsOriginal;
-			default:
-				return NULL;
+		case BIOMEGEN_ORIGINAL:
+			return new BiomeParamsOriginal;
+		default:
+			return NULL;
 		}
 	}
 
 	virtual void clear();
 
 private:
-	BiomeManager(){};
+	BiomeManager() {};
 
 	Server *m_server;
+
 };

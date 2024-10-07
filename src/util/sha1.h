@@ -32,7 +32,8 @@ SOFTWARE.
 
 typedef uint32_t Uint32;
 
-class SHA1 {
+class SHA1
+{
 private:
 	// fields
 	Uint32 H0 = 0x67452301;
@@ -55,7 +56,7 @@ public:
 	void getDigest(unsigned char *to);
 	inline std::string getDigest() {
 		std::string ret(20, '\000');
-		getDigest(reinterpret_cast<unsigned char *>(ret.data()));
+		getDigest(reinterpret_cast<unsigned char*>(ret.data()));
 		return ret;
 	}
 

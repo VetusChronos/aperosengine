@@ -24,14 +24,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 namespace irr::core {
 
-template <class T>
-std::ostream &operator<<(std::ostream &os, vector2d<T> vec) {
-	return os << "(" << vec.X << "," << vec.Y << ")";
-}
+	template <class T>
+	std::ostream &operator<< (std::ostream &os, vector2d<T> vec)
+	{
+		return os << "(" << vec.X << "," << vec.Y << ")";
+	}
 
-template <class T>
-std::ostream &operator<<(std::ostream &os, vector3d<T> vec) {
-	return os << "(" << vec.X << "," << vec.Y << "," << vec.Z << ")";
-}
+	template <class T>
+	std::ostream &operator<< (std::ostream &os, vector3d<T> vec)
+	{
+		return os << "(" << vec.X << "," << vec.Y << "," << vec.Z << ")";
+	}
 
-} //namespace irr::core
+}

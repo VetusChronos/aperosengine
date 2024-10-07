@@ -7,6 +7,14 @@ Introduction
 The main menu is defined as a formspec by Lua in `builtin/mainmenu/`
 Description of formspec language to show your menu is in `lua_api.md`
 
+Images and 3D models
+--------------------
+
+Directory delimiters change according to the OS (e.g. on Unix-like systems
+is `/`, on Windows is `\`). When putting an image or a 3D model inside a formspec,
+be sure to sanitize it first with `core.formspec_escape(img)`; otherwise,
+any resource located in a subpath won't be displayed on OSs using `\` as delimiter.
+
 
 Callbacks
 ---------
@@ -61,6 +69,12 @@ Functions
 
 Filesystem
 ----------
+
+To access specific subpaths, use `DIR_DELIM` as a directory delimiter instead
+of manually putting one, as different OSs use different delimiters. E.g.
+```lua
+"my" .. DIR_DELIM .. "custom" .. DIR_DELIM .. "path" -- and not my/custom/path
+```
 
 * `core.get_builtin_path()`
   * returns path to builtin root
@@ -282,7 +296,7 @@ Package - content which is downloadable from the content db, may or may not be i
       ```lua
       {
           mods = "/home/user/.aperosengine/mods",
-          share = "/usr/share/aperosengine/mods",
+          share = "/usr/share/aperosengine/mods", -- only provided when RUN_IN_PLACE=0
 
           -- Custom dirs can be specified by the APEROSENGINE_MOD_DIR env variable
           ["/path/to/custom/dir"] = "/path/to/custom/dir",
@@ -366,7 +380,7 @@ Settings
 * `core.settings:save()` -> nil, save all settings to config file
 
 For a complete list of methods of the `Settings` object see
-[lua_api.md](https://github.com/yunasatoy/aperosengine/blob/main/docs/locales/en/modding/lua_api.md)
+[lua_api.md](https://github.com/vetuschronos/aperosengine/blob/main/docs/locales/en/modding/lua_api.md)
 
 
 Worlds

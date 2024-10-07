@@ -21,7 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "client/gameui.h"
 
-class TestGameUI : public TestBase {
+class TestGameUI : public TestBase
+{
 public:
 	TestGameUI() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestGameUI"; }
@@ -35,13 +36,15 @@ public:
 
 static TestGameUI g_test_instance;
 
-void TestGameUI::runTests(IGameDef *gamedef) {
+void TestGameUI::runTests(IGameDef *gamedef)
+{
 	TEST(testInit);
 	TEST(testInfoText);
 	TEST(testStatusText);
 }
 
-void TestGameUI::testInit() {
+void TestGameUI::testInit()
+{
 	GameUI gui{};
 	// Ensure flags on GameUI init
 	UASSERT(gui.getFlags().show_chat)
@@ -58,7 +61,8 @@ void TestGameUI::testInit() {
 	// gui.init();
 }
 
-void TestGameUI::testStatusText() {
+void TestGameUI::testStatusText()
+{
 	GameUI gui{};
 	gui.showStatusText(L"test status");
 
@@ -66,7 +70,8 @@ void TestGameUI::testStatusText() {
 	UASSERT(gui.m_statustext == L"test status");
 }
 
-void TestGameUI::testInfoText() {
+void TestGameUI::testInfoText()
+{
 	GameUI gui{};
 	gui.setInfoText(L"test info");
 

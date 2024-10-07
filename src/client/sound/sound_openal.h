@@ -22,9 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/sound.h"
 #include <memory>
 
-namespace sound {
-class SoundManagerSingleton;
-}
+namespace sound { class SoundManagerSingleton; }
 using sound::SoundManagerSingleton;
 
 extern std::shared_ptr<SoundManagerSingleton> g_sound_manager_singleton;

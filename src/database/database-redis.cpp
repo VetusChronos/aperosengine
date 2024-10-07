@@ -33,21 +33,22 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <cassert>
 
 /*
- * Redis is not a good fit for Minetest and only still supported for legacy as
+ * Redis is not a good fit for AperosEngine and only still supported for legacy as
  * well as advanced use case reasons, see:
  * <https://github.com/minetest/minetest/issues/14822>
  *
  * Do NOT extend this backend with any new functionality.
  */
 
-Database_Redis::Database_Redis(Settings &conf) {
+Database_Redis::Database_Redis(Settings &conf)
+{
 	std::string tmp;
 	try {
 		tmp = conf.get("redis_address");
 		hash = conf.get("redis_hash");
 	} catch (SettingNotFoundException &) {
 		throw SettingNotFoundException("Set redis_address and "
-									   "redis_hash in world.mt to use the redis backend");
+			"redis_hash in world.apr to use the redis backend");
 	}
 	const char *addr = tmp.c_str();
 	int port = conf.exists("redis_port") ? conf.getU16("redis_port") : 6379;
@@ -74,50 +75,50 @@ Database_Redis::Database_Redis(Settings &conf) {
 	}
 
 	dstream << "Note: When storing data in Redis you need to ensure that eviction"
-			   " is disabled, or you risk DATA LOSS."
-			<< '\n';
+		" is disabled, or you risk DATA LOSS." << '\n';
 }
 
-Database_Redis::~Database_Redis() {
+Database_Redis::~Database_Redis()
+{
 	redisFree(ctx);
 }
 
-void Database_Redis::beginSave() {
+void Database_Redis::beginSave()
+{
 	redisReply *reply = static_cast<redisReply *>(redisCommand(ctx, "MULTI"));
 	if (!reply) {
 		throw DatabaseException(std::string(
-										"Redis command 'MULTI' failed: ") +
-				ctx->errstr);
+			"Redis command 'MULTI' failed: ") + ctx->errstr);
 	}
 	freeReplyObject(reply);
 }
 
-void Database_Redis::endSave() {
+void Database_Redis::endSave()
+{
 	redisReply *reply = static_cast<redisReply *>(redisCommand(ctx, "EXEC"));
 	if (!reply) {
 		throw DatabaseException(std::string(
-										"Redis command 'EXEC' failed: ") +
-				ctx->errstr);
+			"Redis command 'EXEC' failed: ") + ctx->errstr);
 	}
 	freeReplyObject(reply);
 }
 
-bool Database_Redis::saveBlock(const v3s16 &pos, std::string_view data) {
+bool Database_Redis::saveBlock(const v3s16 &pos, std::string_view data)
+{
 	std::string tmp = i64tos(getBlockAsInteger(pos));
 
 	redisReply *reply = static_cast<redisReply *>(redisCommand(ctx, "HSET %s %s %b",
 			hash.c_str(), tmp.c_str(), data.data(), data.size()));
 	if (!reply) {
 		warningstream << "saveBlock: redis command 'HSET' failed on "
-						 "block "
-					  << pos << ": " << ctx->errstr << '\n';
+			"block " << pos << ": " << ctx->errstr << '\n';
 		freeReplyObject(reply);
 		return false;
 	}
 
 	if (reply->type == REDIS_REPLY_ERROR) {
 		warningstream << "saveBlock: saving block " << pos
-					  << " failed: " << std::string(reply->str, reply->len) << '\n';
+			<< " failed: " << std::string(reply->str, reply->len) << '\n';
 		freeReplyObject(reply);
 		return false;
 	}
@@ -126,59 +127,58 @@ bool Database_Redis::saveBlock(const v3s16 &pos, std::string_view data) {
 	return true;
 }
 
-void Database_Redis::loadBlock(const v3s16 &pos, std::string *block) {
+void Database_Redis::loadBlock(const v3s16 &pos, std::string *block)
+{
 	std::string tmp = i64tos(getBlockAsInteger(pos));
 	redisReply *reply = static_cast<redisReply *>(redisCommand(ctx,
 			"HGET %s %s", hash.c_str(), tmp.c_str()));
 
 	if (!reply) {
 		throw DatabaseException(std::string(
-										"Redis command 'HGET %s %s' failed: ") +
-				ctx->errstr);
+			"Redis command 'HGET %s %s' failed: ") + ctx->errstr);
 	}
 
 	switch (reply->type) {
-		case REDIS_REPLY_STRING: {
-			block->assign(reply->str, reply->len);
-			freeReplyObject(reply);
-			return;
-		}
-		case REDIS_REPLY_ERROR: {
-			std::string errstr(reply->str, reply->len);
-			freeReplyObject(reply);
-			errorstream << "loadBlock: loading block " << pos
-						<< " failed: " << errstr << '\n';
-			throw DatabaseException(std::string(
-											"Redis command 'HGET %s %s' errored: ") +
-					errstr);
-		}
-		case REDIS_REPLY_NIL: {
-			block->clear();
-			freeReplyObject(reply);
-			return;
-		}
+	case REDIS_REPLY_STRING: {
+		block->assign(reply->str, reply->len);
+		freeReplyObject(reply);
+		return;
+	}
+	case REDIS_REPLY_ERROR: {
+		std::string errstr(reply->str, reply->len);
+		freeReplyObject(reply);
+		errorstream << "loadBlock: loading block " << pos
+			<< " failed: " << errstr << '\n';
+		throw DatabaseException(std::string(
+			"Redis command 'HGET %s %s' errored: ") + errstr);
+	}
+	case REDIS_REPLY_NIL: {
+		block->clear();
+		freeReplyObject(reply);
+		return;
+	}
 	}
 
 	errorstream << "loadBlock: loading block " << pos
-				<< " returned invalid reply type " << reply->type
-				<< ": " << std::string(reply->str, reply->len) << '\n';
+		<< " returned invalid reply type " << reply->type
+		<< ": " << std::string(reply->str, reply->len) << '\n';
 	freeReplyObject(reply);
 	throw DatabaseException(std::string(
-			"Redis command 'HGET %s %s' gave invalid reply."));
+		"Redis command 'HGET %s %s' gave invalid reply."));
 }
 
-bool Database_Redis::deleteBlock(const v3s16 &pos) {
+bool Database_Redis::deleteBlock(const v3s16 &pos)
+{
 	std::string tmp = i64tos(getBlockAsInteger(pos));
 
 	redisReply *reply = static_cast<redisReply *>(redisCommand(ctx,
-			"HDEL %s %s", hash.c_str(), tmp.c_str()));
+		"HDEL %s %s", hash.c_str(), tmp.c_str()));
 	if (!reply) {
 		throw DatabaseException(std::string(
-										"Redis command 'HDEL %s %s' failed: ") +
-				ctx->errstr);
+			"Redis command 'HDEL %s %s' failed: ") + ctx->errstr);
 	} else if (reply->type == REDIS_REPLY_ERROR) {
 		warningstream << "deleteBlock: deleting block " << pos
-					  << " failed: " << std::string(reply->str, reply->len) << '\n';
+			<< " failed: " << std::string(reply->str, reply->len) << '\n';
 		freeReplyObject(reply);
 		return false;
 	}
@@ -187,27 +187,28 @@ bool Database_Redis::deleteBlock(const v3s16 &pos) {
 	return true;
 }
 
-void Database_Redis::listAllLoadableBlocks(std::vector<v3s16> &dst) {
+void Database_Redis::listAllLoadableBlocks(std::vector<v3s16> &dst)
+{
 	redisReply *reply = static_cast<redisReply *>(redisCommand(ctx, "HKEYS %s", hash.c_str()));
 	if (!reply) {
 		throw DatabaseException(std::string(
-										"Redis command 'HKEYS %s' failed: ") +
-				ctx->errstr);
+			"Redis command 'HKEYS %s' failed: ") + ctx->errstr);
 	}
 	switch (reply->type) {
-		case REDIS_REPLY_ARRAY:
-			dst.reserve(reply->elements);
-			for (size_t i = 0; i < reply->elements; i++) {
-				assert(reply->element[i]->type == REDIS_REPLY_STRING);
-				dst.push_back(getIntegerAsBlock(stoi64(reply->element[i]->str)));
-			}
-			break;
-		case REDIS_REPLY_ERROR:
-			throw DatabaseException(std::string(
-											"Failed to get keys from database: ") +
-					std::string(reply->str, reply->len));
+	case REDIS_REPLY_ARRAY:
+		dst.reserve(reply->elements);
+		for (size_t i = 0; i < reply->elements; i++) {
+			assert(reply->element[i]->type == REDIS_REPLY_STRING);
+			dst.push_back(getIntegerAsBlock(stoi64(reply->element[i]->str)));
+		}
+		break;
+	case REDIS_REPLY_ERROR:
+		throw DatabaseException(std::string(
+			"Failed to get keys from database: ") +
+			std::string(reply->str, reply->len));
 	}
 	freeReplyObject(reply);
 }
 
 #endif // USE_REDIS
+

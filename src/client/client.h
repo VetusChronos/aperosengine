@@ -20,23 +20,22 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include "clientenvironment.h"
-#include "irrlichttypes_extrabloated.h"
+#include "irrlichttypes.h"
 #include <ostream>
 #include <map>
 #include <memory>
 #include <set>
 #include <vector>
 #include <unordered_set>
-#include "clientobject.h"
 #include "gamedef.h"
 #include "inventorymanager.h"
-#include "client/hud.h"
-#include "tileanimation.h"
 #include "network/address.h"
+#include "network/networkprotocol.h" // multiple enums
 #include "network/peerhandler.h"
 #include "gameparams.h"
-#include "clientdynamicinfo.h"
+#include "script/common/c_types.h" // LuaError
 #include "util/numeric.h"
+#include "util/string.h" // StringMap
 
 #ifdef SERVER
 #error Do not include in server builds
@@ -44,34 +43,35 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #define CLIENT_CHAT_MESSAGE_LIMIT_PER_10S 10.0f
 
-struct ClientEvent;
-struct MeshMakeData;
-struct ChatMessage;
-class MapBlockMesh;
-class RenderingEngine;
-class IWritableTextureSource;
-class IWritableShaderSource;
-class IWritableItemDefManager;
-class ISoundManager;
-class NodeDefManager;
-//class IWritableCraftDefManager;
+class Camera;
 class ClientMediaDownloader;
-class SingleMediaDownloader;
-struct MapDrawControl;
+class ISoundManager;
+class IWritableItemDefManager;
+class IWritableShaderSource;
+class IWritableTextureSource;
+class MapBlockMesh;
+class MapDatabase;
+class MeshUpdateManager;
+class Minimap;
 class ModChannelMgr;
 class MtEventManager;
-struct PointedThing;
-struct MapNode;
-class MapDatabase;
-class Minimap;
-struct MinimapMapblock;
-class MeshUpdateManager;
-class ParticleManager;
-class Camera;
-struct PlayerControl;
 class NetworkPacket;
+class NodeDefManager;
+class ParticleManager;
+class RenderingEngine;
+class SingleMediaDownloader;
+struct ChatMessage;
+struct ClientDynamicInfo;
+struct ClientEvent;
+struct MapDrawControl;
+struct MapNode;
+struct MeshMakeData;
+struct MinimapMapblock;
+struct PlayerControl;
+struct PointedThing;
+
 namespace con {
-class Connection;
+class IConnection;
 }
 using sound_handle_t = int;
 
@@ -85,11 +85,13 @@ enum LocalClientState {
 	Packet counter
 */
 
-class PacketCounter {
+class PacketCounter
+{
 public:
 	PacketCounter() = default;
 
-	void add(u16 command) {
+	void add(u16 command)
+	{
 		auto n = m_packets.find(command);
 		if (n == m_packets.end())
 			m_packets[command] = 1;
@@ -97,7 +99,8 @@ public:
 			n->second++;
 	}
 
-	void clear() {
+	void clear()
+	{
 		m_packets.clear();
 	}
 
@@ -112,7 +115,8 @@ private:
 class ClientScripting;
 class GameUI;
 
-class Client : public con::PeerHandler, public InventoryManager, public IGameDef {
+class Client : public con::PeerHandler, public InventoryManager, public IGameDef
+{
 public:
 	/*
 		NOTE: Nothing is thread-safe here.
@@ -130,15 +134,17 @@ public:
 			MtEventManager *event,
 			RenderingEngine *rendering_engine,
 			GameUI *game_ui,
-			ELoginRegister allow_login_or_register);
+			ELoginRegister allow_login_or_register
+	);
 
 	~Client();
 	DISABLE_CLASS_COPY(Client);
 
 	// Load local mods into memory
 	void scanModSubfolder(const std::string &mod_name, const std::string &mod_path,
-			std::string mod_subpath);
-	inline void scanModIntoMemory(const std::string &mod_name, const std::string &mod_path) {
+				std::string mod_subpath);
+	inline void scanModIntoMemory(const std::string &mod_name, const std::string &mod_path)
+	{
 		scanModSubfolder(mod_name, mod_path, "");
 	}
 
@@ -147,10 +153,11 @@ public:
 	 */
 	void Stop();
 
+
 	bool isShutdown();
 
 	void connect(const Address &address, const std::string &address_name,
-			bool is_local_server);
+		bool is_local_server);
 
 	/*
 		Stuff that references the environment is valid only as
@@ -164,59 +171,59 @@ public:
 	 * Command Handlers
 	 */
 
-	void handleCommand(NetworkPacket *pkt);
+	void handleCommand(NetworkPacket* pkt);
 
-	void handleCommand_Null(NetworkPacket *pkt){};
-	void handleCommand_Deprecated(NetworkPacket *pkt);
-	void handleCommand_Hello(NetworkPacket *pkt);
-	void handleCommand_AuthAccept(NetworkPacket *pkt);
-	void handleCommand_AcceptSudoMode(NetworkPacket *pkt);
-	void handleCommand_DenySudoMode(NetworkPacket *pkt);
-	void handleCommand_AccessDenied(NetworkPacket *pkt);
-	void handleCommand_RemoveNode(NetworkPacket *pkt);
-	void handleCommand_AddNode(NetworkPacket *pkt);
+	void handleCommand_Null(NetworkPacket* pkt) {};
+	void handleCommand_Deprecated(NetworkPacket* pkt);
+	void handleCommand_Hello(NetworkPacket* pkt);
+	void handleCommand_AuthAccept(NetworkPacket* pkt);
+	void handleCommand_AcceptSudoMode(NetworkPacket* pkt);
+	void handleCommand_DenySudoMode(NetworkPacket* pkt);
+	void handleCommand_AccessDenied(NetworkPacket* pkt);
+	void handleCommand_RemoveNode(NetworkPacket* pkt);
+	void handleCommand_AddNode(NetworkPacket* pkt);
 	void handleCommand_NodemetaChanged(NetworkPacket *pkt);
-	void handleCommand_BlockData(NetworkPacket *pkt);
-	void handleCommand_Inventory(NetworkPacket *pkt);
-	void handleCommand_TimeOfDay(NetworkPacket *pkt);
+	void handleCommand_BlockData(NetworkPacket* pkt);
+	void handleCommand_Inventory(NetworkPacket* pkt);
+	void handleCommand_TimeOfDay(NetworkPacket* pkt);
 	void handleCommand_ChatMessage(NetworkPacket *pkt);
-	void handleCommand_ActiveObjectRemoveAdd(NetworkPacket *pkt);
-	void handleCommand_ActiveObjectMessages(NetworkPacket *pkt);
-	void handleCommand_Movement(NetworkPacket *pkt);
+	void handleCommand_ActiveObjectRemoveAdd(NetworkPacket* pkt);
+	void handleCommand_ActiveObjectMessages(NetworkPacket* pkt);
+	void handleCommand_Movement(NetworkPacket* pkt);
 	void handleCommand_Fov(NetworkPacket *pkt);
-	void handleCommand_HP(NetworkPacket *pkt);
-	void handleCommand_Breath(NetworkPacket *pkt);
-	void handleCommand_MovePlayer(NetworkPacket *pkt);
-	void handleCommand_MovePlayerRel(NetworkPacket *pkt);
-	void handleCommand_DeathScreen(NetworkPacket *pkt);
-	void handleCommand_AnnounceMedia(NetworkPacket *pkt);
-	void handleCommand_Media(NetworkPacket *pkt);
-	void handleCommand_NodeDef(NetworkPacket *pkt);
-	void handleCommand_ItemDef(NetworkPacket *pkt);
-	void handleCommand_PlaySound(NetworkPacket *pkt);
-	void handleCommand_StopSound(NetworkPacket *pkt);
+	void handleCommand_HP(NetworkPacket* pkt);
+	void handleCommand_Breath(NetworkPacket* pkt);
+	void handleCommand_MovePlayer(NetworkPacket* pkt);
+	void handleCommand_MovePlayerRel(NetworkPacket* pkt);
+	void handleCommand_DeathScreenLegacy(NetworkPacket* pkt);
+	void handleCommand_AnnounceMedia(NetworkPacket* pkt);
+	void handleCommand_Media(NetworkPacket* pkt);
+	void handleCommand_NodeDef(NetworkPacket* pkt);
+	void handleCommand_ItemDef(NetworkPacket* pkt);
+	void handleCommand_PlaySound(NetworkPacket* pkt);
+	void handleCommand_StopSound(NetworkPacket* pkt);
 	void handleCommand_FadeSound(NetworkPacket *pkt);
-	void handleCommand_Privileges(NetworkPacket *pkt);
-	void handleCommand_InventoryFormSpec(NetworkPacket *pkt);
-	void handleCommand_DetachedInventory(NetworkPacket *pkt);
-	void handleCommand_ShowFormSpec(NetworkPacket *pkt);
-	void handleCommand_SpawnParticle(NetworkPacket *pkt);
-	void handleCommand_AddParticleSpawner(NetworkPacket *pkt);
-	void handleCommand_DeleteParticleSpawner(NetworkPacket *pkt);
-	void handleCommand_HudAdd(NetworkPacket *pkt);
-	void handleCommand_HudRemove(NetworkPacket *pkt);
-	void handleCommand_HudChange(NetworkPacket *pkt);
-	void handleCommand_HudSetFlags(NetworkPacket *pkt);
-	void handleCommand_HudSetParam(NetworkPacket *pkt);
-	void handleCommand_HudSetSky(NetworkPacket *pkt);
-	void handleCommand_HudSetSun(NetworkPacket *pkt);
-	void handleCommand_HudSetMoon(NetworkPacket *pkt);
-	void handleCommand_HudSetStars(NetworkPacket *pkt);
-	void handleCommand_CloudParams(NetworkPacket *pkt);
-	void handleCommand_OverrideDayNightRatio(NetworkPacket *pkt);
-	void handleCommand_LocalPlayerAnimations(NetworkPacket *pkt);
-	void handleCommand_EyeOffset(NetworkPacket *pkt);
-	void handleCommand_UpdatePlayerList(NetworkPacket *pkt);
+	void handleCommand_Privileges(NetworkPacket* pkt);
+	void handleCommand_InventoryFormSpec(NetworkPacket* pkt);
+	void handleCommand_DetachedInventory(NetworkPacket* pkt);
+	void handleCommand_ShowFormSpec(NetworkPacket* pkt);
+	void handleCommand_SpawnParticle(NetworkPacket* pkt);
+	void handleCommand_AddParticleSpawner(NetworkPacket* pkt);
+	void handleCommand_DeleteParticleSpawner(NetworkPacket* pkt);
+	void handleCommand_HudAdd(NetworkPacket* pkt);
+	void handleCommand_HudRemove(NetworkPacket* pkt);
+	void handleCommand_HudChange(NetworkPacket* pkt);
+	void handleCommand_HudSetFlags(NetworkPacket* pkt);
+	void handleCommand_HudSetParam(NetworkPacket* pkt);
+	void handleCommand_HudSetSky(NetworkPacket* pkt);
+	void handleCommand_HudSetSun(NetworkPacket* pkt);
+	void handleCommand_HudSetMoon(NetworkPacket* pkt);
+	void handleCommand_HudSetStars(NetworkPacket* pkt);
+	void handleCommand_CloudParams(NetworkPacket* pkt);
+	void handleCommand_OverrideDayNightRatio(NetworkPacket* pkt);
+	void handleCommand_LocalPlayerAnimations(NetworkPacket* pkt);
+	void handleCommand_EyeOffset(NetworkPacket* pkt);
+	void handleCommand_UpdatePlayerList(NetworkPacket* pkt);
 	void handleCommand_ModChannelMsg(NetworkPacket *pkt);
 	void handleCommand_ModChannelSignal(NetworkPacket *pkt);
 	void handleCommand_SrpBytesSandB(NetworkPacket *pkt);
@@ -229,33 +236,33 @@ public:
 
 	void ProcessData(NetworkPacket *pkt);
 
-	void Send(NetworkPacket *pkt);
+	void Send(NetworkPacket* pkt);
 
 	void interact(InteractAction action, const PointedThing &pointed);
 
 	void sendNodemetaFields(v3s16 p, const std::string &formname,
-			const StringMap &fields);
+		const StringMap &fields);
 	void sendInventoryFields(const std::string &formname,
-			const StringMap &fields);
+		const StringMap &fields);
 	void sendInventoryAction(InventoryAction *a);
 	void sendChatMessage(const std::wstring &message);
 	void clearOutChatQueue();
 	void sendChangePassword(const std::string &oldpassword,
-			const std::string &newpassword);
+		const std::string &newpassword);
 	void sendDamage(u16 damage);
-	void sendRespawn();
+	void sendRespawnLegacy();
 	void sendReady();
 	void sendHaveMedia(const std::vector<u32> &tokens);
 	void sendUpdateClientInfo(const ClientDynamicInfo &info);
 
-	ClientEnvironment &getEnv() { return m_env; }
+	ClientEnvironment& getEnv() { return m_env; }
 	ITextureSource *tsrc() { return getTextureSource(); }
 	ISoundManager *sound() { return getSoundManager(); }
 	static const std::string &getBuiltinLuaPath();
 	static const std::string &getClientModsLuaPath();
 
 	const std::vector<ModSpec> &getMods() const override;
-	const ModSpec *getModSpec(const std::string &modname) const override;
+	const ModSpec* getModSpec(const std::string &modname) const override;
 
 	// Causes urgent mesh updates (unlike Map::add/removeNodeWithEvent)
 	void removeNode(v3s16 p);
@@ -274,13 +281,14 @@ public:
 	bool updateWieldedItem();
 
 	/* InventoryManager interface */
-	Inventory *getInventory(const InventoryLocation &loc) override;
+	Inventory* getInventory(const InventoryLocation &loc) override;
 	void inventoryAction(InventoryAction *a) override;
 
 	// Send the item number 'item' as player item to the server
 	void setPlayerItem(u16 item);
 
-	const std::set<std::string> &getConnectedPlayerNames() {
+	const std::set<std::string> &getConnectedPlayerNames()
+	{
 		return m_env.getPlayerNames();
 	}
 
@@ -292,35 +300,39 @@ public:
 
 	u16 getHP();
 
-	bool checkPrivilege(const std::string &priv) const { return (m_privileges.count(priv) != 0); }
+	bool checkPrivilege(const std::string &priv) const
+	{ return (m_privileges.count(priv) != 0); }
 
-	const std::unordered_set<std::string> &getPrivilegeList() const { return m_privileges; }
+	const std::unordered_set<std::string> &getPrivilegeList() const
+	{ return m_privileges; }
 
 	bool getChatMessage(std::wstring &message);
-	void typeChatMessage(const std::wstring &message);
+	void typeChatMessage(const std::wstring& message);
 
-	u64 getMapSeed() { return m_map_seed; }
+	u64 getMapSeed(){ return m_map_seed; }
 
-	void addUpdateMeshTask(v3s16 blockpos, bool ack_to_server = false, bool urgent = false);
+	void addUpdateMeshTask(v3s16 blockpos, bool ack_to_server=false, bool urgent=false);
 	// Including blocks at appropriate edges
-	void addUpdateMeshTaskWithEdge(v3s16 blockpos, bool ack_to_server = false, bool urgent = false);
-	void addUpdateMeshTaskForNode(v3s16 nodepos, bool ack_to_server = false, bool urgent = false);
+	void addUpdateMeshTaskWithEdge(v3s16 blockpos, bool ack_to_server=false, bool urgent=false);
+	void addUpdateMeshTaskForNode(v3s16 nodepos, bool ack_to_server=false, bool urgent=false);
 
 	void updateCameraOffset(v3s16 camera_offset);
 
 	bool hasClientEvents() const { return !m_client_event_queue.empty(); }
 	// Get event from queue. If queue is empty, it triggers an assertion failure.
-	ClientEvent *getClientEvent();
+	ClientEvent * getClientEvent();
 
 	bool accessDenied() const { return m_access_denied; }
 
 	bool reconnectRequested() const { return m_access_denied_reconnect; }
 
-	void setFatalError(const std::string &reason) {
+	void setFatalError(const std::string &reason)
+	{
 		m_access_denied = true;
 		m_access_denied_reason = reason;
 	}
-	inline void setFatalError(const LuaError &e) {
+	inline void setFatalError(const LuaError &e)
+	{
 		setFatalError(std::string("Lua: ") + e.what());
 	}
 
@@ -328,12 +340,17 @@ public:
 	// disconnect client when CSM failed.
 	const std::string &accessDeniedReason() const { return m_access_denied_reason; }
 
-	bool itemdefReceived() const { return m_itemdef_received; }
-	bool nodedefReceived() const { return m_nodedef_received; }
-	bool mediaReceived() const { return !m_media_downloader; }
-	bool activeObjectsReceived() const { return m_activeobjects_received; }
+	bool itemdefReceived() const
+	{ return m_itemdef_received; }
+	bool nodedefReceived() const
+	{ return m_nodedef_received; }
+	bool mediaReceived() const
+	{ return !m_media_downloader; }
+	bool activeObjectsReceived() const
+	{ return m_activeobjects_received; }
 
-	u16 getProtoVersion() const { return m_proto_ver; }
+	u16 getProtoVersion() const
+	{ return m_proto_ver; }
 
 	bool m_simple_singleplayer_mode;
 
@@ -350,25 +367,26 @@ public:
 		return getProtoVersion() != 0; // (set in TOCLIENT_HELLO)
 	}
 
-	Minimap *getMinimap() { return m_minimap; }
-	void setCamera(Camera *camera) { m_camera = camera; }
+	Minimap* getMinimap() { return m_minimap; }
+	void setCamera(Camera* camera) { m_camera = camera; }
 
-	Camera *getCamera() { return m_camera; }
+	Camera* getCamera () { return m_camera; }
 	scene::ISceneManager *getSceneManager();
 
 	// IGameDef interface
-	IItemDefManager *getItemDefManager() override;
-	const NodeDefManager *getNodeDefManager() override;
-	ICraftDefManager *getCraftDefManager() override;
-	ITextureSource *getTextureSource();
-	virtual IWritableShaderSource *getShaderSource();
+	IItemDefManager* getItemDefManager() override;
+	const NodeDefManager* getNodeDefManager() override;
+	ICraftDefManager* getCraftDefManager() override;
+	ITextureSource* getTextureSource();
+	virtual IWritableShaderSource* getShaderSource();
 	u16 allocateUnknownNodeId(const std::string &name) override;
-	virtual ISoundManager *getSoundManager();
-	MtEventManager *getEventManager();
-	virtual ParticleManager *getParticleManager();
-	bool checkLocalPrivilege(const std::string &priv) { return checkPrivilege(priv); }
-	virtual scene::IAnimatedMesh *getMesh(const std::string &filename, bool cache = false);
-	const std::string *getModFile(std::string filename);
+	virtual ISoundManager* getSoundManager();
+	MtEventManager* getEventManager();
+	virtual ParticleManager* getParticleManager();
+	bool checkLocalPrivilege(const std::string &priv)
+	{ return checkPrivilege(priv); }
+	virtual scene::IAnimatedMesh* getMesh(const std::string &filename, bool cache = false);
+	const std::string* getModFile(std::string filename);
 	ModStorageDatabase *getModStorageDatabase() override { return m_mod_storage_database; }
 
 	// Migrates away old files-based mod storage if necessary
@@ -377,7 +395,7 @@ public:
 	// The following set of functions is used by ClientMediaDownloader
 	// Insert a media file appropriately into the appropriate manager
 	bool loadMedia(const std::string &data, const std::string &filename,
-			bool from_media_push = false);
+		bool from_media_push = false);
 
 	// Send a request for conventional media transfer
 	void request_media(const std::vector<std::string> &file_requests);
@@ -386,7 +404,8 @@ public:
 
 	void makeScreenshot();
 
-	inline void pushToChatQueue(ChatMessage *cec) {
+	inline void pushToChatQueue(ChatMessage *cec)
+	{
 		m_chat_queue.push(cec);
 	}
 
@@ -399,15 +418,18 @@ public:
 	const Address getServerAddress();
 
 	// Hostname of the connected server (but can also be a numerical IP)
-	const std::string &getAddressName() const {
+	const std::string &getAddressName() const
+	{
 		return m_address_name;
 	}
 
-	inline u64 getCSMRestrictionFlags() const {
+	inline u64 getCSMRestrictionFlags() const
+	{
 		return m_csm_restriction_flags;
 	}
 
-	inline bool checkCSMRestrictionFlag(CSMRestrictionFlags flag) const {
+	inline bool checkCSMRestrictionFlag(CSMRestrictionFlags flag) const
+	{
 		return m_csm_restriction_flags & flag;
 	}
 
@@ -419,7 +441,8 @@ public:
 
 	const std::string &getFormspecPrepend() const;
 
-	inline MeshGrid getMeshGrid() {
+	inline MeshGrid getMeshGrid()
+	{
 		return m_mesh_grid;
 	}
 
@@ -429,8 +452,8 @@ private:
 	void loadMods();
 
 	// Virtual methods from con::PeerHandler
-	void peerAdded(con::Peer *peer) override;
-	void deletingPeer(con::Peer *peer, bool timeout) override;
+	void peerAdded(con::IPeer *peer) override;
+	void deletingPeer(con::IPeer *peer, bool timeout) override;
 
 	void initLocalMapSaving(const Address &address,
 			const std::string &hostname,
@@ -466,10 +489,11 @@ private:
 	MtEventManager *m_event;
 	RenderingEngine *m_rendering_engine;
 
+
 	std::unique_ptr<MeshUpdateManager> m_mesh_update_manager;
 	ClientEnvironment m_env;
 	std::unique_ptr<ParticleManager> m_particle_manager;
-	std::unique_ptr<con::Connection> m_con;
+	std::unique_ptr<con::IConnection> m_con;
 	std::string m_address_name;
 	ELoginRegister m_allow_login_or_register = ELoginRegister::Any;
 	Camera *m_camera = nullptr;
@@ -554,7 +578,7 @@ private:
 
 	// Detached inventories
 	// key = name
-	std::unordered_map<std::string, Inventory *> m_detached_inventories;
+	std::unordered_map<std::string, Inventory*> m_detached_inventories;
 
 	// Storage for mesh data for creating multiple instances of the same mesh
 	StringMap m_mesh_data;

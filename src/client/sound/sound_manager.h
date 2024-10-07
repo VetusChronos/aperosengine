@@ -47,7 +47,8 @@ class SoundManagerSingleton;
  * See sound_constants.h for more details.
  */
 
-class OpenALSoundManager final : public Thread {
+class OpenALSoundManager final : public Thread
+{
 private:
 	std::unique_ptr<SoundFallbackPathProvider> m_fallback_path_provider;
 
@@ -167,12 +168,14 @@ protected:
 	void *run() override;
 
 private:
-	void send(SoundManagerMsgToProxy msg) {
+	void send(SoundManagerMsgToProxy msg)
+	{
 		m_queue_to_proxy.push_back(std::move(msg));
 	}
 
-	void reportRemovedSound(sound_handle_t id) {
-		send(sound_manager_messages_to_proxy::ReportRemovedSound{ id });
+	void reportRemovedSound(sound_handle_t id)
+	{
+		send(sound_manager_messages_to_proxy::ReportRemovedSound{id});
 	}
 };
 

@@ -23,7 +23,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "content/subgames.h"
 
 // Information provided from "main"
-struct GameParams {
+struct GameParams
+{
 	GameParams() = default;
 
 	u16 socket_port;
@@ -39,7 +40,8 @@ enum class ELoginRegister {
 };
 
 // Information processed by main menu
-struct GameStartData : GameParams {
+struct GameStartData : GameParams
+{
 	GameStartData() = default;
 
 	bool isSinglePlayer() const { return address.empty() && !local_server; }

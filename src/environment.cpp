@@ -26,10 +26,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "daynightratio.h"
 #include "emerge.h"
 
-Environment::Environment(IGameDef *gamedef) :
-		m_time_of_day_speed(0.0f),
-		m_day_count(0),
-		m_gamedef(gamedef) {
+
+Environment::Environment(IGameDef *gamedef):
+	m_time_of_day_speed(0.0f),
+	m_day_count(0),
+	m_gamedef(gamedef)
+{
 	m_cache_enable_shaders = g_settings->getBool("enable_shaders");
 	m_cache_active_block_mgmt_interval = g_settings->getFloat("active_block_mgmt_interval");
 	m_cache_abm_interval = g_settings->getFloat("abm_interval");
@@ -40,24 +42,28 @@ Environment::Environment(IGameDef *gamedef) :
 	m_time_of_day_f = (float)m_time_of_day / 24000.0f;
 }
 
-u32 Environment::getDayNightRatio() {
+u32 Environment::getDayNightRatio()
+{
 	MutexAutoLock lock(m_time_lock);
 	if (m_enable_day_night_ratio_override)
 		return m_day_night_ratio_override;
 	return time_to_daynight_ratio(m_time_of_day_f * 24000, m_cache_enable_shaders);
 }
 
-void Environment::setTimeOfDaySpeed(float speed) {
+void Environment::setTimeOfDaySpeed(float speed)
+{
 	m_time_of_day_speed = speed;
 }
 
-void Environment::setDayNightRatioOverride(bool enable, u32 value) {
+void Environment::setDayNightRatioOverride(bool enable, u32 value)
+{
 	MutexAutoLock lock(m_time_lock);
 	m_enable_day_night_ratio_override = enable;
 	m_day_night_ratio_override = value;
 }
 
-void Environment::setTimeOfDay(u32 time) {
+void Environment::setTimeOfDay(u32 time)
+{
 	MutexAutoLock lock(m_time_lock);
 	if (m_time_of_day > time)
 		++m_day_count;
@@ -65,17 +71,20 @@ void Environment::setTimeOfDay(u32 time) {
 	m_time_of_day_f = (float)time / 24000.0;
 }
 
-u32 Environment::getTimeOfDay() {
+u32 Environment::getTimeOfDay()
+{
 	MutexAutoLock lock(m_time_lock);
 	return m_time_of_day;
 }
 
-float Environment::getTimeOfDayF() {
+float Environment::getTimeOfDayF()
+{
 	MutexAutoLock lock(m_time_lock);
 	return m_time_of_day_f;
 }
 
-bool Environment::line_of_sight(v3f pos1, v3f pos2, v3s16 *p) {
+bool Environment::line_of_sight(v3f pos1, v3f pos2, v3s16 *p)
+{
 	// Iterate trough nodes on the line
 	voxalgo::VoxelLineIterator iterator(pos1 / BS, (pos2 - pos1) / BS);
 	do {
@@ -96,8 +105,9 @@ bool Environment::line_of_sight(v3f pos1, v3f pos2, v3s16 *p) {
 	Check how a node can be pointed at
 */
 inline static PointabilityType isPointableNode(const MapNode &n,
-		const NodeDefManager *nodedef, bool liquids_pointable,
-		const std::optional<Pointabilities> &pointabilities) {
+	const NodeDefManager *nodedef, bool liquids_pointable,
+	const std::optional<Pointabilities> &pointabilities)
+{
 	const ContentFeatures &features = nodedef->get(n);
 	if (pointabilities) {
 		std::optional<PointabilityType> match =
@@ -111,7 +121,8 @@ inline static PointabilityType isPointableNode(const MapNode &n,
 	return features.pointable;
 }
 
-void Environment::continueRaycast(RaycastState *state, PointedThing *result_p) {
+void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
+{
 	const NodeDefManager *nodedef = getMap().getNodeDefManager();
 	if (state->m_initialization_needed) {
 		// Add objects
@@ -134,7 +145,7 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p) {
 	s16 lastIndex = state->m_iterator.m_last_index;
 	if (!state->m_found.empty()) {
 		lastIndex = state->m_iterator.getIndex(
-				floatToInt(state->m_found.top().intersection_point, BS));
+			floatToInt(state->m_found.top().intersection_point, BS));
 	}
 
 	Map &map = getMap();
@@ -146,7 +157,8 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p) {
 		new_nodes.MaxEdge += state->m_iterator.m_current_node_pos;
 
 		// Only check new nodes
-		v3s16 delta = state->m_iterator.m_current_node_pos - state->m_previous_node;
+		v3s16 delta = state->m_iterator.m_current_node_pos
+			- state->m_previous_node;
 		if (delta.X > 0) {
 			new_nodes.MinEdge.X = new_nodes.MaxEdge.X;
 		} else if (delta.X < 0) {
@@ -162,115 +174,124 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p) {
 		}
 
 		if (new_nodes.MaxEdge.X == S16_MAX ||
-				new_nodes.MaxEdge.Y == S16_MAX ||
-				new_nodes.MaxEdge.Z == S16_MAX) {
+			new_nodes.MaxEdge.Y == S16_MAX ||
+			new_nodes.MaxEdge.Z == S16_MAX) {
 			break; // About to go out of bounds
 		}
 
+		// For check bigSelectionBox
+		v3s16 &current_pos = state->m_iterator.m_current_node_pos;
+
 		// For each untested node
 		for (s16 z = new_nodes.MinEdge.Z; z <= new_nodes.MaxEdge.Z; z++)
-			for (s16 y = new_nodes.MinEdge.Y; y <= new_nodes.MaxEdge.Y; y++)
-				for (s16 x = new_nodes.MinEdge.X; x <= new_nodes.MaxEdge.X; x++) {
-					MapNode n;
-					v3s16 np(x, y, z);
-					bool is_valid_position;
+		for (s16 y = new_nodes.MinEdge.Y; y <= new_nodes.MaxEdge.Y; y++)
+		for (s16 x = new_nodes.MinEdge.X; x <= new_nodes.MaxEdge.X; x++) {
+			MapNode n;
+			v3s16 np(x, y, z);
+			bool is_valid_position;
 
-					n = map.getNode(np, &is_valid_position);
-					if (!is_valid_position)
-						continue;
+			n = map.getNode(np, &is_valid_position);
+			if (!is_valid_position)
+				continue;
+				
+			// If take sense to use it
+			if ((current_pos != np) && !n.haveBigSelectionBox(nodedef))
+				continue;
 
-					PointabilityType pointable = isPointableNode(n, nodedef,
-							state->m_liquids_pointable,
-							state->m_pointabilities);
-					// If it can be pointed through skip
-					if (pointable == PointabilityType::POINTABLE_NOT)
-						continue;
+			PointabilityType pointable = isPointableNode(n, nodedef,
+					state->m_liquids_pointable,
+					state->m_pointabilities);
+			// If it can be pointed through skip
+			if (pointable == PointabilityType::POINTABLE_NOT)
+				continue;
 
-					PointedThing result;
+			PointedThing result;
 
-					boxes.clear();
-					n.getSelectionBoxes(nodedef, &boxes,
-							n.getNeighbors(np, &map));
+			boxes.clear();
+			n.getSelectionBoxes(nodedef, &boxes,
+				n.getNeighbors(np, &map));
 
-					// Is there a collision with a selection box?
-					bool is_colliding = false;
-					// Minimal distance of all collisions
-					float min_distance_sq = 10000000;
-					// ID of the current box (loop counter)
-					u16 id = 0;
-					// If a node is found, this is the center of the
-					// first nodebox the shootline meets.
-					v3f found_boxcenter(0, 0, 0);
+			// Is there a collision with a selection box?
+			bool is_colliding = false;
+			// Minimal distance of all collisions
+			float min_distance_sq = 10000000;
+			// ID of the current box (loop counter)
+			u16 id = 0;
+			// If a node is found, this is the center of the
+			// first nodebox the shootline meets.
+			v3f found_boxcenter(0, 0, 0);
 
-					// Do calculations relative to the node center
-					// to translate the ray rather than the boxes
-					v3f npf = intToFloat(np, BS);
-					v3f rel_start = state->m_shootline.start - npf;
-					for (aabb3f &box : boxes) {
-						v3f intersection_point;
-						v3f intersection_normal;
-						if (!boxLineCollision(box, rel_start,
-									state->m_shootline.getVector(), &intersection_point,
-									&intersection_normal)) {
-							++id;
-							continue;
-						}
-
-						intersection_point += npf; // translate back to world coords
-						f32 distanceSq = (intersection_point - state->m_shootline.start).getLengthSQ();
-						// If this is the nearest collision, save it
-						if (min_distance_sq > distanceSq) {
-							min_distance_sq = distanceSq;
-							result.intersection_point = intersection_point;
-							result.intersection_normal = intersection_normal;
-							result.box_id = id;
-							found_boxcenter = box.getCenter();
-							is_colliding = true;
-						}
-						++id;
-					}
-					// If there wasn't a collision, stop
-					if (!is_colliding) {
-						continue;
-					}
-					result.pointability = pointable;
-					result.type = POINTEDTHING_NODE;
-					result.node_undersurface = np;
-					result.distanceSq = min_distance_sq;
-					// Set undersurface and abovesurface nodes
-					const f32 d = 0.002 * BS;
-					v3f fake_intersection = result.intersection_point;
-					found_boxcenter += npf; // translate back to world coords
-					// Move intersection towards its source block.
-					if (fake_intersection.X < found_boxcenter.X) {
-						fake_intersection.X += d;
-					} else {
-						fake_intersection.X -= d;
-					}
-					if (fake_intersection.Y < found_boxcenter.Y) {
-						fake_intersection.Y += d;
-					} else {
-						fake_intersection.Y -= d;
-					}
-					if (fake_intersection.Z < found_boxcenter.Z) {
-						fake_intersection.Z += d;
-					} else {
-						fake_intersection.Z -= d;
-					}
-					result.node_real_undersurface = floatToInt(
-							fake_intersection, BS);
-					result.node_abovesurface = result.node_real_undersurface + floatToInt(result.intersection_normal, 1.0f);
-
-					// Push found PointedThing
-					state->m_found.push(std::move(result));
-					// If this is nearer than the old nearest object,
-					// the search can be shorter
-					s16 newIndex = state->m_iterator.getIndex(
-							result.node_real_undersurface);
-					if (newIndex < lastIndex) {
-						lastIndex = newIndex;
-					}
+			// Do calculations relative to the node center
+			// to translate the ray rather than the boxes
+			v3f npf = intToFloat(np, BS);
+			v3f rel_start = state->m_shootline.start - npf;
+			for (aabb3f &box : boxes) {
+				v3f intersection_point;
+				v3f intersection_normal;
+				if (!boxLineCollision(box, rel_start,
+						state->m_shootline.getVector(), &intersection_point,
+						&intersection_normal)) {
+					++id;
+					continue;
 				}
+
+				intersection_point += npf; // translate back to world coords
+				f32 distanceSq = (intersection_point
+					- state->m_shootline.start).getLengthSQ();
+				// If this is the nearest collision, save it
+				if (min_distance_sq > distanceSq) {
+					min_distance_sq = distanceSq;
+					result.intersection_point = intersection_point;
+					result.intersection_normal = intersection_normal;
+					result.box_id = id;
+					found_boxcenter = box.getCenter();
+					is_colliding = true;
+				}
+				++id;
+			}
+			// If there wasn't a collision, stop
+			if (!is_colliding) {
+				continue;
+			}
+			result.pointability = pointable;
+			result.type = POINTEDTHING_NODE;
+			result.node_undersurface = np;
+			result.distanceSq = min_distance_sq;
+			// Set undersurface and abovesurface nodes
+			const f32 d = 0.002 * BS;
+			v3f fake_intersection = result.intersection_point;
+			found_boxcenter += npf; // translate back to world coords
+			// Move intersection towards its source block.
+			if (fake_intersection.X < found_boxcenter.X) {
+				fake_intersection.X += d;
+			} else {
+				fake_intersection.X -= d;
+			}
+			if (fake_intersection.Y < found_boxcenter.Y) {
+				fake_intersection.Y += d;
+			} else {
+				fake_intersection.Y -= d;
+			}
+			if (fake_intersection.Z < found_boxcenter.Z) {
+				fake_intersection.Z += d;
+			} else {
+				fake_intersection.Z -= d;
+			}
+			result.node_real_undersurface = floatToInt(
+				fake_intersection, BS);
+			result.node_abovesurface = result.node_real_undersurface
+				+ floatToInt(result.intersection_normal, 1.0f);
+
+			// Push found PointedThing
+			state->m_found.push(std::move(result));
+			// If this is nearer than the old nearest object,
+			// the search can be shorter
+			s16 newIndex = state->m_iterator.getIndex(
+				result.node_real_undersurface);
+			if (newIndex < lastIndex) {
+				lastIndex = newIndex;
+			}
+		}
 		// Next node
 		state->m_previous_node = state->m_iterator.m_current_node_pos;
 		state->m_iterator.next();
@@ -287,7 +308,8 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p) {
 	}
 }
 
-void Environment::stepTimeOfDay(float dtime) {
+void Environment::stepTimeOfDay(float dtime)
+{
 	MutexAutoLock lock(this->m_time_lock);
 
 	// Cached in order to prevent the two reads we do to give
@@ -320,7 +342,8 @@ void Environment::stepTimeOfDay(float dtime) {
 	}
 }
 
-u32 Environment::getDayCount() {
+u32 Environment::getDayCount()
+{
 	// Atomic<u32> counter
 	return m_day_count;
 }

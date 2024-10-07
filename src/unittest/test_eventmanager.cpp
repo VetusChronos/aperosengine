@@ -21,7 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "test.h"
 #include "client/event_manager.h"
 
-class TestEventManager : public TestBase {
+class TestEventManager : public TestBase
+{
 public:
 	TestEventManager() { TestManager::registerTestModule(this); }
 	const char *getName() override { return "TestEventManager"; }
@@ -35,9 +36,11 @@ public:
 };
 
 // EventManager test class
-class EventManagerTest : public EventManager {
+class EventManagerTest : public EventManager
+{
 public:
-	static void eventTest(MtEvent *e, void *data) {
+	static void eventTest(MtEvent *e, void *data)
+	{
 		UASSERT(e->getType() >= 0);
 		UASSERT(e->getType() < MtEvent::TYPE_MAX);
 		EventManagerTest *emt = (EventManagerTest *)data;
@@ -53,27 +56,31 @@ private:
 
 static TestEventManager g_test_instance;
 
-void TestEventManager::runTests(IGameDef *gamedef) {
+void TestEventManager::runTests(IGameDef *gamedef)
+{
 	TEST(testRegister);
 	TEST(testDeregister);
 	TEST(testRealEvent);
 	TEST(testRealEventAfterDereg);
 }
 
-void TestEventManager::testRegister() {
+void TestEventManager::testRegister()
+{
 	EventManager ev;
 	ev.reg(MtEvent::PLAYER_DAMAGE, nullptr, nullptr);
 	ev.reg(MtEvent::PLAYER_DAMAGE, nullptr, nullptr);
 }
 
-void TestEventManager::testDeregister() {
+void TestEventManager::testDeregister()
+{
 	EventManager ev;
 	ev.dereg(MtEvent::NODE_DUG, nullptr, nullptr);
 	ev.reg(MtEvent::PLAYER_DAMAGE, nullptr, nullptr);
 	ev.dereg(MtEvent::PLAYER_DAMAGE, nullptr, nullptr);
 }
 
-void TestEventManager::testRealEvent() {
+void TestEventManager::testRealEvent()
+{
 	EventManager ev;
 	auto emt = std::make_unique<EventManagerTest>();
 	ev.reg(MtEvent::PLAYER_REGAIN_GROUND, EventManagerTest::eventTest, emt.get());
@@ -83,7 +90,8 @@ void TestEventManager::testRealEvent() {
 	UASSERT(emt->getTestValue() == MtEvent::PLAYER_REGAIN_GROUND);
 }
 
-void TestEventManager::testRealEventAfterDereg() {
+void TestEventManager::testRealEventAfterDereg()
+{
 	EventManager ev;
 	auto emt = std::make_unique<EventManagerTest>();
 	ev.reg(MtEvent::PLAYER_REGAIN_GROUND, EventManagerTest::eventTest, emt.get());

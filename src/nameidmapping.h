@@ -23,28 +23,32 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <iostream>
 #include <unordered_map>
 #include <cassert>
-#include "irrlichttypes_bloated.h"
+#include "irrlichttypes.h"
 
 typedef std::unordered_map<u16, std::string> IdToNameMap;
 typedef std::unordered_map<std::string, u16> NameToIdMap;
 
-class NameIdMapping {
+class NameIdMapping
+{
 public:
 	void serialize(std::ostream &os) const;
 	void deSerialize(std::istream &is);
 
-	void clear() {
+	void clear()
+	{
 		m_id_to_name.clear();
 		m_name_to_id.clear();
 	}
 
-	void set(u16 id, const std::string &name) {
+	void set(u16 id, const std::string &name)
+	{
 		assert(!name.empty());
 		m_id_to_name[id] = name;
 		m_name_to_id[name] = id;
 	}
 
-	void removeId(u16 id) {
+	void removeId(u16 id)
+	{
 		std::string name;
 		bool found = getName(id, name);
 		if (!found)
@@ -53,7 +57,8 @@ public:
 		m_name_to_id.erase(name);
 	}
 
-	void eraseName(const std::string &name) {
+	void eraseName(const std::string &name)
+	{
 		u16 id;
 		bool found = getId(name, id);
 		if (!found)
@@ -61,14 +66,16 @@ public:
 		m_id_to_name.erase(id);
 		m_name_to_id.erase(name);
 	}
-	bool getName(u16 id, std::string &result) const {
+	bool getName(u16 id, std::string &result) const
+	{
 		auto i = m_id_to_name.find(id);
 		if (i == m_id_to_name.end())
 			return false;
 		result = i->second;
 		return true;
 	}
-	bool getId(const std::string &name, u16 &result) const {
+	bool getId(const std::string &name, u16 &result) const
+	{
 		auto i = m_name_to_id.find(name);
 		if (i == m_name_to_id.end())
 			return false;

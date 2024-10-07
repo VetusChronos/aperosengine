@@ -18,7 +18,7 @@ Transferring client-sided mods from the server to the client is planned, but not
 
 If you see a deficiency in the API, feel free to attempt to add the
 functionality in the engine and API. You can send such improvements as
-source code patches on GitHub (https://github.com/yunasatoy/aperosengine).
+source code patches on GitHub (https://github.com/vetuschronos/aperosengine).
 
 Programming in Lua
 ------------------
@@ -32,7 +32,7 @@ the `init.lua` scripts in a shared environment.
 
 In order to load client-side mods, the following conditions need to be satisfied:
 
-1) `$path_user/aperosvoxel.conf` contains the setting `enable_client_modding = true`
+1) `$path_user/aperosengine.conf` contains the setting `enable_client_modding = true`
 
 2) The client-side mod located in `$path_user/clientmods/<modname>` is added to
     `$path_user/clientmods/mods.conf` as `load_mod_<modname> = true`.
@@ -338,8 +338,6 @@ Call these functions only at load time!
       is checked to see if the command exists, but after the input is parsed.
     * Return `true` to mark the command as handled, which means that the default
       handlers will be prevented.
-* `aperosengine.register_on_death(function())`
-    * Called when the local player dies
 * `aperosengine.register_on_hp_modification(function(hp))`
     * Called when server modified player's HP
 * `aperosengine.register_on_damage_taken(function(hp))`
@@ -487,8 +485,6 @@ Call these functions only at load time!
     * Returns `false` if the client is already disconnecting otherwise returns `true`.
 * `aperosengine.get_server_info()`
     * Returns [server info](#server-info).
-* `aperosengine.send_respawn()`
-    * Sends a respawn request to the server.
 
 ### Storage API
 * `aperosengine.get_mod_storage()`:

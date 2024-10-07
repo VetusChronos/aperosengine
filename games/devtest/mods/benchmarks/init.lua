@@ -154,3 +154,32 @@ aperosengine.register_chatcommand("bench_bulk_get_node", {
 		return true, msg
 	end,
 })
+
+aperosengine.register_chatcommand("bench_bulk_swap_node", {
+	params = "",
+	description = "Benchmark: Bulk-swap 99×99×99 stone nodes",
+	func = function(name, param)
+		local player = aperosengine.get_player_by_name(name)
+		if not player then
+			return false, "No player."
+		end
+		local pos_list = get_positions_cube(player:get_pos())
+		aperosengine.chat_send_player(name, "Benchmarking aperosengine.bulk_swap_node. Warming up ...")
+		-- warm up because first execution otherwise becomes
+		-- significantly slower
+		aperosengine.bulk_swap_node(pos_list, {name = "mapgen_stone"})
+		aperosengine.chat_send_player(name, "Warming up finished, now benchmarking ...")
+		local start_time = aperosengine.get_us_time()
+		for i=1,#pos_list do
+			aperosengine.swap_node(pos_list[i], {name = "mapgen_stone"})
+		end
+		local middle_time = aperosengine.get_us_time()
+		aperosengine.bulk_swap_node(pos_list, {name = "mapgen_stone"})
+		local end_time = aperosengine.get_us_time()
+		local msg = string.format("Benchmark results: aperosengine.swap_node loop: %.2f ms; aperosengine.bulk_swap_node: %.2f ms",
+			((middle_time - start_time)) / 1000,
+			((end_time - middle_time)) / 1000
+		)
+		return true, msg
+	end,
+})

@@ -27,11 +27,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class Camera;
 class Client;
 
-struct shadowFrustum {
-	f32 zNear{ 0.0f };
-	f32 zFar{ 0.0f };
-	f32 length{ 0.0f };
-	f32 radius{ 0.0f };
+struct shadowFrustum
+{
+	f32 zNear{0.0f};
+	f32 zFar{0.0f};
+	f32 length{0.0f};
+	f32 radius{0.0f};
 	core::matrix4 ProjOrthMat;
 	core::matrix4 ViewMat;
 	v3f position;
@@ -39,7 +40,8 @@ struct shadowFrustum {
 	v3s16 camera_offset;
 };
 
-class DirectionalLight {
+class DirectionalLight
+{
 public:
 	DirectionalLight(const u32 shadowMapResolution,
 			const v3f &position,
@@ -53,7 +55,7 @@ public:
 
 	// when set direction is updated to negative normalized(direction)
 	void setDirection(v3f dir);
-	v3f getDirection() const {
+	v3f getDirection() const{
 		return direction;
 	};
 	v3f getPosition() const;
@@ -68,31 +70,37 @@ public:
 	core::matrix4 getViewProjMatrix();
 
 	/// Gets the light's maximum far value, i.e. the shadow boundary
-	f32 getMaxFarValue() const {
+	f32 getMaxFarValue() const
+	{
 		return farPlane * BS;
 	}
 
 	/// Gets the current far value of the light
-	f32 getFarValue() const {
+	f32 getFarValue() const
+	{
 		return shadow_frustum.zFar;
 	}
 
+
 	/// Gets the light's color.
-	const video::SColorf &getLightColor() const {
+	const video::SColorf &getLightColor() const
+	{
 		return diffuseColor;
 	}
 
 	/// Sets the light's color.
-	void setLightColor(const video::SColorf &lightColor) {
+	void setLightColor(const video::SColorf &lightColor)
+	{
 		diffuseColor = lightColor;
 	}
 
 	/// Gets the shadow map resolution for this light.
-	u32 getMapResolution() const {
+	u32 getMapResolution() const
+	{
 		return mapRes;
 	}
 
-	bool should_update_map_shadow{ true };
+	bool should_update_map_shadow{true};
 
 	void commitFrustum();
 
@@ -105,12 +113,12 @@ private:
 	u32 mapRes;
 
 	v3f pos;
-	v3f direction{ 0 };
+	v3f direction{0};
 
-	v3f last_cam_pos_world{ 0, 0, 0 };
-	v3f last_look{ 0, 1, 0 };
+	v3f last_cam_pos_world{0,0,0};
+	v3f last_look{0,1,0};
 
 	shadowFrustum shadow_frustum;
 	shadowFrustum future_frustum;
-	bool dirty{ false };
+	bool dirty{false};
 };

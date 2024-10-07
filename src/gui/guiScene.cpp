@@ -21,11 +21,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <SViewFrustum.h>
 #include <IAnimatedMeshSceneNode.h>
+#include <IVideoDriver.h>
 #include "porting.h"
 
 GUIScene::GUIScene(gui::IGUIEnvironment *env, scene::ISceneManager *smgr,
-		gui::IGUIElement *parent, core::recti rect, s32 id) :
-		IGUIElement(gui::EGUIET_ELEMENT, env, parent, id, rect) {
+		   gui::IGUIElement *parent, core::recti rect, s32 id)
+	: IGUIElement(gui::EGUIET_ELEMENT, env, parent, id, rect)
+{
 	m_driver = env->getVideoDriver();
 	m_smgr = smgr->createNewSceneManager(false);
 
@@ -35,13 +37,15 @@ GUIScene::GUIScene(gui::IGUIEnvironment *env, scene::ISceneManager *smgr,
 	m_smgr->getParameters()->setAttribute(scene::ALLOW_ZWRITE_ON_TRANSPARENT, true);
 }
 
-GUIScene::~GUIScene() {
+GUIScene::~GUIScene()
+{
 	setMesh(nullptr);
 
 	m_smgr->drop();
 }
 
-scene::IAnimatedMeshSceneNode *GUIScene::setMesh(scene::IAnimatedMesh *mesh) {
+scene::IAnimatedMeshSceneNode *GUIScene::setMesh(scene::IAnimatedMesh *mesh)
+{
 	if (m_mesh) {
 		m_mesh->remove();
 		m_mesh = nullptr;
@@ -57,12 +61,12 @@ scene::IAnimatedMeshSceneNode *GUIScene::setMesh(scene::IAnimatedMesh *mesh) {
 	return m_mesh;
 }
 
-void GUIScene::setTexture(u32 idx, video::ITexture *texture) {
+void GUIScene::setTexture(u32 idx, video::ITexture *texture)
+{
 	video::SMaterial &material = m_mesh->getMaterial(idx);
 	material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
 	material.MaterialTypeParam = 0.5f;
 	material.TextureLayers[0].Texture = texture;
-	material.Lighting = false;
 	material.FogEnable = true;
 	material.TextureLayers[0].MinFilter = video::ETMINF_NEAREST_MIPMAP_NEAREST;
 	material.TextureLayers[0].MagFilter = video::ETMAGF_NEAREST;
@@ -70,7 +74,8 @@ void GUIScene::setTexture(u32 idx, video::ITexture *texture) {
 	material.ZWriteEnable = video::EZW_AUTO;
 }
 
-void GUIScene::draw() {
+void GUIScene::draw()
+{
 	m_driver->clearBuffers(video::ECBF_DEPTH);
 
 	// Control rotation speed based on time
@@ -87,7 +92,7 @@ void GUIScene::draw() {
 		core::recti borderRect =
 				Environment->getRootGUIElement()->getAbsoluteClippingRect();
 		Environment->getSkin()->draw3DSunkenPane(
-				this, m_bgcolor, false, true, borderRect, 0);
+			this, m_bgcolor, false, true, borderRect, 0);
 	}
 
 	core::dimension2d<s32> size = getAbsoluteClippingRect().getSize();
@@ -117,7 +122,8 @@ void GUIScene::draw() {
 	m_driver->setViewPort(oldViewPort);
 }
 
-bool GUIScene::OnEvent(const SEvent &event) {
+bool GUIScene::OnEvent(const SEvent &event)
+{
 	if (m_mouse_ctrl && event.EventType == EET_MOUSE_INPUT_EVENT) {
 		if (event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN) {
 			m_last_pos = v2f((f32)event.MouseInput.X, (f32)event.MouseInput.Y);
@@ -127,8 +133,8 @@ bool GUIScene::OnEvent(const SEvent &event) {
 				m_curr_pos = v2f((f32)event.MouseInput.X, (f32)event.MouseInput.Y);
 
 				rotateCamera(v3f(
-						m_last_pos.Y - m_curr_pos.Y,
-						m_curr_pos.X - m_last_pos.X, 0.f));
+					m_last_pos.Y - m_curr_pos.Y,
+					m_curr_pos.X - m_last_pos.X, 0.f));
 
 				m_last_pos = m_curr_pos;
 				return true;
@@ -139,7 +145,8 @@ bool GUIScene::OnEvent(const SEvent &event) {
 	return gui::IGUIElement::OnEvent(event);
 }
 
-void GUIScene::setStyles(const std::array<StyleSpec, StyleSpec::NUM_STATES> &styles) {
+void GUIScene::setStyles(const std::array<StyleSpec, StyleSpec::NUM_STATES> &styles)
+{
 	StyleSpec::State state = StyleSpec::STATE_DEFAULT;
 	StyleSpec style = StyleSpec::getStyleFromStatePropagation(styles, state);
 
@@ -150,7 +157,8 @@ void GUIScene::setStyles(const std::array<StyleSpec, StyleSpec::NUM_STATES> &sty
 /**
  * Sets the frame loop range for the mesh
  */
-void GUIScene::setFrameLoop(s32 begin, s32 end) {
+void GUIScene::setFrameLoop(s32 begin, s32 end)
+{
 	if (m_mesh->getStartFrame() != begin || m_mesh->getEndFrame() != end)
 		m_mesh->setFrameLoop(begin, end);
 }
@@ -158,17 +166,19 @@ void GUIScene::setFrameLoop(s32 begin, s32 end) {
 /**
  * Sets the animation speed (FPS) for the mesh
  */
-void GUIScene::setAnimationSpeed(f32 speed) {
+void GUIScene::setAnimationSpeed(f32 speed)
+{
 	m_mesh->setAnimationSpeed(speed);
 }
 
 /* Camera control functions */
 
-inline void GUIScene::calcOptimalDistance() {
+inline void GUIScene::calcOptimalDistance()
+{
 	core::aabbox3df box = m_mesh->getBoundingBox();
-	f32 width = box.MaxEdge.X - box.MinEdge.X;
+	f32 width  = box.MaxEdge.X - box.MinEdge.X;
 	f32 height = box.MaxEdge.Y - box.MinEdge.Y;
-	f32 depth = box.MaxEdge.Z - box.MinEdge.Z;
+	f32 depth  = box.MaxEdge.Z - box.MinEdge.Z;
 	f32 max_width = width > depth ? width : depth;
 
 	const scene::SViewFrustum *f = m_cam->getViewFrustum();
@@ -190,7 +200,8 @@ inline void GUIScene::calcOptimalDistance() {
 	m_update_cam = true;
 }
 
-void GUIScene::updateCamera(scene::ISceneNode *target) {
+void GUIScene::updateCamera(scene::ISceneNode *target)
+{
 	m_target = target;
 	updateTargetPos();
 
@@ -200,13 +211,15 @@ void GUIScene::updateCamera(scene::ISceneNode *target) {
 	m_update_cam = true;
 }
 
-void GUIScene::updateTargetPos() {
+void GUIScene::updateTargetPos()
+{
 	m_last_target_pos = m_target_pos;
 	m_target->updateAbsolutePosition();
 	m_target_pos = m_target->getAbsolutePosition();
 }
 
-void GUIScene::setCameraRotation(v3f rot) {
+void GUIScene::setCameraRotation(v3f rot)
+{
 	correctBounds(rot);
 
 	core::matrix4 mat;
@@ -220,7 +233,8 @@ void GUIScene::setCameraRotation(v3f rot) {
 	m_update_cam = false;
 }
 
-bool GUIScene::correctBounds(v3f &rot) {
+bool GUIScene::correctBounds(v3f &rot)
+{
 	const float ROTATION_MAX_1 = 60.0f;
 	const float ROTATION_MAX_2 = 300.0f;
 
@@ -239,7 +253,8 @@ bool GUIScene::correctBounds(v3f &rot) {
 	return false;
 }
 
-void GUIScene::cameraLoop() {
+void GUIScene::cameraLoop()
+{
 	updateCameraPos();
 	updateTargetPos();
 

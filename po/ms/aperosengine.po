@@ -1,12 +1,12 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Malay (Minetest)\n"
+"Project-Id-Version: Malay (AperosEngine)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-11 15:14+0200\n"
 "PO-Revision-Date: 2023-12-04 21:13+0000\n"
 "Last-Translator: \"Yaya - Nurul Azeera Hidayah @ Muhammad Nur Hidayat "
 "Yasuyoshi\" <translation@mnh48.moe>\n"
-"Language-Team: Malay <https://hosted.weblate.org/projects/minetest/minetest/"
+"Language-Team: Malay <https://hosted.weblate.org/projects/AperosEngine/AperosEngine/"
 "ms/>\n"
 "Language: ms\n"
 "MIME-Version: 1.0\n"
@@ -177,8 +177,8 @@ msgid "Back to Main Menu"
 msgstr "Kembali ke Menu Utama"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
-msgid "ContentDB is not available when Minetest was compiled without cURL"
-msgstr "ContentDB tidak tersedia apabila Minetest dikompil tanpa cURL"
+msgid "ContentDB is not available when AperosEngine was compiled without cURL"
+msgstr "ContentDB tidak tersedia apabila AperosEngine dikompil tanpa cURL"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid "Downloading..."
@@ -674,29 +674,29 @@ msgstr "Ketepikan"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"For a long time, the Minetest engine shipped with a default game called "
-"\"Minetest Game\". Since Minetest 5.8.0, Minetest ships without a default "
+"For a long time, the AperosEngine engine shipped with a default game called "
+"\"AperosVoxel\". Since AperosEngine 5.8.0, AperosEngine ships without a default "
 "game."
 msgstr ""
-"Untuk sekian lamanya, enjin Minetest disertakan dengan permainan lalai "
-"dipanggil \"Minetest Game\". Mulai Minetest 5.8.0, Minetest tidak lagi "
+"Untuk sekian lamanya, enjin AperosEngine disertakan dengan permainan lalai "
+"dipanggil \"AperosVoxel\". Mulai AperosEngine 5.8.0, AperosEngine tidak lagi "
 "disertakan dengan permainan lalai."
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"If you want to continue playing in your Minetest Game worlds, you need to "
-"reinstall Minetest Game."
+"If you want to continue playing in your AperosVoxel worlds, you need to "
+"reinstall AperosVoxel."
 msgstr ""
-"Sekiranya anda ingin terus bermain dalam dunia Minetest Game anda, anda "
-"perlu pasang semula Minetest Game."
+"Sekiranya anda ingin terus bermain dalam dunia AperosVoxel anda, anda "
+"perlu pasang semula AperosVoxel."
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Minetest Game is no longer installed by default"
-msgstr "Minetest Game sudah tidak dipasang secara lalainya"
+msgid "AperosVoxel is no longer installed by default"
+msgstr "AperosVoxel sudah tidak dipasang secara lalainya"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Reinstall Minetest Game"
-msgstr "Pasang semula Minetest Game"
+msgid "Reinstall AperosVoxel"
+msgstr "Pasang semula AperosVoxel"
 
 #: builtin/mainmenu/dlg_rename_modpack.lua
 msgid "Accept"
@@ -1070,12 +1070,12 @@ msgstr "Pasangkan permainan daripada ContentDB"
 
 #: builtin/mainmenu/tab_local.lua
 #, fuzzy
-msgid "Aperos Engine doesn't come with the AperosVoxel by default."
-msgstr "Minetest Game sudah tidak dipasang secara lalainya"
+msgid "AperosEngine doesn't come with a game by default."
+msgstr "AperosVoxel sudah tidak dipasang secara lalainya"
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"Aperos Engine is a game creation platform that allows you to create different games."
+"AperosEngine is a game-creation platform that allows you to play many different "
 "games."
 msgstr ""
 
@@ -2864,7 +2864,7 @@ msgid ""
 "software',\n"
 "as defined by the Free Software Foundation.\n"
 "You can also specify content ratings.\n"
-"These flags are independent from Minetest versions,\n"
+"These flags are independent from AperosEngine versions,\n"
 "so see a full list at https://content.aperosvoxel.domain/help/content_flags/"
 msgstr ""
 "Senarai bendera yang ingin disembunyikan dalam repositori kandungan "
@@ -2873,7 +2873,7 @@ msgstr ""
 "digelar 'perisian bebas',\n"
 "seperti ditakrifkan oleh Yayasan Perisian Bebas (Free Software Foundation).\n"
 "Anda juga boleh menyatakan klasifikasi kandungan.\n"
-"Bendera-bendera ini tidak bersangkut paut dengan versi Minetest tertentu,\n"
+"Bendera-bendera ini tidak bersangkut paut dengan versi AperosEngine tertentu,\n"
 "jadi anda boleh lihat senarai penuh di https://content.aperosvoxel.domain/help/"
 "content_flags/"
 
@@ -3088,7 +3088,7 @@ msgid ""
 "expecting.\n"
 "This allows for more fine-grained control than "
 "strict_protocol_version_checking.\n"
-"Minetest still enforces its own internal minimum, and enabling\n"
+"AperosEngine still enforces its own internal minimum, and enabling\n"
 "strict_protocol_version_checking will effectively override this."
 msgstr ""
 "Bolehkan tetapan untuk melarang klien lama daripada menyambung.\n"
@@ -4217,10 +4217,10 @@ msgstr "Memasang perintah sembang ketika pendaftaran."
 #: src/settings_translation_file.cpp
 msgid ""
 "Instrument global callback functions on registration.\n"
-"(anything you pass to a minetest.register_*() function)"
+"(anything you pass to a AperosEngine.register_*() function)"
 msgstr ""
 "Memasang fungsi panggil balik sejagat ketika pendaftaran.\n"
-"(semua benda yang anda salurkan kepada fungsi minetest.register_*())"
+"(semua benda yang anda salurkan kepada fungsi AperosEngine.register_*())"
 
 #: src/settings_translation_file.cpp
 msgid ""
@@ -5203,11 +5203,11 @@ msgstr "Jumlah mesej pemain boleh hantar setiap 10 saat."
 #: src/settings_translation_file.cpp
 msgid ""
 "Number of threads to use for mesh generation.\n"
-"Value of 0 (default) will let Minetest autodetect the number of available "
+"Value of 0 (default) will let AperosEngine autodetect the number of available "
 "threads."
 msgstr ""
 "Jumlah bebenang untuk digunakan bagi penjanaan jejaring.\n"
-"Nilai 0 (lalai) akan membuatkan Minetest mengesan jumlah bebenang tersedia "
+"Nilai 0 (lalai) akan membuatkan AperosEngine mengesan jumlah bebenang tersedia "
 "secara automatik."
 
 #: src/settings_translation_file.cpp
@@ -5359,12 +5359,12 @@ msgstr "Alamat pendengar Prometheus"
 #: src/settings_translation_file.cpp
 msgid ""
 "Prometheus listener address.\n"
-"If Minetest is compiled with ENABLE_PROMETHEUS option enabled,\n"
+"If AperosEngine is compiled with ENABLE_PROMETHEUS option enabled,\n"
 "enable metrics listener for Prometheus on that address.\n"
 "Metrics can be fetched on http://127.0.0.1:30000/metrics"
 msgstr ""
 "Alamat pendengar Prometheus.\n"
-"Jika Minetest dikompil dengan pilihan ENABLE_PROMETHEUS dibolehkan,\n"
+"Jika AperosEngine dikompil dengan pilihan ENABLE_PROMETHEUS dibolehkan,\n"
 "membolehkan pendengar metrik untuk Prometheus pada alamat berkenaan.\n"
 "Metrik boleh diambil di http://127.0.0.1:30000/metrics"
 
@@ -5879,7 +5879,7 @@ msgid "Shader path"
 msgstr "Laluan pembayang"
 
 #: src/settings_translation_file.cpp
-msgid "Shaders"
+msgid "Effects"
 msgstr "Pembayang"
 
 #: src/settings_translation_file.cpp
@@ -6274,14 +6274,14 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"The gesture for punching players/entities.\n"
+"The gesture for for punching players/entities.\n"
 "This can be overridden by games and mods.\n"
 "\n"
 "* short_tap\n"
 "Easy to use and well-known from other games that shall not be named.\n"
 "\n"
 "* long_tap\n"
-"Known from the classic Minetest mobile controls.\n"
+"Known from the classic AperosEngine mobile controls.\n"
 "Combat is more or less impossible."
 msgstr ""
 
@@ -6552,11 +6552,11 @@ msgstr ""
 #: src/settings_translation_file.cpp
 #, fuzzy
 msgid ""
-"URL to JSON file which provides information about the newest Minetest "
+"URL to JSON file which provides information about the newest AperosEngine "
 "release\n"
 "If this is empty the engine will never check for updates."
 msgstr ""
-"URL kepada fail JSON yang menyediakan maklumat mengenai terbitan Minetest "
+"URL kepada fail JSON yang menyediakan maklumat mengenai terbitan AperosEngine "
 "terbaru"
 
 #: src/settings_translation_file.cpp
@@ -6987,11 +6987,11 @@ msgstr "Tetingkap dimaksimumkan"
 
 #: src/settings_translation_file.cpp
 msgid ""
-"Windows systems only: Start Minetest with the command line window in the "
+"Windows systems only: Start AperosEngine with the command line window in the "
 "background.\n"
 "Contains the same information as the file debug.txt (default name)."
 msgstr ""
-"Sistem Windows sahaja: Mulakan Minetest dengan tetingkap garis perintah "
+"Sistem Windows sahaja: Mulakan AperosEngine dengan tetingkap garis perintah "
 "dekat latar belakang.\n"
 "Mengandungi maklumat yang sama seperti fail debug.txt (nama lalai)."
 
@@ -7443,14 +7443,14 @@ msgstr "Had cURL selari"
 #~ msgid "Disabled unlimited viewing range"
 #~ msgstr "Jarak pandang tanpa had dilumpuhkan"
 
-#~ msgid "Don't show \"reinstall Minetest Game\" notification"
-#~ msgstr "Jangan tunjuk pemberitahuan \"pasang semula Minetest Game\""
+#~ msgid "Don't show \"reinstall AperosVoxel\" notification"
+#~ msgstr "Jangan tunjuk pemberitahuan \"pasang semula AperosVoxel\""
 
 #~ msgid "Down"
 #~ msgstr "Bawah"
 
-#~ msgid "Download a game, such as Minetest Game, from aperosvoxel.domain"
-#~ msgstr "Muat turun permainan, contohnya Minetest Game, dari aperosvoxel.domain"
+#~ msgid "Download a game, such as AperosVoxel, from aperosvoxel.domain"
+#~ msgstr "Muat turun permainan, contohnya AperosVoxel, dari aperosvoxel.domain"
 
 #~ msgid "Download one from aperosvoxel.domain"
 #~ msgstr "Muat turun satu dari aperosvoxel.domain"
@@ -7775,10 +7775,10 @@ msgstr "Had cURL selari"
 
 #~ msgid ""
 #~ "If this is set to true, the user will never (again) be shown the\n"
-#~ "\"reinstall Minetest Game\" notification."
+#~ "\"reinstall AperosVoxel\" notification."
 #~ msgstr ""
 #~ "Jika ditetapkan kepada \"true\", pengguna tidak akan ditunjukkan\n"
-#~ "pemberitahuan \"pasang semula Minetest Game\" (lagi)."
+#~ "pemberitahuan \"pasang semula AperosVoxel\" (lagi)."
 
 #~ msgid "In-Game"
 #~ msgstr "Dalam Permainan"
@@ -8454,10 +8454,10 @@ msgstr "Had cURL selari"
 #~ "html#a54da2a0e231901735e3da1b0edf72eb3"
 
 #~ msgid ""
-#~ "Keybindings. (If this menu screws up, remove stuff from minetest.conf)"
+#~ "Keybindings. (If this menu screws up, remove stuff from aperosengine.conf)"
 #~ msgstr ""
 #~ "Ikatan kekunci. (Jika menu ini berselerak, buang sesetengah benda dari "
-#~ "fail minetest.conf)"
+#~ "fail aperosengine.conf)"
 
 #~ msgid "Large chat console key"
 #~ msgstr "Kekunci konsol sembang besar"

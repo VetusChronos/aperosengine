@@ -36,14 +36,17 @@ class IGameDef;
 #define MAPSECTOR_SERVER 0
 #define MAPSECTOR_CLIENT 1
 
-class MapSector {
+class MapSector
+{
 public:
+
 	MapSector(Map *parent, v2s16 pos, IGameDef *gamedef);
 	virtual ~MapSector();
 
 	void deleteBlocks();
 
-	v2s16 getPos() const {
+	v2s16 getPos() const
+	{
 		return m_pos;
 	}
 
@@ -72,8 +75,8 @@ public:
 	bool empty() const { return m_blocks.empty(); }
 
 	int size() const { return m_blocks.size(); }
-
 protected:
+
 	// The pile of MapBlocks
 	std::unordered_map<s16, std::unique_ptr<MapBlock>> m_blocks;
 
@@ -92,4 +95,5 @@ protected:
 		Private methods
 	*/
 	MapBlock *getBlockBuffered(s16 y);
+
 };

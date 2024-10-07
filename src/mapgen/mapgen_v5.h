@@ -29,7 +29,8 @@ class BiomeManager;
 
 extern FlagDesc flagdesc_mapgen_v5[];
 
-struct MapgenV5Params : public MapgenParams {
+struct MapgenV5Params : public MapgenParams
+{
 	float cave_width = 0.09f;
 	s16 large_cave_depth = -256;
 	u16 small_cave_num_min = 0;
@@ -60,7 +61,8 @@ struct MapgenV5Params : public MapgenParams {
 	void setDefaultSettings(Settings *settings);
 };
 
-class MapgenV5 : public MapgenBasic {
+class MapgenV5 : public MapgenBasic
+{
 public:
 	MapgenV5(MapgenV5Params *params, EmergeParams *emerge);
 	~MapgenV5();

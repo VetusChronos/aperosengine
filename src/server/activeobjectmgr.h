@@ -24,8 +24,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "../activeobjectmgr.h"
 #include "serveractiveobject.h"
 
-namespace server {
-class ActiveObjectMgr final : public ::ActiveObjectMgr<ServerActiveObject> {
+namespace server
+{
+class ActiveObjectMgr final : public ::ActiveObjectMgr<ServerActiveObject>
+{
 public:
 	~ActiveObjectMgr() override;
 
@@ -44,7 +46,6 @@ public:
 	void getObjectsInArea(const aabb3f &box,
 			std::vector<ServerActiveObject *> &result,
 			std::function<bool(ServerActiveObject *obj)> include_obj_cb);
-
 	void getAddedActiveObjectsAroundPos(
 			const v3f &player_pos, const std::string &player_name,
 			f32 radius, f32 player_radius,

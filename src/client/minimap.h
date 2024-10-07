@@ -21,6 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "../hud.h"
 #include "irrlichttypes_extrabloated.h"
+#include "irr_ptr.h"
 #include "util/thread.h"
 #include "voxel.h"
 #include <map>
@@ -49,8 +50,9 @@ struct MinimapModeDef {
 };
 
 struct MinimapMarker {
-	MinimapMarker(scene::ISceneNode *parent_node) :
-			parent_node(parent_node) {
+	MinimapMarker(scene::ISceneNode *parent_node):
+		parent_node(parent_node)
+	{
 	}
 	scene::ISceneNode *parent_node;
 };
@@ -92,8 +94,7 @@ struct QueuedMinimapUpdate {
 
 class MinimapUpdateThread : public UpdateThread {
 public:
-	MinimapUpdateThread() :
-			UpdateThread("Minimap") {}
+	MinimapUpdateThread() : UpdateThread("Minimap") {}
 	virtual ~MinimapUpdateThread();
 
 	void getMap(v3s16 pos, s16 size, s16 height);
@@ -146,32 +147,32 @@ public:
 
 	void blitMinimapPixelsToImageRadar(video::IImage *map_image);
 	void blitMinimapPixelsToImageSurface(video::IImage *map_image,
-			video::IImage *heightmap_image);
+		video::IImage *heightmap_image);
 
-	scene::SMeshBuffer *getMinimapMeshBuffer();
+	irr_ptr<scene::SMeshBuffer> createMinimapMeshBuffer();
 
-	MinimapMarker *addMarker(scene::ISceneNode *parent_node);
+	MinimapMarker* addMarker(scene::ISceneNode *parent_node);
 	void removeMarker(MinimapMarker **marker);
 
 	void updateActiveMarkers();
 	void drawMinimap(core::rect<s32> rect);
 
 	video::IVideoDriver *driver;
-	Client *client;
-	MinimapData *data;
+	Client* client;
+	std::unique_ptr<MinimapData> data;
 
 private:
 	ITextureSource *m_tsrc;
 	IShaderSource *m_shdrsrc;
 	const NodeDefManager *m_ndef;
-	MinimapUpdateThread *m_minimap_update_thread = nullptr;
-	scene::SMeshBuffer *m_meshbuffer;
+	std::unique_ptr<MinimapUpdateThread> m_minimap_update_thread;
+	irr_ptr<scene::SMeshBuffer> m_meshbuffer;
 	bool m_enable_shaders;
 	std::vector<MinimapModeDef> m_modes;
 	size_t m_current_mode_index;
 	u16 m_surface_mode_scan_height;
 	f32 m_angle;
 	std::mutex m_mutex;
-	std::list<MinimapMarker *> m_markers;
+	std::list<std::unique_ptr<MinimapMarker>> m_markers;
 	std::list<v2f> m_active_markers;
 };

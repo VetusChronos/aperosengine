@@ -19,18 +19,22 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #pragma once
 
-#include "util/pointer.h"
+#include "util/pointer.h" // Buffer<T>
+#include "irrlichttypes_bloated.h"
 #include "networkprotocol.h"
 #include <SColor.h>
 
-class NetworkPacket {
+class NetworkPacket
+{
 public:
 	NetworkPacket(u16 command, u32 preallocate, session_t peer_id) :
-			m_command(command), m_peer_id(peer_id) {
+		m_command(command), m_peer_id(peer_id)
+	{
 		m_data.reserve(preallocate);
 	}
 	NetworkPacket(u16 command, u32 preallocate) :
-			m_command(command) {
+		m_command(command)
+	{
 		m_data.reserve(preallocate);
 	}
 	NetworkPacket() = default;
@@ -52,7 +56,8 @@ public:
 	const char *getString(u32 from_offset) const;
 	// major difference to putCString(): doesn't write len into the buffer
 	void putRawString(const char *src, u32 len);
-	void putRawString(std::string_view src) {
+	void putRawString(std::string_view src)
+	{
 		putRawString(src.data(), src.size());
 	}
 
@@ -123,7 +128,8 @@ public:
 private:
 	void checkReadOffset(u32 from_offset, u32 field_size) const;
 
-	inline void checkDataSize(u32 field_size) {
+	inline void checkDataSize(u32 field_size)
+	{
 		if (m_read_offset + field_size > m_datasize) {
 			m_datasize = m_read_offset + field_size;
 			m_data.resize(m_datasize);

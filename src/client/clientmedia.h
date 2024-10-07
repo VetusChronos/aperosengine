@@ -37,14 +37,15 @@ struct HTTPFetchResult;
 // Caller should check the hash.
 // return true if something was updated
 bool clientMediaUpdateCache(const std::string &raw_hash,
-		const std::string &filedata);
+	const std::string &filedata);
 
 // Copy file on disk(!) into media cache (unless it exists already)
 bool clientMediaUpdateCacheCopy(const std::string &raw_hash,
-		const std::string &path);
+	const std::string &path);
 
 // more of a base class than an interface but this name was most convenient...
-class IClientMediaDownloader {
+class IClientMediaDownloader
+{
 public:
 	DISABLE_CLASS_COPY(IClientMediaDownloader)
 
@@ -82,7 +83,7 @@ protected:
 
 	// Forwards the call to the appropriate Client method
 	virtual bool loadMedia(Client *client, const std::string &data,
-			const std::string &name) = 0;
+		const std::string &name) = 0;
 
 	bool tryLoadFromCache(const std::string &name, const std::string &sha1,
 			Client *client);
@@ -95,7 +96,8 @@ protected:
 	bool m_write_to_cache;
 };
 
-class ClientMediaDownloader : public IClientMediaDownloader {
+class ClientMediaDownloader : public IClientMediaDownloader
+{
 public:
 	ClientMediaDownloader();
 	~ClientMediaDownloader();
@@ -103,7 +105,7 @@ public:
 	float getProgress() const {
 		if (m_uncached_count >= 1)
 			return 1.0f * m_uncached_received_count /
-					m_uncached_count;
+				m_uncached_count;
 
 		return 0.0f;
 	}
@@ -114,7 +116,7 @@ public:
 
 	bool isDone() const override {
 		return m_initial_step_done &&
-				m_uncached_received_count == m_uncached_count;
+			m_uncached_received_count == m_uncached_count;
 	}
 
 	void addFile(const std::string &name, const std::string &sha1) override;
@@ -158,10 +160,10 @@ private:
 	std::string serializeRequiredHashSet();
 
 	// Maps filename to file status
-	std::map<std::string, FileStatus *> m_files;
+	std::map<std::string, FileStatus*> m_files;
 
 	// Array of remote media servers
-	std::vector<RemoteServerStatus *> m_remotes;
+	std::vector<RemoteServerStatus*> m_remotes;
 
 	// Has an attempt been made to load media files from the file cache?
 	// Have hash sets been requested from remote servers?
@@ -186,6 +188,7 @@ private:
 	// don't need to be looked at again
 	// (use m_files.upper_bound(m_name_bound) to get an iterator)
 	std::string m_name_bound = "";
+
 };
 
 // A media downloader that only downloads a single file.
@@ -193,7 +196,8 @@ private:
 // - won't fetch hash sets from remote servers
 // - will mark loaded media as coming from file push
 // - writing to file cache is optional
-class SingleMediaDownloader : public IClientMediaDownloader {
+class SingleMediaDownloader : public IClientMediaDownloader
+{
 public:
 	SingleMediaDownloader(bool write_to_cache);
 	~SingleMediaDownloader();
@@ -244,4 +248,5 @@ private:
 	// Status of remote transfers
 	unsigned long m_httpfetch_caller;
 	unsigned long m_httpfetch_next_id = 0;
+
 };

@@ -34,7 +34,8 @@ struct ItemStack;
 class Inventory;
 struct ItemDefinition;
 
-class ScriptApiClient : virtual public ScriptApiBase {
+class ScriptApiClient : virtual public ScriptApiBase
+{
 public:
 	// Calls when mods are loaded
 	void on_mods_loaded();
@@ -48,7 +49,6 @@ public:
 
 	void on_damage_taken(int32_t damage_amount);
 	void on_hp_modification(int32_t newhp);
-	void on_death();
 	void environment_step(float dtime);
 	void on_formspec_input(const std::string &formname, const StringMap &fields);
 

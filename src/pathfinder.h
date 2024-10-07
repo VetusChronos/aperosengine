@@ -45,9 +45,9 @@ typedef enum {
 
 /** List of supported algorithms */
 typedef enum {
-	PA_DIJKSTRA, /**< Dijkstra shortest path algorithm             */
-	PA_PLAIN, /**< A* algorithm using heuristics to find a path */
-	PA_PLAIN_NP /**< A* algorithm without prefetching of map data */
+	PA_DIJKSTRA,           /**< Dijkstra shortest path algorithm             */
+	PA_PLAIN,            /**< A* algorithm using heuristics to find a path */
+	PA_PLAIN_NP          /**< A* algorithm without prefetching of map data */
 } PathAlgorithm;
 
 /******************************************************************************/

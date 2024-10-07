@@ -1,6 +1,6 @@
 /*
 Minetest
-Copyright (C) 2010-2013 kwolekr, Ryan Kwolek <kwolekr@aperosvoxel.domain>
+Copyright (C) 2010-2013 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -28,14 +28,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "mapgen/mapgen.h" // for MapgenParams
 #include "map.h"
 
-#define BLOCK_EMERGE_ALLOW_GEN (1 << 0)
+#define BLOCK_EMERGE_ALLOW_GEN   (1 << 0)
 #define BLOCK_EMERGE_FORCE_QUEUE (1 << 1)
 
-#define EMERGE_DBG_OUT(x)                             \
-	{                                                 \
-		if (enable_mapgen_debug_info)                 \
-			infostream << "EmergeThread: " x << '\n'; \
-	}
+#define EMERGE_DBG_OUT(x) {                            \
+	if (enable_mapgen_debug_info)                      \
+		infostream << "EmergeThread: " x << std::endl; \
+}
 
 class EmergeThread;
 class NodeDefManager;
@@ -47,6 +46,7 @@ class DecorationManager;
 class SchematicManager;
 class Server;
 class ModApiMapgen;
+struct MapDatabaseAccessor;
 
 // Structure containing inputs/outputs for chunk generation
 struct BlockMakeData {
@@ -82,13 +82,14 @@ constexpr const char *emergeActionStrs[] = {
 
 // Callback
 typedef void (*EmergeCompletionCallback)(
-		v3s16 blockpos, EmergeAction action, void *param);
+	v3s16 blockpos, EmergeAction action, void *param);
 
 typedef std::vector<
-		std::pair<
-				EmergeCompletionCallback,
-				void *>>
-		EmergeCallbackList;
+	std::pair<
+		EmergeCompletionCallback,
+		void *
+	>
+> EmergeCallbackList;
 
 struct BlockEmergeData {
 	u16 peer_requested;
@@ -98,7 +99,6 @@ struct BlockEmergeData {
 
 class EmergeParams {
 	friend class EmergeManager;
-
 public:
 	EmergeParams() = delete;
 	~EmergeParams();
@@ -119,14 +119,14 @@ public:
 
 	inline GenerateNotifier createNotifier() const {
 		return GenerateNotifier(gen_notify_on, gen_notify_on_deco_ids,
-				gen_notify_on_custom);
+			gen_notify_on_custom);
 	}
 
 private:
 	EmergeParams(EmergeManager *parent, const BiomeGen *biomegen,
-			const BiomeManager *biomemgr,
-			const OreManager *oremgr, const DecorationManager *decomgr,
-			const SchematicManager *schemmgr);
+		const BiomeManager *biomemgr,
+		const OreManager *oremgr, const DecorationManager *decomgr,
+		const SchematicManager *schemmgr);
 };
 
 class EmergeManager {
@@ -135,7 +135,6 @@ class EmergeManager {
 	 * - using schemmgr to load and place schematics
 	 */
 	friend class ModApiMapgen;
-
 public:
 	const NodeDefManager *ndef;
 	bool enable_mapgen_debug_info;
@@ -175,24 +174,29 @@ public:
 	SchematicManager *getWritableSchematicManager();
 
 	void initMapgens(MapgenParams *mgparams);
+	/// @param holder non-owned reference that must stay alive
+	void initMap(MapDatabaseAccessor *holder);
+	/// resets the reference
+	void resetMap();
 
 	void startThreads();
 	void stopThreads();
 	bool isRunning();
 
 	bool enqueueBlockEmerge(
-			session_t peer_id,
-			v3s16 blockpos,
-			bool allow_generate,
-			bool ignore_queue_limits = false);
+		session_t peer_id,
+		v3s16 blockpos,
+		bool allow_generate,
+		bool ignore_queue_limits=false);
 
 	bool enqueueBlockEmergeEx(
-			v3s16 blockpos,
-			session_t peer_id,
-			u16 flags,
-			EmergeCompletionCallback callback,
-			void *callback_param);
+		v3s16 blockpos,
+		session_t peer_id,
+		u16 flags,
+		EmergeCompletionCallback callback,
+		void *callback_param);
 
+	size_t getQueueSize();
 	bool isBlockInQueue(v3s16 pos);
 
 	Mapgen *getCurrentMapgen();
@@ -207,6 +211,9 @@ private:
 	std::vector<Mapgen *> m_mapgens;
 	std::vector<EmergeThread *> m_threads;
 	bool m_threads_active = false;
+
+	// The map database
+	MapDatabaseAccessor *m_db = nullptr;
 
 	std::mutex m_queue_mutex;
 	std::map<v3s16, BlockEmergeData> m_blocks_enqueued;
@@ -231,12 +238,12 @@ private:
 	EmergeThread *getOptimalThread();
 
 	bool pushBlockEmergeData(
-			v3s16 pos,
-			u16 peer_requested,
-			u16 flags,
-			EmergeCompletionCallback callback,
-			void *callback_param,
-			bool *entry_already_exists);
+		v3s16 pos,
+		u16 peer_requested,
+		u16 flags,
+		EmergeCompletionCallback callback,
+		void *callback_param,
+		bool *entry_already_exists);
 
 	bool popBlockEmergeData(v3s16 pos, BlockEmergeData *bedata);
 

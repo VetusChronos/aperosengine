@@ -16,7 +16,7 @@
 #endif
 
 #ifdef __MINGW32__
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "aperosvoxel.exe.manifest"
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "minetest.exe.manifest"
 #endif
 
 LANGUAGE 0, SUBLANG_NEUTRAL
@@ -49,9 +49,9 @@ BEGIN
         VALUE "FileDescription", PROJECT_NAME_C " engine"
         VALUE "FileVersion", VERSION_STRING
         VALUE "InternalName", PROJECT_NAME
-        VALUE "LegalCopyright", "(c) 2024 YunaSato"
+        VALUE "LegalCopyright", "(c) 2011-2015 celeron55"
         VALUE "LegalTrademarks", """AperosEngine"" is the property of the AperosEngine community, don't use it without permission!"
-        VALUE "OriginalFilename", "aperosvoxel.exe"
+        VALUE "OriginalFilename", "minetest.exe"
         VALUE "PrivateBuild", VERSION_EXTRA
         VALUE "ProductName", PROJECT_NAME_C
         VALUE "ProductVersion", PRODUCT_VERSION_STRING

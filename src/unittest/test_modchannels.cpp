@@ -22,7 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "gamedef.h"
 #include "modchannels.h"
 
-class TestModChannels : public TestBase {
+class TestModChannels : public TestBase
+{
 public:
 	TestModChannels() { TestManager::registerTestModule(this); }
 	const char *getName() { return "TestModChannels"; }
@@ -36,20 +37,23 @@ public:
 
 static TestModChannels g_test_instance;
 
-void TestModChannels::runTests(IGameDef *gamedef) {
+void TestModChannels::runTests(IGameDef *gamedef)
+{
 	TEST(testJoinChannel, gamedef);
 	TEST(testLeaveChannel, gamedef);
 	TEST(testSendMessageToChannel, gamedef);
 }
 
-void TestModChannels::testJoinChannel(IGameDef *gamedef) {
+void TestModChannels::testJoinChannel(IGameDef *gamedef)
+{
 	// Test join
 	UASSERT(gamedef->joinModChannel("test_join_channel"));
 	// Test join (fail, already join)
 	UASSERT(!gamedef->joinModChannel("test_join_channel"));
 }
 
-void TestModChannels::testLeaveChannel(IGameDef *gamedef) {
+void TestModChannels::testLeaveChannel(IGameDef *gamedef)
+{
 	// Test leave (not joined)
 	UASSERT(!gamedef->leaveModChannel("test_leave_channel"));
 
@@ -59,7 +63,8 @@ void TestModChannels::testLeaveChannel(IGameDef *gamedef) {
 	UASSERT(gamedef->leaveModChannel("test_leave_channel"));
 }
 
-void TestModChannels::testSendMessageToChannel(IGameDef *gamedef) {
+void TestModChannels::testSendMessageToChannel(IGameDef *gamedef)
+{
 	// Test sendmsg (not joined)
 	UASSERT(!gamedef->sendModChannelMessage(
 			"test_sendmsg_channel", "testmsgchannel"));

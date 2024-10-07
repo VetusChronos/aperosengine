@@ -21,7 +21,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include "server.h"
-#include "networkprotocol.h"
 
 class NetworkPacket;
 // Note: don't forward-declare Server here (#14324)
@@ -32,14 +31,16 @@ enum ToServerConnectionState {
 	TOSERVER_STATE_INGAME,
 	TOSERVER_STATE_ALL,
 };
-struct ToServerCommandHandler {
+struct ToServerCommandHandler
+{
 	const char *name;
 	ToServerConnectionState state;
-	void (Server::*handler)(NetworkPacket *pkt);
+	void (Server::*handler)(NetworkPacket* pkt);
 };
 
-struct ClientCommandFactory {
-	const char *name;
+struct ClientCommandFactory
+{
+	const char* name;
 	u8 channel;
 	bool reliable;
 };

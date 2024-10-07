@@ -1,7 +1,7 @@
 # Project properties
 PROJECT_NAME           = @PROJECT_NAME_CAPITALIZED@
 PROJECT_NUMBER         = @VERSION_STRING@
-PROJECT_LOGO           = @CMAKE_CURRENT_SOURCE_DIR@/misc/aperosengine.svg
+PROJECT_LOGO           = @CMAKE_CURRENT_SOURCE_DIR@/misc/aperosengine-icon.jpg
 
 # Parsing
 JAVADOC_AUTOBRIEF      = YES
@@ -30,7 +30,7 @@ CALL_GRAPH             = YES
 CALLER_GRAPH           = YES
 MAX_DOT_GRAPH_DEPTH    = 3
 DOT_MULTI_TARGETS      = YES
-DOT_IMAGE_FORMAT       = svg
+DOT_IMAGE_FORMAT       = jpg
 
 # Output
 GENERATE_LATEX         = NO

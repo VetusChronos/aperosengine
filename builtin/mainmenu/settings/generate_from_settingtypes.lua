@@ -15,6 +15,9 @@ local aperosengine_example_header = [[
 #    Any other path can be chosen by passing the path as a parameter
 #    to the program, eg. "aperosvoxel.exe --config ../aperosengine.conf.example".
 
+#    Further documentation:
+#    https://wiki.aperosvoxel.domain/
+
 ]]
 
 local group_format_template = [[
@@ -58,7 +61,7 @@ local function create_aperosengine_conf_example(settings)
 				end
 			end
 			if entry.type == "key" then
-				local line = "See https://github.com/minetest/irrlicht/blob/master/include/Keycodes.h"
+				local line = "See https://github.com/vetuschronos/aperosengine/blob/main/irr/include/Keycodes.h"
 				insert(result, "#    " .. line .. "\n")
 			end
 			insert(result, "#    type: " .. entry.type)
@@ -123,7 +126,7 @@ local function create_translation_file(settings)
 	return concat(result, "\n")
 end
 
-local file = assert(io.open("aperosvoxel.conf.example", "w"))
+local file = assert(io.open("aperosengine.conf.example", "w"))
 file:write(create_aperosengine_conf_example(settingtypes.parse_config_file(true, false)))
 file:close()
 

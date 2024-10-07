@@ -15,9 +15,9 @@
 --with this program; if not, write to the Free Software Foundation, Inc.,
 --51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-local mods_dir = "/tmp/.minetest/mods"
-local games_dir = "/tmp/.minetest/games"
-local txp_dir = "/tmp/.minetest/textures"
+local mods_dir = "/tmp/.aperosengine/mods"
+local games_dir = "/tmp/.aperosengine/games"
+local txp_dir = "/tmp/.aperosengine/textures"
 
 local function reset()
 	local env = {

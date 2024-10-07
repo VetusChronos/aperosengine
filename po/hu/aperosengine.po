@@ -1,12 +1,12 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Hungarian (Minetest)\n"
+"Project-Id-Version: Hungarian (AperosEngine)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-11 15:14+0200\n"
 "PO-Revision-Date: 2024-06-28 05:09+0000\n"
 "Last-Translator: Kisbenedek Márton <martonkisbenedek@gmail.com>\n"
-"Language-Team: Hungarian <https://hosted.weblate.org/projects/minetest/"
-"minetest/hu/>\n"
+"Language-Team: Hungarian <https://hosted.weblate.org/projects/AperosEngine/"
+"AperosEngine/hu/>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -176,8 +176,8 @@ msgid "Back to Main Menu"
 msgstr "Vissza a főmenübe"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
-msgid "ContentDB is not available when Minetest was compiled without cURL"
-msgstr "A ContentDB nem elérhető, ha a Minetest cURL nélkül lett lefordítva"
+msgid "ContentDB is not available when AperosEngine was compiled without cURL"
+msgstr "A ContentDB nem elérhető, ha a AperosEngine cURL nélkül lett lefordítva"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid "Downloading..."
@@ -675,29 +675,29 @@ msgstr "Elhagy(ás)"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"For a long time, the Minetest engine shipped with a default game called "
-"\"Minetest Game\". Since Minetest 5.8.0, Minetest ships without a default "
+"For a long time, the AperosEngine engine shipped with a default game called "
+"\"AperosVoxel\". Since AperosEngine 5.8.0, AperosEngine ships without a default "
 "game."
 msgstr ""
-"A Minetest motort hosszú ideig a \"Minetest Game\" nevű alapértelmezett "
-"játékkal települt. A Minetest 5.8.0 óta a Minetest alapértelmezett játék "
+"A AperosEngine motort hosszú ideig a \"AperosVoxel\" nevű alapértelmezett "
+"játékkal települt. A AperosEngine 5.8.0 óta a AperosEngine alapértelmezett játék "
 "nélkül települ."
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"If you want to continue playing in your Minetest Game worlds, you need to "
-"reinstall Minetest Game."
+"If you want to continue playing in your AperosVoxel worlds, you need to "
+"reinstall AperosVoxel."
 msgstr ""
-"Ha szeretnéd folytatni a Minetest alap játékában generált pályádat, akkor "
-"újra kell telepítened a Minetest alap játékát."
+"Ha szeretnéd folytatni a AperosEngine alap játékában generált pályádat, akkor "
+"újra kell telepítened a AperosEngine alap játékát."
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Minetest Game is no longer installed by default"
-msgstr "A Minetest Game már nem települ alapból"
+msgid "AperosVoxel is no longer installed by default"
+msgstr "A AperosVoxel már nem települ alapból"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Reinstall Minetest Game"
-msgstr "Minetest Game újratelepítése"
+msgid "Reinstall AperosVoxel"
+msgstr "AperosVoxel újratelepítése"
 
 #: builtin/mainmenu/dlg_rename_modpack.lua
 msgid "Accept"
@@ -1072,12 +1072,12 @@ msgstr "Játékok telepítése ContentDB-ről"
 
 #: builtin/mainmenu/tab_local.lua
 #, fuzzy
-msgid "Aperos Engine doesn't come with the AperosVoxel by default."
-msgstr "A Minetest Game már nem települ alapból"
+msgid "AperosEngine doesn't come with a game by default."
+msgstr "A AperosVoxel már nem települ alapból"
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"Aperos Engine is a game creation platform that allows you to create different games."
+"AperosEngine is a game-creation platform that allows you to play many different "
 "games."
 msgstr ""
 
@@ -2869,7 +2869,7 @@ msgid ""
 "software',\n"
 "as defined by the Free Software Foundation.\n"
 "You can also specify content ratings.\n"
-"These flags are independent from Minetest versions,\n"
+"These flags are independent from AperosEngine versions,\n"
 "so see a full list at https://content.aperosvoxel.domain/help/content_flags/"
 msgstr ""
 "A tartalomtárban elrejtendő jelölők vesszővel tagolt listája.\n"
@@ -2878,7 +2878,7 @@ msgstr ""
 "\"szabad szoftverek kategóriájába a Free Software Foundation meghatározása "
 "szerint.\n"
 "Megadhatja továbbá a tartalom besorolásait is.\n"
-"Ezek a jelölők függetlenek a Minetest verziótól, ezért nézze meg\n"
+"Ezek a jelölők függetlenek a AperosEngine verziótól, ezért nézze meg\n"
 "a teljes listát itt: https://content.aperosvoxel.domain/help/content_flags/"
 
 #: src/settings_translation_file.cpp
@@ -3095,7 +3095,7 @@ msgid ""
 "expecting.\n"
 "This allows for more fine-grained control than "
 "strict_protocol_version_checking.\n"
-"Minetest still enforces its own internal minimum, and enabling\n"
+"AperosEngine still enforces its own internal minimum, and enabling\n"
 "strict_protocol_version_checking will effectively override this."
 msgstr ""
 "Régi verziójú kliensek csatlakozásának tiltása.\n"
@@ -4235,10 +4235,10 @@ msgstr "Csevegésparancsok behangolása regisztrációkor."
 #: src/settings_translation_file.cpp
 msgid ""
 "Instrument global callback functions on registration.\n"
-"(anything you pass to a minetest.register_*() function)"
+"(anything you pass to a AperosEngine.register_*() function)"
 msgstr ""
 "A globális callback függvények behangolása regisztrációkor.\n"
-"(bármi, amit átadsz egy minetest.register_*() függvénynek)"
+"(bármi, amit átadsz egy AperosEngine.register_*() függvénynek)"
 
 #: src/settings_translation_file.cpp
 msgid ""
@@ -5230,11 +5230,11 @@ msgstr "Üzenetek száma amit egy játékos küldhet / 10 s."
 #: src/settings_translation_file.cpp
 msgid ""
 "Number of threads to use for mesh generation.\n"
-"Value of 0 (default) will let Minetest autodetect the number of available "
+"Value of 0 (default) will let AperosEngine autodetect the number of available "
 "threads."
 msgstr ""
 "A háló létrehozásához használt szálak száma.\n"
-"A 0 (alapértelmezett) érték lehetővé teszi, hogy a Minetest automatikusan "
+"A 0 (alapértelmezett) érték lehetővé teszi, hogy a AperosEngine automatikusan "
 "felismerje az elérhető szálak számát."
 
 #: src/settings_translation_file.cpp
@@ -5392,12 +5392,12 @@ msgstr "Prometheus figyelési cím"
 #: src/settings_translation_file.cpp
 msgid ""
 "Prometheus listener address.\n"
-"If Minetest is compiled with ENABLE_PROMETHEUS option enabled,\n"
+"If AperosEngine is compiled with ENABLE_PROMETHEUS option enabled,\n"
 "enable metrics listener for Prometheus on that address.\n"
 "Metrics can be fetched on http://127.0.0.1:30000/metrics"
 msgstr ""
 "Prometheus figyelési cím.\n"
-"Ha a Minetest-et az ENABLE_PROMETHEUS opció engedélyezésével állítták "
+"Ha a AperosEngine-et az ENABLE_PROMETHEUS opció engedélyezésével állítták "
 "össze,\n"
 "elérhetővé válnak a Prometheus mérőszám figyelői ezen a címen.\n"
 "A mérőszámok itt érhetők el: http://127.0.0.1:30000/metrics"
@@ -5906,7 +5906,7 @@ msgid "Shader path"
 msgstr "Árnyaló útvonala"
 
 #: src/settings_translation_file.cpp
-msgid "Shaders"
+msgid "Effects"
 msgstr "Árnyalók"
 
 #: src/settings_translation_file.cpp
@@ -6305,14 +6305,14 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"The gesture for punching players/entities.\n"
+"The gesture for for punching players/entities.\n"
 "This can be overridden by games and mods.\n"
 "\n"
 "* short_tap\n"
 "Easy to use and well-known from other games that shall not be named.\n"
 "\n"
 "* long_tap\n"
-"Known from the classic Minetest mobile controls.\n"
+"Known from the classic AperosEngine mobile controls.\n"
 "Combat is more or less impossible."
 msgstr ""
 
@@ -6589,10 +6589,10 @@ msgstr ""
 #: src/settings_translation_file.cpp
 #, fuzzy
 msgid ""
-"URL to JSON file which provides information about the newest Minetest "
+"URL to JSON file which provides information about the newest AperosEngine "
 "release\n"
 "If this is empty the engine will never check for updates."
-msgstr "A JSON fájl URL-ja a legújabb Minetest kiadásról"
+msgstr "A JSON fájl URL-ja a legújabb AperosEngine kiadásról"
 
 #: src/settings_translation_file.cpp
 msgid "URL to the server list displayed in the Multiplayer Tab."
@@ -7007,11 +7007,11 @@ msgstr "Az ablak már teljes képernyős"
 
 #: src/settings_translation_file.cpp
 msgid ""
-"Windows systems only: Start Minetest with the command line window in the "
+"Windows systems only: Start AperosEngine with the command line window in the "
 "background.\n"
 "Contains the same information as the file debug.txt (default name)."
 msgstr ""
-"Csak Windows rendszeren: Minetest indítása parancssorral a háttérben.\n"
+"Csak Windows rendszeren: AperosEngine indítása parancssorral a háttérben.\n"
 "Ugyanazokat az információkat tartalmazza, mint a debug.txt fájl "
 "(alapértelmezett név)."
 
@@ -7436,8 +7436,8 @@ msgstr "cURL párhuzamossági korlát"
 #~ msgid "Down"
 #~ msgstr "Le"
 
-#~ msgid "Download a game, such as Minetest Game, from aperosvoxel.domain"
-#~ msgstr "Játék (mint a minetest_game) letöltése a aperosvoxel.domain címről"
+#~ msgid "Download a game, such as AperosVoxel, from aperosvoxel.domain"
+#~ msgstr "Játék (mint a AperosEngine_game) letöltése a aperosvoxel.domain címről"
 
 #~ msgid "Download one from aperosvoxel.domain"
 #~ msgstr "Letöltés a aperosvoxel.domain címről"
@@ -8418,10 +8418,10 @@ msgstr "cURL párhuzamossági korlát"
 #~ "html#a54da2a0e231901735e3da1b0edf72eb3"
 
 #~ msgid ""
-#~ "Keybindings. (If this menu screws up, remove stuff from minetest.conf)"
+#~ "Keybindings. (If this menu screws up, remove stuff from aperosengine.conf)"
 #~ msgstr ""
 #~ "Billentyűzetkiosztás. (Ha ez a menü összeomlik, távolíts el néhány dolgot "
-#~ "a minetest.conf-ból)"
+#~ "a aperosengine.conf-ból)"
 
 #~ msgid "Large chat console key"
 #~ msgstr "Nagy csevegéskonzol gomb"

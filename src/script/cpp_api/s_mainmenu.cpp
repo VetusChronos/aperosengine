@@ -21,7 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "cpp_api/s_internal.h"
 #include "common/c_converter.h"
 
-void ScriptApiMainMenu::setMainMenuData(const MainMenuDataForScript *data) {
+void ScriptApiMainMenu::setMainMenuData(const MainMenuDataForScript *data)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	lua_getglobal(L, "gamedata");
@@ -37,7 +38,8 @@ void ScriptApiMainMenu::setMainMenuData(const MainMenuDataForScript *data) {
 	lua_pop(L, 1);
 }
 
-void ScriptApiMainMenu::handleMainMenuEvent(const std::string &text) {
+void ScriptApiMainMenu::handleMainMenuEvent(const std::string &text)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
@@ -58,7 +60,8 @@ void ScriptApiMainMenu::handleMainMenuEvent(const std::string &text) {
 	lua_pop(L, 1); // Pop error handler
 }
 
-void ScriptApiMainMenu::handleMainMenuButtons(const StringMap &fields) {
+void ScriptApiMainMenu::handleMainMenuButtons(const StringMap &fields)
+{
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);

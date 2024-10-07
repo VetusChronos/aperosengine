@@ -20,82 +20,84 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "filecache.h"
 
+#include "log.h"
+#include "filesys.h"
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <filesystem>
-#include <system_error>
+#include <cstdlib>
 
-#include "network/networkprotocol.h"
-#include "log.h"
-
-namespace fs = std::filesystem;
-
-void FileCache::createDir() {
-	std::error_code ec;
-	if (!fs::create_directories(m_dir, ec) && ec) {
-		errorstream << "Could not create cache directory: " << m_dir << " - " << ec.message() << '\n';
+void FileCache::createDir()
+{
+	if (!fs::CreateAllDirs(m_dir)) {
+		errorstream << "Could not create cache directory: "
+			<< m_dir << '\n';
 	}
 }
 
-bool FileCache::loadByPath(const std::string &path, std::ostream &os) {
-	std::ifstream fis(path, std::ios::binary);
-	if (!fis) {
+bool FileCache::loadByPath(const std::string &path, std::ostream &os)
+{
+	auto fis = open_ifstream(path.c_str(), false);
+	if (!fis.good())
 		return false;
+
+	bool bad = false;
+	for(;;){
+		char buf[4096];
+		fis.read(buf, sizeof(buf));
+		std::streamsize len = fis.gcount();
+		os.write(buf, len);
+		if(fis.eof())
+			break;
+		if(!fis.good()){
+			bad = true;
+			break;
+		}
+	}
+	if(bad){
+		errorstream<<"FileCache: Failed to read file from cache: \""
+				<<path<<"\""<<'\n';
 	}
 
-	os << fis.rdbuf();
-	if (fis.bad()) {
-		errorstream << "FileCache: Failed to read file from cache: \"" << path << "\"" << '\n';
-		return false;
-	}
-
-	return true;
+	return !bad;
 }
 
-bool FileCache::updateByPath(const std::string &path, std::string_view data) {
+bool FileCache::updateByPath(const std::string &path, std::string_view data)
+{
 	createDir();
 
-	std::ofstream file(path, std::ios::binary);
-	if (!file) {
+	auto file = open_ofstream(path.c_str(), true);
+	if (!file.good())
 		return false;
-	}
 
-	file.write(data.data(), data.size());
-	if (file.fail()) {
-		errorstream << "FileCache: Failed to write file to cache: \"" << path << "\"" << '\n';
-		return false;
-	}
+	file << data;
+	file.close();
 
-	return true;
+	return !file.fail();
 }
 
-bool FileCache::update(const std::string &name, std::string_view data) {
-	std::string path = m_dir + fs::path::preferred_separator + name;
+bool FileCache::update(const std::string &name, std::string_view data)
+{
+	std::string path = m_dir + DIR_DELIM + name;
 	return updateByPath(path, data);
 }
 
-bool FileCache::load(const std::string &name, std::ostream &os) {
-	std::string path = m_dir + fs::path::preferred_separator + name;
+bool FileCache::load(const std::string &name, std::ostream &os)
+{
+	std::string path = m_dir + DIR_DELIM + name;
 	return loadByPath(path, os);
 }
 
-bool FileCache::exists(const std::string &name) {
-	std::string path = m_dir + fs::path::preferred_separator + name;
-	return fs::exists(path);
+bool FileCache::exists(const std::string &name)
+{
+	std::string path = m_dir + DIR_DELIM + name;
+	return fs::PathExists(path);
 }
 
-bool FileCache::updateCopyFile(const std::string &name, const std::string &src_path) {
-	std::string path = m_dir + fs::path::preferred_separator + name;
+bool FileCache::updateCopyFile(const std::string &name, const std::string &src_path)
+{
+	std::string path = m_dir + DIR_DELIM + name;
+
 	createDir();
-
-	std::error_code ec;
-	fs::copy_file(src_path, path, fs::copy_options::overwrite_existing, ec);
-	if (ec) {
-		errorstream << "FileCache: Failed to copy file from \"" << src_path << "\" to \"" << path << "\" - "
-					<< ec.message() << '\n';
-		return false;
-	}
-
-	return true;
+	return fs::CopyFileContents(src_path, path);
 }

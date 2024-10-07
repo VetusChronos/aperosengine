@@ -30,13 +30,11 @@ struct LightPair {
 	u8 lightNight;
 
 	LightPair() = default;
-	explicit LightPair(u16 value) :
-			lightDay(value & 0xff), lightNight(value >> 8) {}
-	LightPair(u8 valueA, u8 valueB) :
-			lightDay(valueA), lightNight(valueB) {}
+	explicit LightPair(u16 value) : lightDay(value & 0xff), lightNight(value >> 8) {}
+	LightPair(u8 valueA, u8 valueB) : lightDay(valueA), lightNight(valueB) {}
 	LightPair(float valueA, float valueB) :
-			lightDay(core::clamp(core::round32(valueA), 0, 255)),
-			lightNight(core::clamp(core::round32(valueB), 0, 255)) {}
+		lightDay(core::clamp(core::round32(valueA), 0, 255)),
+		lightNight(core::clamp(core::round32(valueB), 0, 255)) {}
 	operator u16() const { return lightDay | lightNight << 8; }
 };
 
@@ -45,10 +43,12 @@ struct LightInfo {
 	float light_night;
 	float light_boosted;
 
-	LightPair getPair(float sunlight_boost = 0.0) const {
+	LightPair getPair(float sunlight_boost = 0.0) const
+	{
 		return LightPair(
-				(1 - sunlight_boost) * light_day + sunlight_boost * light_boosted,
-				light_night);
+			(1 - sunlight_boost) * light_day
+			+ sunlight_boost * light_boosted,
+			light_night);
 	}
 };
 
@@ -58,7 +58,8 @@ struct LightFrame {
 	bool sunlight[8];
 };
 
-class MapblockMeshGenerator {
+class MapblockMeshGenerator
+{
 public:
 	MapblockMeshGenerator(MeshMakeData *input, MeshCollector *output,
 			scene::IMeshManipulator *mm);
@@ -74,10 +75,10 @@ private:
 
 	const v3s16 blockpos_nodes;
 
-	// options
+// options
 	const bool enable_mesh_cache;
 
-	// current node
+// current node
 	struct {
 		v3s16 p;
 		v3f origin;
@@ -90,30 +91,30 @@ private:
 		f32 scale;
 	} cur_node;
 
-	// lighting
+// lighting
 	void getSmoothLightFrame();
 	LightInfo blendLight(const v3f &vertex_pos);
 	video::SColor blendLightColor(const v3f &vertex_pos);
 	video::SColor blendLightColor(const v3f &vertex_pos, const v3f &vertex_normal);
 
 	void useTile(int index = 0, u8 set_flags = MATERIAL_FLAG_CRACK_OVERLAY,
-			u8 reset_flags = 0, bool special = false);
+		u8 reset_flags = 0, bool special = false);
 	void getTile(int index, TileSpec *tile);
 	void getTile(v3s16 direction, TileSpec *tile);
 	void getSpecialTile(int index, TileSpec *tile, bool apply_crack = false);
 
-	// face drawing
+// face drawing
 	void drawQuad(v3f *vertices, const v3s16 &normal = v3s16(0, 0, 0),
-			float vertical_tiling = 1.0);
+		float vertical_tiling = 1.0);
 
-	// cuboid drawing!
+// cuboid drawing!
 	template <typename Fn>
 	void drawCuboid(const aabb3f &box, TileSpec *tiles, int tilecount, const f32 *txc, u8 mask, Fn &&face_lighter);
 	void generateCuboidTextureCoords(aabb3f const &box, f32 *coords);
 	void drawAutoLightedCuboid(aabb3f box, f32 const *txc = nullptr, TileSpec *tiles = nullptr, int tile_count = 0, u8 mask = 0);
 	u8 getNodeBoxMask(aabb3f box, u8 solid_neighbors, u8 sametype_neighbors) const;
 
-	// liquid-specific
+// liquid-specific
 	struct LiquidData {
 		struct NeighborData {
 			f32 level;
@@ -133,6 +134,7 @@ private:
 		f32 corner_levels[2][2];
 	};
 	LiquidData cur_liquid;
+	bool smooth_liquids = false;
 
 	void prepareLiquidNodeDrawing();
 	void getLiquidNeighborhood();
@@ -142,7 +144,7 @@ private:
 	void drawLiquidTop();
 	void drawLiquidBottom();
 
-	// raillike-specific
+// raillike-specific
 	// name of the group that enables connecting to raillike nodes of different kind
 	static const std::string raillike_groupname;
 	struct RaillikeData {
@@ -151,7 +153,7 @@ private:
 	RaillikeData cur_rail;
 	bool isSameRail(v3s16 dir);
 
-	// plantlike-specific
+// plantlike-specific
 	struct PlantlikeData {
 		PlantlikeStyle draw_style;
 		v3f offset;
@@ -163,14 +165,14 @@ private:
 	PlantlikeData cur_plant;
 
 	void drawPlantlikeQuad(float rotation, float quad_offset = 0,
-			bool offset_top_only = false);
+		bool offset_top_only = false);
 	void drawPlantlike(bool is_rooted = false);
 
-	// firelike-specific
+// firelike-specific
 	void drawFirelikeQuad(float rotation, float opening_angle,
-			float offset_h, float offset_v = 0.0);
+		float offset_h, float offset_v = 0.0);
 
-	// drawtypes
+// drawtypes
 	void drawSolidNode();
 	void drawLiquidNode();
 	void drawGlasslikeNode();
@@ -186,7 +188,7 @@ private:
 	void drawNodeboxNode();
 	void drawMeshNode();
 
-	// common
+// common
 	void errorUnknownDrawtype();
 	void drawNode();
 };

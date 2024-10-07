@@ -25,32 +25,33 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <memory> // std::shared_ptr
 #include <string_view>
 
-template <typename T>
-class ConstSharedPtr {
-public:
-	ConstSharedPtr(T *ptr) :
-			ptr(ptr) {}
-	ConstSharedPtr(const std::shared_ptr<T> &ptr) :
-			ptr(ptr) {}
 
-	const T *get() const noexcept { return ptr.get(); }
-	const T &operator*() const noexcept { return *ptr.get(); }
-	const T *operator->() const noexcept { return ptr.get(); }
+template<typename T> class ConstSharedPtr {
+public:
+	ConstSharedPtr(T *ptr) : ptr(ptr) {}
+	ConstSharedPtr(const std::shared_ptr<T> &ptr) : ptr(ptr) {}
+
+	const T* get() const noexcept { return ptr.get(); }
+	const T& operator*() const noexcept { return *ptr.get(); }
+	const T* operator->() const noexcept { return ptr.get(); }
 
 private:
 	std::shared_ptr<T> ptr;
 };
 
 template <typename T>
-class Buffer {
+class Buffer
+{
 public:
-	Buffer() {
+	Buffer()
+	{
 		m_size = 0;
 		data = nullptr;
 	}
-	Buffer(unsigned int size) {
+	Buffer(unsigned int size)
+	{
 		m_size = size;
-		if (size != 0)
+		if(size != 0)
 			data = new T[size];
 		else
 			data = nullptr;
@@ -60,44 +61,55 @@ public:
 	Buffer(const Buffer &) = delete;
 	Buffer &operator=(const Buffer &) = delete;
 
-	Buffer(Buffer &&buffer) {
+	Buffer(Buffer &&buffer)
+	{
 		m_size = buffer.m_size;
-		if (m_size != 0) {
+		if(m_size != 0)
+		{
 			data = buffer.data;
 			buffer.data = nullptr;
 			buffer.m_size = 0;
-		} else
+		}
+		else
 			data = nullptr;
 	}
 	// Copies whole buffer
-	Buffer(const T *t, unsigned int size) {
+	Buffer(const T *t, unsigned int size)
+	{
 		m_size = size;
-		if (size != 0) {
+		if(size != 0)
+		{
 			data = new T[size];
 			memcpy(data, t, size);
-		} else
+		}
+		else
 			data = nullptr;
 	}
 
-	~Buffer() {
+	~Buffer()
+	{
 		drop();
 	}
 
-	Buffer &operator=(Buffer &&buffer) {
-		if (this == &buffer)
+	Buffer& operator=(Buffer &&buffer)
+	{
+		if(this == &buffer)
 			return *this;
 		drop();
 		m_size = buffer.m_size;
-		if (m_size != 0) {
+		if(m_size != 0)
+		{
 			data = buffer.data;
 			buffer.data = nullptr;
 			buffer.m_size = 0;
-		} else
+		}
+		else
 			data = nullptr;
 		return *this;
 	}
 
-	void copyTo(Buffer &buffer) const {
+	void copyTo(Buffer &buffer) const
+	{
 		buffer.drop();
 		buffer.m_size = m_size;
 		if (m_size != 0) {
@@ -108,25 +120,30 @@ public:
 		}
 	}
 
-	T &operator[](unsigned int i) const {
+	T & operator[](unsigned int i) const
+	{
 		return data[i];
 	}
-	T *operator*() const {
+	T * operator*() const
+	{
 		return data;
 	}
 
-	unsigned int getSize() const {
+	unsigned int getSize() const
+	{
 		return m_size;
 	}
 
-	operator std::string_view() const {
+	operator std::string_view() const
+	{
 		if (!data)
 			return std::string_view();
-		return std::string_view(reinterpret_cast<char *>(data), m_size);
+		return std::string_view(reinterpret_cast<char*>(data), m_size);
 	}
 
 private:
-	void drop() {
+	void drop()
+	{
 		delete[] data;
 	}
 	T *data;
@@ -141,32 +158,37 @@ private:
  *                                              *
  ************************************************/
 template <typename T>
-class SharedBuffer {
+class SharedBuffer
+{
 public:
-	SharedBuffer() {
+	SharedBuffer()
+	{
 		m_size = 0;
 		data = NULL;
 		refcount = new unsigned int;
 		(*refcount) = 1;
 	}
-	SharedBuffer(unsigned int size) {
+	SharedBuffer(unsigned int size)
+	{
 		m_size = size;
-		if (m_size != 0)
+		if(m_size != 0)
 			data = new T[m_size];
 		else
 			data = nullptr;
 		refcount = new unsigned int;
-		memset(data, 0, sizeof(T) * m_size);
+		memset(data,0,sizeof(T)*m_size);
 		(*refcount) = 1;
 	}
-	SharedBuffer(const SharedBuffer &buffer) {
+	SharedBuffer(const SharedBuffer &buffer)
+	{
 		m_size = buffer.m_size;
 		data = buffer.data;
 		refcount = buffer.refcount;
 		(*refcount)++;
 	}
-	SharedBuffer &operator=(const SharedBuffer &buffer) {
-		if (this == &buffer)
+	SharedBuffer & operator=(const SharedBuffer & buffer)
+	{
+		if(this == &buffer)
 			return *this;
 		drop();
 		m_size = buffer.m_size;
@@ -178,12 +200,15 @@ public:
 	/*
 		Copies whole buffer
 	*/
-	SharedBuffer(const T *t, unsigned int size) {
+	SharedBuffer(const T *t, unsigned int size)
+	{
 		m_size = size;
-		if (m_size != 0) {
+		if(m_size != 0)
+		{
 			data = new T[m_size];
 			memcpy(data, t, m_size);
-		} else
+		}
+		else
 			data = nullptr;
 		refcount = new unsigned int;
 		(*refcount) = 1;
@@ -191,38 +216,46 @@ public:
 	/*
 		Copies whole buffer
 	*/
-	SharedBuffer(const Buffer<T> &buffer) {
+	SharedBuffer(const Buffer<T> &buffer)
+	{
 		m_size = buffer.getSize();
 		if (m_size != 0) {
-			data = new T[m_size];
-			memcpy(data, *buffer, buffer.getSize());
-		} else
+				data = new T[m_size];
+				memcpy(data, *buffer, buffer.getSize());
+		}
+		else
 			data = nullptr;
 		refcount = new unsigned int;
 		(*refcount) = 1;
 	}
-	~SharedBuffer() {
+	~SharedBuffer()
+	{
 		drop();
 	}
-	T &operator[](unsigned int i) const {
+	T & operator[](unsigned int i) const
+	{
 		assert(i < m_size);
 		return data[i];
 	}
-	T *operator*() const {
+	T * operator*() const
+	{
 		return data;
 	}
-	unsigned int getSize() const {
+	unsigned int getSize() const
+	{
 		return m_size;
 	}
-	operator Buffer<T>() const {
+	operator Buffer<T>() const
+	{
 		return Buffer<T>(data, m_size);
 	}
-
 private:
-	void drop() {
+	void drop()
+	{
 		assert((*refcount) > 0);
 		(*refcount)--;
-		if (*refcount == 0) {
+		if(*refcount == 0)
+		{
 			delete[] data;
 			delete refcount;
 		}
@@ -238,15 +271,9 @@ public:
 	IntrusiveReferenceCounted() = default;
 	virtual ~IntrusiveReferenceCounted() = default;
 	void grab() noexcept { ++m_refcount; }
-	void drop() noexcept {
-		if (--m_refcount == 0)
-			delete this;
-	}
+	void drop() noexcept { if (--m_refcount == 0) delete this; }
 
-	// Preserve own reference count.
-	IntrusiveReferenceCounted(const IntrusiveReferenceCounted &) {}
-	IntrusiveReferenceCounted &operator=(const IntrusiveReferenceCounted &) { return *this; }
-
+	DISABLE_CLASS_COPY(IntrusiveReferenceCounted)
 private:
 	u32 m_refcount = 1;
 };

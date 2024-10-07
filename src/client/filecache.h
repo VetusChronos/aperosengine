@@ -23,13 +23,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <iostream>
 #include <string>
 #include <string_view>
-#include <filesystem>
 
-class FileCache {
+class FileCache
+{
 public:
-	// 'dir' is the file cache directory to use.
-	explicit FileCache(const std::string &dir) :
-			m_dir(dir) {}
+	/*
+		'dir' is the file cache directory to use.
+	*/
+	FileCache(const std::string &dir) : m_dir(dir) {}
 
 	bool update(const std::string &name, std::string_view data);
 	bool load(const std::string &name, std::ostream &os);

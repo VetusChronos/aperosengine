@@ -20,14 +20,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include <iostream>
-#include <string>
+#include <string_view>
 #include <functional>
 
-template <int BufferLength, typename Emitter = std::function<void(const std::string &)>>
+template<int BufferLength, typename Emitter = std::function<void(std::string_view)> >
 class StringStreamBuffer : public std::streambuf {
 public:
-	StringStreamBuffer(Emitter emitter) :
-			m_emitter(emitter) {
+	StringStreamBuffer(Emitter emitter) : m_emitter(emitter) {
 		buffer_index = 0;
 	}
 
@@ -39,23 +38,22 @@ public:
 	void push_back(char c) {
 		if (c == '\n' || c == '\r') {
 			if (buffer_index)
-				m_emitter(std::string(buffer, buffer_index));
+				m_emitter(std::string_view(buffer, buffer_index));
 			buffer_index = 0;
 		} else {
 			buffer[buffer_index++] = c;
 			if (buffer_index >= BufferLength) {
-				m_emitter(std::string(buffer, buffer_index));
+				m_emitter(std::string_view(buffer, buffer_index));
 				buffer_index = 0;
 			}
 		}
 	}
 
 	std::streamsize xsputn(const char *s, std::streamsize n) {
-		for (int i = 0; i < n; ++i)
+		for (std::streamsize i = 0; i < n; ++i)
 			push_back(s[i]);
 		return n;
 	}
-
 private:
 	Emitter m_emitter;
 	char buffer[BufferLength];

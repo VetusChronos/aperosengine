@@ -28,8 +28,10 @@ struct BlockMakeData;
  * Lua state, not the server one.
  */
 
-class ScriptApiMapgen : virtual public ScriptApiBase {
+class ScriptApiMapgen : virtual public ScriptApiBase
+{
 public:
+
 	void on_mods_loaded();
 	void on_shutdown();
 

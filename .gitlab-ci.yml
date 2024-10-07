@@ -1,0 +1,16 @@
+---
+# Github repository is cloned every day on Gitlab.com
+# https://gitlab.com/vetuschronos/aperosengine
+# Pipelines URL: https://gitlab.com/vetuschronos/aperosengine/pipelines
+
+
+pages:
+  stage: deploy
+  image: python:3.8
+  script:
+    - ./misc/make_redirects.sh
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

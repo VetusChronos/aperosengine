@@ -26,6 +26,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #pragma once
 
+#include <string_view>
+
 extern "C" {
 #include <lua.h>
 #include <lauxlib.h>
@@ -33,6 +35,7 @@ extern "C" {
 
 #include "config.h"
 #include "common/c_types.h"
+
 
 /*
 	Define our custom indices into the Lua registry table.
@@ -66,6 +69,7 @@ enum {
 	CUSTOM_RIDX_PUSH_MOVERESULT1,
 };
 
+
 // Determine if CUSTOM_RIDX_SCRIPTAPI will hold a light or full userdata
 #if defined(__aarch64__) && USE_LUAJIT
 /* LuaJIT has a 47-bit limit for lightuserdata on this platform and we cannot
@@ -79,19 +83,19 @@ enum {
 #define PUSH_ERROR_HANDLER(L) \
 	(lua_rawgeti((L), LUA_REGISTRYINDEX, CUSTOM_RIDX_ERROR_HANDLER), lua_gettop((L)))
 
-#define PCALL_RESL(L, RES)                                  \
-	{                                                       \
-		int result_ = (RES);                                \
-		if (result_ != 0) {                                 \
-			script_error((L), result_, NULL, __FUNCTION__); \
-		}                                                   \
-	}
+#define PCALL_RESL(L, RES) {                            \
+	int result_ = (RES);                                \
+	if (result_ != 0) {                                 \
+		script_error((L), result_, NULL, __FUNCTION__); \
+	}                                                   \
+}
 
 // What script_run_callbacks does with the return values of callbacks.
 // Regardless of the mode, if only one callback is defined,
 // its return value is the total return value.
 // Modes only affect the case where 0 or >= 2 callbacks are defined.
-enum RunCallbacksMode {
+enum RunCallbacksMode
+{
 	// Returns the return value of the first callback
 	// Returns nil if list of callbacks is empty
 	RUN_CALLBACKS_MODE_FIRST,
@@ -125,8 +129,8 @@ int script_error_handler(lua_State *L);
 // Takes an error from lua_pcall and throws it as a LuaError
 void script_error(lua_State *L, int pcall_result, const char *mod, const char *fxn);
 
-bool script_log_unique(lua_State *L, std::string message, std::ostream &log_to,
-		int stack_depth = 1);
+bool script_log_unique(lua_State *L, std::string_view message, std::ostream &log_to,
+	int stack_depth = 1);
 
 enum DeprecatedHandlingMode {
 	Ignore,
@@ -150,7 +154,8 @@ DeprecatedHandlingMode get_deprecated_handling_mode();
  *        (ie: not builtin or core). -1 to disabled.
  * @param once Log the deprecation warning only once per callsite.
  */
-void log_deprecated(lua_State *L, std::string message, int stack_depth = 1, bool once = false);
+void log_deprecated(lua_State *L, std::string_view message,
+	int stack_depth = 1, bool once = false);
 
 // Safely call string.dump on a function value
 // (does not pop, leaves one value on stack)

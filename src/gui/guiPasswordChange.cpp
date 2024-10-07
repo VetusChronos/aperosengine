@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <IGUIButton.h>
 #include <IGUIStaticText.h>
 #include <IGUIFont.h>
+#include <IVideoDriver.h>
 
 #include "porting.h"
 #include "gettext.h"
@@ -35,17 +36,20 @@ const int ID_change = 259;
 const int ID_message = 260;
 const int ID_cancel = 261;
 
-GUIPasswordChange::GUIPasswordChange(gui::IGUIEnvironment *env,
-		gui::IGUIElement *parent, s32 id,
+GUIPasswordChange::GUIPasswordChange(gui::IGUIEnvironment* env,
+		gui::IGUIElement* parent, s32 id,
 		IMenuManager *menumgr,
-		Client *client,
-		ISimpleTextureSource *tsrc) :
-		GUIModalMenu(env, parent, id, menumgr),
-		m_client(client),
-		m_tsrc(tsrc) {
+		Client* client,
+		ISimpleTextureSource *tsrc
+):
+	GUIModalMenu(env, parent, id, menumgr),
+	m_client(client),
+	m_tsrc(tsrc)
+{
 }
 
-void GUIPasswordChange::regenerateGui(v2u32 screensize) {
+void GUIPasswordChange::regenerateGui(v2u32 screensize)
+{
 	/*
 		save current input
 	*/
@@ -139,7 +143,8 @@ void GUIPasswordChange::regenerateGui(v2u32 screensize) {
 	}
 }
 
-void GUIPasswordChange::drawMenu() {
+void GUIPasswordChange::drawMenu()
+{
 	gui::IGUISkin *skin = Environment->getSkin();
 	if (!skin)
 		return;
@@ -154,7 +159,8 @@ void GUIPasswordChange::drawMenu() {
 #endif
 }
 
-void GUIPasswordChange::acceptInput() {
+void GUIPasswordChange::acceptInput()
+{
 	gui::IGUIElement *e;
 	e = getElementFromId(ID_oldPassword);
 	if (e != NULL)
@@ -167,7 +173,8 @@ void GUIPasswordChange::acceptInput() {
 		m_newpass_confirm = e->getText();
 }
 
-bool GUIPasswordChange::processInput() {
+bool GUIPasswordChange::processInput()
+{
 	if (m_newpass != m_newpass_confirm) {
 		gui::IGUIElement *e = getElementFromId(ID_message);
 		if (e != NULL)
@@ -178,7 +185,8 @@ bool GUIPasswordChange::processInput() {
 	return true;
 }
 
-bool GUIPasswordChange::OnEvent(const SEvent &event) {
+bool GUIPasswordChange::OnEvent(const SEvent &event)
+{
 	if (event.EventType == EET_KEY_INPUT_EVENT) {
 		if (event.KeyInput.Key == KEY_ESCAPE && event.KeyInput.PressedDown) {
 			quitMenu();
@@ -196,32 +204,32 @@ bool GUIPasswordChange::OnEvent(const SEvent &event) {
 				isVisible()) {
 			if (!canTakeFocus(event.GUIEvent.Element)) {
 				infostream << "GUIPasswordChange: Not allowing focus change."
-						   << '\n';
+					<< '\n';
 				// Returning true disables focus change
 				return true;
 			}
 		}
 		if (event.GUIEvent.EventType == gui::EGET_BUTTON_CLICKED) {
 			switch (event.GUIEvent.Caller->getID()) {
-				case ID_change:
-					acceptInput();
-					if (processInput())
-						quitMenu();
-					return true;
-				case ID_cancel:
+			case ID_change:
+				acceptInput();
+				if (processInput())
 					quitMenu();
-					return true;
+				return true;
+			case ID_cancel:
+				quitMenu();
+				return true;
 			}
 		}
 		if (event.GUIEvent.EventType == gui::EGET_EDITBOX_ENTER) {
 			switch (event.GUIEvent.Caller->getID()) {
-				case ID_oldPassword:
-				case ID_newPassword1:
-				case ID_newPassword2:
-					acceptInput();
-					if (processInput())
-						quitMenu();
-					return true;
+			case ID_oldPassword:
+			case ID_newPassword1:
+			case ID_newPassword2:
+				acceptInput();
+				if (processInput())
+					quitMenu();
+				return true;
 			}
 		}
 	}
@@ -229,20 +237,22 @@ bool GUIPasswordChange::OnEvent(const SEvent &event) {
 	return Parent ? Parent->OnEvent(event) : false;
 }
 
-std::string GUIPasswordChange::getNameByID(s32 id) {
+std::string GUIPasswordChange::getNameByID(s32 id)
+{
 	switch (id) {
-		case ID_oldPassword:
-			return "old_password";
-		case ID_newPassword1:
-			return "new_password_1";
-		case ID_newPassword2:
-			return "new_password_2";
+	case ID_oldPassword:
+		return "old_password";
+	case ID_newPassword1:
+		return "new_password_1";
+	case ID_newPassword2:
+		return "new_password_2";
 	}
 	return "";
 }
 
 #ifdef __ANDROID__
-void GUIPasswordChange::getAndroidUIInput() {
+void GUIPasswordChange::getAndroidUIInput()
+{
 	porting::AndroidDialogState dialogState = getAndroidUIInputState();
 	if (dialogState == porting::DIALOG_SHOWN) {
 		return;

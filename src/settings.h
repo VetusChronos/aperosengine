@@ -38,10 +38,11 @@ extern std::string g_settings_path;
 typedef void (*SettingsChangedCallback)(const std::string &name, void *data);
 
 typedef std::vector<
-		std::pair<
-				SettingsChangedCallback,
-				void *>>
-		SettingsCallbackList;
+	std::pair<
+		SettingsChangedCallback,
+		void *
+	>
+> SettingsCallbackList;
 
 typedef std::unordered_map<std::string, SettingsCallbackList> SettingsCallbackMap;
 
@@ -87,11 +88,12 @@ private:
 	void onLayerCreated(int layer, Settings *obj);
 	void onLayerRemoved(int layer);
 
-	std::vector<Settings *> layers;
+	std::vector<Settings*> layers;
 };
 
 struct ValueSpec {
-	ValueSpec(ValueType a_type, const char *a_help = NULL) {
+	ValueSpec(ValueType a_type, const char *a_help=NULL)
+	{
 		type = a_type;
 		help = a_help;
 	}
@@ -104,11 +106,13 @@ struct SettingsEntry {
 	SettingsEntry() = default;
 
 	SettingsEntry(const std::string &value_) :
-			value(value_) {}
+		value(value_)
+	{}
 
 	SettingsEntry(Settings *group_) :
-			group(group_),
-			is_group(true) {}
+		group(group_),
+		is_group(true)
+	{}
 
 	std::string value = "";
 	Settings *group = nullptr;
@@ -125,11 +129,12 @@ public:
 	/**/
 
 	Settings(std::string_view end_tag = "") :
-			m_end_tag(end_tag) {}
+		m_end_tag(end_tag)
+	{}
 	Settings(std::string_view end_tag, SettingsHierarchy *h, int settings_layer);
 	~Settings();
 
-	Settings &operator=(const Settings &other);
+	Settings & operator=(const Settings &other);
 
 	/***********************
 	 * Reading and writing *
@@ -143,7 +148,7 @@ public:
 	bool parseCommandLine(int argc, char *argv[],
 			const std::map<std::string, ValueSpec> &allowed_options);
 	bool parseConfigLines(std::istream &is);
-	void writeLines(std::ostream &os, u32 tab_depth = 0) const;
+	void writeLines(std::ostream &os, u32 tab_depth=0) const;
 
 	/***********
 	 * Getters *
@@ -174,6 +179,7 @@ public:
 	// check if setting exists in this object ("locally")
 	bool existsLocal(const std::string &name) const;
 
+
 	/***************************************
 	 * Getters that don't throw exceptions *
 	 ***************************************/
@@ -194,7 +200,8 @@ public:
 	// 1) Read default flags (or 0)
 	// 2) Override using user-defined flags
 	bool getFlagStrNoEx(const std::string &name, u32 &val,
-			const FlagDesc *flagdesc) const;
+		const FlagDesc *flagdesc) const;
+
 
 	/***********
 	 * Setters *
@@ -203,7 +210,7 @@ public:
 	// N.B. Groups not allocated with new must be set to NULL in the settings
 	// tree before object destruction.
 	bool setEntry(const std::string &name, const void *entry,
-			bool set_group);
+		bool set_group);
 	bool set(const std::string &name, const std::string &value);
 	bool setDefault(const std::string &name, const std::string &value);
 	bool setGroup(const std::string &name, const Settings &group);
@@ -216,7 +223,7 @@ public:
 	bool setV2F(const std::string &name, v2f value);
 	bool setV3F(const std::string &name, v3f value);
 	bool setFlagStr(const std::string &name, u32 flags,
-			const FlagDesc *flagdesc = nullptr, u32 flagmask = U32_MAX);
+		const FlagDesc *flagdesc = nullptr, u32 flagmask = U32_MAX);
 	bool setNoiseParams(const std::string &name, const NoiseParams &np);
 
 	// remove a setting
@@ -230,9 +237,9 @@ public:
 	const FlagDesc *getFlagDescFallback(const std::string &name) const;
 
 	void registerChangedCallback(const std::string &name,
-			SettingsChangedCallback cbf, void *userdata = NULL);
+		SettingsChangedCallback cbf, void *userdata = NULL);
 	void deregisterChangedCallback(const std::string &name,
-			SettingsChangedCallback cbf, void *userdata = NULL);
+		SettingsChangedCallback cbf, void *userdata = NULL);
 
 	void removeSecureSettings();
 
@@ -246,15 +253,15 @@ private:
 	 ***********************/
 
 	SettingsParseEvent parseConfigObject(const std::string &line,
-			std::string &name, std::string &value);
+		std::string &name, std::string &value);
 	bool updateConfigObject(std::istream &is, std::ostream &os,
-			u32 tab_depth = 0);
+		u32 tab_depth=0);
 
 	static bool checkNameValid(std::string_view name);
 	static bool checkValueValid(std::string_view value);
-	static std::string getMultiline(std::istream &is, size_t *num_lines = NULL);
+	static std::string getMultiline(std::istream &is, size_t *num_lines=NULL);
 	static void printEntry(std::ostream &os, const std::string &name,
-			const SettingsEntry &entry, u32 tab_depth = 0);
+		const SettingsEntry &entry, u32 tab_depth=0);
 
 	/***********
 	 * Getters *

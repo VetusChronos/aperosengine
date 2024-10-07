@@ -26,11 +26,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "serverenvironment.h"
 
 PlayerSAO::PlayerSAO(ServerEnvironment *env_, RemotePlayer *player_, session_t peer_id_,
-		bool is_singleplayer) :
-		UnitSAO(env_, v3f(0, 0, 0)),
-		m_player(player_),
-		m_peer_id_initial(peer_id_),
-		m_is_singleplayer(is_singleplayer) {
+		bool is_singleplayer):
+	UnitSAO(env_, v3f(0,0,0)),
+	m_player(player_),
+	m_peer_id_initial(peer_id_),
+	m_is_singleplayer(is_singleplayer)
+{
 	SANITY_CHECK(m_peer_id_initial != PEER_ID_INEXISTENT);
 
 	m_prop.hp_max = PLAYER_MAX_HP_DEFAULT;
@@ -47,7 +48,7 @@ PlayerSAO::PlayerSAO(ServerEnvironment *env_, RemotePlayer *player_, session_t p
 	m_prop.textures.emplace_back("player_back.png");
 	m_prop.colors.clear();
 	m_prop.colors.emplace_back(255, 255, 255, 255);
-	m_prop.spritediv = v2s16(1, 1);
+	m_prop.spritediv = v2s16(1,1);
 	m_prop.eye_height = 1.625f;
 	// End of default appearance
 	m_prop.is_visible = true;
@@ -64,22 +65,26 @@ PlayerSAO::PlayerSAO(ServerEnvironment *env_, RemotePlayer *player_, session_t p
 		m_armor_groups["immortal"] = 1;
 }
 
-void PlayerSAO::finalize(RemotePlayer *player, const std::set<std::string> &privs) {
+void PlayerSAO::finalize(RemotePlayer *player, const std::set<std::string> &privs)
+{
 	assert(player);
 	m_player = player;
 	m_privs = privs;
 }
 
-v3f PlayerSAO::getEyeOffset() const {
+v3f PlayerSAO::getEyeOffset() const
+{
 	return v3f(0, BS * m_prop.eye_height, 0);
 }
 
-std::string PlayerSAO::getDescription() {
+std::string PlayerSAO::getDescription()
+{
 	return std::string("player ") + m_player->getName();
 }
 
 // Called after id has been set and has been inserted in environment
-void PlayerSAO::addedToEnvironment(u32 dtime_s) {
+void PlayerSAO::addedToEnvironment(u32 dtime_s)
+{
 	ServerActiveObject::addedToEnvironment(dtime_s);
 	ServerActiveObject::setBasePosition(m_base_position);
 	m_player->setPlayerSAO(this);
@@ -89,7 +94,8 @@ void PlayerSAO::addedToEnvironment(u32 dtime_s) {
 }
 
 // Called before removing from environment
-void PlayerSAO::removingFromEnvironment() {
+void PlayerSAO::removingFromEnvironment()
+{
 	ServerActiveObject::removingFromEnvironment();
 
 	// If this fails, fix the ActiveObjectMgr code in ServerEnvironment
@@ -101,7 +107,8 @@ void PlayerSAO::removingFromEnvironment() {
 	}
 }
 
-std::string PlayerSAO::getClientInitializationData(u16 protocol_version) {
+std::string PlayerSAO::getClientInitializationData(u16 protocol_version)
+{
 	std::ostringstream os(std::ios::binary);
 
 	// Protocol >= 15
@@ -119,7 +126,7 @@ std::string PlayerSAO::getClientInitializationData(u16 protocol_version) {
 	msg_os << serializeString32(generateUpdateAnimationCommand()); // 3
 	for (const auto &it : m_bone_override) {
 		msg_os << serializeString32(generateUpdateBoneOverrideCommand(
-				it.first, it.second)); // 3 + N
+			it.first, it.second)); // 3 + N
 	}
 	msg_os << serializeString32(generateUpdateAttachmentCommand()); // 4 + m_bone_override.size
 	msg_os << serializeString32(generateUpdatePhysicsOverrideCommand()); // 5 + m_bone_override.size
@@ -130,7 +137,7 @@ std::string PlayerSAO::getClientInitializationData(u16 protocol_version) {
 		if (ServerActiveObject *obj = m_env->getActiveObject(id)) {
 			message_count++;
 			msg_os << serializeString32(obj->generateUpdateInfantCommand(
-					id, protocol_version));
+				id, protocol_version));
 		}
 	}
 
@@ -142,12 +149,17 @@ std::string PlayerSAO::getClientInitializationData(u16 protocol_version) {
 	return os.str();
 }
 
-void PlayerSAO::getStaticData(std::string *result) const {
+void PlayerSAO::getStaticData(std::string * result) const
+{
 	FATAL_ERROR("This function shall not be called for PlayerSAO");
 }
 
-void PlayerSAO::step(float dtime, bool send_recommended) {
-	if (!isImmortal() && m_drowning_interval.step(dtime, 2.0f)) {
+void PlayerSAO::step(float dtime, bool send_recommended)
+{
+	bool not_immortal = !isImmortal();
+
+	if (not_immortal && m_flags.drowning
+			&& m_drowning_interval.step(dtime, 2.0f)) {
 		// Get nose/mouth position, approximate with eye position
 		v3s16 p = floatToInt(getEyePosition(), BS);
 		MapNode n = m_env->getMap().getNode(p);
@@ -165,7 +177,8 @@ void PlayerSAO::step(float dtime, bool send_recommended) {
 		}
 	}
 
-	if (m_breathing_interval.step(dtime, 0.5f) && !isImmortal()) {
+	if (not_immortal && m_flags.breathing
+			&& m_breathing_interval.step(dtime, 0.5f)) {
 		// Get nose/mouth position, approximate with eye position
 		v3s16 p = floatToInt(getEyePosition(), BS);
 		MapNode n = m_env->getMap().getNode(p);
@@ -176,7 +189,8 @@ void PlayerSAO::step(float dtime, bool send_recommended) {
 			setBreath(m_breath + 1);
 	}
 
-	if (!isImmortal() && m_node_hurt_interval.step(dtime, 1.0f)) {
+	if (not_immortal && m_flags.node_damage
+			&& m_node_hurt_interval.step(dtime, 1.0f)) {
 		u32 damage_per_second = 0;
 		std::string nodename;
 		v3s16 node_pos;
@@ -187,8 +201,7 @@ void PlayerSAO::step(float dtime, bool send_recommended) {
 		// upwards in 1 node intervals, stopping below top damage point.
 		for (float dam_height = 0.1f; dam_height < dam_top; dam_height++) {
 			v3s16 p = floatToInt(m_base_position +
-							v3f(0.0f, dam_height * BS, 0.0f),
-					BS);
+				v3f(0.0f, dam_height * BS, 0.0f), BS);
 			MapNode n = m_env->getMap().getNode(p);
 			const ContentFeatures &c = m_env->getGameDef()->ndef()->get(n);
 			if (c.damage_per_second > damage_per_second) {
@@ -200,8 +213,7 @@ void PlayerSAO::step(float dtime, bool send_recommended) {
 
 		// Top damage point
 		v3s16 ptop = floatToInt(m_base_position +
-						v3f(0.0f, dam_top * BS, 0.0f),
-				BS);
+			v3f(0.0f, dam_top * BS, 0.0f), BS);
 		MapNode ntop = m_env->getMap().getNode(ptop);
 		const ContentFeatures &c = m_env->getGameDef()->ndef()->get(ntop);
 		if (c.damage_per_second > damage_per_second) {
@@ -226,20 +238,20 @@ void PlayerSAO::step(float dtime, bool send_recommended) {
 	}
 
 	// If attached, check that our parent is still there. If it isn't, detach.
-	if (m_attachment_parent_id && !isAttached()) {
+	if (m_attachment_parent_id && !getParent()) {
 		// This is handled when objects are removed from the map
-		warningstream << "PlayerSAO::step() id=" << m_id << " is attached to nonexistent parent. This is a bug." << '\n';
+		warningstream << "PlayerSAO::step() id=" << m_id <<
+			" is attached to nonexistent parent. This is a bug." << '\n';
 		clearParentAttachment();
-		setBasePosition(m_last_good_position);
-		m_env->getGameDef()->SendMovePlayer(this);
+		setPos(m_last_good_position);
 	}
 
-	//dstream<<"PlayerSAO::step: dtime: "<<dtime<<std::endl;
+	//dstream<<"PlayerSAO::step: dtime: "<<dtime<<'\n';
 
 	// Set lag pool maximums based on estimated lag
 	const float LAG_POOL_MIN = 5.0f;
 	float lag_pool_max = m_env->getMaxLagEstimate() * 2.0f;
-	if (lag_pool_max < LAG_POOL_MIN)
+	if(lag_pool_max < LAG_POOL_MIN)
 		lag_pool_max = LAG_POOL_MIN;
 	m_dig_pool.setMax(lag_pool_max);
 	m_move_pool.setMax(lag_pool_max);
@@ -280,13 +292,14 @@ void PlayerSAO::step(float dtime, bool send_recommended) {
 			pos = m_base_position;
 
 		std::string str = generateUpdatePositionCommand(
-				pos,
-				v3f(0.0f, 0.0f, 0.0f),
-				v3f(0.0f, 0.0f, 0.0f),
-				m_rotation,
-				true,
-				false,
-				update_interval);
+			pos,
+			v3f(0.0f, 0.0f, 0.0f),
+			v3f(0.0f, 0.0f, 0.0f),
+			m_rotation,
+			true,
+			false,
+			update_interval
+		);
 		// create message and add to list
 		m_messages_out.emplace(getId(), false, str);
 	}
@@ -300,7 +313,8 @@ void PlayerSAO::step(float dtime, bool send_recommended) {
 	sendOutdatedData();
 }
 
-std::string PlayerSAO::generateUpdatePhysicsOverrideCommand() const {
+std::string PlayerSAO::generateUpdatePhysicsOverrideCommand() const
+{
 	if (!m_player) {
 		// Will output a format warning client-side
 		return "";
@@ -332,7 +346,8 @@ std::string PlayerSAO::generateUpdatePhysicsOverrideCommand() const {
 	return os.str();
 }
 
-void PlayerSAO::setBasePosition(v3f position) {
+void PlayerSAO::setBasePosition(v3f position)
+{
 	if (m_player && position != m_base_position)
 		m_player->setDirty(true);
 
@@ -345,7 +360,8 @@ void PlayerSAO::setBasePosition(v3f position) {
 	}
 }
 
-void PlayerSAO::setPos(const v3f &pos) {
+void PlayerSAO::setPos(const v3f &pos)
+{
 	if (isAttached())
 		return;
 
@@ -361,7 +377,8 @@ void PlayerSAO::setPos(const v3f &pos) {
 	m_env->getGameDef()->SendMovePlayer(this);
 }
 
-void PlayerSAO::addPos(const v3f &added_pos) {
+void PlayerSAO::addPos(const v3f &added_pos)
+{
 	if (isAttached())
 		return;
 
@@ -384,8 +401,9 @@ void PlayerSAO::addPos(const v3f &added_pos) {
 	m_env->getGameDef()->SendMovePlayerRel(getPeerID(), added_pos);
 }
 
-void PlayerSAO::moveTo(v3f pos, bool continuous) {
-	if (isAttached())
+void PlayerSAO::moveTo(v3f pos, bool continuous)
+{
+	if(isAttached())
 		return;
 
 	setBasePosition(pos);
@@ -396,7 +414,8 @@ void PlayerSAO::moveTo(v3f pos, bool continuous) {
 	m_env->getGameDef()->SendMovePlayer(this);
 }
 
-void PlayerSAO::setPlayerYaw(const float yaw) {
+void PlayerSAO::setPlayerYaw(const float yaw)
+{
 	v3f rotation(0, yaw, 0);
 	if (m_player && yaw != m_rotation.Y)
 		m_player->setDirty(true);
@@ -405,42 +424,48 @@ void PlayerSAO::setPlayerYaw(const float yaw) {
 	UnitSAO::setRotation(rotation);
 }
 
-void PlayerSAO::setFov(const float fov) {
+void PlayerSAO::setFov(const float fov)
+{
 	if (m_player && fov != m_fov)
 		m_player->setDirty(true);
 
 	m_fov = fov;
 }
 
-void PlayerSAO::setWantedRange(const s16 range) {
+void PlayerSAO::setWantedRange(const s16 range)
+{
 	if (m_player && range != m_wanted_range)
 		m_player->setDirty(true);
 
 	m_wanted_range = range;
 }
 
-void PlayerSAO::setPlayerYawAndSend(const float yaw) {
+void PlayerSAO::setPlayerYawAndSend(const float yaw)
+{
 	setPlayerYaw(yaw);
 	m_env->getGameDef()->SendMovePlayer(this);
 }
 
-void PlayerSAO::setLookPitch(const float pitch) {
+void PlayerSAO::setLookPitch(const float pitch)
+{
 	if (m_player && pitch != m_pitch)
 		m_player->setDirty(true);
 
 	m_pitch = pitch;
 }
 
-void PlayerSAO::setLookPitchAndSend(const float pitch) {
+void PlayerSAO::setLookPitchAndSend(const float pitch)
+{
 	setLookPitch(pitch);
 	m_env->getGameDef()->SendMovePlayer(this);
 }
 
 u32 PlayerSAO::punch(v3f dir,
-		const ToolCapabilities *toolcap,
-		ServerActiveObject *puncher,
-		float time_from_last_punch,
-		u16 initial_wear) {
+	const ToolCapabilities *toolcap,
+	ServerActiveObject *puncher,
+	float time_from_last_punch,
+	u16 initial_wear)
+{
 	if (!toolcap)
 		return 0;
 
@@ -460,8 +485,8 @@ u32 PlayerSAO::punch(v3f dir,
 	PlayerSAO *playersao = m_player->getPlayerSAO();
 
 	bool damage_handled = m_env->getScriptIface()->on_punchplayer(playersao,
-			puncher, time_from_last_punch, toolcap, dir,
-			hitparams.hp);
+				puncher, time_from_last_punch, toolcap, dir,
+				hitparams.hp);
 
 	if (!damage_handled) {
 		setHP((s32)getHP() - (s32)hitparams.hp,
@@ -474,26 +499,32 @@ u32 PlayerSAO::punch(v3f dir,
 	}
 
 	if (puncher) {
-		actionstream << puncher->getDescription() << " (id=" << puncher->getId() << ", hp=" << puncher->getHP() << ")";
+		actionstream << puncher->getDescription() << " (id=" << puncher->getId() <<
+				", hp=" << puncher->getHP() << ")";
 	} else {
 		actionstream << "(none)";
 	}
-	actionstream << " puched " << getDescription() << " (id=" << m_id << ", hp=" << m_hp << "), damage=" << (old_hp - (s32)getHP()) << (damage_handled ? " (handled by Lua)" : "") << '\n';
+	actionstream << " puched " <<
+			getDescription() << " (id=" << m_id << ", hp=" << m_hp <<
+			"), damage=" << (old_hp - (s32)getHP()) <<
+			(damage_handled ? " (handled by Lua)" : "") << '\n';
 
 	return hitparams.wear;
 }
 
-void PlayerSAO::rightClick(ServerActiveObject *clicker) {
+void PlayerSAO::rightClick(ServerActiveObject *clicker)
+{
 	m_env->getScriptIface()->on_rightclickplayer(this, clicker);
 }
 
-void PlayerSAO::setHP(s32 target_hp, const PlayerHPChangeReason &reason, bool from_client) {
-	target_hp = rangelim(target_hp, 0, U16_MAX);
-
-	if (target_hp == m_hp)
+void PlayerSAO::setHP(s32 target_hp, const PlayerHPChangeReason &reason, bool from_client)
+{
+	if (target_hp == m_hp || (m_hp == 0 && target_hp < 0))
 		return; // Nothing to do
 
-	s32 hp_change = m_env->getScriptIface()->on_player_hpchange(this, target_hp - (s32)m_hp, reason);
+	// Protect against overflow.
+	s32 hp_change = std::max<s64>((s64)target_hp - (s64)m_hp, S32_MIN);
+	hp_change = m_env->getScriptIface()->on_player_hpchange(this, hp_change, reason);
 	hp_change = std::min<s32>(hp_change, U16_MAX); // Protect against overflow
 
 	s32 hp = (s32)m_hp + hp_change;
@@ -516,7 +547,8 @@ void PlayerSAO::setHP(s32 target_hp, const PlayerHPChangeReason &reason, bool fr
 		m_env->getGameDef()->SendPlayerHP(this, true);
 }
 
-void PlayerSAO::setBreath(const u16 breath, bool send) {
+void PlayerSAO::setBreath(const u16 breath, bool send)
+{
 	if (m_player && breath != m_breath)
 		m_player->setDirty(true);
 
@@ -526,25 +558,45 @@ void PlayerSAO::setBreath(const u16 breath, bool send) {
 		m_env->getGameDef()->SendPlayerBreath(this);
 }
 
-Inventory *PlayerSAO::getInventory() const {
+void PlayerSAO::respawn()
+{
+	infostream << "PlayerSAO::respawn(): Player " << m_player->getName()
+			<< " respawns" << std::endl;
+
+	setHP(m_prop.hp_max, PlayerHPChangeReason(PlayerHPChangeReason::RESPAWN));
+	setBreath(m_prop.breath_max);
+
+	bool repositioned = m_env->getScriptIface()->on_respawnplayer(this);
+	if (!repositioned) {
+		// setPos will send the new position to client
+		setPos(m_env->getGameDef()->findSpawnPos());
+	}
+}
+
+Inventory *PlayerSAO::getInventory() const
+{
 	return m_player ? &m_player->inventory : nullptr;
 }
 
-InventoryLocation PlayerSAO::getInventoryLocation() const {
+InventoryLocation PlayerSAO::getInventoryLocation() const
+{
 	InventoryLocation loc;
 	loc.setPlayer(m_player->getName());
 	return loc;
 }
 
-u16 PlayerSAO::getWieldIndex() const {
+u16 PlayerSAO::getWieldIndex() const
+{
 	return m_player->getWieldIndex();
 }
 
-ItemStack PlayerSAO::getWieldedItem(ItemStack *selected, ItemStack *hand) const {
+ItemStack PlayerSAO::getWieldedItem(ItemStack *selected, ItemStack *hand) const
+{
 	return m_player->getWieldedItem(selected, hand);
 }
 
-bool PlayerSAO::setWieldedItem(const ItemStack &item) {
+bool PlayerSAO::setWieldedItem(const ItemStack &item)
+{
 	InventoryList *mlist = m_player->inventory.getList(getWieldList());
 	if (mlist) {
 		mlist->changeItem(m_player->getWieldIndex(), item);
@@ -553,28 +605,33 @@ bool PlayerSAO::setWieldedItem(const ItemStack &item) {
 	return false;
 }
 
-void PlayerSAO::disconnected() {
+void PlayerSAO::disconnected()
+{
 	markForRemoval();
 	m_player->setPeerId(PEER_ID_INEXISTENT);
 }
 
-session_t PlayerSAO::getPeerID() const {
+session_t PlayerSAO::getPeerID() const
+{
 	// Before adding `this` to the server env, m_player is still nullptr.
 	return m_player ? m_player->getPeerId() : PEER_ID_INEXISTENT;
 }
 
-void PlayerSAO::unlinkPlayerSessionAndSave() {
+void PlayerSAO::unlinkPlayerSessionAndSave()
+{
 	assert(m_player->getPlayerSAO() == this);
 	m_env->savePlayer(m_player);
 	m_env->removePlayer(m_player);
 }
 
-std::string PlayerSAO::getPropertyPacket() {
+std::string PlayerSAO::getPropertyPacket()
+{
 	m_prop.is_visible = (true);
 	return generateSetPropertiesCommand(m_prop);
 }
 
-void PlayerSAO::setMaxSpeedOverride(const v3f &vel) {
+void PlayerSAO::setMaxSpeedOverride(const v3f &vel)
+{
 	if (m_max_speed_override_time == 0.0f)
 		m_max_speed_override = vel;
 	else
@@ -586,7 +643,8 @@ void PlayerSAO::setMaxSpeedOverride(const v3f &vel) {
 	}
 }
 
-bool PlayerSAO::checkMovementCheat() {
+bool PlayerSAO::checkMovementCheat()
+{
 	if (m_is_singleplayer ||
 			isAttached() ||
 			g_settings->getBool("disable_anticheat")) {
@@ -678,8 +736,8 @@ bool PlayerSAO::checkMovementCheat() {
 		lag_pool_max = MYMAX(lag_pool_max, LAG_POOL_MIN);
 		if (m_time_from_last_teleport > lag_pool_max) {
 			actionstream << "Server: " << m_player->getName()
-						 << " moved too fast: V=" << d_vert << ", H=" << d_horiz
-						 << "; resetting position." << '\n';
+					<< " moved too fast: V=" << d_vert << ", H=" << d_horiz
+					<< "; resetting position." << '\n';
 			cheated = true;
 		}
 		setBasePosition(m_last_good_position);
@@ -687,7 +745,8 @@ bool PlayerSAO::checkMovementCheat() {
 	return cheated;
 }
 
-bool PlayerSAO::getCollisionBox(aabb3f *toset) const {
+bool PlayerSAO::getCollisionBox(aabb3f *toset) const
+{
 	//update collision box
 	toset->MinEdge = m_prop.collisionbox.MinEdge * BS;
 	toset->MaxEdge = m_prop.collisionbox.MaxEdge * BS;
@@ -697,7 +756,8 @@ bool PlayerSAO::getCollisionBox(aabb3f *toset) const {
 	return true;
 }
 
-bool PlayerSAO::getSelectionBox(aabb3f *toset) const {
+bool PlayerSAO::getSelectionBox(aabb3f *toset) const
+{
 	if (!m_prop.is_visible) {
 		return false;
 	}
@@ -708,6 +768,7 @@ bool PlayerSAO::getSelectionBox(aabb3f *toset) const {
 	return true;
 }
 
-float PlayerSAO::getZoomFOV() const {
+float PlayerSAO::getZoomFOV() const
+{
 	return m_prop.zoom_fov;
 }

@@ -32,13 +32,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	  after a fixed amount of time (mesecons buttons, for example)
 */
 
-class NodeTimer {
+class NodeTimer
+{
 public:
 	NodeTimer() = default;
-	NodeTimer(const v3s16 &position_) :
-			position(position_) {}
-	NodeTimer(f32 timeout_, f32 elapsed_, v3s16 position_) :
-			timeout(timeout_), elapsed(elapsed_), position(position_) {}
+	NodeTimer(const v3s16 &position_):
+		position(position_) {}
+	NodeTimer(f32 timeout_, f32 elapsed_, v3s16 position_):
+		timeout(timeout_), elapsed(elapsed_), position(position_) {}
 	~NodeTimer() = default;
 
 	void serialize(std::ostream &os) const;
@@ -53,7 +54,8 @@ public:
 	List of timers of all the nodes of a block
 */
 
-class NodeTimerList {
+class NodeTimerList
+{
 public:
 	NodeTimerList() = default;
 	~NodeTimerList() = default;
@@ -63,49 +65,52 @@ public:
 
 	// Get timer
 	NodeTimer get(const v3s16 &p) {
-		auto it = m_iterators.find(p);
-		if (it == m_iterators.end())
+		std::map<v3s16, std::multimap<double, NodeTimer>::iterator>::iterator n =
+			m_iterators.find(p);
+		if (n == m_iterators.end())
 			return NodeTimer();
-		NodeTimer t = it->second->second;
-		t.elapsed = t.timeout - (it->second->first - m_time);
+		NodeTimer t = n->second->second;
+		t.elapsed = t.timeout - (n->second->first - m_time);
 		return t;
 	}
-
 	// Deletes timer
 	void remove(v3s16 p) {
-		auto it = m_iterators.find(p);
-		if (it != m_iterators.end()) {
-			double removed_time = it->second->first;
-			m_timers.erase(it->second);
-			m_iterators.erase(it);
-
+		std::map<v3s16, std::multimap<double, NodeTimer>::iterator>::iterator n =
+			m_iterators.find(p);
+		if(n != m_iterators.end()) {
+			double removed_time = n->second->first;
+			m_timers.erase(n->second);
+			m_iterators.erase(n);
+			// Yes, this is float equality, but it is not a problem
+			// since we only test equality of floats as an ordered type
+			// and thus we never lose precision
 			if (removed_time == m_next_trigger_time) {
-				m_next_trigger_time = m_timers.empty() ? -1.0 : m_timers.begin()->first;
+				if (m_timers.empty())
+					m_next_trigger_time = -1.;
+				else
+					m_next_trigger_time = m_timers.begin()->first;
 			}
 		}
 	}
-
 	// Undefined behavior if there already is a timer
 	void insert(const NodeTimer &timer) {
 		v3s16 p = timer.position;
-		double trigger_time = m_time + static_cast<double>(timer.timeout - timer.elapsed);
-		auto it = m_timers.emplace(trigger_time, timer);
+		double trigger_time = m_time + (double)(timer.timeout - timer.elapsed);
+		std::multimap<double, NodeTimer>::iterator it = m_timers.emplace(trigger_time, timer);
 		m_iterators.emplace(p, it);
-		if (m_next_trigger_time == -1.0 || trigger_time < m_next_trigger_time)
+		if (m_next_trigger_time == -1. || trigger_time < m_next_trigger_time)
 			m_next_trigger_time = trigger_time;
 	}
-
 	// Deletes old timer and sets a new one
 	inline void set(const NodeTimer &timer) {
 		remove(timer.position);
 		insert(timer);
 	}
-
 	// Deletes all timers
 	void clear() {
 		m_timers.clear();
 		m_iterators.clear();
-		m_next_trigger_time = -1.0;
+		m_next_trigger_time = -1.;
 	}
 
 	// Move forward in time, returns elapsed timers

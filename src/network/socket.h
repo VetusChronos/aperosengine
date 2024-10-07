@@ -21,7 +21,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <ostream>
 #include <cstring>
-
 #include "address.h"
 #include "irrlichttypes.h"
 #include "networkexceptions.h"
@@ -29,26 +28,28 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 void sockets_init();
 void sockets_cleanup();
 
-class UDPSocket {
+class UDPSocket
+{
 public:
-    UDPSocket() = default;
-    explicit UDPSocket(bool ipv6);
-    ~UDPSocket();
-    bool init(bool ipv6, bool noExceptions = false);
+	UDPSocket() = default;
+	UDPSocket(bool ipv6); // calls init()
+	~UDPSocket();
+	bool init(bool ipv6, bool noExceptions = false);
 
-    void Bind(Address addr);
+	void Bind(Address addr);
 
-    void Send(const Address &destination, const void *data, int size);
-    int Receive(Address &sender, void *data, int size); // Returns -1 if there is no data
-    void setTimeoutMs(int timeout_ms);
-    bool WaitData(int timeout_ms); // Returns true if there is data, false if timeout occurred
+	void Send(const Address &destination, const void *data, int size);
+	// Returns -1 if there is no data
+	int Receive(Address &sender, void *data, int size);
+	void setTimeoutMs(int timeout_ms);
+	// Returns true if there is data, false if timeout occurred
+	bool WaitData(int timeout_ms);
 
-    void enableDebugOutput(bool enable) { m_debug_output = enable; }
-    int GetHandle() const { return m_handle; } // Debugging purposes only
+	// Debugging purposes only
+	int GetHandle() const { return m_handle; };
 
 private:
-    int m_handle = -1;
-    int m_timeout_ms = -1;
-    unsigned short m_addr_family = 0;
-    bool m_debug_output = false;
+	int m_handle = -1;
+	int m_timeout_ms = -1;
+	unsigned short m_addr_family = 0;
 };

@@ -37,7 +37,7 @@ std::string getImagePath(std::string_view path);
  * If not found, returns "".
  *
  * Utilizes a thread-safe cache.
- */
+*/
 std::string getTexturePath(const std::string &filename, bool *is_base_pack = nullptr);
 
 // Returns all dictionaries found from the "texture_path" setting.
