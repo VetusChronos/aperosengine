@@ -1070,13 +1070,12 @@ msgstr "Pasangkan permainan daripada ContentDB"
 
 #: builtin/mainmenu/tab_local.lua
 #, fuzzy
-msgid "AperosEngine doesn't come with a game by default."
+msgid "Aperos Engine doesn't come with the AperosVoxel by default."
 msgstr "AperosVoxel sudah tidak dipasang secara lalainya"
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"AperosEngine is a game-creation platform that allows you to play many different "
-"games."
+"Aperos Engine is a game creation platform that allows you to create different games."
 msgstr ""
 
 #: builtin/mainmenu/tab_local.lua

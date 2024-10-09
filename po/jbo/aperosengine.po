@@ -1077,13 +1077,12 @@ msgid "Install games from ContentDB"
 msgstr "samtcise'a lo se kelci ra'i la'oi ContentDB"
 
 #: builtin/mainmenu/tab_local.lua
-msgid "AperosEngine doesn't come with a game by default."
+msgid "Aperos Engine doesn't come with the AperosVoxel by default."
 msgstr ""
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"AperosEngine is a game-creation platform that allows you to play many different "
-"games."
+"Aperos Engine is a game creation platform that allows you to create different games."
 msgstr ""
 
 #: builtin/mainmenu/tab_local.lua

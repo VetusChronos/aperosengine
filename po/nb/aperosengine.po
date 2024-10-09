@@ -1073,13 +1073,12 @@ msgstr "Installer spill fra ContentDB"
 
 #: builtin/mainmenu/tab_local.lua
 #, fuzzy
-msgid "AperosEngine doesn't come with a game by default."
+msgid "Aperos Engine doesn't come with the AperosVoxel by default."
 msgstr "AperosVoxel er ikke lenger installert på forhånd"
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"AperosEngine is a game-creation platform that allows you to play many different "
-"games."
+"Aperos Engine is a game creation platform that allows you to create different games."
 msgstr ""
 
 #: builtin/mainmenu/tab_local.lua
