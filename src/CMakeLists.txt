@@ -430,6 +430,7 @@ set(common_SRCS
 	nodemetadata.cpp
 	nodetimer.cpp
 	noise.cpp
+	pcg_random.cpp
 	objdef.cpp
 	object_properties.cpp
 	particles.cpp

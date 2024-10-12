@@ -1,170 +1,32 @@
-/*
- * Minetest
- * Copyright (C) 2010-2014 celeron55, Perttu Ahola <celeron55@gmail.com>
- * Copyright (C) 2010-2014 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *  1. Redistributions of source code must retain the above copyright notice, this list of
- *     conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright notice, this list
- *     of conditions and the following disclaimer in the documentation and/or other materials
- *     provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+// SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include <cmath>
 #include "noise.h"
-#include <iostream>
-#include <cstring> // memset
 #include "debug.h"
 #include "util/numeric.h"
 #include "util/string.h"
 #include "exceptions.h"
 
-#define NOISE_MAGIC_X    1619
-#define NOISE_MAGIC_Y    31337
-#define NOISE_MAGIC_Z    52591
+#include <cmath>
+#include <iostream>
+#include <cstring> // memset
+#include <array>
+#include <cstdint>
+#include <stdexcept>
+
+constexpr uint64_t NOISE_MAGIC_X = 1619;
+constexpr uint64_t NOISE_MAGIC_Y = 31337;
+constexpr uint64_t NOISE_MAGIC_Z = 52591;
 // Unsigned magic seed prevents undefined behavior.
-#define NOISE_MAGIC_SEED 1013U
+constexpr uint64_t NOISE_MAGIC_SEED = 1013U;
 
 FlagDesc flagdesc_noiseparams[] = {
-	{"defaults",    NOISE_FLAG_DEFAULTS},
-	{"eased",       NOISE_FLAG_EASED},
-	{"absvalue",    NOISE_FLAG_ABSVALUE},
-	{"pointbuffer", NOISE_FLAG_POINTBUFFER},
-	{"simplex",     NOISE_FLAG_SIMPLEX},
-	{NULL,          0}
+    {"defaults",    NOISE_FLAG_DEFAULTS},
+    {"eased",       NOISE_FLAG_EASED},
+    {"absvalue",    NOISE_FLAG_ABSVALUE},
+    {"pointbuffer", NOISE_FLAG_POINTBUFFER},
+    {"simplex",     NOISE_FLAG_SIMPLEX},
+    {nullptr,       0}
 };
-
-///////////////////////////////////////////////////////////////////////////////
-
-PcgRandom::PcgRandom(u64 state, u64 seq)
-{
-	seed(state, seq);
-}
-
-void PcgRandom::seed(u64 state, u64 seq)
-{
-	m_state = 0U;
-	m_inc = (seq << 1u) | 1u;
-	next();
-	m_state += state;
-	next();
-}
-
-
-u32 PcgRandom::next()
-{
-	u64 oldstate = m_state;
-	m_state = oldstate * 6364136223846793005ULL + m_inc;
-
-	u32 xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
-	u32 rot = oldstate >> 59u;
-	return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
-}
-
-
-u32 PcgRandom::range(u32 bound)
-{
-	// If the bound is 0, we cover the whole RNG's range
-	if (bound == 0)
-		return next();
-
-	/*
-		This is an optimization of the expression:
-		  0x100000000ull % bound
-		since 64-bit modulo operations typically much slower than 32.
-	*/
-	u32 threshold = -bound % bound;
-	u32 r;
-
-	/*
-		If the bound is not a multiple of the RNG's range, it may cause bias,
-		e.g. a RNG has a range from 0 to 3 and we take want a number 0 to 2.
-		Using rand() % 3, the number 0 would be twice as likely to appear.
-		With a very large RNG range, the effect becomes less prevalent but
-		still present.
-
-		This can be solved by modifying the range of the RNG to become a
-		multiple of bound by dropping values above the a threshold.
-
-		In our example, threshold == 4 % 3 == 1, so reject values < 1
-		(that is, 0), thus making the range == 3 with no bias.
-
-		This loop may look dangerous, but will always terminate due to the
-		RNG's property of uniformity.
-	*/
-	while ((r = next()) < threshold)
-		;
-
-	return r % bound;
-}
-
-
-s32 PcgRandom::range(s32 min, s32 max)
-{
-	if (max < min)
-		throw PrngException("Invalid range (max < min)");
-
-	// We have to cast to s64 because otherwise this could overflow,
-	// and signed overflow is undefined behavior.
-	u32 bound = (s64)max - (s64)min + 1;
-	return range(bound) + min;
-}
-
-
-void PcgRandom::bytes(void *out, size_t len)
-{
-	u8 *outb = (u8 *)out;
-	int bytes_left = 0;
-	u32 r;
-
-	while (len--) {
-		if (bytes_left == 0) {
-			bytes_left = sizeof(u32);
-			r = next();
-		}
-
-		*outb = r & 0xFF;
-		outb++;
-		bytes_left--;
-		r >>= CHAR_BIT;
-	}
-}
-
-
-s32 PcgRandom::randNormalDist(s32 min, s32 max, int num_trials)
-{
-	s32 accum = 0;
-	for (int i = 0; i != num_trials; i++)
-		accum += range(min, max);
-	return myround((float)accum / num_trials);
-}
-
-void PcgRandom::getState(u64 state[2]) const
-{
-	state[0] = m_state;
-	state[1] = m_inc;
-}
-
-void PcgRandom::setState(const u64 state[2])
-{
-  m_state = state[0];
-  m_inc = state[1];
-}
-
-///////////////////////////////////////////////////////////////////////////////
 
 float noise2d(int x, int y, s32 seed)
 {
@@ -175,7 +37,6 @@ float noise2d(int x, int y, s32 seed)
 	return 1.f - (float)(int)n / 0x40000000;
 }
 
-
 float noise3d(int x, int y, int z, s32 seed)
 {
 	unsigned int n = (NOISE_MAGIC_X * x + NOISE_MAGIC_Y * y + NOISE_MAGIC_Z * z
@@ -185,18 +46,15 @@ float noise3d(int x, int y, int z, s32 seed)
 	return 1.f - (float)(int)n / 0x40000000;
 }
 
-
 inline float dotProduct(float vx, float vy, float wx, float wy)
 {
 	return vx * wx + vy * wy;
 }
 
-
 inline float linearInterpolation(float v0, float v1, float t)
 {
 	return v0 + (v1 - v0) * t;
 }
-
 
 inline float biLinearInterpolation(
 	float v00, float v10,
@@ -213,7 +71,6 @@ inline float biLinearInterpolation(
 	float v = linearInterpolation(v01, v11, x);
 	return linearInterpolation(u, v, y);
 }
-
 
 inline float triLinearInterpolation(
 	float v000, float v100, float v010, float v110,
@@ -249,7 +106,6 @@ float noise2d_gradient(float x, float y, s32 seed, bool eased)
 	return biLinearInterpolation(v00, v10, v01, v11, xl, yl, eased);
 }
 
-
 float noise3d_gradient(float x, float y, float z, s32 seed, bool eased)
 {
 	// Calculate the integer coordinates
@@ -277,7 +133,6 @@ float noise3d_gradient(float x, float y, float z, s32 seed, bool eased)
 		eased);
 }
 
-
 float noise2d_perlin(float x, float y, s32 seed,
 	int octaves, float persistence, bool eased)
 {
@@ -302,9 +157,7 @@ float contour(float v)
 	return (1.0 - v);
 }
 
-
 ///////////////////////// [ New noise ] ////////////////////////////
-
 
 float NoisePerlin2D(const NoiseParams *np, float x, float y, s32 seed)
 {
@@ -330,7 +183,6 @@ float NoisePerlin2D(const NoiseParams *np, float x, float y, s32 seed)
 
 	return np->offset + a * np->scale;
 }
-
 
 float NoisePerlin3D(const NoiseParams *np, float x, float y, float z, s32 seed)
 {
@@ -358,7 +210,6 @@ float NoisePerlin3D(const NoiseParams *np, float x, float y, float z, s32 seed)
 	return np->offset + a * np->scale;
 }
 
-
 Noise::Noise(const NoiseParams *np_, s32 seed, u32 sx, u32 sy, u32 sz)
 {
 	np = *np_;
@@ -370,7 +221,6 @@ Noise::Noise(const NoiseParams *np_, s32 seed, u32 sx, u32 sy, u32 sz)
 	allocBuffers();
 }
 
-
 Noise::~Noise()
 {
 	delete[] gradient_buf;
@@ -378,7 +228,6 @@ Noise::~Noise()
 	delete[] noise_buf;
 	delete[] result;
 }
-
 
 void Noise::allocBuffers()
 {
@@ -406,7 +255,6 @@ void Noise::allocBuffers()
 	}
 }
 
-
 void Noise::setSize(u32 sx, u32 sy, u32 sz)
 {
 	this->sx = sx;
@@ -416,7 +264,6 @@ void Noise::setSize(u32 sx, u32 sy, u32 sz)
 	allocBuffers();
 }
 
-
 void Noise::setSpreadFactor(v3f spread)
 {
 	this->np.spread = spread;
@@ -424,14 +271,12 @@ void Noise::setSpreadFactor(v3f spread)
 	resizeNoiseBuf(sz > 1);
 }
 
-
 void Noise::setOctaves(int octaves)
 {
 	this->np.octaves = octaves;
 
 	resizeNoiseBuf(sz > 1);
 }
-
 
 void Noise::resizeNoiseBuf(bool is3d)
 {
@@ -474,7 +319,6 @@ void Noise::resizeNoiseBuf(bool is3d)
 		throw InvalidNoiseParamsException();
 	}
 }
-
 
 /*
  * NB:  This algorithm is not optimal in terms of space complexity.  The entire
@@ -547,7 +391,6 @@ void Noise::gradientMap2D(
 	}
 }
 #undef idx
-
 
 #define idx(x, y, z) ((z) * nly * nlx + (y) * nlx + (x))
 void Noise::gradientMap3D(
@@ -640,7 +483,6 @@ void Noise::gradientMap3D(
 }
 #undef idx
 
-
 float *Noise::perlinMap2D(float x, float y, float *persistence_map)
 {
 	float f = 1.0, g = 1.0;
@@ -676,7 +518,6 @@ float *Noise::perlinMap2D(float x, float y, float *persistence_map)
 
 	return result;
 }
-
 
 float *Noise::perlinMap3D(float x, float y, float z, float *persistence_map)
 {
@@ -714,7 +555,6 @@ float *Noise::perlinMap3D(float x, float y, float z, float *persistence_map)
 
 	return result;
 }
-
 
 void Noise::updateResults(float g, float *gmap,
 	const float *persistence_map, size_t bufsize)
