@@ -330,6 +330,12 @@ void CAnimatedMeshSceneNode::render()
 }
 
 //! Returns the current start frame number.
+f32 CAnimatedMeshSceneNode::getStartFrame() const
+{
+	return StartFrame;
+}
+
+//! Returns the current start frame number.
 f32 CAnimatedMeshSceneNode::getEndFrame() const
 {
 	return EndFrame;

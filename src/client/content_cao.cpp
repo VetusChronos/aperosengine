@@ -1052,7 +1052,7 @@ void GenericCAO::step(float dtime, ClientEnvironment *env)
 				walking = true;
 			}
 
-			v2f new_anim = v2s32(0,0);
+			v2f new_anim(0,0);
 			bool allow_update = false;
 
 			// increase speed if using fast or flying fast

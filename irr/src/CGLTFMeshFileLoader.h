@@ -96,11 +96,12 @@ private:
 			const NormalizedValuesAccessor<N> &accessor,
 			const std::size_t i);
 
-	class MeshExtractor {
+	class MeshExtractor
+	{
 	public:
 		MeshExtractor(tiniergltf::GlTF &&model,
 				CSkinnedMesh *mesh) noexcept
-			: m_gltf_model(model), m_irr_model(mesh) {};
+			: m_gltf_model(std::move(model)), m_irr_model(mesh) {};
 
 		/* Gets indices for the given mesh/primitive.
 		 *
@@ -137,11 +138,15 @@ private:
 		void addPrimitive(const tiniergltf::MeshPrimitive &primitive,
 				const std::optional<std::size_t> skinIdx,
 				CSkinnedMesh::SJoint *parent);
+
 		void deferAddMesh(const std::size_t meshIdx,
 				const std::optional<std::size_t> skinIdx,
 				CSkinnedMesh::SJoint *parentJoint);
+
 		void loadNode(const std::size_t nodeIdx, CSkinnedMesh::SJoint *parentJoint);
+
 		void loadNodes();
+
 		void loadSkins();
 
 		void loadAnimation(const std::size_t animIdx);
@@ -153,4 +158,3 @@ private:
 } // namespace scene
 
 } // namespace irr
-

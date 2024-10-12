@@ -121,6 +121,7 @@ public:
 	}
 
 	void getLocalAnimations(v2f *frames, float *frame_speed)
+	{
 		for (int i = 0; i < 4; i++)
 			frames[i] = local_animations[i];
 		*frame_speed = local_animation_speed;

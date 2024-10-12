@@ -1,18 +1,18 @@
-AperosEngine Lua Modding API Reference
-======================================
+Aperos (Voxel) Engine Lua Modding API Reference
+===============================================
 
 * More information at <http://www.aperosvoxel.domain/>
 * Developer Wiki: <http://dev.aperosvoxel.domain/>
-* Modding tools: <https://github.com/minetest/modtools>
+* Modding tools: <https://github.com/aperosvoxel/modtools>
 
 Introduction
 ------------
 
-Content and functionality can be added to AperosEngine using Lua scripting
+Content and functionality can be added to Aperos Engine using Lua scripting
 in run-time loaded mods.
 
 A mod is a self-contained bunch of scripts, textures and other related
-things, which is loaded by and interfaces with AperosEngine.
+things, which is loaded by and interfaces with Aperos Engine.
 
 Mods are contained and ran solely on the server side. Definitions and media
 files are automatically transferred to the client.
@@ -35,7 +35,7 @@ the `init.lua` scripts in a shared environment.
 Paths
 -----
 
-AperosEngine keeps and looks for files mostly in two paths. `path_share` or `path_user`.
+Aperos Engine keeps and looks for files mostly in two paths. `path_share` or `path_user`.
 
 `path_share` contains possibly read-only content for the engine (incl. games and mods).
 `path_user` contains mods or games installed by the user but also the users
@@ -59,7 +59,7 @@ Where `<gameid>` is unique to each game.
 The game directory can contain the following files:
 
 * `game.conf`, with the following keys:
-    * `title`: Required, a human-readable title to address the game, e.g. `title = AperosVoxel`.
+    * `title`: Required, a human-readable title to address the game, e.g. `title = Aperos Engine Game`.
     * `name`: (Deprecated) same as title.
     * `description`: Short description to be shown in the content tab.
       See [Translating content meta](#translating-content-meta).
@@ -158,7 +158,7 @@ Mods can be put in a subdirectory, if the parent directory, which otherwise
 should be a mod, contains a file named `modpack.conf`.
 The file is a key-value store of modpack details.
 
-* `name`: The modpack name. Allows AperosEngine to determine the modpack name even
+* `name`: The modpack name. Allows Aperos Engine to determine the modpack name even
           if the folder is wrongly named.
 * `title`: A human-readable title to address the modpack. See [Translating content meta](#translating-content-meta).
 * `description`: Description of mod to be shown in the Mods tab of the main
@@ -204,7 +204,7 @@ The location of this directory can be fetched by using
 
 A `Settings` file that provides meta information about the mod.
 
-* `name`: The mod name. Allows AperosEngine to determine the mod name even if the
+* `name`: The mod name. Allows Aperos Engine to determine the mod name even if the
           folder is wrongly named.
 * `title`: A human-readable title to address the mod. See [Translating content meta](#translating-content-meta).
 * `description`: Description of mod to be shown in the Mods tab of the main
@@ -224,28 +224,6 @@ A `Settings` file that provides meta information about the mod.
 A screenshot shown in the mod manager within the main menu. It should
 have an aspect ratio of 3:2 and a minimum size of 300×200 pixels.
 
-### `depends.txt`
-
-**Deprecated:** you should use mod.conf instead.
-
-This file is used if there are no dependencies in mod.conf.
-
-List of mods that have to be loaded before loading this mod.
-
-A single line contains a single modname.
-
-Optional dependencies can be defined by appending a question mark
-to a single modname. This means that if the specified mod
-is missing, it does not prevent this mod from being loaded.
-
-### `description.txt`
-
-**Deprecated:** you should use mod.conf instead.
-
-This file is used if there is no description in mod.conf.
-
-A file containing a description to be shown in the Mods tab of the main menu.
-
 ### `settingtypes.txt`
 
 The format is documented in `builtin/settingtypes.txt`.
@@ -258,7 +236,7 @@ See [`Settings`].
 ### `init.lua`
 
 The main Lua script. Running this script should register everything it
-wants to register. Subsequent execution depends on AperosEngine calling the
+wants to register. Subsequent execution depends on Aperos Engine calling the
 registered callbacks.
 
 ### `textures`, `sounds`, `media`, `models`, `locale`
@@ -273,7 +251,7 @@ Accepted formats are:
 
     images: .png, .jpg, .tga, (deprecated:) .bmp
     sounds: .ogg vorbis
-    models: .x, .b3d, .obj
+    models: .x, .b3d, .obj, (since version 5.10:) .gltf, .glb
 
 Other formats won't be sent to the client (e.g. you can store .blend files
 in a folder for convenience, without the risk that such files are transferred)
@@ -289,6 +267,49 @@ in one of its parents, the parent's file is used.
 
 Although it is discouraged, a mod can overwrite a media file of any mod that it
 depends on by supplying a file with an equal name.
+
+Only a subset of model file format features is supported:
+
+Simple textured meshes (with multiple textures), optionally with normals.
+The .x, .b3d and .gltf formats additionally support (a single) animation.
+
+#### glTF
+
+The glTF model file format for now only serves as a
+more modern alternative to the other static model file formats;
+it unlocks no special rendering features.
+
+Binary glTF (`.glb`) files are supported and recommended over `.gltf` files
+due to their space savings.
+
+This means that many glTF features are not supported *yet*, including:
+
+* Animations
+  * Only a single animation is supported,
+    use frame ranges within this animation.
+  * Only integer frames are supported.
+* Cameras
+* Materials
+  * Only base color textures are supported
+  * Backface culling is overridden
+  * Double-sided materials don't work
+* Alternative means of supplying data
+  * Embedded images
+  * References to files via URIs
+
+Textures are supplied solely via the same means as for the other model file formats:
+The `textures` object property, the `tiles` node definition field and
+the list of textures used in the `model[]` formspec element.
+
+The order in which textures are to be supplied
+is that in which they appear in the `textures` array in the glTF file.
+
+Do not rely on glTF features not being supported; they may be supported in the future.
+The backwards compatibility guarantee does not extend to ignoring unsupported features.
+
+For example, if your model used an emissive material,
+you should expect that a future version of Aperos Engine may respect this,
+and thus cause your model to render differently there.
 
 Naming conventions
 ------------------
@@ -472,6 +493,7 @@ Example:
 `default_grass_side.png` is overlaid over `default_dirt.png`.
 
 *See notes: `TEXMOD_UPSCALE`*
+
 
 ### Texture grouping
 
@@ -767,6 +789,8 @@ in GIMP. Overlay is the same as Hard light but with the role of the two
 textures swapped, see the `[hardlight` modifier description for more detail
 about these blend modes.
 
+*See notes: `TEXMOD_UPSCALE`*
+
 #### `[hardlight:<file>`
 
 Applies a Hard light blend with the two textures, like the Hard light layer
@@ -976,7 +1000,7 @@ Soft texture overlay
 --------------------
 
 Sometimes hardware coloring is not enough, because it affects the
-whole tile. Soft texture overlays were added to AperosEngine to allow
+whole tile. Soft texture overlays were added to Aperos Engine to allow
 the dynamic coloring of only specific parts of the node's texture.
 For example a grass block may have colored grass, while keeping the
 dirt brown.
@@ -1113,7 +1137,6 @@ Table used to specify how a sound is played:
     -- its end in `-start_time` seconds.
     -- It is unspecified what happens if `loop` is false and `start_time` is
     -- smaller than minus the sound's length.
-
     -- Available since feature `sound_params_start_time`.
 
     loop = false,
@@ -1381,7 +1404,6 @@ The function of `param2` is determined by `paramtype2` in node definition.
     * The five most significant bits of `param2` tells which color is picked from the
       palette. The palette should have 32 pixels.
     * The three least significant bits contain the `wallmounted` value.
-      palette. The palette should have 32 pixels.
 * `paramtype2 = "glasslikeliquidlevel"`
     * Only valid for "glasslike_framed" or "glasslike_framed_optional"
       drawtypes. "glasslike_framed_optional" nodes are only affected if the
@@ -1504,7 +1526,7 @@ Look for examples in `games/devtest` or `games/aperosvoxel`.
     * For supported model formats see Irrlicht engine documentation.
 * `plantlike_rooted`
     * Enables underwater `plantlike` without air bubbles around the nodes.
-    * Consists of a base cube at the co-ordinates of the node plus a
+    * Consists of a base cube at the coordinates of the node plus a
       `plantlike` extension above
     * If `paramtype2="leveled", the `plantlike` extension has a height
       of `param2 / 16` nodes, otherwise it's the height of 1 node
@@ -1760,6 +1782,13 @@ Displays a horizontal bar made up of half-images with an optional background.
 * `item`: Position of item that is selected.
 * `direction`: Direction the list will be displayed in
 * `offset`: offset in pixels from position.
+* `alignment`: The alignment of the inventory. Aligned at the top left corner if not specified.
+
+### `hotbar`
+
+* `direction`: Direction the list will be displayed in
+* `offset`: offset in pixels from position.
+* `alignment`: The alignment of the inventory.
 
 ### `waypoint`
 
@@ -1818,6 +1847,11 @@ Displays a minimap on the HUD.
 
 * `size`: Size of the minimap to display. Minimap should be a square to avoid
   distortion.
+  * Negative values represent percentages of the screen. If either `x` or `y`
+    is specified as a percentage, the resulting pixel size will be used for
+    both `x` and `y`. Example: On a 1920x1080 screen, `{x = 0, y = -25}` will
+    result in a 270x270 minimap.
+  * Negative values are supported starting with protocol version 45.
 * `alignment`: The alignment of the minimap.
 * `offset`: offset in pixels from position.
 
@@ -2644,7 +2678,7 @@ reserved to pass key press events to formspec!
 **WARNING**: names and values of elements cannot contain binary data such as ASCII
 control characters. For values, escape sequences used by the engine are an exception to this.
 
-**WARNING**: AperosEngine allows you to add elements to every single formspec instance
+**WARNING**: Aperos Engine allows you to add elements to every single formspec instance
 using `player:set_formspec_prepend()`, which may be the reason backgrounds are
 appearing when you don't expect them to, or why things are styled differently
 to normal. See [`no_prepend[]`] and [Styling Formspecs].
@@ -2674,28 +2708,6 @@ Examples
     list[current_player;craft;3,0;3,3;]
     list[current_player;craftpreview;7,1;1,1;]
 
-Version History
----------------
-
-* Formspec version 1 (pre-5.1.0):
-  * (too much)
-* Formspec version 2 (5.1.0):
-  * Forced real coordinates
-  * background9[]: 9-slice scaling parameters
-* Formspec version 3 (5.2.0):
-  * Formspec elements are drawn in the order of definition
-  * bgcolor[]: use 3 parameters (bgcolor, formspec (now an enum), fbgcolor)
-  * box[] and image[] elements enable clipping by default
-  * new element: scroll_container[]
-* Formspec version 4 (5.4.0):
-  * Allow dropdown indexing events
-* Formspec version 5 (5.5.0):
-  * Added padding[] element
-* Formspec version 6 (5.6.0):
-  * Add nine-slice images, animated_image, and fgimg_middle
-* Formspec version 7 (5.8.0):
-  * style[]: Add focused state for buttons
-  * Add field_enter_after_edit[] (experimental)
 
 Elements
 --------
@@ -2779,7 +2791,7 @@ Elements
 * End of a container, following elements are no longer relative to this
   container.
 
-### `scroll_container[<X>,<Y>;<W>,<H>;<scrollbar name>;<orientation>;<scroll factor>]`
+### `scroll_container[<X>,<Y>;<W>,<H>;<scrollbar name>;<orientation>;<scroll factor>;<content padding>]`
 
 * Start of a scroll_container block. All contained elements will ...
   * take the scroll_container coordinate as position origin,
@@ -2788,6 +2800,12 @@ Elements
   * be clipped to the rectangle defined by `X`, `Y`, `W` and `H`.
 * `orientation`: possible values are `vertical` and `horizontal`.
 * `scroll factor`: optional, defaults to `0.1`.
+* `content padding`: (optional), in formspec coordinate units
+  * If specified, the scrollbar properties `max` and `thumbsize` are calculated automatically
+    based on the content size plus `content padding` at the end of the container. `min` is set to 0.
+  * Negative `scroll factor` is not supported.
+  * When active, `scrollbaroptions[]` has no effect on the affected properties.
+  * Defaults to empty value (= disabled).
 * Nesting is possible.
 * Some elements might work a little different if they are in a scroll_container.
 * Note: If you want the scroll_container to actually work, you also need to add a
@@ -3081,7 +3099,7 @@ Elements
 ### `textlist[<X>,<Y>;<W>,<H>;<name>;<listelem 1>,<listelem 2>,...,<listelem n>]`
 
 * Scrollable item list showing arbitrary text elements
-* `name` fieldname sent to server on doubleclick value is current selected
+* `name` fieldname sent to server on double-click value is current selected
   element.
 * `listelements` can be prepended by #color in hexadecimal format RRGGBB
   (only).
@@ -3090,7 +3108,7 @@ Elements
 ### `textlist[<X>,<Y>;<W>,<H>;<name>;<listelem 1>,<listelem 2>,...,<listelem n>;<selected idx>;<transparent>]`
 
 * Scrollable itemlist showing arbitrary text elements
-* `name` fieldname sent to server on doubleclick value is current selected
+* `name` fieldname sent to server on double-click value is current selected
   element.
 * `listelements` can be prepended by #RRGGBB (only) in hexadecimal format
     * if you want a listelement to start with "#" write "##"
@@ -3227,7 +3245,7 @@ Elements
 
 * Show scrollable table using options defined by the previous `tableoptions[]`
 * Displays cells as defined by the previous `tablecolumns[]`
-* `name`: fieldname sent to server on row select or doubleclick
+* `name`: fieldname sent to server on row select or double-click
 * `cell 1`...`cell n`: cell contents given in row-major order
 * `selected idx`: index of row to be selected within table (first row = `1`)
 * See also `aperosengine.explode_table_event`
@@ -3761,7 +3779,7 @@ The following functions provide escape sequences:
 Spatial Vectors
 ===============
 
-AperosEngine stores 3-dimensional spatial vectors in Lua as tables of 3 coordinates,
+Aperos Engine stores 3-dimensional spatial vectors in Lua as tables of 3 coordinates,
 and has a class to represent them (`vector.*`), which this chapter is about.
 For details on what a spatial vectors is, please refer to Wikipedia:
 https://en.wikipedia.org/wiki/Euclidean_vector.
@@ -3788,12 +3806,12 @@ Compatibility notes
 -------------------
 
 Vectors used to be defined as tables of the form `{x = num, y = num, z = num}`.
-Since Minetest 5.5.0, vectors additionally have a metatable to enable easier use.
+Since Aperos Engine 5.5.0, vectors additionally have a metatable to enable easier use.
 Note: Those old-style vectors can still be found in old mod code. Hence, mod and
 engine APIs still need to be able to cope with them in many places.
 
 Manually constructed tables are deprecated and highly discouraged. This interface
-should be used to ensure seamless compatibility between mods and the AperosEngine API.
+should be used to ensure seamless compatibility between mods and the Aperos Engine API.
 This is especially important to callback function parameters and functions overwritten
 by mods.
 Also, though not likely, the internal implementation of a vector might change in
@@ -3866,15 +3884,23 @@ vectors are written like this: `(x, y, z)`:
     * If `v` has zero length, returns `(0, 0, 0)`.
 * `vector.floor(v)`:
     * Returns a vector, each dimension rounded down.
+* `vector.ceil(v)`:
+    * Returns a vector, each dimension rounded up.
 * `vector.round(v)`:
     * Returns a vector, each dimension rounded to nearest integer.
     * At a multiple of 0.5, rounds away from zero.
-* `vector.apply(v, func)`:
+* `vector.sign(v, tolerance)`:
+    * Returns a vector where `math.sign` was called for each component.
+    * See [Helper functions] for details.
+* `vector.abs(v)`:
+    * Returns a vector with absolute values for each component.
+* `vector.apply(v, func, ...)`:
     * Returns a vector where the function `func` has been applied to each
       component.
+    * `...` are optional arguments passed to `func`.
 * `vector.combine(v, w, func)`:
-	* Returns a vector where the function `func` has combined both components of `v` and `w`
-	  for each component
+    * Returns a vector where the function `func` has combined both components of `v` and `w`
+      for each component
 * `vector.equals(v1, v2)`:
     * Returns a boolean, `true` if the vectors are identical.
 * `vector.sort(v1, v2)`:
@@ -3892,10 +3918,14 @@ vectors are written like this: `(x, y, z)`:
       by a `vector.*` function.
     * Returns `false` for anything else, including tables like `{x=3,y=1,z=4}`.
 * `vector.in_area(pos, min, max)`:
-	* Returns a boolean value indicating if `pos` is inside area formed by `min` and `max`.
-	* `min` and `max` are inclusive.
-	* If `min` is bigger than `max` on some axis, function always returns false.
-	* You can use `vector.sort` if you have two vectors and don't know which are the minimum and the maximum.
+    * Returns a boolean value indicating if `pos` is inside area formed by `min` and `max`.
+    * `min` and `max` are inclusive.
+    * If `min` is bigger than `max` on some axis, function always returns false.
+    * You can use `vector.sort` if you have two vectors and don't know which are the minimum and the maximum.
+* `vector.random_in_area(min, max)`:
+    * Returns a random integer position in area formed by `min` and `max`
+    * `min` and `max` are inclusive.
+    * You can use `vector.sort` if you have two vectors and don't know which are the minimum and the maximum.
 
 For the following functions `x` can be either a vector or a number:
 
@@ -4101,8 +4131,8 @@ Translations
 Texts can be translated client-side with the help of `aperosengine.translate` and
 translation files.
 
-Consider using the script `mod_translation_updater.py` in the AperosEngine
-[modtools](https://github.com/minetest/modtools) repository to generate and
+Consider using the script `mod_translation_updater.py` in the Aperos Engine
+[modtools](https://github.com/aperosvoxel/modtools) repository to generate and
 update translation files automatically from the Lua sources.
 
 Translating a string
@@ -4238,7 +4268,7 @@ Say you have a mod called `mymod` with a short description in mod.conf:
 description = This is the short description
 ```
 
-AperosEngine will look for translations in the `mymod` textdomain as there's no
+Aperos Engine will look for translations in the `mymod` textdomain as there's no
 textdomain specified in mod.conf. For example, `mymod/locale/mymod.fr.tr`:
 
 ```
@@ -4248,7 +4278,7 @@ This is the short description=Voici la description succincte
 
 ### Games and Modpacks
 
-For games and modpacks, AperosEngine will look for the textdomain in all mods.
+For games and modpacks, Aperos Engine will look for the textdomain in all mods.
 
 Say you have a game called `mygame` with the following game.conf:
 
@@ -4257,7 +4287,7 @@ description = This is the game's short description
 textdomain = mygame
 ```
 
-AperosEngine will then look for the textdomain `mygame` in all mods, for example,
+Aperos Engine will then look for the textdomain `mygame` in all mods, for example,
 `mygame/mods/anymod/locale/mygame.fr.tr`. Note that it is still recommended that your
 textdomain match the mod name, but this isn't required.
 
@@ -4267,7 +4297,7 @@ Perlin noise
 ============
 
 Perlin noise creates a continuously-varying value depending on the input values.
-Usually in AperosEngine the input values are either 2D or 3D co-ordinates in nodes.
+Usually in Aperos Engine the input values are either 2D or 3D coordinates in nodes.
 The result is used during map generation to create the terrain shape, vary heat
 and humidity to distribute biomes, vary the density of decorations or vary the
 structure of ores.
@@ -4530,7 +4560,7 @@ computationally expensive than any other ore.
 Creates a single undulating ore stratum that is continuous across mapchunk
 borders and horizontally spans the world.
 
-The 2D perlin noise described by `noise_params` defines the Y co-ordinate of
+The 2D perlin noise described by `noise_params` defines the Y coordinate of
 the stratum midpoint. The 2D perlin noise described by `np_stratum_thickness`
 defines the stratum's vertical thickness (in units of nodes). Due to being
 continuous across mapchunk borders the stratum's vertical thickness is
@@ -4619,7 +4649,7 @@ Schematic specifier
 --------------------
 
 A schematic specifier identifies a schematic by either a filename to a
-AperosEngine Schematic file (`.apr`) or through raw data supplied through Lua,
+Aperos Engine Schematic file (`.aprs`) or through raw data supplied through Lua,
 in the form of a table.  This table specifies the following fields:
 
 * The `size` field is a 3D vector containing the dimensions of the provided
@@ -4953,7 +4983,7 @@ Methods
 A helper class for voxel areas.
 It can be created via `VoxelArea(pmin, pmax)` or
 `VoxelArea:new({MinEdge = pmin, MaxEdge = pmax})`.
-The coordinates are *inclusive*, like most other things in AperosEngine.
+The coordinates are *inclusive*, like most other things in Aperos Engine.
 
 ### Methods
 
@@ -5095,12 +5125,12 @@ Callbacks:
       used for updating the entity state.
 * `on_deactivate(self, removal)`
     * Called when the object is about to get removed or unloaded.
-	* `removal`: boolean indicating whether the object is about to get removed.
-	  Calling `object:remove()` on an active object will call this with `removal=true`.
-	  The mapblock the entity resides in being unloaded will call this with `removal=false`.
-	* Note that this won't be called if the object hasn't been activated in the first place.
-	  In particular, `aperosengine.clear_objects({mode = "full"})` won't call this,
-	  whereas `aperosengine.clear_objects({mode = "quick"})` might call this.
+    * `removal`: boolean indicating whether the object is about to get removed.
+      Calling `object:remove()` on an active object will call this with `removal=true`.
+      The mapblock the entity resides in being unloaded will call this with `removal=false`.
+    * Note that this won't be called if the object hasn't been activated in the first place.
+      In particular, `aperosengine.clear_objects({mode = "full"})` won't call this,
+      whereas `aperosengine.clear_objects({mode = "quick"})` might call this.
 * `on_step(self, dtime, moveresult)`
     * Called on every server tick, after movement and collision processing.
     * `dtime`: elapsed time since last call
@@ -5125,12 +5155,15 @@ Callbacks:
       to the object (not necessarily an actual rightclick)
     * `clicker`: an `ObjectRef` (may or may not be a player)
 * `on_attach_child(self, child)`
-    * `child`: an `ObjectRef` of the child that attaches
+    * Called after another object is attached to this object.
+    * `child`: an `ObjectRef` of the child
 * `on_detach_child(self, child)`
-    * `child`: an `ObjectRef` of the child that detaches
+    * Called after another object has detached from this object.
+    * `child`: an `ObjectRef` of the child
 * `on_detach(self, parent)`
-    * `parent`: an `ObjectRef` (can be `nil`) from where it got detached
-    * This happens before the parent object is removed from the world
+    * Called after detaching from another object.
+    * `parent`: an `ObjectRef` from where it got detached
+    * Note: this is also called before removal from the world.
 * `get_staticdata(self)`
     * Should return a string that will be passed to `on_activate` when the
       object is instantiated the next time.
@@ -5284,8 +5317,8 @@ and `aperosengine.register_on_priv_revoke` functions.
 Built-in privileges
 -------------------
 
-AperosEngine includes a set of built-in privileges that control capabilities
-provided by the AperosEngine and can be used by mods:
+Aperos Engine includes a set of built-in privileges that control capabilities
+provided by the Aperos Engine and can be used by mods:
 
   * Basic privileges are normally granted to all players:
       * `shout`: can communicate using the in-game chat.
@@ -5325,7 +5358,7 @@ provided by the AperosEngine and can be used by mods:
 Related settings
 ----------------
 
-AperosEngine includes the following settings to control behavior of privileges:
+Aperos Engine includes the following settings to control behavior of privileges:
 
    * `default_privs`: defines privileges granted to new players.
    * `basic_privs`: defines privileges that can be granted/revoked by players having
@@ -5368,12 +5401,10 @@ Utilities
     * Useful for storing custom data *independently of worlds*.
     * Must be called during mod load time.
     * Can read or write to this directory at any time.
-    * It's possible that multiple AperosEngine instances are running at the same
+    * It's possible that multiple Aperos Engine instances are running at the same
       time, which may lead to corruption if you are not careful.
 * `aperosengine.is_singleplayer()`
 * `aperosengine.features`: Table containing API feature flags
-
-Note: The numbers in square brackets `()` refer to the Minetest versions
 
   ```lua
   {
@@ -5465,7 +5496,7 @@ Note: The numbers in square brackets `()` refer to the Minetest versions
       dynamic_add_media_filepath = true,
        -- L-system decoration type (5.9.0)
       lsystem_decoration_type = true,
-      -- Overrideable pointing range using the itemstack meta key `"range"` (5.9.0)
+      -- Overridable pointing range using the itemstack meta key `"range"` (5.9.0)
       item_meta_range = true,
       -- Allow passing an optional "actor" ObjectRef to the following functions:
       -- aperosengine.place_node, aperosengine.dig_node, aperosengine.punch_node (5.9.0)
@@ -5537,9 +5568,9 @@ Note: The numbers in square brackets `()` refer to the Minetest versions
           y = 577,
       },
 
-      -- Estimated maximum formspec size before AperosEngine will start shrinking the
-      -- formspec to fit. For a fullscreen formspec, use a size 10-20% larger than
-      -- this and `padding[-0.01,-0.01]`.
+      -- Estimated maximum formspec size before Aperos Engine will start shrinking the
+      -- formspec to fit. For a fullscreen formspec, use this formspec size and
+      -- `padding[0,0]`. `bgcolor[;true]` is also recommended.
       max_formspec_size = {
           x = 20,
           y = 11.25
@@ -5555,7 +5586,7 @@ Note: The numbers in square brackets `()` refer to the Minetest versions
 
       -- Whether the touchscreen controls are enabled.
       -- Usually (but not always) `true` on Android.
-      -- Requires at least Minetest 5.9.0 on the client. For older clients, it
+      -- Requires at least Aperos Engine 5.9.0 on the client. For older clients, it
       -- is always set to `false`.
       touch_controls = false,
   }
@@ -5588,7 +5619,7 @@ Note: The numbers in square brackets `()` refer to the Minetest versions
       `local f = io.open(path, "wb"); f:write(content); f:close()`
 * `aperosengine.get_version()`: returns a table containing components of the
    engine version.  Components:
-    * `project`: Name of the project, eg, "AperosVoxel"
+    * `project`: Name of the project, eg, "Aperos Engine"
     * `string`: Simple version, eg, "1.2.3-dev"
     * `proto_min`: The minimum supported protocol version
     * `proto_max`: The maximum supported protocol version
@@ -5613,6 +5644,13 @@ Note: The numbers in square brackets `()` refer to the Minetest versions
 * `aperosengine.colorspec_to_bytes(colorspec)`: Converts a ColorSpec to a raw
   string of four bytes in an RGBA layout, returned as a string.
   * `colorspec`: The ColorSpec to convert
+* `aperosengine.colorspec_to_table(colorspec)`: Converts a ColorSpec into RGBA table
+  form. If the ColorSpec is invalid, returns `nil`. You can use this to parse
+  ColorStrings.
+    * `colorspec`: The ColorSpec to convert
+* `aperosengine.time_to_day_night_ratio(time_of_day)`: Returns a "day-night ratio" value
+  (as accepted by `ObjectRef:override_day_night_ratio`) that is equivalent to
+  the given "time of day" value (as returned by `aperosengine.get_timeofday`).
 * `aperosengine.encode_png(width, height, data, [compression])`: Encode a PNG
   image and return it in string form.
     * `width`: Width of the image
@@ -5628,7 +5666,7 @@ Note: The numbers in square brackets `()` refer to the Minetest versions
   You may use this to procedurally generate textures during server init.
 * `aperosengine.urlencode(str)`: Encodes reserved URI characters by a
   percent sign followed by two hex digits. See
-  [RFC 3986, section 2.3](https://datatracker.ietf.org/doc/html/rfc3986#section-2.3).
+  [RFC 3986, section 2.3](https://datatracker.ietf.org/docs/en/html/rfc3986#section-2.3).
 
 Logging
 -------
@@ -5747,7 +5785,7 @@ Call these functions only at load time!
 
 * `aperosengine.register_globalstep(function(dtime))`
     * Called every server step, usually interval of 0.1s.
-	* `dtime` is the time since last execution in seconds.
+    * `dtime` is the time since last execution in seconds.
 * `aperosengine.register_on_mods_loaded(function())`
     * Called after mods have finished loading and before the media is cached or the
       aliases handled.
@@ -5773,7 +5811,7 @@ Call these functions only at load time!
 * `aperosengine.register_on_generated(function(minp, maxp, blockseed))`
     * Called after generating a piece of world between `minp` and `maxp`.
     * **Avoid using this** whenever possible. As with other callbacks this blocks
-      the main thread and introduces noticable latency.
+      the main thread and introduces noticeable latency.
       Consider [Mapgen environment] for an alternative.
 * `aperosengine.register_on_newplayer(function(ObjectRef))`
     * Called when a new player enters the world for the first time
@@ -5800,6 +5838,9 @@ Call these functions only at load time!
     * When `hp == hp_max`, healing does still trigger this callback.
     * `player`: ObjectRef of the player
     * `hp_change`: the amount of change. Negative when it is damage.
+      * Historically, the new HP value was clamped to [0, 65535] before
+        calculating the HP change. This clamping has been removed as of
+        Aperos Engine 5.10.0
     * `reason`: a PlayerHPChangeReason table.
         * The `type` field will have one of the following values:
             * `set_hp`: A mod or the engine called `set_hp` without
@@ -6019,7 +6060,7 @@ Authentication
     * Only use this function for making it possible to log in via password from
       external protocols such as IRC, other uses are frowned upon.
 * `aperosengine.get_password_hash(name, raw_password)`
-    * Convert a name-password pair to a password hash that AperosEngine can use.
+    * Convert a name-password pair to a password hash that Aperos Engine can use.
     * The returned value alone is not a good basis for password checks based
       on comparing the password hash in the database with the password hash
       from the function, with an externally provided password, as the hash
@@ -6180,7 +6221,7 @@ Environment access
     * **Warning**: The same warning as for `aperosengine.get_objects_inside_radius` applies.
       Use `aperosengine.objects_in_area` instead to iterate only valid objects.
 * `aperosengine.objects_in_area(min_pos, max_pos)`
-	* returns an iterator of valid objects
+    * returns an iterator of valid objects
 * `aperosengine.set_timeofday(val)`: set time of day
     * `val` is between `0` and `1`; `0` for midnight, `0.5` for midday
 * `aperosengine.get_timeofday()`: get time of day
@@ -6442,11 +6483,11 @@ Environment access
     * spread these updates to neighbors and can cause a cascade
       of nodes to fall.
 * `aperosengine.get_spawn_level(x, z)`
-    * Returns a player spawn y co-ordinate for the provided (x, z)
-      co-ordinates, or `nil` for an unsuitable spawn point.
+    * Returns a player spawn y coordinate for the provided (x, z)
+      coordinates, or `nil` for an unsuitable spawn point.
     * For most mapgens a 'suitable spawn point' is one with y between
       `water_level` and `water_level + 16`, and in mgv7 well away from rivers,
-      so `nil` will be returned for many (x, z) co-ordinates.
+      so `nil` will be returned for many (x, z) coordinates.
     * The spawn level returned is for a player spawn in unmodified terrain.
     * The spawn level is intentionally above terrain level to cope with
       full-node biome 'dust' nodes.
@@ -6454,7 +6495,7 @@ Environment access
 Mod channels
 ------------
 
-You can find mod channels communication scheme in `doc/mod_channels.png`.
+You can find mod channels communication scheme in `docs/en/mod_channels.png`.
 
 * `aperosengine.mod_channel_join(channel_name)`
     * Server joins channel `channel_name`, and creates it if necessary. You
@@ -6507,6 +6548,9 @@ Formspec
 * `aperosengine.formspec_escape(string)`: returns a string
     * escapes the characters "[", "]", "\", "," and ";", which cannot be used
       in formspecs.
+* `aperosengine.hypertext_escape(string)`: returns a string
+    * escapes the characters "\", "<", and ">" to show text in a hypertext element.
+    * not safe for use with tag attributes.
 * `aperosengine.explode_table_event(string)`: returns a table
     * returns e.g. `{type="CHG", row=1, column=2}`
     * `type` is one of:
@@ -6764,6 +6808,17 @@ This allows you easy interoperability for delegating work to jobs.
     * Register a path to a Lua file to be imported when an async environment
       is initialized. You can use this to preload code which you can then call
       later using `aperosengine.handle_async()`.
+* `aperosengine.register_portable_metatable(name, mt)`:
+    * Register a metatable that should be preserved when data is transferred
+    between the main thread and the async environment.
+    * `name` is a string that identifies the metatable. It is recommended to
+      follow the `modname:name` convention for this identifier.
+    * `mt` is the metatable to register.
+    * Note that it is allowed to register the same metatable under multiple
+      names, but it is not allowed to register multiple metatables under the
+      same name.
+    * You must register the metatable in both the main environment
+      and the async environment for this mechanism to work.
 
 
 ### List of APIs available in an async environment
@@ -6793,8 +6848,7 @@ Functions:
 
 * Standalone helpers such as logging, filesystem, encoding,
   hashing or compression APIs
-* `aperosengine.register_portable_metatable`
-* IPC
+* `aperosengine.register_portable_metatable` (see above)
 
 Variables:
 
@@ -6872,7 +6926,6 @@ Functions:
 * `aperosengine.get_node`, `set_node`, `find_node_near`, `find_nodes_in_area`,
   `spawn_tree` and similar
     * these only operate on the current chunk (if inside a callback)
-* IPC
 
 Variables:
 
@@ -6925,7 +6978,7 @@ Server
                        all players (optional)
         * `ephemeral`: boolean that marks the media as ephemeral,
                        it will not be cached on the client (optional, default false)
-        * Exactly one of the paramters marked [*] must be specified.
+        * Exactly one of the parameters marked [*] must be specified.
     * `callback`: function with arguments `name`, which is a player name
     * Pushes the specified media file to client(s). (details below)
       The file must be a supported image, sound or model format.
@@ -6949,49 +7002,6 @@ Server
     * Clients will attempt to fetch files added this way via remote media,
       this can make transfer of bigger files painless (if set up). Nevertheless
       it is advised not to use dynamic media for big media files.
-
-IPC
----
-
-The engine provides a generalized mechanism to enable sharing data between the
-different Lua environments (main, mapgen and async).
-It is essentially a shared in-memory key-value store.
-* `aperosengine.ipc_get(key)`:
-  * Read a value from the shared data area.
-  * `key`: string, should use the `"modname:thing"` convention to avoid conflicts.
-  * returns an arbitrary Lua value, or `nil` if this key does not exist
-* `aperosengine.ipc_set(key, value)`:
-  * Write a value to the shared data area.
-  * `key`: as above
-  * `value`: an arbitrary Lua value, cannot be or contain userdata.
-Interacting with the shared data will perform an operation comparable to
-(de)serialization on each access.
-For that reason modifying references will not have any effect, as in this example:
-```lua
-aperosengine.ipc_set("test:foo", {})
-aperosengine.ipc_get("test:foo").subkey = "value" -- WRONG!
-      aperosengine.ipc_get("test:foo") -- returns an empty table
-      ```
-
-**Advanced**:
-* `aperosengine.ipc_cas(key, old_value, new_value)`:
-  * Write a value to the shared data area, but only if the previous value
-    equals what was given.
-    This operation is called Compare-and-Swap and can be used to implement
-    synchronization between threads.
-  * `key`: as above
-  * `old_value`: value compared to using `==` (`nil` compares equal for non-existing keys)
-  * `new_value`: value that will be set
-  * returns: true on success, false otherwise
-* `aperosengine.ipc_poll(key, timeout)`:
-  * Do a blocking wait until a value (other than `nil`) is present at the key.
-  * **IMPORTANT**: You usually don't need this function. Use this as a last resort
-    if nothing else can satisfy your use case! None of the Lua environments the
-    engine has are safe to block for extended periods, especially on the main
-    thread any delays directly translate to lag felt by players.
-  * `key`: as above
-  * `timeout`: maximum wait time, in milliseconds (positive values only)
-  * returns: true on success, false on timeout
 
 Bans
 ----
@@ -7067,7 +7077,7 @@ Schematics
               applied, the lowest slice being `ypos = 0`.
             * If slice probability list equals `nil`, no slice probabilities
               are applied.
-    * Saves schematic in the AperosEngine Schematic format to filename.
+    * Saves schematic in the Aperos Engine Schematic format to filename.
 
 * `aperosengine.place_schematic(pos, schematic, rotation, replacements, force_placement, flags)`
     * Place the schematic specified by schematic (see [Schematic specifier]) at
@@ -7107,7 +7117,7 @@ Schematics
     * Return the serialized schematic specified by schematic
       (see [Schematic specifier])
     * in the `format` of either "aprs" or "lua".
-    * "aprs" - a string containing the binary MTS data used in the MTS file
+    * "aprs" - a string containing the binary APRS data used in the APRS file
       format.
     * "lua" - a string containing Lua code representing the schematic in table
       format.
@@ -7173,7 +7183,7 @@ Misc.
   could be used as a player name (regardless of whether said player exists).
 * `aperosengine.hud_replace_builtin(name, hud_definition)`
     * Replaces definition of a builtin hud element
-    * `name`: `"breath"`, `"health"` or `"minimap"`
+    * `name`: `"breath"`, `"health"`, `"minimap"` or `"hotbar"`
     * `hud_definition`: definition to replace builtin definition
 * `aperosengine.parse_relative_number(arg, relative_to)`: returns number or nil
     * Helper function for chat commands.
@@ -7392,17 +7402,6 @@ Misc.
 * `aperosengine.global_exists(name)`
     * Checks if a global variable has been set, without triggering a warning.
 
-* `aperosengine.register_portable_metatable(name, mt)`:
-    * Register a metatable that should be preserved when Lua data is transferred
-      between environments (via IPC or `handle_async`).
-    * `name` is a string that identifies the metatable. It is recommended to
-      follow the `modname:name` convention for this identifier.
-    * `mt` is the metatable to register.
-    * Note that the same metatable can be registered under multiple names,
-      but multiple metatables must not be registered under the same name.
-    * You must register the metatable in both the main environment
-      and the async environment for this mechanism to work.
-
 Global objects
 --------------
 
@@ -7522,7 +7521,7 @@ use the provided load and write functions for this.
     * `type_name`: optional, forces the internally used API.
         * Possible values: `"LibSpatial"` (default).
         * When other values are specified, or SpatialIndex is not available,
-          the custom AperosEngine functions are used.
+          the custom Aperos Engine functions are used.
 * `get_area(id, include_corners, include_data)`
     * Returns the area information about the specified ID.
     * Returned values are either of these:
@@ -7815,7 +7814,7 @@ metadata_table = {
     -- metadata fields (key/value store)
     fields = {
         infotext = "Container",
-        anoter_key = "Another Value",
+        another_key = "Another Value",
     },
 
     -- inventory data (for nodes)
@@ -8013,7 +8012,7 @@ child will follow movement and rotation of that bone.
        * Animation interpolates towards the end frame but stops when it is reached
        * If looped, there is no interpolation back to the start frame
        * If looped, the model should look identical at start and end
-      * default: `{x=1.0, y=1.0}`
+       * default: `{x=1.0, y=1.0}`
     * `frame_speed`: How fast the animation plays, in frames per second (number)
        * default: `15.0`
     * `frame_blend`: number, default: `0.0`
@@ -8043,13 +8042,13 @@ child will follow movement and rotation of that bone.
     object.
 * `set_detach()`: Detaches object. No-op if object was not attached.
 * `set_bone_position([bone, position, rotation])`
-	* Shorthand for `set_bone_override(bone, {position = position, rotation = rotation:apply(math.rad)})` using absolute values.
-	* **Note:** Rotation is in degrees, not radians.
-	* **Deprecated:** Use `set_bone_override` instead.
+    * Shorthand for `set_bone_override(bone, {position = position, rotation = rotation:apply(math.rad)})` using absolute values.
+    * **Note:** Rotation is in degrees, not radians.
+    * **Deprecated:** Use `set_bone_override` instead.
 * `get_bone_position(bone)`: returns the previously set position and rotation of the bone
-	* Shorthand for `get_bone_override(bone).position.vec, get_bone_override(bone).rotation.vec:apply(math.deg)`.
-	* **Note:** Returned rotation is in degrees, not radians.
-	* **Deprecated:** Use `get_bone_override` instead.
+    * Shorthand for `get_bone_override(bone).position.vec, get_bone_override(bone).rotation.vec:apply(math.deg)`.
+    * **Note:** Returned rotation is in degrees, not radians.
+    * **Deprecated:** Use `get_bone_override` instead.
 * `set_bone_override(bone, override)`
     * `bone`: string
     * `override`: `{ position = property, rotation = property, scale = property }` or `nil`
@@ -8066,7 +8065,7 @@ child will follow movement and rotation of that bone.
     * Compatibility note: Clients prior to 5.9.0 only support absolute position and rotation.
       All values are treated as absolute and are set immediately (no interpolation).
 * `get_bone_override(bone)`: returns `override` in the above format
-	* **Note:** Unlike `get_bone_position`, the returned rotation is in radians, not degrees.
+    * **Note:** Unlike `get_bone_position`, the returned rotation is in radians, not degrees.
 * `get_bone_overrides()`: returns all bone overrides as table `{[bonename] = override, ...}`
 * `set_properties(object property table)`
 * `get_properties()`: returns a table of all object properties
@@ -8137,7 +8136,7 @@ child will follow movement and rotation of that bone.
     * `rot` is a vector (radians). X is pitch (elevation), Y is yaw (heading)
       and Z is roll (bank).
     * Does not reset rotation incurred through `automatic_rotate`.
-      Remove & readd your objects to force a certain rotation.
+      Remove & re-add your objects to force a certain rotation.
 * `get_rotation()`: returns the rotation, a vector (radians)
 * `set_yaw(yaw)`: sets the yaw in radians (heading).
 * `get_yaw()`: returns number in radians
@@ -8163,8 +8162,8 @@ child will follow movement and rotation of that bone.
         * Fifth column:  subject viewed from above
         * Sixth column:  subject viewed from below
 * `get_luaentity()`:
-	* Returns the object's associated luaentity table, if there is one
-	* Otherwise returns `nil` (e.g. for players)
+    * Returns the object's associated luaentity table, if there is one
+    * Otherwise returns `nil` (e.g. for players)
 * `get_entity_name()`:
     * **Deprecated**: Will be removed in a future version,
       use `:get_luaentity().name` instead.
@@ -8344,7 +8343,9 @@ child will follow movement and rotation of that bone.
     * See `hud_set_flags` for a list of flags that can be toggled.
 * `hud_set_hotbar_itemcount(count)`: sets number of items in builtin hotbar
     * `count`: number of items, must be between `1` and `32`
+    * If `count` exceeds the `"main"` list size, the list size will be used instead.
 * `hud_get_hotbar_itemcount()`: returns number of visible items
+    * This value is also clamped by the `"main"` list size.
 * `hud_set_hotbar_image(texturename)`
     * sets background image for hotbar
 * `hud_get_hotbar_image()`: returns texturename
@@ -8424,7 +8425,7 @@ child will follow movement and rotation of that bone.
               at sunrise and sunset. (default: `#7f99cc`)
             * `fog_tint_type`: string, changes which mode the directional fog
                 abides by, `"custom"` uses `sun_tint` and `moon_tint`, while
-                `"default"` uses the classic AperosEngine sun and moon tinting.
+                `"default"` uses the classic Aperos Engine sun and moon tinting.
                 Will use tonemaps, if set to `"default"`. (default: `"default"`)
         * `fog`: A table with following optional fields:
             * `fog_distance`: integer, set an upper bound for the client's viewing_range.
@@ -8535,6 +8536,7 @@ child will follow movement and rotation of that bone.
     * `0`...`1`: Overrides day-night ratio, controlling sunlight to a specific
       amount.
     * Passing no arguments disables override, defaulting to sunlight based on day-night cycle
+    * See also `aperosengine.time_to_day_night_ratio`,
 * `get_day_night_ratio()`: returns the ratio or nil if it isn't overridden
 * `set_local_animation(idle, walk, dig, walk_while_dig, frame_speed)`:
   set animation for player model in third person view.
@@ -8572,23 +8574,43 @@ child will follow movement and rotation of that bone.
           * values < 0 cause an effect similar to inversion,
             but keeping original luma and being symmetrical in terms of saturation
             (eg. -1 and 1 is the same saturation and luma, but different hues)
+        * This value has no effect on clients who have shaders or post-processing disabled.
       * `shadows` is a table that controls ambient shadows
+        * This has no effect on clients who have the "Dynamic Shadows" effect disabled.
         * `intensity` sets the intensity of the shadows from 0 (no shadows, default) to 1 (blackness)
-            * This value has no effect on clients who have the "Dynamic Shadows" shader disabled.
         * `tint` tints the shadows with the provided color, with RGB values ranging from 0 to 255.
           (default `{r=0, g=0, b=0}`)
-            * This value has no effect on clients who have the "Dynamic Shadows" shader disabled.
       * `exposure` is a table that controls automatic exposure.
         The basic exposure factor equation is `e = 2^exposure_correction / clamp(luminance, 2^luminance_min, 2^luminance_max)`
+        * This has no effect on clients who have the "Automatic Exposure" effect disabled.
         * `luminance_min` set the lower luminance boundary to use in the calculation (default: `-3.0`)
         * `luminance_max` set the upper luminance boundary to use in the calculation (default: `-3.0`)
         * `exposure_correction` correct observed exposure by the given EV value (default: `0.0`)
         * `speed_dark_bright` set the speed of adapting to bright light (default: `1000.0`)
         * `speed_bright_dark` set the speed of adapting to dark scene (default: `1000.0`)
         * `center_weight_power` set the power factor for center-weighted luminance measurement (default: `1.0`)
+      * `bloom` is a table that controls bloom.
+        * This has no effect on clients with protocol version < 46 or clients who
+          have the "Bloom" effect disabled.
+        * `intensity` defines much bloom is applied to the rendered image.
+          * Recommended range: from 0.0 to 1.0, default: 0.05
+          * If set to 0, bloom is disabled.
+          * The default value is to be changed from 0.05 to 0 in the future.
+            If you wish to keep the current default value, you should set it
+            explicitly.
+        * `strength_factor` defines the magnitude of bloom overexposure.
+          * Recommended range: from 0.1 to 10.0, default: 1.0
+        * `radius` is a logical value that controls how far the bloom effect
+          spreads from the bright objects.
+          * Recommended range: from 0.1 to 8.0, default: 1.0
+        * The behavior of values outside the recommended range is unspecified.
       * `volumetric_light`: is a table that controls volumetric light (a.k.a. "godrays")
-        * `strength`: sets the strength of the volumetric light effect from 0 (off, default) to 1 (strongest)
-           * This value has no effect on clients who have the "Volumetric Lighting" or "Bloom" shaders disabled.
+        * This has no effect on clients who have the "Volumetric Lighting" or "Bloom" effects disabled.
+        * `strength`: sets the strength of the volumetric light effect from 0 (off, default) to 1 (strongest).
+            * `0.2` is a reasonable standard value.
+            * Currently, bloom `intensity` and `strength_factor` affect volumetric
+              lighting `strength` and vice versa. This behavior is to be changed
+              in the future, do not rely on it.
 
 * `get_lighting()`: returns the current state of lighting for the player.
     * Result is a table with the same fields as `light_definition` in `set_lighting`.
@@ -8601,6 +8623,7 @@ child will follow movement and rotation of that bone.
 * `set_flags(flags)`: sets flags
   * takes a table in the same format as returned by `get_flags`
   * absent fields are left unchanged
+
 
 `PcgRandom`
 -----------
@@ -8776,7 +8799,7 @@ In multiplayer mode, the error may be arbitrarily large.
 
 Interface for the operating system's crypto-secure PRNG.
 
-It can be created via `SecureRandom()`.  The constructor returns nil if a
+It can be created via `SecureRandom()`.  The constructor throws an error if a
 secure random device cannot be found on the system.
 
 ### Methods
@@ -9143,7 +9166,12 @@ Used by `aperosengine.register_lbm`.
 
 A loading block modifier (LBM) is used to define a function that is called for
 specific nodes (defined by `nodenames`) when a mapblock which contains such nodes
-gets activated (not loaded!)
+gets activated (not loaded!).
+
+Note: LBMs operate on a "snapshot" of node positions taken once before they are triggered.
+That means if an LBM callback adds a node, it won't be taken into account.
+However the engine guarantees that when the callback is called that all given position(s)
+contain a matching node.
 
 ```lua
 {
@@ -9167,7 +9195,13 @@ gets activated (not loaded!)
     action = function(pos, node, dtime_s) end,
     -- Function triggered for each qualifying node.
     -- `dtime_s` is the in-game time (in seconds) elapsed since the block
-    -- was last active
+    -- was last active.
+
+    bulk_action = function(pos_list, dtime_s) end,
+    -- Function triggered with a list of all applicable node positions at once.
+    -- This can be provided as an alternative to `action` (not both).
+    -- Available since `aperosengine.features.bulk_lbms` (5.10.0)
+    -- `dtime_s`: as above
 }
 ```
 
@@ -9680,8 +9714,6 @@ Used by `aperosengine.register_node`.
 
     selection_box = {
         -- see [Node boxes] for possibilities
-        -- Selection boxes that oversize node size can cause
-        -- significant performance drop of Raycasts.
     },
     -- Custom selection box definition. Multiple boxes can be defined.
     -- If "nodebox" drawtype is used and selection_box is nil, then node_box
@@ -10021,7 +10053,7 @@ Parameters:
       `old_item` is the input item to replace (same syntax as for a regular input
       slot; groups are allowed) and `new_item` is an itemstring for the item stack
       it will become
-    * When the output is crafted, AperosEngine iterates through the list
+    * When the output is crafted, Aperos Engine iterates through the list
       of input items if the crafting grid. For each input item stack, it checks if
       it matches with an `old_item` in the item pair list.
         * If it matches, the item will be replaced. Also, this item pair
@@ -10518,7 +10550,7 @@ See [Decoration types]. Used by `aperosengine.register_decoration`.
     y_min = -31000,
     y_max = 31000,
     -- Lower and upper limits for decoration (inclusive).
-    -- These parameters refer to the Y co-ordinate of the 'place_on' node.
+    -- These parameters refer to the Y coordinate of the 'place_on' node.
 
     spawn_by = "default:water",
     -- Node (or list of nodes) that the decoration only spawns next to.
@@ -10588,9 +10620,9 @@ See [Decoration types]. Used by `aperosengine.register_decoration`.
 
     ----- Schematic-type parameters
 
-    schematic = "foobar.apr",
+    schematic = "foobar.aprs",
     -- If schematic is a string, it is the filepath relative to the current
-    -- working directory of the specified AperosEngine schematic file.
+    -- working directory of the specified Aperos Engine schematic file.
     -- Could also be the ID of a previously registered schematic.
 
     schematic = {
@@ -10768,8 +10800,9 @@ Used by `ObjectRef:hud_add`. Returned by `ObjectRef:hud_get`.
 ```lua
 {
     type = "image",
-    -- Type of element, can be "image", "text", "statbar", "inventory",
-    -- "waypoint", "image_waypoint", "compass" or "minimap"
+    -- Type of element, can be "compass", "hotbar" (46 ¹), "image", "image_waypoint",
+    -- "inventory", "minimap" (44 ¹), "statbar", "text" or "waypoint"
+    -- ¹: minimal protocol version for client-side support
     -- If undefined "text" will be used.
 
     hud_elem_type = "image",
@@ -11420,10 +11453,20 @@ Functions: bit.tobit, bit.tohex, bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshi
 
 See http://bitop.luajit.org/ for advanced information.
 
+Tracy Profiler
+--------------
+
+Aperos Engine can be built with support for the Tracy profiler, which can also be
+useful for profiling mods and is exposed to Lua as the global `tracy`.
+
+See docs/en/developing/misc.md for details.
+
+Note: This is a development feature and not covered by compatibility promises.
+
 Error Handling
 --------------
 
-When an error occurs that is not caught, AperosEngine calls the function
+When an error occurs that is not caught, Aperos Engine calls the function
 `aperosengine.error_handler` with the error object as its first argument. The second
 argument is the stack level where the error occurred. The return value is the
 error string that should be shown. By default this is a backtrace from
