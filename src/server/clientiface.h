@@ -297,7 +297,7 @@ public:
 				<<", m_blocks_sending.size()="<<m_blocks_sending.size()
 				<<", m_nearest_unsent_d="<<m_nearest_unsent_d
 				<<", m_excess_gotblocks="<<m_excess_gotblocks
-				<<'\n';
+				<< '\n';
 		m_excess_gotblocks = 0;
 	}
 

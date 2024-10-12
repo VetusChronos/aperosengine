@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "network/connection.h"
-#include "network/atp/impl.h"
+#include "network/aprp/impl.h"
 
 namespace con
 {
 
-IConnection *createATP(float timeout, bool ipv6, PeerHandler *handler)
+IConnection *createAPRP(float timeout, bool ipv6, PeerHandler *handler)
 {
 	// safe minimum across internet networks for ipv4 and ipv6
 	constexpr u32 MAX_PACKET_SIZE = 512;

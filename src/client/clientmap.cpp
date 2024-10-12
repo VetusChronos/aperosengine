@@ -830,7 +830,7 @@ void ClientMap::renderMap(video::IVideoDriver* driver, s32 pass)
 					if (!transparent) {
 						if (buf->getVertexCount() == 0)
 							errorstream << "Block [" << analyze_block(block)
-									<< "] contains an empty meshbuf" << std::endl;
+									<< "] contains an empty meshbuf" << '\n';
 
 						grouped_buffers.add(buf, block_pos, layer);
 					}
@@ -978,7 +978,7 @@ static bool getVisibleBrightness(Map *map, const v3f &p0, v3f dir, float step,
 		return false;
 	*result = brightness_sum / brightness_count;
 	/*std::cerr<<"Sampled "<<brightness_count<<" points; result="
-			<<(*result)<<std::endl;*/
+			<<(*result)<< '\n';*/
 	return true;
 }
 
@@ -1015,8 +1015,7 @@ int ClientMap::getBackgroundBrightness(float max_d, u32 daylight_factor,
 		v3f z_dir = z_directions[i];
 		core::CMatrix4<f32> a;
 		a.buildRotateFromTo(v3f(0,1,0), z_dir);
-		v3f dir = m_camera_direction;
-		a.rotateVect(dir);
+		v3f dir = a.rotateAndScaleVect(m_camera_direction);
 		int br = 0;
 		float step = BS*1.5;
 		if(max_d > 35*BS)

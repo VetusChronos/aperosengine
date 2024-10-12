@@ -593,7 +593,7 @@ bool IClientMediaDownloader::checkAndLoad(
 }
 
 /*
-	AperosEngine Hashset File Format
+	Minetest Hashset File Format
 
 	All values are stored in big-endian byte order.
 	[u32] signature: 'MTHS'

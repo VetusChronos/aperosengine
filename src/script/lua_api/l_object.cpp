@@ -103,7 +103,7 @@ int ObjectRef::l_remove(lua_State *L)
 	if (sao->getType() == ACTIVEOBJECT_TYPE_PLAYER)
 		return 0;
 
-	verbosestream << "ObjectRef::l_remove(): id=" << sao->getId() << std::endl;
+	verbosestream << "ObjectRef::l_remove(): id=" << sao->getId() << '\n';
 	sao->markForRemoval();
 	return 0;
 }
@@ -235,7 +235,7 @@ int ObjectRef::l_set_hp(lua_State *L)
 		lua_getfield(L, -1, "type");
 		if (lua_isstring(L, -1) &&
 				!reason.setTypeFromString(readParam<std::string>(L, -1))) {
-			errorstream << "Bad type given!" << std::endl;
+			errorstream << "Bad type given!" << '\n';
 		}
 		lua_pop(L, 1);
 
@@ -361,8 +361,8 @@ int ObjectRef::l_set_armor_groups(lua_State *L)
 	if (sao->getType() == ACTIVEOBJECT_TYPE_PLAYER) {
 		if (!g_settings->getBool("enable_damage") && !itemgroup_get(groups, "immortal")) {
 			warningstream << "Mod tried to enable damage for a player, but it's "
-				"disabled globally. Ignoring." << std::endl;
-			infostream << script_get_backtrace(L) << std::endl;
+				"disabled globally. Ignoring." << '\n';
+			infostream << script_get_backtrace(L) << '\n';
 			groups["immortal"] = 1;
 		}
 	}
@@ -433,10 +433,10 @@ int ObjectRef::l_set_local_animation(lua_State *L)
 	if (player == nullptr)
 		return 0;
 
-	v2s32 frames[4];
+	v2f frames[4];
 	for (int i=0;i<4;i++) {
 		if (!lua_isnil(L, 2+1))
-			frames[i] = read_v2s32(L, 2+i);
+			frames[i] = read_v2f(L, 2+i);
 	}
 	float frame_speed = readParam<float>(L, 6, 30.0f);
 
@@ -453,12 +453,12 @@ int ObjectRef::l_get_local_animation(lua_State *L)
 	if (player == nullptr)
 		return 0;
 
-	v2s32 frames[4];
+	v2f frames[4];
 	float frame_speed;
 	player->getLocalAnimations(frames, &frame_speed);
 
-	for (const v2s32 &frame : frames) {
-		push_v2s32(L, frame);
+	for (const v2f &frame : frames) {
+		push_v2f(L, frame);
 	}
 
 	lua_pushnumber(L, frame_speed);
@@ -2586,7 +2586,7 @@ int ObjectRef::l_set_minimap_modes(lua_State *L)
 				mode.scale = getintfield_default(L, -1, "scale", 1);
 			} else {
 				warningstream << "Minimap mode of unknown type \"" << type.c_str()
-					<< "\" ignored.\n" << std::endl;
+					<< "\" ignored.\n" << '\n';
 				ok = false;
 			}
 
@@ -2649,6 +2649,14 @@ int ObjectRef::l_set_lighting(lua_State *L)
 			lighting.volumetric_light_strength = rangelim(lighting.volumetric_light_strength, 0.0f, 1.0f);
 		}
 		lua_pop(L, 1); // volumetric_light
+
+		lua_getfield(L, 2, "bloom");
+		if (lua_istable(L, -1)) {
+			lighting.bloom_intensity       = getfloatfield_default(L, -1, "intensity",       lighting.bloom_intensity);
+			lighting.bloom_strength_factor = getfloatfield_default(L, -1, "strength_factor", lighting.bloom_strength_factor);
+			lighting.bloom_radius          = getfloatfield_default(L, -1, "radius",          lighting.bloom_radius);
+		}
+		lua_pop(L, 1); // bloom
 }
 
 	getServer(L)->setLighting(player, lighting);
@@ -2693,6 +2701,14 @@ int ObjectRef::l_get_lighting(lua_State *L)
 	lua_pushnumber(L, lighting.volumetric_light_strength);
 	lua_setfield(L, -2, "strength");
 	lua_setfield(L, -2, "volumetric_light");
+	lua_newtable(L); // "bloom"
+	lua_pushnumber(L, lighting.bloom_intensity);
+	lua_setfield(L, -2, "intensity");
+	lua_pushnumber(L, lighting.bloom_strength_factor);
+	lua_setfield(L, -2, "strength_factor");
+	lua_pushnumber(L, lighting.bloom_radius);
+	lua_setfield(L, -2, "radius");
+	lua_setfield(L, -2, "bloom");
 	return 1;
 }
 

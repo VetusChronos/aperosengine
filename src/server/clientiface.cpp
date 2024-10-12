@@ -128,7 +128,7 @@ void RemoteClient::GetNextBlocks (
 
 	// Won't send anything if already sending
 	if (m_blocks_sending.size() >= m_max_simul_sends) {
-		//infostream<<"Not sending any blocks, Queue full."<<'\n';
+		//infostream<<"Not sending any blocks, Queue full."<< '\n';
 		return;
 	}
 
@@ -444,7 +444,7 @@ void RemoteClient::SentBlock(v3s16 p)
 		m_blocks_sending[p] = 0.0f;
 	else
 		infostream<<"RemoteClient::SentBlock(): Sent block"
-				" already in m_blocks_sending"<<'\n';
+				" already in m_blocks_sending"<< '\n';
 }
 
 void RemoteClient::SetBlockNotSent(v3s16 p)
@@ -747,7 +747,7 @@ void ClientInterface::UpdatePlayerList()
 		m_clients_names.clear();
 
 		if (!clients.empty())
-			infostream<<"Players:"<<'\n';
+			infostream<<"Players:"<< '\n';
 
 		for (session_t i : clients) {
 			RemotePlayer *player = m_env->getPlayer(i);

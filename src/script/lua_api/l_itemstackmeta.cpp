@@ -41,7 +41,7 @@ void ItemStackMetaRef::clearMeta()
 
 void ItemStackMetaRef::reportMetadataChange(const std::string *name)
 {
-	// Nothing to do
+	// nothing to do
 }
 
 // Exported functions

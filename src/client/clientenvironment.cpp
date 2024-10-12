@@ -333,7 +333,7 @@ void ClientEnvironment::addActiveObject(u16 id, u8 type,
 	if (!obj) {
 		infostream<<"ClientEnvironment::addActiveObject(): "
 			<<"id="<<id<<" type="<<type<<": Couldn't create object"
-			<<'\n';
+			<< '\n';
 		return;
 	}
 
@@ -347,7 +347,7 @@ void ClientEnvironment::addActiveObject(u16 id, u8 type,
 			<<": SerializationError in initialize(): "
 			<<e.what()
 			<<": init_data="<<serializeJsonString(init_data)
-			<<'\n';
+			<< '\n';
 	}
 
 	u16 new_id = addActiveObject(std::move(obj));

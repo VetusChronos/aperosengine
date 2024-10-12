@@ -156,7 +156,7 @@ void content_nodemeta_deserialize_legacy(std::istream &is,
 	if(version > 1)
 	{
 		infostream<<FUNCTION_NAME<<": version "<<version<<" not supported"
-				<<'\n';
+				<< '\n';
 		throw SerializationError(FUNCTION_NAME);
 	}
 
@@ -178,7 +178,7 @@ void content_nodemeta_deserialize_legacy(std::istream &is,
 			warningstream<<FUNCTION_NAME<<": "
 					<<"already set data at position"
 					<<"("<<p.X<<","<<p.Y<<","<<p.Z<<"): Ignoring."
-					<<'\n';
+					<< '\n';
 			continue;
 		}
 

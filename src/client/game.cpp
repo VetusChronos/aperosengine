@@ -43,6 +43,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "gui/touchcontrols.h"
 #include "itemdef.h"
 #include "log.h"
+#include "log_internal.h"
 #include "filesys.h"
 #include "gameparams.h"
 #include "gettext.h"
@@ -101,7 +102,7 @@ struct TextDestNodeMetadata : public TextDest
 	{
 		std::string ntext = wide_to_utf8(text);
 		infostream << "Submitting 'text' field of node at (" << m_p.X << ","
-			   << m_p.Y << "," << m_p.Z << "): " << ntext << std::endl;
+			   << m_p.Y << "," << m_p.Z << "): " << ntext << '\n';
 		StringMap fields;
 		fields["text"] = ntext;
 		m_client->sendNodemetaFields(m_p, "", fields);
@@ -182,7 +183,7 @@ struct LocalFormspecHandler : public TextDest
 			return;
 		}
 
-		if (m_formname == "APR_DEATH_SCREEN") {
+		if (m_formname == "MT_DEATH_SCREEN") {
 			assert(m_client != nullptr);
 
 			if (fields.find("quit") != fields.end())
@@ -405,11 +406,8 @@ class GameGlobalShaderConstantSetter : public IShaderConstantSetter
 	float m_user_exposure_compensation;
 	bool m_bloom_enabled;
 	CachedPixelShaderSetting<float> m_bloom_intensity_pixel{"bloomIntensity"};
-	float m_bloom_intensity;
 	CachedPixelShaderSetting<float> m_bloom_strength_pixel{"bloomStrength"};
-	float m_bloom_strength;
 	CachedPixelShaderSetting<float> m_bloom_radius_pixel{"bloomRadius"};
-	float m_bloom_radius;
 	CachedPixelShaderSetting<float> m_saturation_pixel{"saturation"};
 	bool m_volumetric_light_enabled;
 	CachedPixelShaderSetting<float, 3>
@@ -421,11 +419,8 @@ class GameGlobalShaderConstantSetter : public IShaderConstantSetter
 	CachedPixelShaderSetting<float>
 		m_volumetric_light_strength_pixel{"volumetricLightStrength"};
 
-	static constexpr std::array<const char*, 4> SETTING_CALLBACKS = {
+	static constexpr std::array<const char*, 1> SETTING_CALLBACKS = {
 		"exposure_compensation",
-		"bloom_intensity",
-		"bloom_strength_factor",
-		"bloom_radius"
 	};
 
 public:
@@ -433,12 +428,6 @@ public:
 	{
 		if (name == "exposure_compensation")
 			m_user_exposure_compensation = g_settings->getFloat("exposure_compensation", -1.0f, 1.0f);
-		if (name == "bloom_intensity")
-			m_bloom_intensity = g_settings->getFloat("bloom_intensity", 0.01f, 1.0f);
-		if (name == "bloom_strength_factor")
-			m_bloom_strength = RenderingEngine::BASE_BLOOM_STRENGTH * g_settings->getFloat("bloom_strength_factor", 0.1f, 10.0f);
-		if (name == "bloom_radius")
-			m_bloom_radius = g_settings->getFloat("bloom_radius", 0.1f, 8.0f);
 	}
 
 	static void settingsCallback(const std::string &name, void *userdata)
@@ -457,9 +446,6 @@ public:
 
 		m_user_exposure_compensation = g_settings->getFloat("exposure_compensation", -1.0f, 1.0f);
 		m_bloom_enabled = g_settings->getBool("enable_bloom");
-		m_bloom_intensity = g_settings->getFloat("bloom_intensity", 0.01f, 1.0f);
-		m_bloom_strength = RenderingEngine::BASE_BLOOM_STRENGTH * g_settings->getFloat("bloom_strength_factor", 0.1f, 10.0f);
-		m_bloom_radius = g_settings->getFloat("bloom_radius", 0.1f, 8.0f);
 		m_volumetric_light_enabled = g_settings->getBool("enable_volumetric_lighting") && m_bloom_enabled;
 	}
 
@@ -511,7 +497,9 @@ public:
 		m_texel_size0_vertex.set(m_texel_size0, services);
 		m_texel_size0_pixel.set(m_texel_size0, services);
 
-		const AutoExposure &exposure_params = m_client->getEnv().getLocalPlayer()->getLighting().exposure;
+		const auto &lighting = m_client->getEnv().getLocalPlayer()->getLighting();
+
+		const AutoExposure &exposure_params = lighting.exposure;
 		std::array<float, 7> exposure_buffer = {
 			std::pow(2.0f, exposure_params.luminance_min),
 			std::pow(2.0f, exposure_params.luminance_max),
@@ -524,12 +512,14 @@ public:
 		m_exposure_params_pixel.set(exposure_buffer.data(), services);
 
 		if (m_bloom_enabled) {
-			m_bloom_intensity_pixel.set(&m_bloom_intensity, services);
-			m_bloom_radius_pixel.set(&m_bloom_radius, services);
-			m_bloom_strength_pixel.set(&m_bloom_strength, services);
+			float intensity = std::max(lighting.bloom_intensity, 0.0f);
+			m_bloom_intensity_pixel.set(&intensity, services);
+			float strength_factor = std::max(lighting.bloom_strength_factor, 0.0f);
+			m_bloom_strength_pixel.set(&strength_factor, services);
+			float radius = std::max(lighting.bloom_radius, 0.0f);
+			m_bloom_radius_pixel.set(&radius, services);
 		}
 
-		const auto &lighting = m_client->getEnv().getLocalPlayer()->getLighting();
 		float saturation = lighting.saturation;
 		m_saturation_pixel.set(&saturation, services);
 
@@ -733,6 +723,7 @@ protected:
 	void processUserInput(f32 dtime);
 	void processKeyInput();
 	void processItemSelection(u16 *new_playeritem);
+	bool shouldShowTouchControls();
 
 	void dropSelectedItem(bool single_item = false);
 	void openInventory();
@@ -1370,18 +1361,18 @@ bool Game::initSound()
 {
 #if USE_SOUND
 	if (g_settings->getBool("enable_sound") && g_sound_manager_singleton.get()) {
-		infostream << "Attempting to use OpenAL audio" << std::endl;
+		infostream << "Attempting to use OpenAL audio" << '\n';
 		sound_manager = createOpenALSoundManager(g_sound_manager_singleton.get(),
 				std::make_unique<SoundFallbackPathProvider>());
 		if (!sound_manager)
-			infostream << "Failed to initialize OpenAL audio" << std::endl;
+			infostream << "Failed to initialize OpenAL audio" << '\n';
 	} else {
-		infostream << "Sound disabled." << std::endl;
+		infostream << "Sound disabled." << '\n';
 	}
 #endif
 
 	if (!sound_manager) {
-		infostream << "Using dummy audio." << std::endl;
+		infostream << "Using dummy audio." << '\n';
 		sound_manager = std::make_unique<DummySoundManager>();
 	}
 
@@ -1417,12 +1408,12 @@ bool Game::createSingleplayerServer(const std::string &map_dir,
 	} catch (const ResolveError &e) {
 		warningstream << "Resolving bind address \"" << bind_str
 			<< "\" failed: " << e.what()
-			<< " -- Listening on all addresses." << std::endl;
+			<< " -- Listening on all addresses." << '\n';
 	}
 	if (bind_addr.isIPv6() && !g_settings->getBool("enable_ipv6")) {
 		*error_message = fmtgettext("Unable to listen on %s because IPv6 is disabled",
 			bind_addr.serializeString().c_str());
-		errorstream << *error_message << std::endl;
+		errorstream << *error_message << '\n';
 		return false;
 	}
 
@@ -1474,7 +1465,7 @@ void Game::copyServerClientCache()
 			n++;
 	}
 	infostream << "Copied " << n << " files directly from server to client cache"
-		<< std::endl;
+		<< '\n';
 }
 
 bool Game::createClient(const GameStartData &start_data)
@@ -1493,7 +1484,7 @@ bool Game::createClient(const GameStartData &start_data)
 		if (error_message->empty() && !connect_aborted) {
 			// Should not happen if error messages are set properly
 			*error_message = gettext("Connection failed for unknown reason");
-			errorstream << *error_message << std::endl;
+			errorstream << *error_message << '\n';
 		}
 		return false;
 	}
@@ -1502,7 +1493,7 @@ bool Game::createClient(const GameStartData &start_data)
 		if (error_message->empty() && !connect_aborted) {
 			// Should not happen if error messages are set properly
 			*error_message = gettext("Connection failed for unknown reason");
-			errorstream << *error_message << std::endl;
+			errorstream << *error_message << '\n';
 		}
 		return false;
 	}
@@ -1575,6 +1566,14 @@ bool Game::createClient(const GameStartData &start_data)
 	return true;
 }
 
+bool Game::shouldShowTouchControls()
+{
+	const std::string &touch_controls = g_settings->get("touch_controls");
+	if (touch_controls == "auto")
+		return RenderingEngine::getLastPointerType() == PointerType::Touch;
+	return is_yes(touch_controls);
+}
+
 bool Game::initGui()
 {
 	m_game_ui->init();
@@ -1589,7 +1588,7 @@ bool Game::initGui()
 	gui_chat_console = make_irr<GUIChatConsole>(guienv, guienv->getRootGUIElement(),
 			-1, chat_backend, client, &g_menumgr);
 
-	if (g_settings->getBool("touch_controls")) {
+	if (shouldShowTouchControls()) {
 		g_touchcontrols = new TouchControls(device, texture_src);
 		g_touchcontrols->setUseCrosshair(!isTouchCrosshairDisabled());
 	}
@@ -1627,7 +1626,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 	} catch (ResolveError &e) {
 		*error_message = fmtgettext("Couldn't resolve address: %s", e.what());
 
-		errorstream << *error_message << std::endl;
+		errorstream << *error_message << '\n';
 		return false;
 	}
 
@@ -1636,7 +1635,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 		// empty
 	} else if (connect_address.isIPv6()) {
 		*error_message = fmtgettext("Unable to connect to %s because IPv6 is disabled", connect_address.serializeString().c_str());
-		errorstream << *error_message << std::endl;
+		errorstream << *error_message << '\n';
 		return false;
 	} else if (fallback_address.isIPv6()) {
 		fallback_address = Address();
@@ -1646,10 +1645,10 @@ bool Game::connectToServer(const GameStartData &start_data,
 	if (fallback_address.isValid()) {
 		infostream << "Resolved two addresses for \"" << address_name
 			<< "\" isIPv6[0]=" << connect_address.isIPv6()
-			<< " isIPv6[1]=" << fallback_address.isIPv6() << std::endl;
+			<< " isIPv6[1]=" << fallback_address.isIPv6() << '\n';
 	} else {
 		infostream << "Resolved one address for \"" << address_name
-			<< "\" isIPv6=" << connect_address.isIPv6() << std::endl;
+			<< "\" isIPv6=" << connect_address.isIPv6() << '\n';
 	}
 
 
@@ -1662,7 +1661,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 				start_data.allow_login_or_register);
 	} catch (const BaseException &e) {
 		*error_message = fmtgettext("Error creating client: %s", e.what());
-		errorstream << *error_message << std::endl;
+		errorstream << *error_message << '\n';
 		return false;
 	}
 
@@ -1710,13 +1709,13 @@ bool Game::connectToServer(const GameStartData &start_data,
 			if (client->accessDenied()) {
 				*error_message = fmtgettext("Access denied. Reason: %s", client->accessDeniedReason().c_str());
 				*reconnect_requested = client->reconnectRequested();
-				errorstream << *error_message << std::endl;
+				errorstream << *error_message << '\n';
 				break;
 			}
 
 			if (input->cancelPressed()) {
 				*connection_aborted = true;
-				infostream << "Connect aborted [Escape]" << std::endl;
+				infostream << "Connect aborted [Escape]" << '\n';
 				break;
 			}
 
@@ -1731,7 +1730,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 				did_fallback = true;
 			} else if (wait_time > GAME_CONNECTION_TIMEOUT) {
 				*error_message = gettext("Connection timed out.");
-				errorstream << *error_message << std::endl;
+				errorstream << *error_message << '\n';
 				break;
 			}
 
@@ -1740,7 +1739,7 @@ bool Game::connectToServer(const GameStartData &start_data,
 		}
 		framemarker.end();
 	} catch (con::PeerNotFoundException &e) {
-		warningstream << "This should not happen. Please report a bug." << std::endl;
+		warningstream << "This should not happen. Please report a bug." << '\n';
 		return false;
 	}
 
@@ -1777,13 +1776,13 @@ bool Game::getServerContent(bool *aborted)
 
 		if (client->getState() < LC_Init) {
 			*error_message = gettext("Client disconnected");
-			errorstream << *error_message << std::endl;
+			errorstream << *error_message << '\n';
 			return false;
 		}
 
 		if (input->cancelPressed()) {
 			*aborted = true;
-			infostream << "Connect aborted [Escape]" << std::endl;
+			infostream << "Connect aborted [Escape]" << '\n';
 			return false;
 		}
 
@@ -1829,7 +1828,7 @@ bool Game::getServerContent(bool *aborted)
 	framemarker.end();
 
 	*aborted = true;
-	infostream << "Connect aborted [device]" << std::endl;
+	infostream << "Connect aborted [device]" << '\n';
 	return false;
 }
 
@@ -1859,7 +1858,7 @@ inline bool Game::checkConnection()
 	if (client->accessDenied()) {
 		*error_message = fmtgettext("Access denied. Reason: %s", client->accessDeniedReason().c_str());
 		*reconnect_requested = client->reconnectRequested();
-		errorstream << *error_message << std::endl;
+		errorstream << *error_message << '\n';
 		return false;
 	}
 
@@ -1960,7 +1959,7 @@ void Game::updateProfilers(const RunStats &stats, const FpsControl &draw_times,
 
 	if (profiler_interval.step(dtime, profiler_print_interval)) {
 		if (print_to_log) {
-			infostream << "Profiler:" << std::endl;
+			infostream << "Profiler:" << '\n';
 			g_profiler->print(infostream);
 		}
 
@@ -2041,11 +2040,20 @@ void Game::updateStats(RunStats *stats, const FpsControl &draw_times,
 
 void Game::processUserInput(f32 dtime)
 {
+	bool desired = shouldShowTouchControls();
+	if (desired && !g_touchcontrols) {
+		g_touchcontrols = new TouchControls(device, texture_src);
+
+	} else if (!desired && g_touchcontrols) {
+		delete g_touchcontrols;
+		g_touchcontrols = nullptr;
+	}
+
 	// Reset input if window not active or some menu is active
 	if (!device->isWindowActive() || isMenuActive() || guienv->hasFocus(gui_chat_console.get())) {
 		if (m_game_focused) {
 			m_game_focused = false;
-			infostream << "Game lost focus" << std::endl;
+			infostream << "Game lost focus" << '\n';
 			input->releaseAllKeys();
 		} else {
 			input->clear();
@@ -2287,7 +2295,7 @@ void Game::openInventory()
 	if (!player || !player->getCAO())
 		return;
 
-	infostream << "Game: Launching inventory" << std::endl;
+	infostream << "Game: Launching inventory" << '\n';
 
 	PlayerInventoryFormSource *fs_src = new PlayerInventoryFormSource(client);
 
@@ -2671,7 +2679,7 @@ void Game::updateCameraDirection(CameraOrientation *cam, float dtime)
 				cur_control->setVisible(false);
 		}
 
-		if (m_first_loop_after_window_activation) {
+		if (m_first_loop_after_window_activation && !g_touchcontrols) {
 			m_first_loop_after_window_activation = false;
 
 			input->setMousePos(driver->getScreenSize().Width / 2,
@@ -2687,6 +2695,8 @@ void Game::updateCameraDirection(CameraOrientation *cam, float dtime)
 
 		m_first_loop_after_window_activation = true;
 	}
+	if (g_touchcontrols)
+		m_first_loop_after_window_activation = true;
 }
 
 // Get the factor to multiply with sensitivity to get the same mouse/joystick
@@ -3102,7 +3112,7 @@ void Game::handleClientEvent_SetSky(ClientEvent *event, CameraOrientation *cam)
 		// Handle everything else as plain color.
 		if (event->set_sky->type != "plain")
 			infostream << "Unknown sky type: "
-				<< (event->set_sky->type) << std::endl;
+				<< (event->set_sky->type) << '\n';
 		sky->setVisible(false);
 		sky->setFallbackBgColor(event->set_sky->bgcolor);
 		// Disable directional sun/moon tinting on plain or invalid skyboxes.
@@ -3370,7 +3380,7 @@ void Game::processPlayerInteraction(f32 dtime, bool show_hud)
 			camera_offset);
 
 	if (pointed != runData.pointed_old)
-		infostream << "Pointing at " << pointed.dump() << std::endl;
+		infostream << "Pointing at " << pointed.dump() << '\n';
 
 	if (g_touchcontrols) {
 		auto mode = selected_def.touch_interaction.getMode(selected_def, pointed.type);
@@ -3396,7 +3406,7 @@ void Game::processPlayerInteraction(f32 dtime, bool show_hud)
 	*/
 	if (runData.digging) {
 		if (wasKeyReleased(KeyType::DIG)) {
-			infostream << "Dig button released (stopped digging)" << std::endl;
+			infostream << "Dig button released (stopped digging)" << '\n';
 			runData.digging = false;
 		} else if (pointed != runData.pointed_old) {
 			if (pointed.type == POINTEDTHING_NODE
@@ -3406,7 +3416,7 @@ void Game::processPlayerInteraction(f32 dtime, bool show_hud)
 				// Still pointing to the same node, but a different face.
 				// Don't reset.
 			} else {
-				infostream << "Pointing away from node (stopped digging)" << std::endl;
+				infostream << "Pointing away from node (stopped digging)" << '\n';
 				runData.digging = false;
 				hud->updateSelectionMesh(camera_offset);
 			}
@@ -3579,7 +3589,7 @@ PointedThing Game::updatePointedThing(
 
 void Game::handlePointingAtNothing(const ItemStack &playerItem)
 {
-	infostream << "Attempted to place item while pointing at nothing" << std::endl;
+	infostream << "Attempted to place item while pointing at nothing" << '\n';
 	PointedThing fauxPointed;
 	fauxPointed.type = POINTEDTHING_NOTHING;
 	client->interact(INTERACT_ACTIVATE, fauxPointed);
@@ -3622,7 +3632,7 @@ void Game::handlePointingAtNode(const PointedThing &pointed,
 			runData.repeat_place_timer >= m_repeat_place_time) &&
 			client->checkPrivilege("interact")) {
 		runData.repeat_place_timer = 0;
-		infostream << "Place button pressed while looking at ground" << std::endl;
+		infostream << "Place button pressed while looking at ground" << '\n';
 
 		// Placing animation (always shown for feedback)
 		camera->setDigging(1);
@@ -3666,7 +3676,7 @@ bool Game::nodePlacement(const ItemDefinition &selected_def,
 		if (nodedef_manager->get(map.getNode(nodepos)).rightclickable)
 			client->interact(INTERACT_PLACE, pointed);
 
-		infostream << "Launching custom inventory view" << std::endl;
+		infostream << "Launching custom inventory view" << '\n';
 
 		InventoryLocation inventoryloc;
 		inventoryloc.setNodeMeta(nodepos);
@@ -3693,7 +3703,7 @@ bool Game::nodePlacement(const ItemDefinition &selected_def,
 	}
 
 	verbosestream << "Node placement prediction for "
-		<< selected_def.name << " is " << prediction << std::endl;
+		<< selected_def.name << " is " << prediction << '\n';
 	v3s16 p = neighborpos;
 
 	// Place inside node itself if buildable_to
@@ -3719,7 +3729,7 @@ bool Game::nodePlacement(const ItemDefinition &selected_def,
 	if (!found) {
 		errorstream << "Node placement prediction failed for "
 			<< selected_def.name << " (places " << prediction
-			<< ") - Name not known" << std::endl;
+			<< ") - Name not known" << '\n';
 		// Handle this as if prediction was empty
 		// Report to server
 		client->interact(INTERACT_PLACE, pointed);
@@ -3871,7 +3881,7 @@ bool Game::nodePlacement(const ItemDefinition &selected_def,
 	} catch (const InvalidPositionException &e) {
 		errorstream << "Node placement prediction failed for "
 			<< selected_def.name << " (places "
-			<< prediction << ") - Position not loaded" << std::endl;
+			<< prediction << ") - Position not loaded" << '\n';
 		soundmaker->m_player_rightpunch_sound = selected_def.sound_place_failed;
 		return false;
 	}
@@ -3906,7 +3916,7 @@ void Game::handlePointingAtObject(const PointedThing &pointed,
 			do_punch = true;
 
 		if (do_punch) {
-			infostream << "Punched object" << std::endl;
+			infostream << "Punched object" << '\n';
 			runData.punching = true;
 		}
 
@@ -3923,7 +3933,7 @@ void Game::handlePointingAtObject(const PointedThing &pointed,
 				client->interact(INTERACT_START_DIGGING, pointed);
 		}
 	} else if (wasKeyDown(KeyType::PLACE)) {
-		infostream << "Pressed place button while pointing at object" << std::endl;
+		infostream << "Pressed place button while pointing at object" << '\n';
 		client->interact(INTERACT_PLACE, pointed);  // place
 	}
 }
@@ -3964,7 +3974,7 @@ void Game::handleDigging(const PointedThing &pointed, const v3s16 &nodepos,
 	}
 
 	if (!runData.digging) {
-		infostream << "Started digging" << std::endl;
+		infostream << "Started digging" << '\n';
 		runData.dig_instantly = runData.dig_time_complete == 0;
 		if (client->modsLoaded() && client->getScript()->on_punchnode(nodepos, n))
 			return;
@@ -4003,7 +4013,7 @@ void Game::handleDigging(const PointedThing &pointed, const v3s16 &nodepos,
 	} else if (runData.dig_index < crack_animation_length) {
 		client->setCrack(runData.dig_index, nodepos);
 	} else {
-		infostream << "Digging completed" << std::endl;
+		infostream << "Digging completed" << '\n';
 		client->setCrack(-1, v3s16(0, 0, 0));
 
 		runData.dig_time = 0;
@@ -4472,7 +4482,7 @@ void Game::showDeathFormspecLegacy()
 	/* Note: FormspecFormSource and LocalFormspecHandler  *
 	 * are deleted by guiFormSpecMenu                     */
 	FormspecFormSource *fs_src = new FormspecFormSource(formspec_str);
-	LocalFormspecHandler *txt_dst = new LocalFormspecHandler("APR_DEATH_SCREEN", client);
+	LocalFormspecHandler *txt_dst = new LocalFormspecHandler("MT_DEATH_SCREEN", client);
 
 	auto *&formspec = m_game_ui->getFormspecGUI();
 	GUIFormSpecMenu::create(formspec, client, m_rendering_engine->get_gui_env(),
@@ -4618,21 +4628,21 @@ void the_game(bool *kill,
 		const std::string ver_err = fmtgettext("The server is probably running a different version of %s.", PROJECT_NAME_C);
 		error_message = strgettext("A serialization error occurred:") +"\n"
 				+ e.what() + "\n\n" + ver_err;
-		errorstream << error_message << std::endl;
+		errorstream << error_message << '\n';
 	} catch (ServerError &e) {
 		error_message = e.what();
-		errorstream << "ServerError: " << error_message << std::endl;
+		errorstream << "ServerError: " << error_message << '\n';
 	} catch (ModError &e) {
 		// DO NOT TRANSLATE the `ModError`, it's used by `ui.lua`
 		error_message = std::string("ModError: ") + e.what() +
 				strgettext("\nCheck debug.txt for details.");
-		errorstream << error_message << std::endl;
+		errorstream << error_message << '\n';
 	} catch (con::PeerNotFoundException &e) {
 		error_message = gettext("Connection error (timed out?)");
-		errorstream << error_message << std::endl;
+		errorstream << error_message << '\n';
 	} catch (ShaderException &e) {
 		error_message = e.what();
-		errorstream << error_message << std::endl;
+		errorstream << error_message << '\n';
 	}
 
 	game.shutdown();

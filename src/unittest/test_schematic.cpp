@@ -1,6 +1,6 @@
  /*
 Minetest
-Copyright (C) 2010-2014 kwolekr, Ryan Kwolek <kwolekr@aperosvoxel.domain>
+Copyright (C) 2010-2014 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -80,9 +80,9 @@ void TestSchematic::testMtsSerializeDeserialize(const NodeDefManager *ndef)
 	schem.schemdata   = new MapNode[volume];
 	schem.slice_probs = new u8[size.Y];
 	for (size_t i = 0; i != volume; i++)
-		schem.schemdata[i] = MapNode(test_schem1_data[i], MTSCHEM_PROB_ALWAYS, 0);
+		schem.schemdata[i] = MapNode(test_schem1_data[i], APRSCHEM_PROB_ALWAYS, 0);
 	for (s16 y = 0; y != size.Y; y++)
-		schem.slice_probs[y] = MTSCHEM_PROB_ALWAYS;
+		schem.slice_probs[y] = APRSCHEM_PROB_ALWAYS;
 
 	UASSERT(schem.serializeToMts(&ss));
 
@@ -122,7 +122,7 @@ void TestSchematic::testLuaTableSerialize(const NodeDefManager *ndef)
 	for (size_t i = 0; i != volume; i++)
 		schem.schemdata[i] = MapNode(test_schem2_data[i], test_schem2_prob[i], 0);
 	for (s16 y = 0; y != size.Y; y++)
-		schem.slice_probs[y] = MTSCHEM_PROB_ALWAYS;
+		schem.slice_probs[y] = APRSCHEM_PROB_ALWAYS;
 
 	std::vector<std::string> &names = schem.m_nodenames;
 	names.emplace_back("air");

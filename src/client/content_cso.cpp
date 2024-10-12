@@ -34,7 +34,7 @@ public:
 	SmokePuffCSO(scene::ISceneManager *smgr,
 			ClientEnvironment *env, const v3f &pos, const v2f &size)
 	{
-		infostream<<"SmokePuffCSO: constructing"<<'\n';
+		infostream<<"SmokePuffCSO: constructing"<< '\n';
 		m_spritenode = smgr->addBillboardSceneNode(
 				NULL, v2f(1,1), pos, -1);
 		video::ITexture *tex = env->getGameDef()->tsrc()->getTextureForMesh("smoke_puff.png");
@@ -60,7 +60,7 @@ public:
 	}
 	virtual ~SmokePuffCSO()
 	{
-		infostream<<"SmokePuffCSO: destructing"<<'\n';
+		infostream<<"SmokePuffCSO: destructing"<< '\n';
 		m_spritenode->remove();
 	}
 	void step(float dtime)

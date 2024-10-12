@@ -1,5 +1,6 @@
 local F = core.formspec_escape
 local S = core.get_translator("__builtin")
+
 function core.show_death_screen(player, _reason)
 	local fs = {
 		"formspec_version[1]",
@@ -10,14 +11,17 @@ function core.show_death_screen(player, _reason)
 	}
 	core.show_formspec(player:get_player_name(), "__builtin:death", table.concat(fs, ""))
 end
+
 core.register_on_dieplayer(function(player, reason)
 	core.show_death_screen(player, reason)
 end)
+
 core.register_on_joinplayer(function(player)
 	if player:get_hp() == 0 then
 		core.show_death_screen(player, nil)
 	end
 end)
+
 core.register_on_player_receive_fields(function(player, formname, fields)
 	if formname == "__builtin:death" and fields.quit and player:get_hp() == 0 then
 		player:respawn()

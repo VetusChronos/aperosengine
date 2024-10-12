@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <zlib.h>
 #include <zstd.h>
+#include <memory>
 
 /* report a zlib or i/o error */
 static void zerr(int ret)
@@ -31,24 +32,24 @@ static void zerr(int ret)
 	switch (ret) {
 	case Z_ERRNO:
 		if (ferror(stdin))
-			dstream<<"error reading stdin"<<'\n';
+			dstream<<"error reading stdin"<< '\n';
 		if (ferror(stdout))
-			dstream<<"error writing stdout"<<'\n';
+			dstream<<"error writing stdout"<< '\n';
 		break;
 	case Z_STREAM_ERROR:
-		dstream<<"invalid compression level"<<'\n';
+		dstream<<"invalid compression level"<< '\n';
 		break;
 	case Z_DATA_ERROR:
-		dstream<<"invalid or incomplete deflate data"<<'\n';
+		dstream<<"invalid or incomplete deflate data"<< '\n';
 		break;
 	case Z_MEM_ERROR:
-		dstream<<"out of memory"<<'\n';
+		dstream<<"out of memory"<< '\n';
 		break;
 	case Z_VERSION_ERROR:
-		dstream<<"zlib version mismatch!"<<'\n';
+		dstream<<"zlib version mismatch!"<< '\n';
 		break;
 	default:
-		dstream<<"return value = "<<ret<<'\n';
+		dstream<<"return value = "<<ret<< '\n';
 	}
 }
 
@@ -179,8 +180,8 @@ void decompressZlib(std::istream &is, std::ostream &os, size_t limit)
 				is.unget();
 				if(is.fail() || is.bad())
 				{
-					dstream<<"unget #"<<i<<" failed"<<'\n';
-					dstream<<"fail="<<is.fail()<<" bad="<<is.bad()<<'\n';
+					dstream<<"unget #"<<i<<" failed"<< '\n';
+					dstream<<"fail="<<is.fail()<<" bad="<<is.bad()<< '\n';
 					throw SerializationError("decompressZlib: unget failed");
 				}
 			}

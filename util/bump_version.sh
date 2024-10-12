@@ -112,10 +112,10 @@ write_new_version() {
 	sed -i -re "s/set\(\"versionPatch\", [0-9]+\)/set(\"versionPatch\", $NEXT_VERSION_PATCH)/" android/build.gradle
 
 	# Update doc versions
-	sed -i -re '1s/[0-9]+\.[0-9]+\.[0-9]+/'"$NEXT_VERSION"'/g' docs/locale/en/modding/menu_lua_api.md
-	sed -i -re '1s/[0-9]+\.[0-9]+\.[0-9]+/'"$NEXT_VERSION"'/g' docs/locale/en/modding/client_lua_api.md
+	sed -i -re '1s/[0-9]+\.[0-9]+\.[0-9]+/'"$NEXT_VERSION"'/g' docs/en/modding/menu_lua_api.md
+	sed -i -re '1s/[0-9]+\.[0-9]+\.[0-9]+/'"$NEXT_VERSION"'/g' docs/en/modding/client_lua_api.md
 
-	git add -f CMakeLists.txt android/build.gradle docs/locale/en/modding/menu_lua_api.md docs/locale/en/modding/client_lua_api.md
+	git add -f CMakeLists.txt android/build.gradle docs/en/modding/menu_lua_api.md docs/en/modding/client_lua_api.md
 }
 
 ## Create release commit and tag
@@ -168,7 +168,7 @@ if [[ "$(prompt_for "Is this correct?" '[Yy][Ee][Ss]|[Nn][Oo]|' no)" != [Yy][Ee]
 fi
 
 if [ "$DO_PATCH_REL" -eq 0 ]; then
-	# On a regular release the version moves from 5.7.0-dev -> 5.7.0 (new tag) -> 5.8.0-dev
+	# On a regular release the version moves from 1.0.0-dev -> 1.0.0 (new tag) -> 1.1.0-dev
 
 	old_proto=$(read_proto_ver origin/stable-5)
 	new_proto=$(read_proto_ver HEAD)

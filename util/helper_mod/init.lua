@@ -49,6 +49,7 @@ elseif mode == "mapgen" then
 	core.after(0, next_, 1)
 
 elseif mode == "error" then
+
 	local n = tonumber(core.settings:get("error_type"))
 	local error_lua = core.get_modpath(core.get_current_modname()) .. "/error.lua"
 	if n == 1 then

@@ -92,11 +92,11 @@ function singleplayer_refresh_gamebar()
 		end
 	end
 
-	local ENABLE_TOUCH = core.settings:get_bool("enable_touch")
+	local TOUCH_GUI = core.settings:get_bool("touch_gui")
 
 	local gamebar_pos_y = MAIN_TAB_H
 		+ TABHEADER_H -- tabheader included in formspec size
-		+ (ENABLE_TOUCH and GAMEBAR_OFFSET_TOUCH or GAMEBAR_OFFSET_DESKTOP)
+		+ (TOUCH_GUI and GAMEBAR_OFFSET_TOUCH or GAMEBAR_OFFSET_DESKTOP)
 
 	local btnbar = buttonbar_create(
 			"game_button_bar",
@@ -127,9 +127,11 @@ function singleplayer_refresh_gamebar()
 		btnbar:add_button(btn_name, text, image, tooltip)
 	end
 
-	--local plus_image = core.formspec_escape(defaulttexturedir .. "plus.png")
-	--btnbar:add_button("game_open_cdb", "", plus_image, fgettext("Install games from ContentDB"))
+	--[[ ContentDB
+	local plus_image = core.formspec_escape(defaulttexturedir .. "plus.png")
+	btnbar:add_button("game_open_cdb", "", plus_image, fgettext("Install games from ContentDB"))
 	return true
+	--]]
 end
 
 local function get_disabled_settings(game)
@@ -166,11 +168,11 @@ local function get_formspec(tabview, name, tabdata)
 		local H = tabview.height
 
 		local hypertext = "<global valign=middle halign=center size=18>" ..
-		fgettext_ne("Aperos Engine is a game creation platform that allows you to create different games.") .. "\n" ..
-		fgettext_ne("Aperos Engine doesn't come with the AperosVoxel by default.") .. " " ..
-		fgettext_ne("You need to install a game before you can create a world.")
+				fgettext_ne("Aperos Engine is a game-creation platform that allows you to play many and create different games.") .. "\n" ..
+				fgettext_ne("Aperos Engine doesn't come with the AperosVoxel by default.") .. " " ..
+				fgettext_ne("You need to install a game before you can create a world.")
 
-		--[[ Button to install games from the library
+		--[[ Button to install games from the ContentDB
 		local button_y = H * 2/3 - 0.6
 		return table.concat({
 			"hypertext[0.375,0;", W - 2*0.375, ",", button_y, ";ht;", core.formspec_escape(hypertext), "]",

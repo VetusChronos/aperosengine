@@ -178,6 +178,7 @@ public:
 				(uintptr_t)c >= (uintptr_t)(str.data()) &&
 				(uintptr_t)c <  (uintptr_t)(str.data() + str.size()));
 		}
+
 		if ((void *)c == (void *)c_str())
 			return *this;
 

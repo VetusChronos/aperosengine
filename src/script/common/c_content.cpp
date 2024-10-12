@@ -1383,7 +1383,7 @@ ItemStack read_item(lua_State* L, int index, IItemDefManager *idef)
 		catch(SerializationError &e)
 		{
 			warningstream<<"unable to create item from itemstring"
-					<<": "<<itemstring<<'\n';
+					<<": "<<itemstring<< '\n';
 			return ItemStack();
 		}
 	}

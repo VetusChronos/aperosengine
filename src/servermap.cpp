@@ -73,7 +73,7 @@ ServerMap::ServerMap(const std::string &savedir, IGameDef *gamedef,
 	settings_mgr(savedir + DIR_DELIM + "map_meta.txt"),
 	m_emerge(emerge)
 {
-	verbosestream<<FUNCTION_NAME<<std::endl;
+	verbosestream<<FUNCTION_NAME<< '\n';
 
 	// Tell the EmergeManager about our MapSettingsManager
 	emerge->map_settings_mgr = &settings_mgr;
@@ -97,7 +97,7 @@ ServerMap::ServerMap(const std::string &savedir, IGameDef *gamedef,
 		m_db.dbase_ro = createDatabase(conf.get("readonly_backend"), readonly_dir, conf);
 	}
 	if (!conf.updateConfigFile(conf_path.c_str()))
-		errorstream << "ServerMap::ServerMap(): Failed to update world.apr!" << std::endl;
+		errorstream << "ServerMap::ServerMap(): Failed to update world.apr!" << '\n';
 
 	m_savedir = savedir;
 	m_map_saving_enabled = false;
@@ -106,11 +106,11 @@ ServerMap::ServerMap(const std::string &savedir, IGameDef *gamedef,
 	m_emerge->initMap(&m_db);
 
 	m_save_time_counter = mb->addCounter(
-		"aperosengine_map_save_time", "Time spent saving blocks (in microseconds)");
+		"minetest_map_save_time", "Time spent saving blocks (in microseconds)");
 	m_save_count_counter = mb->addCounter(
-		"aperosengine_map_saved_blocks", "Number of blocks saved");
+		"minetest_map_saved_blocks", "Number of blocks saved");
 	m_loaded_blocks_gauge = mb->addGauge(
-		"aperosengine_map_loaded_blocks", "Number of loaded blocks");
+		"minetest_map_loaded_blocks", "Number of loaded blocks");
 
 	m_map_compression_level = rangelim(g_settings->getS16("map_compression_level_disk"), -1, 9);
 
@@ -120,7 +120,7 @@ ServerMap::ServerMap(const std::string &savedir, IGameDef *gamedef,
 			// If directory is empty, it is safe to save into it.
 			if (fs::GetDirListing(m_savedir).empty()) {
 				infostream<<"ServerMap: Empty save directory is valid."
-						<<std::endl;
+						<< '\n';
 				m_map_saving_enabled = true;
 			}
 			else
@@ -128,11 +128,11 @@ ServerMap::ServerMap(const std::string &savedir, IGameDef *gamedef,
 
 				if (settings_mgr.loadMapMeta()) {
 					infostream << "ServerMap: Metadata loaded from "
-						<< savedir << std::endl;
+						<< savedir << '\n';
 				} else {
 					infostream << "ServerMap: Metadata could not be loaded "
 						"from " << savedir << ", assuming valid save "
-						"directory." << std::endl;
+						"directory." << '\n';
 				}
 
 				m_map_saving_enabled = true;
@@ -148,30 +148,30 @@ ServerMap::ServerMap(const std::string &savedir, IGameDef *gamedef,
 	catch(std::exception &e)
 	{
 		warningstream<<"ServerMap: Failed to load map from "<<savedir
-				<<", exception: "<<e.what()<<std::endl;
-		infostream<<"Please remove the map or fix it."<<std::endl;
-		warningstream<<"Map saving will be disabled."<<std::endl;
+				<<", exception: "<<e.what()<< '\n';
+		infostream<<"Please remove the map or fix it."<< '\n';
+		warningstream<<"Map saving will be disabled."<< '\n';
 	}
 }
 
 ServerMap::~ServerMap()
 {
-	verbosestream<<FUNCTION_NAME<<std::endl;
+	verbosestream<<FUNCTION_NAME<< '\n';
 
 	try
 	{
 		if (m_map_saving_enabled) {
 			// Save only changed parts
 			save(MOD_STATE_WRITE_AT_UNLOAD);
-			infostream << "ServerMap: Saved map to " << m_savedir << std::endl;
+			infostream << "ServerMap: Saved map to " << m_savedir << '\n';
 		} else {
-			infostream << "ServerMap: Map not saved" << std::endl;
+			infostream << "ServerMap: Map not saved" << '\n';
 		}
 	}
 	catch(std::exception &e)
 	{
 		errorstream << "ServerMap: Failed to save map to " << m_savedir
-				 << ", exception: " << e.what() << std::endl;
+				 << ", exception: " << e.what() << '\n';
 	}
 
 	m_emerge->resetMap();
@@ -379,7 +379,7 @@ MapBlock * ServerMap::createBlock(v3s16 p)
 	try {
 		sector = createSector(p2d);
 	} catch (InvalidPositionException &e) {
-		infostream<<"createBlock: createSector() failed"<<std::endl;
+		infostream<<"createBlock: createSector() failed"<< '\n';
 		throw e;
 	}
 
@@ -395,7 +395,7 @@ MapBlock * ServerMap::createBlock(v3s16 p)
 	try {
 		block = sector->createBlankBlock(block_y);
 	} catch (InvalidPositionException &e) {
-		infostream << "createBlock: createBlankBlock() failed" << std::endl;
+		infostream << "createBlock: createBlankBlock() failed" << '\n';
 		throw e;
 	}
 
@@ -495,7 +495,7 @@ void ServerMap::reportMetrics(u64 save_time_us, u32 saved_blocks, u32 all_blocks
 void ServerMap::save(ModifiedState save_level)
 {
 	if (!m_map_saving_enabled) {
-		warningstream<<"Not saving map, saving disabled."<<std::endl;
+		warningstream<<"Not saving map, saving disabled."<< '\n';
 		return;
 	}
 
@@ -503,7 +503,7 @@ void ServerMap::save(ModifiedState save_level)
 
 	if(save_level == MOD_STATE_CLEAN)
 		infostream<<"ServerMap: Saving whole map, this can take time."
-				<<std::endl;
+				<< '\n';
 
 	if (m_map_metadata_changed || save_level == MOD_STATE_CLEAN) {
 		if (settings_mgr.saveMapMeta())
@@ -554,9 +554,9 @@ void ServerMap::save(ModifiedState save_level)
 		infostream << "ServerMap: Written: "
 				<< block_count << " blocks"
 				<< ", " << block_count_all << " blocks in memory."
-				<< std::endl;
+				<< '\n';
 		PrintInfo(infostream); // ServerMap/ClientMap:
-		infostream<<"Blocks modified by: "<<std::endl;
+		infostream<<"Blocks modified by: "<< '\n';
 		modprofiler.print(infostream);
 	}
 
@@ -699,14 +699,14 @@ MapBlock *ServerMap::loadBlock(const std::string &blob, v3s16 p3d, bool save_aft
 	} catch (SerializationError &e) {
 		errorstream<<"Invalid block data in database"
 				<<" ("<<p3d.X<<","<<p3d.Y<<","<<p3d.Z<<")"
-				<<" (SerializationError): "<<e.what()<<std::endl;
+				<<" (SerializationError): "<<e.what()<< '\n';
 
 		// TODO: Block should be marked as invalid in memory so that it is
 		// not touched but the game can run
 
 		if(g_settings->getBool("ignore_world_load_errors")){
 			errorstream<<"Ignoring block load error. Duck and cover! "
-					<<"(ignore_world_load_errors)"<<std::endl;
+					<<"(ignore_world_load_errors)"<< '\n';
 		} else {
 			throw SerializationError("Invalid block data in database");
 		}
@@ -879,7 +879,7 @@ void ServerMap::transformLiquids(std::map<v3s16, MapBlock*> &modified_blocks,
 	u32 initial_size = m_transforming_liquid.size();
 
 	/*if(initial_size != 0)
-		infostream<<"transformLiquids(): initial_size="<<initial_size<<std::endl;*/
+		infostream<<"transformLiquids(): initial_size="<<initial_size<< '\n';*/
 
 	// list of nodes that due to viscosity have not reached their max level height
 	std::vector<v3s16> must_reflow;
@@ -1187,7 +1187,7 @@ void ServerMap::transformLiquids(std::map<v3s16, MapBlock*> &modified_blocks,
 				break;
 		}
 	}
-	//infostream<<"Map::transformLiquids(): loopcount="<<loopcount<<std::endl;
+	//infostream<<"Map::transformLiquids(): loopcount="<<loopcount<< '\n';
 
 	for (const auto &iter : must_reflow)
 		m_transforming_liquid.push_back(iter);
@@ -1239,7 +1239,7 @@ void ServerMap::transformLiquids(std::map<v3s16, MapBlock*> &modified_blocks,
 		size_t dump_qty = m_unprocessed_count - liquid_loop_max;
 
 		infostream << "transformLiquids(): DUMPING " << dump_qty
-		           << " blocks from the queue" << std::endl;
+		           << " blocks from the queue" << '\n';
 
 		while (dump_qty--)
 			m_transforming_liquid.pop_front();

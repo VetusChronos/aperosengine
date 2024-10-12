@@ -2,7 +2,7 @@
 Minetest
 Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
 Copyright (C) 2010-2013 blue42u, Jonathon Anderson <anderjon@umail.iu.edu>
-Copyright (C) 2010-2013 kwolekr, Ryan Kwolek <kwolekr@aperosvoxel.domain>
+Copyright (C) 2010-2013 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -536,9 +536,9 @@ void Hud::drawLuaElements(const v3s16 &camera_offset)
 					return; // Avoid zero divides
 
 				// Angle according to camera view
-				v3f fore(0.f, 0.f, 1.f);
 				scene::ICameraSceneNode *cam = client->getSceneManager()->getActiveCamera();
-				cam->getAbsoluteTransformation().rotateVect(fore);
+				v3f fore = cam->getAbsoluteTransformation()
+						.rotateAndScaleVect(v3f(0.f, 0.f, 1.f));
 				int angle = - fore.getHorizontalAngle().Y;
 
 				// Limit angle and ajust with given offset

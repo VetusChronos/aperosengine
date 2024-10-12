@@ -1732,7 +1732,7 @@ void MapblockMeshGenerator::drawMeshNode()
 // also called when the drawtype is known but should have been pre-converted
 void MapblockMeshGenerator::errorUnknownDrawtype()
 {
-	infostream << "Got drawtype " << cur_node.f->drawtype << std::endl;
+	infostream << "Got drawtype " << cur_node.f->drawtype << '\n';
 	FATAL_ERROR("Unknown drawtype");
 }
 

@@ -91,7 +91,7 @@ local function buttonhandler(this, fields)
 
 		local maintab = ui.find_by_name("maintab")
 
-		local dlg = create_contentdb_dlg(nil, "vetuschronos/aperosvoxel")
+		local dlg = create_contentdb_dlg(nil, "VetusChronos/aperosengine")
 		dlg:set_parent(maintab)
 		maintab:hide()
 		dlg:show()

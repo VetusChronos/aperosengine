@@ -179,9 +179,6 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 			break; // About to go out of bounds
 		}
 
-		// For check bigSelectionBox
-		v3s16 &current_pos = state->m_iterator.m_current_node_pos;
-
 		// For each untested node
 		for (s16 z = new_nodes.MinEdge.Z; z <= new_nodes.MaxEdge.Z; z++)
 		for (s16 y = new_nodes.MinEdge.Y; y <= new_nodes.MaxEdge.Y; y++)
@@ -192,10 +189,6 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 
 			n = map.getNode(np, &is_valid_position);
 			if (!is_valid_position)
-				continue;
-				
-			// If take sense to use it
-			if ((current_pos != np) && !n.haveBigSelectionBox(nodedef))
 				continue;
 
 			PointabilityType pointable = isPointableNode(n, nodedef,

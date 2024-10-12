@@ -49,7 +49,7 @@ Database_PostgreSQL::Database_PostgreSQL(const std::string &connect_string,
 			"Notes:\n"
 			"pgsql" + s + "_connection has the following form: \n"
 			"\tpgsql" + s + "_connection = host=127.0.0.1 port=5432 "
-			"user=mt_user password=mt_password dbname=aperosengine" + s + "\n"
+			"user=mt_user password=apr_password dbname=aperosengine" + s + "\n"
 			"mt_user should have CREATE TABLE, INSERT, SELECT, UPDATE and "
 			"DELETE rights on the database. "
 			"Don't create mt_user as a SUPERUSER!";

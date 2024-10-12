@@ -1,10 +1,13 @@
 -- test ABMs with min_y and max_y
+
 local S = aperosengine.get_translator("testnodes")
+
 -- ABM min_y node
 aperosengine.register_node("testabms:min_y", {
 	description = S("Node for test ABM min_y."),
 	drawtype = "normal",
 	tiles = { "testabms_wait_node.png" },
+
 	groups = { dig_immediate = 3 },
 	
 	on_construct = function (pos)
@@ -12,6 +15,7 @@ aperosengine.register_node("testabms:min_y", {
 		meta:set_string("infotext", "Waiting for ABM testabms:min_y at y "..pos.y.." with min_y = 0")
 	end,
 })
+
 aperosengine.register_abm({
 	label = "testabms:min_y",
 	nodenames = "testabms:min_y",
@@ -24,11 +28,13 @@ aperosengine.register_abm({
 		meta:set_string("infotext", "ABM testabsm:min_y changed this node.")
 	end
 })
+
 -- ABM max_y node
 aperosengine.register_node("testabms:max_y", {
 	description = S("Node for test ABM max_y."),
 	drawtype = "normal",
 	tiles = { "testabms_wait_node.png" },
+
 	groups = { dig_immediate = 3 },
 	
 	on_construct = function (pos)
@@ -36,6 +42,7 @@ aperosengine.register_node("testabms:max_y", {
 		meta:set_string("infotext", "Waiting for ABM testabms:max_y at y "..pos.y.." with max_y = 0")
 	end,
 })
+
 aperosengine.register_abm({
 	label = "testabms:max_y",
 	nodenames = "testabms:max_y",
@@ -48,3 +55,4 @@ aperosengine.register_abm({
 		meta:set_string("infotext", "ABM testabsm:max_y changed this node.")
 	end
 })
+

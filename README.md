@@ -1,15 +1,16 @@
-AperosVoxel Engine
-==================
+Aperos (Voxel) Engine
+=====================
 
 [![License](https://img.shields.io/badge/license-LGPLv2.1%2B-blue.svg)](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html)
 
-Aperos (Voxel) Engine is a free open source voxel game engine focusing on ease of modding and game creation.
+Aperos Engine is a free open source voxel game engine focusing on ease of modding and game creation.
+With the aim of bringing the AperosVoxel game to life.
 
 Aperos Engine is based on [Minetest](https://minetest.net):
 
-> Copyright (C) 2010-2024 Perttu Ahola <celeron55@gmail.com>
-and contributors of the Minetest (see source file comments). 
-Thanks to the contributors!
+> Credits to (C) 2010-2018 Perttu Ahola <celeron55@gmail.com> for creating Minetest
+> and Minetest collaborators for their contributions (see the LICENSE file). 
+> Thanks to Minetest contributors!
 
 Locales
 -------
@@ -17,7 +18,6 @@ Locales
 
 Table of Contents
 -----------------
-
 1. [Further Documentation](#further-documentation)
 2. [Default Controls](#default-controls)
 3. [Paths](#paths)
@@ -30,7 +30,7 @@ Table of Contents
 
 Further documentation
 ---------------------
-- GitHub: https://github.com/vetuschronos/aperosengine/
+- GitHub: https://github.com/VetusChronos/aperosengine/
 - [Developer documentation](docs/locales/en/developing/)
 - [docs/](docs/locales/en/) directory of source distribution
 

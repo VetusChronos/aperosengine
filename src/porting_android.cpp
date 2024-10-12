@@ -45,7 +45,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 extern int main(int argc, char *argv[]);
 
 extern "C" JNIEXPORT void JNICALL
-Java_net_aperosengine_aperosengine_GameActivity_saveSettings(JNIEnv* env, jobject /* this */) {
+Java_net_minetest_minetest_GameActivity_saveSettings(JNIEnv* env, jobject /* this */) {
 	if (!g_settings_path.empty())
 		g_settings->updateConfigFile(g_settings_path.c_str());
 }
@@ -90,7 +90,7 @@ void osSpecificInit()
 #ifdef GPROF
 	// in the start-up code
 	warningstream << "Initializing GPROF profiler" << '\n';
-	monstartup("libAperosEngine.so");
+	monstartup("libMinetest.so");
 #endif
 }
 

@@ -24,7 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "settings.h"
 #include "util/serialize.h"
 #include "network/peerhandler.h"
-#include "network/atp/internal.h"
+#include "network/aprp/internal.h"
 #include "network/networkpacket.h"
 #include "network/socket.h"
 
@@ -141,15 +141,15 @@ void TestConnection::testHelpers()
 	UASSERT(readU8(&p1->data[6]) == channel);
 	UASSERT(readU8(&p1->data[7]) == data1[0]);
 
-	//infostream<<"initial data1[0]="<<((u32)data1[0]&0xff)<<'\n';
+	//infostream<<"initial data1[0]="<<((u32)data1[0]&0xff)<< '\n';
 
 	SharedBuffer<u8> p2 = con::makeReliablePacket(data1, seqnum);
 
 	/*infostream<<"p2.getSize()="<<p2.getSize()<<", data1.getSize()="
-			<<data1.getSize()<<'\n';
+			<<data1.getSize()<< '\n';
 	infostream<<"readU8(&p2[3])="<<readU8(&p2[3])
-			<<" p2[3]="<<((u32)p2[3]&0xff)<<'\n';
-	infostream<<"data1[0]="<<((u32)data1[0]&0xff)<<'\n';*/
+			<<" p2[3]="<<((u32)p2[3]&0xff)<< '\n';
+	infostream<<"data1[0]="<<((u32)data1[0]&0xff)<< '\n';*/
 
 	UASSERT(p2.getSize() == 3 + data1.getSize());
 	UASSERT(readU8(&p2[0]) == con::PACKET_TYPE_RELIABLE);
@@ -278,7 +278,7 @@ void TestConnection::testConnectSendReceive()
 
 		auto sentdata = pkt.oldForgePacket();
 
-		infostream<<"** running client.Send()"<<'\n';
+		infostream<<"** running client.Send()"<< '\n';
 		client.Send(PEER_ID_SERVER, 0, &pkt, true);
 
 		sleep_ms(50);

@@ -132,7 +132,7 @@ bool ModApiCraft::readCraftReplacements(lua_State *L, int index,
 int ModApiCraft::l_register_craft(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
-	//infostream<<"register_craft"<<'\n';
+	//infostream<<"register_craft"<< '\n';
 	luaL_checktype(L, 1, LUA_TTABLE);
 	int table = 1;
 

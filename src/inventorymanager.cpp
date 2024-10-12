@@ -89,7 +89,7 @@ void InventoryLocation::deSerialize(std::istream &is)
 		type = InventoryLocation::DETACHED;
 		std::getline(is, name, '\n');
 	} else {
-		infostream<<"Unknown InventoryLocation type=\""<<tname<<"\""<<'\n';
+		infostream<<"Unknown InventoryLocation type=\""<<tname<<"\""<< '\n';
 		throw SerializationError("Unknown InventoryLocation type");
 	}
 }
@@ -471,7 +471,7 @@ void IMoveAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 				<<" to inv=\""<<to_inv.dump()<<"\""
 				<<" list=\""<<to_list<<"\""
 				<<" i="<<to_i
-				<<'\n';
+				<< '\n';
 
 		return;
 	}
@@ -689,7 +689,7 @@ void IDropAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 
 	if (!inv_from) {
 		infostream<<"IDropAction::apply(): FAIL: source inventory not found: "
-				<<"from_inv=\""<<from_inv.dump()<<"\""<<'\n';
+				<<"from_inv=\""<<from_inv.dump()<<"\""<< '\n';
 		return;
 	}
 
@@ -700,14 +700,14 @@ void IDropAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 	*/
 	if (!list_from) {
 		infostream<<"IDropAction::apply(): FAIL: source list not found: "
-				<<"from_inv=\""<<from_inv.dump()<<"\""<<'\n';
+				<<"from_inv=\""<<from_inv.dump()<<"\""<< '\n';
 		return;
 	}
 	if (list_from->getItem(from_i).empty()) {
 		infostream<<"IDropAction::apply(): FAIL: source item not found: "
 				<<"from_inv=\""<<from_inv.dump()<<"\""
 				<<", from_list=\""<<from_list<<"\""
-				<<" from_i="<<from_i<<'\n';
+				<<" from_i="<<from_i<< '\n';
 		return;
 	}
 
@@ -762,7 +762,7 @@ void IDropAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 		int actually_dropped_count = take_count - item1.count;
 
 		if (actually_dropped_count == 0) {
-			infostream<<"Actually dropped no items"<<'\n';
+			infostream<<"Actually dropped no items"<< '\n';
 
 			// Revert client prediction. See 'clientApply'
 			if (from_inv.type == InventoryLocation::PLAYER)
@@ -776,7 +776,7 @@ void IDropAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 			ItemStack item2 = list_from->takeItem(from_i, actually_dropped_count);
 
 			if (item2.count != actually_dropped_count)
-				errorstream<<"Could not take dropped count of items"<<'\n';
+				errorstream<<"Could not take dropped count of items"<< '\n';
 		}
 
 		src_item.count = actually_dropped_count;
@@ -787,7 +787,7 @@ void IDropAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 			<<" from inv=\""<<from_inv.dump()<<"\""
 			<<" list=\""<<from_list<<"\""
 			<<" i="<<from_i
-			<<'\n';
+			<< '\n';
 
 
 	/*
@@ -986,7 +986,7 @@ void ICraftAction::apply(InventoryManager *mgr,
 
 	infostream<<"ICraftAction::apply(): crafted "
 			<<" craft_inv=\""<<craft_inv.dump()<<"\""
-			<<'\n';
+			<< '\n';
 }
 
 void ICraftAction::clientApply(InventoryManager *mgr, IGameDef *gamedef)

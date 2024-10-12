@@ -25,7 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 bool run_benchmarks(const char *arg)
 {
 	const char *const argv[] = {
-		"AperosEngineBenchmark", arg, nullptr
+		"MinetestBenchmark", arg, nullptr
 	};
 	const int argc = arg ? 2 : 1;
 	int errCount = Catch::Session().run(argc, argv);

@@ -1,5 +1,5 @@
 --[[ Drawtype Test: This file tests out and provides examples for
-all drawtypes in AperosEngine. It is attempted to keep the node
+all drawtypes in Minetest. It is attempted to keep the node
 definitions as simple and minimal as possible to keep
 side-effects to a minimum.
 
@@ -111,6 +111,7 @@ aperosengine.register_node("testnodes:allfaces_6", {
 			"testnodes_allfaces.png^[colorize:blue",
 			"testnodes_allfaces.png^[colorize:purple"
 		},
+
 	groups = { dig_immediate = 3 },
 })
 

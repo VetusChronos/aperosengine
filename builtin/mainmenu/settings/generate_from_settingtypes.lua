@@ -13,7 +13,7 @@ local aperosengine_example_header = [[
 #    ../aperosengine.conf
 #    ../../aperosengine.conf
 #    Any other path can be chosen by passing the path as a parameter
-#    to the program, eg. "aperosvoxel.exe --config ../aperosengine.conf.example".
+#    to the program, eg. "aperosengine.exe --config ../aperosengine.conf.example".
 
 #    Further documentation:
 #    https://wiki.aperosvoxel.domain/

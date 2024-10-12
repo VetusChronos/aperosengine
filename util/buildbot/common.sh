@@ -1,4 +1,4 @@
-CORE_GIT=https://github.com/vetuschronos/aperosengine
+CORE_GIT=https://github.com/VetusChronos/aperosengine
 CORE_BRANCH=main
 CORE_NAME=aperosengine
 

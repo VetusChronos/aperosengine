@@ -204,7 +204,7 @@ void Server::handleCommand_Init(NetworkPacket* pkt)
 			actionstream << "Server: Player with the name \"" << playerName <<
 				"\" tried to connect from " << addr_s <<
 				" but it was disallowed for the following reason: " << reason <<
-				'\n';
+				std::endl;
 			DenyAccess(peer_id, SERVER_ACCESSDENIED_CUSTOM_STRING, reason);
 			return;
 		}
@@ -243,7 +243,7 @@ void Server::handleCommand_Init(NetworkPacket* pkt)
 			} else {
 				actionstream << "User " << playername << " tried to log in, "
 					"but password field was invalid (unknown mechcode)." <<
-					'\n';
+					std::endl;
 				DenyAccess(peer_id, SERVER_ACCESSDENIED_SERVER_FAIL);
 				return;
 			}
@@ -305,7 +305,7 @@ void Server::handleCommand_Init2(NetworkPacket* pkt)
 	*/
 
 	infostream << "Server: Sending content to " << getPlayerName(peer_id) <<
-		'\n';
+		std::endl;
 
 	// Send item definitions
 	SendItemDef(peer_id, m_itemdef, protocol_version);
@@ -478,9 +478,11 @@ void Server::process_PlayerPos(RemotePlayer *player, PlayerSAO *playersao,
 
 	*pkt >> keyPressed;
 	player->control.unpackKeysPressed(keyPressed);
+
 	*pkt >> f32fov;
 	fov = (f32)f32fov / 80.0f;
 	*pkt >> wanted_range;
+
 	if (pkt->getRemainingBytes() >= 1)
 		*pkt >> bits;
 
@@ -1009,12 +1011,12 @@ void Server::handleCommand_Interact(NetworkPacket *pkt)
 	/*
 		Check that target is reasonably close
 	*/
-	static thread_local const bool enable_anticheat =
-			!g_settings->getBool("disable_anticheat");
+	static thread_local const u32 anticheat_flags =
+		g_settings->getFlagStr("anticheat_flags", flagdesc_anticheat, nullptr);
 
 	if ((action == INTERACT_START_DIGGING || action == INTERACT_DIGGING_COMPLETED ||
 			action == INTERACT_PLACE || action == INTERACT_USE) &&
-			enable_anticheat && !isSingleplayer()) {
+			(anticheat_flags & AC_INTERACTION) && !isSingleplayer()) {
 		v3f target_pos = player_pos;
 		if (pointed.type == POINTEDTHING_NODE) {
 			target_pos = intToFloat(pointed.node_undersurface, BS);
@@ -1117,7 +1119,7 @@ void Server::handleCommand_Interact(NetworkPacket *pkt)
 
 		/* Cheat prevention */
 		bool is_valid_dig = true;
-		if (enable_anticheat && !isSingleplayer()) {
+		if ((anticheat_flags & AC_DIGGING) && !isSingleplayer()) {
 			v3s16 nocheat_p = playersao->getNoCheatDigPos();
 			float nocheat_t = playersao->getNoCheatDigTime();
 			playersao->noCheatDigEnd();
@@ -1728,7 +1730,7 @@ void Server::handleCommand_SrpBytesM(NetworkPacket* pkt)
 		if (!m_script->getAuth(playername, nullptr, nullptr)) {
 			errorstream << "Server: " << playername <<
 				" cannot be authenticated (auth handler does not work?)" <<
-				'\n';
+				std::endl;
 			DenyAccess(peer_id, SERVER_ACCESSDENIED_SERVER_FAIL);
 			return;
 		}
@@ -1800,7 +1802,7 @@ void Server::handleCommand_ModChannelMsg(NetworkPacket *pkt)
 	session_t peer_id = pkt->getPeerId();
 	verbosestream << "Mod channel message received from peer " << peer_id <<
 		" on channel " << channel_name << " message: " << channel_msg <<
-		'\n';
+		std::endl;
 
 	// If mod channels are not enabled, discard message
 	if (!g_settings->getBool("enable_mod_channels")) {

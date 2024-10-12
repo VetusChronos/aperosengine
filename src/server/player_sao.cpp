@@ -246,7 +246,7 @@ void PlayerSAO::step(float dtime, bool send_recommended)
 		setPos(m_last_good_position);
 	}
 
-	//dstream<<"PlayerSAO::step: dtime: "<<dtime<<'\n';
+	//dstream<<"PlayerSAO::step: dtime: "<<dtime<< '\n';
 
 	// Set lag pool maximums based on estimated lag
 	const float LAG_POOL_MIN = 5.0f;
@@ -524,6 +524,7 @@ void PlayerSAO::setHP(s32 target_hp, const PlayerHPChangeReason &reason, bool fr
 
 	// Protect against overflow.
 	s32 hp_change = std::max<s64>((s64)target_hp - (s64)m_hp, S32_MIN);
+
 	hp_change = m_env->getScriptIface()->on_player_hpchange(this, hp_change, reason);
 	hp_change = std::min<s32>(hp_change, U16_MAX); // Protect against overflow
 
@@ -561,7 +562,7 @@ void PlayerSAO::setBreath(const u16 breath, bool send)
 void PlayerSAO::respawn()
 {
 	infostream << "PlayerSAO::respawn(): Player " << m_player->getName()
-			<< " respawns" << std::endl;
+			<< " respawns" << '\n';
 
 	setHP(m_prop.hp_max, PlayerHPChangeReason(PlayerHPChangeReason::RESPAWN));
 	setBreath(m_prop.breath_max);
@@ -645,9 +646,11 @@ void PlayerSAO::setMaxSpeedOverride(const v3f &vel)
 
 bool PlayerSAO::checkMovementCheat()
 {
+	static thread_local const u32 anticheat_flags =
+		g_settings->getFlagStr("anticheat_flags", flagdesc_anticheat, nullptr);
 	if (m_is_singleplayer ||
 			isAttached() ||
-			g_settings->getBool("disable_anticheat")) {
+			!(anticheat_flags & AC_MOVEMENT)) {
 		m_last_good_position = m_base_position;
 		return false;
 	}
@@ -727,6 +730,10 @@ bool PlayerSAO::checkMovementCheat()
 		float s = MYMAX(player_max_jump, player_max_walk);
 		required_time = MYMAX(required_time, d_vert / s);
 	}
+
+	static thread_local float anticheat_movement_tolerance =
+		std::max(g_settings->getFloat("anticheat_movement_tolerance"), 1.0f);
+	required_time /= anticheat_movement_tolerance;
 
 	if (m_move_pool.grab(required_time)) {
 		m_last_good_position = m_base_position;

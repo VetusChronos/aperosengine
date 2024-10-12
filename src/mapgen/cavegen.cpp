@@ -2,7 +2,7 @@
 Minetest
 Copyright (C) 2010-2020 celeron55, Perttu Ahola <celeron55@gmail.com>
 Copyright (C) 2015-2020 paramat
-Copyright (C) 2010-2016 kwolekr, Ryan Kwolek <kwolekr@aperosvoxel.domain>
+Copyright (C) 2010-2016 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

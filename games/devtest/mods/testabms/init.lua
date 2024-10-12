@@ -1,4 +1,5 @@
-local path = minetest.get_modpath(minetest.get_current_modname())
+local path = aperosengine.get_modpath(aperosengine.get_current_modname())
+
 dofile(path.."/after_node.lua")
 dofile(path.."/chances.lua")
 dofile(path.."/intervals.lua")

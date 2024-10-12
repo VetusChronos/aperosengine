@@ -412,7 +412,7 @@ u32 ShaderSource::getShader(const std::string &name,
 	m_get_shader_queue.add(name, 0, 0, &result_queue);
 
 	/* infostream<<"Waiting for shader from main thread, name=\""
-			<<name<<"\""<<'\n';*/
+			<<name<<"\""<< '\n';*/
 
 	while(true) {
 		GetResult<std::string, u32, u8, u8>
@@ -439,7 +439,7 @@ u32 ShaderSource::getShaderIdDirect(const std::string &name,
 {
 	// Empty name means shader 0
 	if (name.empty()) {
-		infostream<<"getShaderIdDirect(): name is empty"<<'\n';
+		infostream<<"getShaderIdDirect(): name is empty"<< '\n';
 		return 0;
 	}
 
@@ -456,7 +456,7 @@ u32 ShaderSource::getShaderIdDirect(const std::string &name,
 	*/
 	if (std::this_thread::get_id() != m_main_thread) {
 		errorstream<<"ShaderSource::getShaderIdDirect() "
-				"called not from main thread"<<'\n';
+				"called not from main thread"<< '\n';
 		return 0;
 	}
 
@@ -472,7 +472,7 @@ u32 ShaderSource::getShaderIdDirect(const std::string &name,
 	m_shaderinfo_cache.push_back(info);
 
 	infostream<<"getShaderIdDirect(): "
-			<<"Returning id="<<id<<" for name \""<<name<<"\""<<'\n';
+			<<"Returning id="<<id<<" for name \""<<name<<"\""<< '\n';
 
 	return id;
 }
@@ -499,7 +499,7 @@ void ShaderSource::insertSourceShader(const std::string &name_of_shader,
 {
 	/*infostream<<"ShaderSource::insertSourceShader(): "
 			"name_of_shader=\""<<name_of_shader<<"\", "
-			"filename=\""<<filename<<"\""<<'\n';*/
+			"filename=\""<<filename<<"\""<< '\n';*/
 
 	sanity_check(std::this_thread::get_id() == m_main_thread);
 
@@ -707,8 +707,10 @@ ShaderInfo ShaderSource::generateShader(const std::string &name,
 
 		if (g_settings->getBool("enable_water_reflections"))
 			shaders_header << "#define ENABLE_WATER_REFLECTIONS 1\n";
+
 		if (g_settings->getBool("enable_translucent_foliage"))
 			shaders_header << "#define ENABLE_TRANSLUCENT_FOLIAGE 1\n";
+
 		if (g_settings->getBool("enable_node_specular"))
 			shaders_header << "#define ENABLE_NODE_SPECULAR 1\n";
 
@@ -760,7 +762,7 @@ ShaderInfo ShaderSource::generateShader(const std::string &name,
 	}
 
 	irr_ptr<ShaderCallback> cb{new ShaderCallback(m_setter_factories)};
-	infostream<<"Compiling high level shaders for "<<name<<'\n';
+	infostream<<"Compiling high level shaders for "<<name<< '\n';
 	s32 shadermat = gpu->addHighLevelShaderMaterial(
 		vertex_shader.c_str(), nullptr, video::EVST_VS_1_1,
 		fragment_shader.c_str(), nullptr, video::EPST_PS_1_1,
@@ -770,7 +772,7 @@ ShaderInfo ShaderSource::generateShader(const std::string &name,
 		errorstream<<"generate_shader(): "
 				"failed to generate \""<<name<<"\", "
 				"addHighLevelShaderMaterial failed."
-				<<'\n';
+				<< '\n';
 		dumpShaderProgram(warningstream, "Vertex", vertex_shader);
 		dumpShaderProgram(warningstream, "Fragment", fragment_shader);
 		dumpShaderProgram(warningstream, "Geometry", geometry_shader);

@@ -507,7 +507,8 @@ PackedValue *script_pack(lua_State *L, int idx)
 
 void script_unpack(lua_State *L, PackedValue *pv)
 {
-	// table that tracks objects for keep_ref / PUSHREF (key = instr index)
+	assert(pv);
+	// Table that tracks objects for keep_ref / PUSHREF (key = instr index)
 	lua_newtable(L);
 	const int top = lua_gettop(L);
 	int ctr = 0;

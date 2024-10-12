@@ -67,7 +67,7 @@ public:
 	virtual float getLocalStat(rate_stat_type type) = 0;
 };
 
-// ATP = AperosEngine Protocol
-IConnection *createATP(float timeout, bool ipv6, PeerHandler *handler);
+// APRP = AperosEngine Protocol
+IConnection *createAPRP(float timeout, bool ipv6, PeerHandler *handler);
 
 } // namespace

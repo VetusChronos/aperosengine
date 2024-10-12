@@ -19,6 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "client/client.h"
 
+#include "irr_v2d.h"
 #include "util/base64.h"
 #include "client/camera.h"
 #include "client/mesh_generator_thread.h"
@@ -68,7 +69,7 @@ void Client::handleCommand_Deprecated(NetworkPacket* pkt)
 {
 	infostream << "Got deprecated command "
 			<< toClientCommandTable[pkt->getCommand()].name << " from peer "
-			<< pkt->getPeerId() << "!" << std::endl;
+			<< pkt->getPeerId() << "!" << '\n';
 }
 
 void Client::handleCommand_Hello(NetworkPacket* pkt)
@@ -91,11 +92,11 @@ void Client::handleCommand_Hello(NetworkPacket* pkt)
 			<< "serialization_ver=" << (u32)serialization_ver
 			<< ", auth_mechs=" << auth_mechs
 			<< ", proto_ver=" << proto_ver
-			<< ". Doing auth with mech " << chosen_auth_mechanism << std::endl;
+			<< ". Doing auth with mech " << chosen_auth_mechanism << '\n';
 
 	if (!ser_ver_supported(serialization_ver)) {
 		infostream << "Client: TOCLIENT_HELLO: Server sent "
-				<< "unsupported ser_fmt_ver"<< std::endl;
+				<< "unsupported ser_fmt_ver"<< '\n';
 		return;
 	}
 
@@ -105,7 +106,7 @@ void Client::handleCommand_Hello(NetworkPacket* pkt)
 	if (m_chosen_auth_mech != AUTH_MECHANISM_NONE) {
 		// we received a TOCLIENT_HELLO while auth was already going on
 		errorstream << "Client: TOCLIENT_HELLO while auth was already going on"
-			<< "(chosen_mech=" << m_chosen_auth_mech << ")." << std::endl;
+			<< "(chosen_mech=" << m_chosen_auth_mech << ")." << '\n';
 		if (m_chosen_auth_mech == AUTH_MECHANISM_SRP ||
 				m_chosen_auth_mech == AUTH_MECHANISM_LEGACY_PASSWORD) {
 			srp_user_delete((SRPUser *) m_auth_data);
@@ -156,9 +157,9 @@ void Client::handleCommand_AuthAccept(NetworkPacket* pkt)
 	assert(player != NULL);
 	player->setPosition(playerpos);
 
-	infostream << "Client: received map seed: " << m_map_seed << std::endl;
+	infostream << "Client: received map seed: " << m_map_seed << '\n';
 	infostream << "Client: received recommended send interval "
-					<< m_recommended_send_interval<<std::endl;
+					<< m_recommended_send_interval<< '\n';
 
 	// Reply to server
 	/*~ DO NOT TRANSLATE THIS LITERALLY!
@@ -181,7 +182,7 @@ void Client::handleCommand_AcceptSudoMode(NetworkPacket* pkt)
 
 	m_password = m_new_password;
 
-	verbosestream << "Client: Received TOCLIENT_ACCEPT_SUDO_MODE." << std::endl;
+	verbosestream << "Client: Received TOCLIENT_ACCEPT_SUDO_MODE." << '\n';
 
 	// send packet to actually set the password
 	startAuth(AUTH_MECHANISM_FIRST_SRP);
@@ -398,7 +399,7 @@ void Client::handleCommand_TimeOfDay(NetworkPacket* pkt)
 			time_speed = (3600.0f * 24.0f) * tod_diff_f / time_diff;
 			infostream << "Client: Measured time_of_day speed (old format): "
 					<< time_speed << " tod_diff_f=" << tod_diff_f
-					<< " time_diff=" << time_diff << std::endl;
+					<< " time_diff=" << time_diff << '\n';
 		}
 	}
 
@@ -410,7 +411,7 @@ void Client::handleCommand_TimeOfDay(NetworkPacket* pkt)
 	//u32 dr = m_env.getDayNightRatio();
 	//infostream << "Client: time_of_day=" << time_of_day
 	//		<< " time_speed=" << time_speed
-	//		<< " dr=" << dr << std::endl;
+	//		<< " dr=" << dr << '\n';
 }
 
 void Client::handleCommand_ChatMessage(NetworkPacket *pkt)
@@ -488,7 +489,7 @@ void Client::handleCommand_ActiveObjectRemoveAdd(NetworkPacket* pkt)
 		}
 	} catch (PacketError &e) {
 		infostream << "handleCommand_ActiveObjectRemoveAdd: " << e.what()
-				<< ". The packet is unreliable, ignoring" << std::endl;
+				<< ". The packet is unreliable, ignoring" << '\n';
 	}
 
 	// m_activeobjects_received is false before the first
@@ -522,7 +523,7 @@ void Client::handleCommand_ActiveObjectMessages(NetworkPacket* pkt)
 		}
 	} catch (SerializationError &e) {
 		errorstream << "Client::handleCommand_ActiveObjectMessages: "
-			<< "caught SerializationError: " << e.what() << std::endl;
+			<< "caught SerializationError: " << e.what() << '\n';
 	}
 }
 
@@ -627,7 +628,7 @@ void Client::handleCommand_MovePlayer(NetworkPacket* pkt)
 			<< " pos=(" << pos.X << "," << pos.Y << "," << pos.Z << ")"
 			<< " pitch=" << pitch
 			<< " yaw=" << yaw
-			<< std::endl;
+			<< '\n';
 
 	/*
 		Add to ClientEvent queue.
@@ -667,7 +668,7 @@ void Client::handleCommand_AnnounceMedia(NetworkPacket* pkt)
 	*pkt >> num_files;
 
 	infostream << "Client: Received media announcement: packet size: "
-			<< pkt->getSize() << std::endl;
+			<< pkt->getSize() << '\n';
 
 	if (m_media_downloader == NULL ||
 			m_media_downloader->isStarted()) {
@@ -677,7 +678,7 @@ void Client::handleCommand_AnnounceMedia(NetworkPacket* pkt)
 		errorstream << "Client: Received media announcement but "
 			<< problem << "! "
 			<< " files=" << num_files
-			<< " size=" << pkt->getSize() << std::endl;
+			<< " size=" << pkt->getSize() << '\n';
 		return;
 	}
 
@@ -733,7 +734,7 @@ void Client::handleCommand_Media(NetworkPacket* pkt)
 
 	infostream << "Client: Received files: bunch " << bunch_i << "/"
 			<< num_bunches << " files=" << num_files
-			<< " size=" << pkt->getSize() << std::endl;
+			<< " size=" << pkt->getSize() << '\n';
 
 	if (num_files == 0)
 		return;
@@ -768,7 +769,7 @@ void Client::handleCommand_Media(NetworkPacket* pkt)
 			errorstream << "Client: Received media \"" << name
 				<< "\" but no downloads pending. " << num_bunches << " bunches, "
 				<< num_files << " in this one. (init_phase=" << init_phase
-				<< ")" << std::endl;
+				<< ")" << '\n';
 		}
 	}
 }
@@ -776,7 +777,7 @@ void Client::handleCommand_Media(NetworkPacket* pkt)
 void Client::handleCommand_NodeDef(NetworkPacket* pkt)
 {
 	infostream << "Client: Received node definitions: packet size: "
-			<< pkt->getSize() << std::endl;
+			<< pkt->getSize() << '\n';
 
 	// Mesh update thread must be stopped while
 	// updating content definitions
@@ -795,7 +796,7 @@ void Client::handleCommand_NodeDef(NetworkPacket* pkt)
 void Client::handleCommand_ItemDef(NetworkPacket* pkt)
 {
 	infostream << "Client: Received item definitions: packet size: "
-			<< pkt->getSize() << std::endl;
+			<< pkt->getSize() << '\n';
 
 	// Mesh update thread must be stopped while
 	// updating content definitions
@@ -934,7 +935,7 @@ void Client::handleCommand_Privileges(NetworkPacket* pkt)
 		m_privileges.insert(priv);
 		infostream << priv << " ";
 	}
-	infostream << std::endl;
+	infostream << '\n';
 }
 
 void Client::handleCommand_InventoryFormSpec(NetworkPacket* pkt)
@@ -953,7 +954,7 @@ void Client::handleCommand_DetachedInventory(NetworkPacket* pkt)
 	*pkt >> name >> keep_inv;
 
 	infostream << "Client: Detached inventory update: \"" << name
-		<< "\", mode=" << (keep_inv ? "update" : "remove") << std::endl;
+		<< "\", mode=" << (keep_inv ? "update" : "remove") << '\n';
 
 	const auto &inv_it = m_detached_inventories.find(name);
 	if (!keep_inv) {
@@ -1516,11 +1517,15 @@ void Client::handleCommand_LocalPlayerAnimations(NetworkPacket* pkt)
 	LocalPlayer *player = m_env.getLocalPlayer();
 	assert(player != NULL);
 
-	*pkt >> player->local_animations[0];
-	*pkt >> player->local_animations[1];
-	*pkt >> player->local_animations[2];
-	*pkt >> player->local_animations[3];
-	*pkt >> player->local_animation_speed;
+	for (int i = 0; i < 4; ++i) {
+		if (getProtoVersion() >= 46) {
+			*pkt >> player->local_animations[i];
+		} else {
+			v2s32 local_animation;
+			*pkt >> local_animation;
+			player->local_animations[i] = v2f::from(local_animation);
+		}
+	}
 
 	player->last_animation = LocalPlayerAnimation::NO_ANIM;
 }
@@ -1566,7 +1571,7 @@ void Client::handleCommand_SrpBytesSandB(NetworkPacket* pkt)
 			m_chosen_auth_mech != AUTH_MECHANISM_LEGACY_PASSWORD) {
 		errorstream << "Client: Received SRP S_B login message,"
 			<< " but wasn't supposed to (chosen_mech="
-			<< m_chosen_auth_mech << ")." << std::endl;
+			<< m_chosen_auth_mech << ")." << '\n';
 		return;
 	}
 
@@ -1577,14 +1582,14 @@ void Client::handleCommand_SrpBytesSandB(NetworkPacket* pkt)
 	std::string B;
 	*pkt >> s >> B;
 
-	infostream << "Client: Received TOCLIENT_SRP_BYTES_S_B." << std::endl;
+	infostream << "Client: Received TOCLIENT_SRP_BYTES_S_B." << '\n';
 
 	srp_user_process_challenge(usr, (const unsigned char *) s.c_str(), s.size(),
 		(const unsigned char *) B.c_str(), B.size(),
 		(unsigned char **) &bytes_M, &len_M);
 
 	if ( !bytes_M ) {
-		errorstream << "Client: SRP-6a S_B safety check violation!" << std::endl;
+		errorstream << "Client: SRP-6a S_B safety check violation!" << '\n';
 		return;
 	}
 
@@ -1645,7 +1650,7 @@ void Client::handleCommand_MediaPush(NetworkPacket *pkt)
 		verbosestream << "to be fetched ";
 	else
 		verbosestream << "with " << filedata.size() << " bytes ";
-	verbosestream << "(cached=" << cached << ")" << std::endl;
+	verbosestream << "(cached=" << cached << ")" << '\n';
 
 	if (!filedata.empty()) {
 		// LEGACY CODEPATH
@@ -1657,7 +1662,7 @@ void Client::handleCommand_MediaPush(NetworkPacket *pkt)
 			computed_hash = ctx.getDigest();
 		}
 		if (raw_hash != computed_hash) {
-			verbosestream << "Hash of file data mismatches, ignoring." << std::endl;
+			verbosestream << "Hash of file data mismatches, ignoring." << '\n';
 			return;
 		}
 
@@ -1691,11 +1696,11 @@ void Client::handleCommand_ModChannelMsg(NetworkPacket *pkt)
 
 	verbosestream << "Mod channel message received from server " << pkt->getPeerId()
 		<< " on channel " << channel_name << ". sender: `" << sender << "`, message: "
-		<< channel_msg << std::endl;
+		<< channel_msg << '\n';
 
 	if (!m_modchannel_mgr->channelRegistered(channel_name)) {
 		verbosestream << "Server sent us messages on unregistered channel "
-			<< channel_name << ", ignoring." << std::endl;
+			<< channel_name << ", ignoring." << '\n';
 		return;
 	}
 
@@ -1718,29 +1723,29 @@ void Client::handleCommand_ModChannelSignal(NetworkPacket *pkt)
 		case MODCHANNEL_SIGNAL_JOIN_OK:
 			m_modchannel_mgr->setChannelState(channel, MODCHANNEL_STATE_READ_WRITE);
 			infostream << "Server ack our mod channel join on channel `" << channel
-				<< "`, joining." << std::endl;
+				<< "`, joining." << '\n';
 			break;
 		case MODCHANNEL_SIGNAL_JOIN_FAILURE:
 			// Unable to join, remove channel
 			m_modchannel_mgr->leaveChannel(channel, 0);
 			infostream << "Server refused our mod channel join on channel `" << channel
-				<< "`" << std::endl;
+				<< "`" << '\n';
 			break;
 		case MODCHANNEL_SIGNAL_LEAVE_OK:
 #ifndef NDEBUG
 			infostream << "Server ack our mod channel leave on channel " << channel
-				<< "`, leaving." << std::endl;
+				<< "`, leaving." << '\n';
 #endif
 			break;
 		case MODCHANNEL_SIGNAL_LEAVE_FAILURE:
 			infostream << "Server refused our mod channel leave on channel `" << channel
-				<< "`" << std::endl;
+				<< "`" << '\n';
 			break;
 		case MODCHANNEL_SIGNAL_CHANNEL_NOT_REGISTERED:
 #ifndef NDEBUG
 			// Generally unused, but ensure we don't do an implementation error
 			infostream << "Server tells us we sent a message on channel `" << channel
-				<< "` but we are not registered. Message was dropped." << std::endl;
+				<< "` but we are not registered. Message was dropped." << '\n';
 #endif
 			break;
 		case MODCHANNEL_SIGNAL_SET_STATE: {
@@ -1749,19 +1754,19 @@ void Client::handleCommand_ModChannelSignal(NetworkPacket *pkt)
 
 			if (state == MODCHANNEL_STATE_INIT || state >= MODCHANNEL_STATE_MAX) {
 				infostream << "Received wrong channel state " << state
-						<< ", ignoring." << std::endl;
+						<< ", ignoring." << '\n';
 				return;
 			}
 
 			m_modchannel_mgr->setChannelState(channel, (ModChannelState) state);
 			infostream << "Server sets mod channel `" << channel
-					<< "` in read-only mode." << std::endl;
+					<< "` in read-only mode." << '\n';
 			break;
 		}
 		default:
 #ifndef NDEBUG
 			warningstream << "Received unhandled mod channel signal ID "
-				<< signal << ", ignoring." << std::endl;
+				<< signal << ", ignoring." << '\n';
 #endif
 			valid_signal = false;
 			break;
@@ -1819,4 +1824,9 @@ void Client::handleCommand_SetLighting(NetworkPacket *pkt)
 		*pkt >> lighting.volumetric_light_strength;
 	if (pkt->getRemainingBytes() >= 4)
 		*pkt >> lighting.shadow_tint;
+	if (pkt->getRemainingBytes() >= 12) {
+		*pkt >> lighting.bloom_intensity
+				>> lighting.bloom_strength_factor
+				>> lighting.bloom_radius;
+	}
 }

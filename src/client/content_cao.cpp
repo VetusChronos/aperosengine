@@ -302,7 +302,7 @@ void TestCAO::step(float dtime, ClientEnvironment *env)
 	if(m_node)
 	{
 		v3f rot = m_node->getRotation();
-		//infostream<<"dtime="<<dtime<<", rot.Y="<<rot.Y<<'\n';
+		//infostream<<"dtime="<<dtime<<", rot.Y="<<rot.Y<< '\n';
 		rot.Y += dtime * 180;
 		m_node->setRotation(rot);
 	}
@@ -310,7 +310,7 @@ void TestCAO::step(float dtime, ClientEnvironment *env)
 
 void TestCAO::processMessage(const std::string &data)
 {
-	infostream<<"TestCAO: Got data: "<<data<<'\n';
+	infostream<<"TestCAO: Got data: "<<data<< '\n';
 	std::istringstream is(data, std::ios::binary);
 	u16 cmd;
 	is>>cmd;
@@ -780,7 +780,7 @@ void GenericCAO::addToScene(ITextureSource *tsrc, scene::ISceneManager *smgr)
 				mat.BackfaceCulling = m_prop.backface_culling;
 			});
 		} else
-			errorstream<<"GenericCAO::addToScene(): Could not load mesh "<<m_prop.mesh<<'\n';
+			errorstream<<"GenericCAO::addToScene(): Could not load mesh "<<m_prop.mesh<< '\n';
 	} else if (m_prop.visual == "wielditem" || m_prop.visual == "item") {
 		grabMatrixNode();
 		ItemStack item;
@@ -804,7 +804,7 @@ void GenericCAO::addToScene(ITextureSource *tsrc, scene::ISceneManager *smgr)
 		m_wield_meshnode->setScale(m_prop.visual_size / 2.0f);
 	} else {
 		infostream<<"GenericCAO::addToScene(): \""<<m_prop.visual
-				<<"\" not supported"<<'\n';
+				<<"\" not supported"<< '\n';
 	}
 
 	/* Set VBO hint */
@@ -1052,7 +1052,7 @@ void GenericCAO::step(float dtime, ClientEnvironment *env)
 				walking = true;
 			}
 
-			v2s32 new_anim = v2s32(0,0);
+			v2f new_anim = v2s32(0,0);
 			bool allow_update = false;
 
 			// increase speed if using fast or flying fast
@@ -1379,7 +1379,7 @@ void GenericCAO::updateTextures(std::string mod)
 				texturestring += mod;
 				video::ITexture *texture = tsrc->getTextureForMesh(texturestring);
 				if (!texture) {
-					errorstream<<"GenericCAO::updateTextures(): Could not load texture "<<texturestring<<'\n';
+					errorstream<<"GenericCAO::updateTextures(): Could not load texture "<<texturestring<< '\n';
 					continue;
 				}
 
@@ -1635,7 +1635,7 @@ bool GenericCAO::visualExpiryRequired(const ObjectProperties &new_) const
 
 void GenericCAO::processMessage(const std::string &data)
 {
-	//infostream<<"GenericCAO: Got message"<<'\n';
+	//infostream<<"GenericCAO: Got message"<< '\n';
 	std::istringstream is(data, std::ios::binary);
 	// command
 	u8 cmd = readU8(is);
@@ -1799,10 +1799,9 @@ void GenericCAO::processMessage(const std::string &data)
 			phys.speed_walk = override_speed_walk;
 		}
 	} else if (cmd == AO_CMD_SET_ANIMATION) {
-		// TODO: change frames send as v2s32 value
 		v2f range = readV2F32(is);
 		if (!m_is_local_player) {
-			m_animation_range = v2s32((s32)range.X, (s32)range.Y);
+			m_animation_range = range;
 			m_animation_speed = readF32(is);
 			m_animation_blend = readF32(is);
 			// these are sent inverted so we get true when the server sends nothing
@@ -1812,7 +1811,7 @@ void GenericCAO::processMessage(const std::string &data)
 			LocalPlayer *player = m_env->getLocalPlayer();
 			if(player->last_animation == LocalPlayerAnimation::NO_ANIM)
 			{
-				m_animation_range = v2s32((s32)range.X, (s32)range.Y);
+				m_animation_range = range;
 				m_animation_speed = readF32(is);
 				m_animation_blend = readF32(is);
 				// these are sent inverted so we get true when the server sends nothing

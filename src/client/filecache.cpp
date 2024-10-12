@@ -56,7 +56,7 @@ bool FileCache::loadByPath(const std::string &path, std::ostream &os)
 	}
 	if(bad){
 		errorstream<<"FileCache: Failed to read file from cache: \""
-				<<path<<"\""<<'\n';
+				<<path<<"\""<< '\n';
 	}
 
 	return !bad;

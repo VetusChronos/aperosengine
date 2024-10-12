@@ -475,13 +475,13 @@ ServerEnvironment::ServerEnvironment(std::unique_ptr<ServerMap> map,
 	m_server(server)
 {
 	m_step_time_counter = mb->addCounter(
-		"aperosengine_env_step_time", "Time spent in environment step (in microseconds)");
+		"minetest_env_step_time", "Time spent in environment step (in microseconds)");
 
 	m_active_block_gauge = mb->addGauge(
-		"aperosengine_env_active_blocks", "Number of active blocks");
+		"minetest_env_active_blocks", "Number of active blocks");
 
 	m_active_object_gauge = mb->addGauge(
-		"aperosengine_env_active_objects", "Number of active objects");
+		"minetest_env_active_objects", "Number of active objects");
 }
 
 void ServerEnvironment::init()
@@ -746,7 +746,7 @@ void ServerEnvironment::saveMeta()
 	if(!fs::safeWriteToFile(path, ss.str()))
 	{
 		infostream<<"ServerEnvironment::saveMeta(): Failed to write "
-			<<path<<'\n';
+			<<path<< '\n';
 		throw SerializationError("Couldn't save env meta");
 	}
 }
@@ -1041,7 +1041,7 @@ public:
 					neighbor_invalid:
 					continue;
 				}
-				
+
 				neighbor_found:
 
 				abms_run++;
@@ -1086,7 +1086,7 @@ void ServerEnvironment::activateBlock(MapBlock *block, u32 additional_dtime)
 	dtime_s += additional_dtime;
 
 	/*infostream<<"ServerEnvironment::activateBlock(): block timestamp: "
-			<<stamp<<", game time: "<<m_game_time<<'\n';*/
+			<<stamp<<", game time: "<<m_game_time<< '\n';*/
 
 	// Remove stored static objects if clearObjects was called since block's timestamp
 	// Note that non-generated blocks may still have stored static objects
@@ -1099,7 +1099,7 @@ void ServerEnvironment::activateBlock(MapBlock *block, u32 additional_dtime)
 	block->setTimestampNoChangedFlag(m_game_time);
 
 	/*infostream<<"ServerEnvironment::activateBlock(): block is "
-			<<dtime_s<<" seconds old."<<'\n';*/
+			<<dtime_s<<" seconds old."<< '\n';*/
 
 	// Activate stored objects
 	activateObjects(block, dtime_s);
@@ -1312,7 +1312,7 @@ void ServerEnvironment::clearObjects(ClearObjectsMode mode)
 	m_map->listAllLoadedBlocks(loaded_blocks);
 	infostream << "ServerEnvironment::clearObjects(): "
 		<< "Done listing all loaded blocks: "
-		<< loaded_blocks.size()<<'\n';
+		<< loaded_blocks.size()<< '\n';
 
 	// Get list of loadable blocks
 	std::vector<v3s16> loadable_blocks;
@@ -2410,14 +2410,14 @@ bool ServerEnvironment::migratePlayersDatabase(const GameParams &game_params,
 		const Settings &cmd_args)
 {
 	std::string migrate_to = cmd_args.get("migrate-players");
-	Settings world_apr;
-	std::string world_apr_path = game_params.world_path + DIR_DELIM + "world.apr";
-	if (!world_apr.readConfigFile(world_apr_path.c_str())) {
+	Settings world_mt;
+	std::string world_mt_path = game_params.world_path + DIR_DELIM + "world.apr";
+	if (!world_mt.readConfigFile(world_mt_path.c_str())) {
 		errorstream << "Cannot read world.apr!" << '\n';
 		return false;
 	}
 
-	if (!world_apr.exists("player_backend")) {
+	if (!world_mt.exists("player_backend")) {
 		errorstream << "Please specify your current backend in world.apr:"
 			<< '\n'
 			<< "	player_backend = {files|sqlite3|leveldb|postgresql}"
@@ -2425,7 +2425,7 @@ bool ServerEnvironment::migratePlayersDatabase(const GameParams &game_params,
 		return false;
 	}
 
-	std::string backend = world_apr.get("player_backend");
+	std::string backend = world_mt.get("player_backend");
 	if (backend == migrate_to) {
 		errorstream << "Cannot migrate: new backend is same"
 			<< " as the old one" << '\n';
@@ -2442,9 +2442,9 @@ bool ServerEnvironment::migratePlayersDatabase(const GameParams &game_params,
 
 	try {
 		PlayerDatabase *srcdb = ServerEnvironment::openPlayerDatabase(backend,
-			game_params.world_path, world_apr);
+			game_params.world_path, world_mt);
 		PlayerDatabase *dstdb = ServerEnvironment::openPlayerDatabase(migrate_to,
-			game_params.world_path, world_apr);
+			game_params.world_path, world_mt);
 
 		std::vector<std::string> player_list;
 		srcdb->listPlayers(player_list);
@@ -2471,8 +2471,8 @@ bool ServerEnvironment::migratePlayersDatabase(const GameParams &game_params,
 
 		actionstream << "Successfully migrated " << player_list.size() << " players"
 			<< '\n';
-		world_apr.set("player_backend", migrate_to);
-		if (!world_apr.updateConfigFile(world_apr_path.c_str()))
+		world_mt.set("player_backend", migrate_to);
+		if (!world_mt.updateConfigFile(world_mt_path.c_str()))
 			errorstream << "Failed to update world.apr!" << '\n';
 		else
 			actionstream << "world.apr updated" << '\n';
@@ -2522,16 +2522,16 @@ bool ServerEnvironment::migrateAuthDatabase(
 		const GameParams &game_params, const Settings &cmd_args)
 {
 	std::string migrate_to = cmd_args.get("migrate-auth");
-	Settings world_apr;
-	std::string world_apr_path = game_params.world_path + DIR_DELIM + "world.apr";
-	if (!world_apr.readConfigFile(world_apr_path.c_str())) {
+	Settings world_mt;
+	std::string world_mt_path = game_params.world_path + DIR_DELIM + "world.apr";
+	if (!world_mt.readConfigFile(world_mt_path.c_str())) {
 		errorstream << "Cannot read world.apr!" << '\n';
 		return false;
 	}
 
 	std::string backend = "files";
-	if (world_apr.exists("auth_backend"))
-		backend = world_apr.get("auth_backend");
+	if (world_mt.exists("auth_backend"))
+		backend = world_mt.get("auth_backend");
 	else
 		warningstream << "No auth_backend found in world.apr, "
 				"assuming \"files\"." << '\n';
@@ -2544,9 +2544,9 @@ bool ServerEnvironment::migrateAuthDatabase(
 
 	try {
 		const std::unique_ptr<AuthDatabase> srcdb(ServerEnvironment::openAuthDatabase(
-				backend, game_params.world_path, world_apr));
+				backend, game_params.world_path, world_mt));
 		const std::unique_ptr<AuthDatabase> dstdb(ServerEnvironment::openAuthDatabase(
-				migrate_to, game_params.world_path, world_apr));
+				migrate_to, game_params.world_path, world_mt));
 
 		std::vector<std::string> names_list;
 		srcdb->listNames(names_list);
@@ -2562,8 +2562,8 @@ bool ServerEnvironment::migrateAuthDatabase(
 
 		actionstream << "Successfully migrated " << names_list.size()
 				<< " auth entries" << '\n';
-		world_apr.set("auth_backend", migrate_to);
-		if (!world_apr.updateConfigFile(world_apr_path.c_str()))
+		world_mt.set("auth_backend", migrate_to);
+		if (!world_mt.updateConfigFile(world_mt_path.c_str()))
 			errorstream << "Failed to update world.apr!" << '\n';
 		else
 			actionstream << "world.apr updated" << '\n';

@@ -95,7 +95,7 @@ public class UnzipService extends IntentService {
 		} finally {
 			setIsRunning(false);
 			if (!zipFile.delete()) {
-				Log.w("UnzipService", "AperosEngine installation ZIP cannot be deleted");
+				Log.w("UnzipService", "Aperos Engine installation ZIP cannot be deleted");
 			}
 		}
 	}

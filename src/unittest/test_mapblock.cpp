@@ -150,7 +150,7 @@ void TestMapBlock::testSave29(IGameDef *gamedef)
 
 	/*
 	 * Quick note:
-	 * AperosEngine deals with MapBlocks that violate these invariants (mostly) fine,
+	 * Minetest deals with MapBlocks that violate these invariants (mostly) fine,
 	 * but we should still be careful about them as third-party tools may rely on them.
 	 */
 

@@ -1,16 +1,16 @@
-AperosVoxel Engine
-==================
+Aperos (Voxel) Engine
+=====================
 
 [![Licença](https://img.shields.io/badge/license-LGPLv2.1%2B-blue.svg)](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.pt-br.html)
 
 Aperos (Voxel) Engine é um mecanismo de jogo voxel de código aberto gratuito com foco na facilidade de modificação 
-e criação de jogos.
+e criação de jogos. Com o objetivo de dar vida ao jogo AperosVoxel.
 
-AperosVoxel é baseado no [Minetest Engine](https://aperosvoxel.domain):
+Aperos Engine é baseado no [Minetest Engine](https://minetest.net):
 
-> Direitos autorais (C) 2010-2024 Perttu Ahola <celeron55@gmail.com>
-e colaboradores do Minetest (veja o arquivo LICENSE). 
-Obrigada aos contribuidores!
+> Créditos ao (C) 2010-2018 Perttu Ahola <celeron55@gmail.com> por ter criado o Minetest
+> e colaboradores do Minetest por suas contribuições (veja o arquivo LICENSE). 
+> Obrigada aos contribuidores do Minetest!
 
 Localização
 -----------
@@ -31,7 +31,7 @@ Localização
 
 Documentação adicional
 ----------------------
-- GitHub: https://github.com/vetuschronos/aperosengine/
+- GitHub: https://github.com/VetusChronos/aperosengine/
 - [Documentação do desenvolvedor](../en/engine/developing/) (inglês)
 - [Documentação para modding](../en/modding/) (inglês)
 - [docs/](../en/) diretório da documentação (inglês)
@@ -110,11 +110,11 @@ Arquivo de configuração
 -----------------------
 - Localização padrão:
     `user/aperosengine.conf`
-- Este arquivo é criado fechando o AperosEngine pela primeira vez.
+- Este arquivo é criado fechando a AperosEngine pela primeira vez.
 - Um arquivo diferente pode ser especificado na linha de comando:
     `--config <caminho-para-o-arquivo>`
 - Uma compilação executada no local procurará o arquivo de configuração em
-    `location_of_exe/../aperosengine.conf` e também `location_of_exe/../../aperosengine.conf`
+    `localização_do_executável/../aperosengine.conf` e também `localização_do_executável/../../aperosengine.conf`
 
 Opções por linha de comando
 ---------------------------

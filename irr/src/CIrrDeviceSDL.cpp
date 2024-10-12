@@ -313,11 +313,11 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters &param) :
 
 		SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
 
-		// AperosEngine does its own screen keyboard handling.
+		// Minetest does its own screen keyboard handling.
 		SDL_SetHint(SDL_HINT_ENABLE_SCREEN_KEYBOARD, "0");
 #endif
 
-		// AperosEngine has its own signal handler
+		// Minetest has its own signal handler
 		SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 
 		// Disabling the compositor is not a good idea in windowed mode.
@@ -335,7 +335,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters &param) :
 		SDL_SetHint(SDL_HINT_WINDOWS_DPI_SCALING, "1");
 #endif
 
-		// AperosEngine has its own code to synthesize mouse events from touch events,
+		// Minetest has its own code to synthesize mouse events from touch events,
 		// so we prevent SDL from doing it.
 		SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
 		SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
@@ -721,12 +721,19 @@ bool CIrrDeviceSDL::run()
 
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-			MouseX = irrevent.MouseInput.X =
-				static_cast<s32>(SDL_event.motion.x * ScaleX);
-			MouseY = irrevent.MouseInput.Y =
-				static_cast<s32>(SDL_event.motion.y * ScaleY);
+
 			MouseXRel = static_cast<s32>(SDL_event.motion.xrel * ScaleX);
 			MouseYRel = static_cast<s32>(SDL_event.motion.yrel * ScaleY);
+			if (!SDL_GetRelativeMouseMode()) {
+				MouseX = static_cast<s32>(SDL_event.motion.x * ScaleX);
+				MouseY = static_cast<s32>(SDL_event.motion.y * ScaleY);
+			} else {
+				MouseX += MouseXRel;
+				MouseY += MouseYRel;
+			}
+			irrevent.MouseInput.X = MouseX;
+			irrevent.MouseInput.Y = MouseY;
+
 			irrevent.MouseInput.ButtonStates = MouseButtonStates;
 			irrevent.MouseInput.Shift = (keymod & KMOD_SHIFT) != 0;
 			irrevent.MouseInput.Control = (keymod & KMOD_CTRL) != 0;
@@ -792,7 +799,7 @@ bool CIrrDeviceSDL::run()
 			// According to some web searches I did, this is probably
 			// vendor/device-specific.
 			// Since a working right mouse button is very important for
-			// AperosEngine, we have this little hack.
+			// Minetest, we have this little hack.
 			if (button == SDL_BUTTON_X2)
 				button = SDL_BUTTON_RIGHT;
 #endif

@@ -33,7 +33,7 @@ redirect /entity-damage-mechanism/index.html
 redirect /escape-sequences/index.html
 redirect /registered-entities/index.html
 redirect /flag-specifier-format/index.html
-redirect /minetest-namespace-reference/index.html
+redirect /aperosengine-namespace-reference/index.html
 redirect /ores/index.html
 redirect /search.html
 redirect /representations-of-simple-things/index.html

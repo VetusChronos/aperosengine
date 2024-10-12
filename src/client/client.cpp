@@ -393,7 +393,7 @@ void Client::connect(const Address &address, const std::string &address_name,
 	}
 
 	m_address_name = address_name;
-	m_con.reset(con::createATP(CONNECTION_TIMEOUT, address.isIPv6(), this));
+	m_con.reset(con::createAPRP(CONNECTION_TIMEOUT, address.isIPv6(), this));
 
 	infostream << "Connecting to server at ";
 	address.print(infostream);
@@ -799,7 +799,7 @@ bool Client::loadMedia(const std::string &data, const std::string &filename,
 		video::IImage *img = vdrv->createImageFromFile(rfile);
 		if (!img) {
 			errorstream<<"Client: Cannot create image from data of "
-					<<"file \""<<filename<<"\""<<'\n';
+					<<"file \""<<filename<<"\""<< '\n';
 			rfile->drop();
 			return false;
 		}
@@ -833,10 +833,10 @@ bool Client::loadMedia(const std::string &data, const std::string &filename,
 	name = removeStringEnd(filename, model_ext);
 	if (!name.empty()) {
 		verbosestream<<"Client: Storing model into memory: "
-				<<"\""<<filename<<"\""<<'\n';
+				<<"\""<<filename<<"\""<< '\n';
 		if(m_mesh_data.count(filename))
 			errorstream<<"Multiple models with name \""<<filename.c_str()
-					<<"\" found; replacing previous model"<<'\n';
+					<<"\" found; replacing previous model"<< '\n';
 		m_mesh_data[filename] = data;
 		return true;
 	}
@@ -1425,6 +1425,7 @@ void Client::sendPlayerPos()
 	player->last_keyPressed      = keyPressed;
 	player->last_camera_fov      = camera_fov;
 	player->last_camera_inverted = camera_inverted;
+	player->last_wanted_range    = wanted_range;
 	player->last_movement_speed  = movement_speed;
 	player->last_movement_dir    = movement_dir;
 
@@ -1751,7 +1752,7 @@ void Client::addUpdateMeshTaskForNode(v3s16 nodepos, bool ack_to_server, bool ur
 		v3s16 p = nodepos;
 		infostream<<"Client::addUpdateMeshTaskForNode(): "
 				<<"("<<p.X<<","<<p.Y<<","<<p.Z<<")"
-				<<'\n';
+				<< '\n';
 	}
 
 	v3s16 blockpos = getNodeBlockPos(nodepos);
@@ -1833,7 +1834,7 @@ void Client::showUpdateProgressTexture(void *args, u32 progress, u32 max_progres
 
 void Client::afterContentReceived()
 {
-	infostream<<"Client::afterContentReceived() started"<<'\n';
+	infostream<<"Client::afterContentReceived() started"<< '\n';
 	assert(m_itemdef_received); // pre-condition
 	assert(m_nodedef_received); // pre-condition
 	assert(mediaReceived()); // pre-condition
@@ -1844,19 +1845,19 @@ void Client::afterContentReceived()
 	guiScalingCacheClear();
 
 	// Rebuild inherited images and recreate textures
-	infostream<<"- Rebuilding images and textures"<<'\n';
+	infostream<<"- Rebuilding images and textures"<< '\n';
 	m_rendering_engine->draw_load_screen(wstrgettext("Loading textures..."),
 			guienv, m_tsrc, 0, 70);
 	m_tsrc->rebuildImagesAndTextures();
 
 	// Rebuild shaders
-	infostream<<"- Rebuilding shaders"<<'\n';
+	infostream<<"- Rebuilding shaders"<< '\n';
 	m_rendering_engine->draw_load_screen(wstrgettext("Rebuilding shaders..."),
 			guienv, m_tsrc, 0, 71);
 	m_shsrc->rebuildShaders();
 
 	// Update node aliases
-	infostream<<"- Updating node aliases"<<'\n';
+	infostream<<"- Updating node aliases"<< '\n';
 	m_rendering_engine->draw_load_screen(wstrgettext("Initializing nodes..."),
 			guienv, m_tsrc, 0, 72);
 	m_nodedef->updateAliases(m_itemdef);
@@ -1869,7 +1870,7 @@ void Client::afterContentReceived()
 	m_nodedef->runNodeResolveCallbacks();
 
 	// Update node textures and assign shaders to each tile
-	infostream<<"- Updating node textures"<<'\n';
+	infostream<<"- Updating node textures"<< '\n';
 	TextureUpdateArgs tu_args;
 	tu_args.guienv = guienv;
 	tu_args.last_time_ms = porting::getTimeMs();
@@ -1879,7 +1880,7 @@ void Client::afterContentReceived()
 	m_nodedef->updateTextures(this, &tu_args);
 
 	// Start mesh update thread after setting up content definitions
-	infostream<<"- Starting mesh update thread"<<'\n';
+	infostream<<"- Starting mesh update thread"<< '\n';
 	m_mesh_update_manager->start();
 
 	m_state = LC_Ready;
@@ -1889,7 +1890,7 @@ void Client::afterContentReceived()
 		m_script->on_client_ready(m_env.getLocalPlayer());
 
 	m_rendering_engine->draw_load_screen(wstrgettext("Done!"), guienv, m_tsrc, 0, 100);
-	infostream<<"Client::afterContentReceived() done"<<'\n';
+	infostream<<"Client::afterContentReceived() done"<< '\n';
 }
 
 float Client::getRTT()

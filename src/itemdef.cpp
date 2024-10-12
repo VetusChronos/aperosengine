@@ -607,11 +607,11 @@ public:
 		bool alias_removed = (m_aliases.erase(def.name) != 0);
 		if(alias_removed)
 			infostream<<"ItemDefManager: erased alias "<<def.name
-					<<" because item was defined"<<'\n';
+					<<" because item was defined"<< '\n';
 	}
 	virtual void unregisterItem(const std::string &name)
 	{
-		verbosestream<<"ItemDefManager: unregistering \""<<name<<"\""<<'\n';
+		verbosestream<<"ItemDefManager: unregistering \""<<name<<"\""<< '\n';
 
 		delete m_item_definitions[name];
 		m_item_definitions.erase(name);

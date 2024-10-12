@@ -75,6 +75,7 @@ inline io::path deletePathFromFilename(const io::path &filename)
 
 	if (p != s)
 		++p;
+
 	return p;
 }
 

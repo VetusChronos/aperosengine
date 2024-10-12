@@ -26,6 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <cerrno>
 #include <fstream>
 #include <atomic>
+#include <memory>
 #include "log.h"
 #include "config.h"
 #include "porting.h"
@@ -34,12 +35,26 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <IFileArchive.h>
 #include <IFileSystem.h>
 #endif
+
 #ifdef __linux__
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #ifndef FICLONE
 #define FICLONE _IOW(0x94, 9, int)
 #endif
+#endif
+
+#ifdef _WIN32
+#include <windows.h>
+#include <shlwapi.h>
+#include <io.h>
+#include <direct.h>
+#else
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #endif
 
 // Error from last OS call as string
@@ -57,11 +72,6 @@ namespace fs
 /***********
  * Windows *
  ***********/
-
-#include <windows.h>
-#include <shlwapi.h>
-#include <io.h>
-#include <direct.h>
 
 std::vector<DirListNode> GetDirListing(const std::string &pathstring)
 {
@@ -205,14 +215,14 @@ std::string TempPath()
 {
 	DWORD bufsize = GetTempPath(0, NULL);
 	if(bufsize == 0){
-		errorstream<<"GetTempPath failed, error = "<<GetLastError()<<'\n';
+		errorstream<<"GetTempPath failed, error = "<<GetLastError()<< '\n';
 		return "";
 	}
 	std::string buf;
 	buf.resize(bufsize);
 	DWORD len = GetTempPath(bufsize, &buf[0]);
 	if(len == 0 || len > bufsize){
-		errorstream<<"GetTempPath failed, error = "<<GetLastError()<<'\n';
+		errorstream<<"GetTempPath failed, error = "<<GetLastError()<< '\n';
 		return "";
 	}
 	buf.resize(len);
@@ -272,12 +282,6 @@ bool CopyFileContents(const std::string &source, const std::string &target)
  * POSIX *
  *********/
 
-#include <sys/types.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
 std::vector<DirListNode> GetDirListing(const std::string &pathstring)
 {
 	std::vector<DirListNode> listing;
@@ -285,7 +289,7 @@ std::vector<DirListNode> GetDirListing(const std::string &pathstring)
 	DIR *dp;
 	struct dirent *dirp;
 	if((dp = opendir(pathstring.c_str())) == NULL) {
-		//infostream<<"Error("<<errno<<") opening "<<pathstring<<'\n';
+		//infostream<<"Error("<<errno<<") opening "<<pathstring<< '\n';
 		return listing;
 	}
 
@@ -380,41 +384,41 @@ bool RecursiveDelete(const std::string &path)
 		Execute the 'rm' command directly, by fork() and execve()
 	*/
 
-	infostream<<"Removing \""<<path<<"\""<<'\n';
+	infostream << "Removing \"" << path << "\"" << '\n';
 
-	pid_t child_pid = fork();
+	assert(IsPathAbsolute(path));
 
-	if(child_pid == 0)
-	{
+	const pid_t child_pid = fork();
+
+	if (child_pid == -1) {
+		errorstream << "fork errno: " << errno << ": " << strerror(errno)
+			<< '\n';
+		return false;
+	}
+
+	if (child_pid == 0) {
 		// Child
-		const char *argv[4] = {
-#ifdef __ANDROID__
-			"/system/bin/rm",
-#else
-			"/bin/rm",
-#endif
+		std::array<const char*, 4> argv = {
+			"rm",
 			"-rf",
 			path.c_str(),
-			NULL
+			nullptr
 		};
 
-		verbosestream<<"Executing '"<<argv[0]<<"' '"<<argv[1]<<"' '"
-				<<argv[2]<<"'"<<'\n';
+		execvp(argv[0], const_cast<char**>(argv.data()));
 
-		execv(argv[0], const_cast<char**>(argv));
-
-		// Execv shouldn't return. Failed.
+		// NOTE: use cerr because our logging won't flush in forked process
+		std::cerr << "exec errno: " << errno << ": " << strerror(errno)
+			<< '\n';
 		_exit(1);
-	}
-	else
-	{
+	} else {
 		// Parent
-		int child_status;
+		int status;
 		pid_t tpid;
-		do{
-			tpid = wait(&child_status);
-		}while(tpid != child_pid);
-		return (child_status == 0);
+		do
+			tpid = waitpid(child_pid, &status, 0);
+		while (tpid != child_pid);
+		return WIFEXITED(status) && WEXITSTATUS(status) == 0;
 	}
 }
 
@@ -609,7 +613,7 @@ void GetRecursiveSubPaths(const std::string &path,
 
 bool RecursiveDeleteContent(const std::string &path)
 {
-	infostream<<"Removing content of \""<<path<<"\""<<'\n';
+	infostream << "Removing content of \"" << path << "\"" <<  '\n';
 	std::vector<DirListNode> list = GetDirListing(path);
 	for (const DirListNode &dln : list) {
 		if(trim(dln.name) == "." || trim(dln.name) == "..")
@@ -765,15 +769,15 @@ std::string RemoveLastPathComponent(const std::string &path,
 	size_t remaining = path.size();
 
 	for(int i = 0; i < count; ++i){
-		// strip a dir delimiter
+		// Strip a dir delimiter
 		while(remaining != 0 && IsDirDelimiter(path[remaining-1]))
 			remaining--;
-		// strip a path component
+		// Strip a path component
 		size_t component_end = remaining;
 		while(remaining != 0 && !IsDirDelimiter(path[remaining-1]))
 			remaining--;
 		size_t component_start = remaining;
-		// strip a dir delimiter
+		// Strip a dir delimiter
 		while(remaining != 0 && IsDirDelimiter(path[remaining-1]))
 			remaining--;
 		if(removed){
@@ -794,10 +798,10 @@ std::string RemoveRelativePathComponents(std::string path)
 	size_t dotdot_count = 0;
 	while (pos != 0) {
 		size_t component_with_delim_end = pos;
-		// skip a dir delimiter
+		// Skip a dir delimiter
 		while (pos != 0 && IsDirDelimiter(path[pos-1]))
 			pos--;
-		// strip a path component
+		// Strip a path component
 		size_t component_end = pos;
 		while (pos != 0 && !IsDirDelimiter(path[pos-1]))
 			pos--;
@@ -834,7 +838,7 @@ std::string RemoveRelativePathComponents(std::string path)
 	if (dotdot_count > 0)
 		return "";
 
-	// remove trailing dir delimiters
+	// Remove trailing dir delimiters
 	pos = path.size();
 	while (pos != 0 && IsDirDelimiter(path[pos-1]))
 		pos--;
@@ -866,12 +870,12 @@ const char *GetFilenameFromPath(const char *path)
 	return filename ? filename + 1 : path;
 }
 
-// Note: this is not safe if two MT processes try this at the same time (FIXME?)
+// NOTE: this is not safe if two MT processes try this at the same time (FIXME?)
 bool safeWriteToFile(const std::string &path, std::string_view content)
 {
 	// Prevent two threads from writing to the same temporary file
 	static std::atomic<u16> g_file_counter;
-	const std::string tmp_file = path + ".~mt" + itos(g_file_counter.fetch_add(1));
+	const std::string tmp_file = path + ".~apr" + itos(g_file_counter.fetch_add(1));
 
 	// Write data to a temporary file
 	std::string write_error;
@@ -966,7 +970,7 @@ bool extractZipFile(io::IFileSystem *fs, const char *filename, const std::string
 
 	for (u32 i = 0; i < files_in_zip->getFileCount(); i++) {
 		if (files_in_zip->isDirectory(i))
-			continue; // ignore, we create dirs as necessary
+			continue; // Ignore, we create dirs as necessary
 
 		const auto &filename = files_in_zip->getFullFileName(i);
 		std::string fullpath = destination + DIR_DELIM;

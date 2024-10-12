@@ -258,9 +258,13 @@ int ModApiEnv::l_swap_node(lua_State *L)
 int ModApiEnv::l_bulk_swap_node(lua_State *L)
 {
 	GET_ENV_PTR;
+
 	luaL_checktype(L, 1, LUA_TTABLE);
+
 	s32 len = lua_objlen(L, 1);
+
 	MapNode n = readnode(L, 2);
+
 	// Do it
 	bool succeeded = true;
 	for (s32 i = 1; i <= len; i++) {
@@ -269,6 +273,7 @@ int ModApiEnv::l_bulk_swap_node(lua_State *L)
 			succeeded = false;
 		lua_pop(L, 1);
 	}
+
 	lua_pushboolean(L, succeeded);
 	return 1;
 }

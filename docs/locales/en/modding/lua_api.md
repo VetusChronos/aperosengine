@@ -6764,17 +6764,6 @@ This allows you easy interoperability for delegating work to jobs.
     * Register a path to a Lua file to be imported when an async environment
       is initialized. You can use this to preload code which you can then call
       later using `aperosengine.handle_async()`.
-* `aperosengine.register_portable_metatable(name, mt)`:
-    * Register a metatable that should be preserved when data is transferred
-    between the main thread and the async environment.
-    * `name` is a string that identifies the metatable. It is recommended to
-      follow the `modname:name` convention for this identifier.
-    * `mt` is the metatable to register.
-    * Note that it is allowed to register the same metatable under multiple
-      names, but it is not allowed to register multiple metatables under the
-      same name.
-    * You must register the metatable in both the main environment
-      and the async environment for this mechanism to work.
 
 
 ### List of APIs available in an async environment
@@ -6804,7 +6793,8 @@ Functions:
 
 * Standalone helpers such as logging, filesystem, encoding,
   hashing or compression APIs
-* `aperosengine.register_portable_metatable` (see above)
+* `aperosengine.register_portable_metatable`
+* IPC
 
 Variables:
 
@@ -6882,6 +6872,7 @@ Functions:
 * `aperosengine.get_node`, `set_node`, `find_node_near`, `find_nodes_in_area`,
   `spawn_tree` and similar
     * these only operate on the current chunk (if inside a callback)
+* IPC
 
 Variables:
 
@@ -6958,6 +6949,49 @@ Server
     * Clients will attempt to fetch files added this way via remote media,
       this can make transfer of bigger files painless (if set up). Nevertheless
       it is advised not to use dynamic media for big media files.
+
+IPC
+---
+
+The engine provides a generalized mechanism to enable sharing data between the
+different Lua environments (main, mapgen and async).
+It is essentially a shared in-memory key-value store.
+* `aperosengine.ipc_get(key)`:
+  * Read a value from the shared data area.
+  * `key`: string, should use the `"modname:thing"` convention to avoid conflicts.
+  * returns an arbitrary Lua value, or `nil` if this key does not exist
+* `aperosengine.ipc_set(key, value)`:
+  * Write a value to the shared data area.
+  * `key`: as above
+  * `value`: an arbitrary Lua value, cannot be or contain userdata.
+Interacting with the shared data will perform an operation comparable to
+(de)serialization on each access.
+For that reason modifying references will not have any effect, as in this example:
+```lua
+aperosengine.ipc_set("test:foo", {})
+aperosengine.ipc_get("test:foo").subkey = "value" -- WRONG!
+      aperosengine.ipc_get("test:foo") -- returns an empty table
+      ```
+
+**Advanced**:
+* `aperosengine.ipc_cas(key, old_value, new_value)`:
+  * Write a value to the shared data area, but only if the previous value
+    equals what was given.
+    This operation is called Compare-and-Swap and can be used to implement
+    synchronization between threads.
+  * `key`: as above
+  * `old_value`: value compared to using `==` (`nil` compares equal for non-existing keys)
+  * `new_value`: value that will be set
+  * returns: true on success, false otherwise
+* `aperosengine.ipc_poll(key, timeout)`:
+  * Do a blocking wait until a value (other than `nil`) is present at the key.
+  * **IMPORTANT**: You usually don't need this function. Use this as a last resort
+    if nothing else can satisfy your use case! None of the Lua environments the
+    engine has are safe to block for extended periods, especially on the main
+    thread any delays directly translate to lag felt by players.
+  * `key`: as above
+  * `timeout`: maximum wait time, in milliseconds (positive values only)
+  * returns: true on success, false on timeout
 
 Bans
 ----
@@ -7357,6 +7391,17 @@ Misc.
 
 * `aperosengine.global_exists(name)`
     * Checks if a global variable has been set, without triggering a warning.
+
+* `aperosengine.register_portable_metatable(name, mt)`:
+    * Register a metatable that should be preserved when Lua data is transferred
+      between environments (via IPC or `handle_async`).
+    * `name` is a string that identifies the metatable. It is recommended to
+      follow the `modname:name` convention for this identifier.
+    * `mt` is the metatable to register.
+    * Note that the same metatable can be registered under multiple names,
+      but multiple metatables must not be registered under the same name.
+    * You must register the metatable in both the main environment
+      and the async environment for this mechanism to work.
 
 Global objects
 --------------
@@ -7968,8 +8013,7 @@ child will follow movement and rotation of that bone.
        * Animation interpolates towards the end frame but stops when it is reached
        * If looped, there is no interpolation back to the start frame
        * If looped, the model should look identical at start and end
-       * Only integer numbers are supported
-       * default: `{x=1, y=1}`
+      * default: `{x=1.0, y=1.0}`
     * `frame_speed`: How fast the animation plays, in frames per second (number)
        * default: `15.0`
     * `frame_blend`: number, default: `0.0`

@@ -33,6 +33,12 @@ public:
 
 	constexpr vector2d(const dimension2d<T> &other) :
 			X(other.Width), Y(other.Height) {}
+	
+	template <class U>
+	constexpr static vector2d<T> from(const vector2d<U> &other)
+	{
+		return {static_cast<T>(other.X), static_cast<T>(other.Y)};
+	}
 
 	// operators
 

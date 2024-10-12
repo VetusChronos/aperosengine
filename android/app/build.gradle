@@ -70,7 +70,7 @@ task prepareAssets() {
 			from "${projRoot}/aperosengine.conf.example", "${projRoot}/README.md" into assetsFolder
 		}
 		copy {
-			from "${projRoot}/doc/lgpl-2.1.txt" into assetsFolder
+			from "${projRoot}/docs/en/LGPL-2.1.md" into assetsFolder
 		}
 		copy {
 			from "${projRoot}/builtin" into "${assetsFolder}/builtin"

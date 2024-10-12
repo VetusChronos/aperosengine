@@ -378,7 +378,7 @@ void Clouds::updateMesh()
 	}
 
 	tracestream << "Cloud::updateMesh(): " << mb->getVertexCount() << " vertices"
-		<< std::endl;
+		<< '\n';
 }
 
 void Clouds::render()

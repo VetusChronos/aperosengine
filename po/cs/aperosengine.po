@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Czech (AperosEngine)\n"
+"Project-Id-Version: Czech (Minetest)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-11 15:14+0200\n"
 "PO-Revision-Date: 2024-08-02 22:09+0000\n"
 "Last-Translator: Honzapkcz <honzapkc@gmail.com>\n"
-"Language-Team: Czech <https://hosted.weblate.org/projects/AperosEngine/AperosEngine/"
+"Language-Team: Czech <https://hosted.weblate.org/projects/aperosengine/aperosengine/"
 "cs/>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -177,9 +177,9 @@ msgid "Back to Main Menu"
 msgstr "Zpět do hlavní nabídky"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
-msgid "ContentDB is not available when AperosEngine was compiled without cURL"
+msgid "ContentDB is not available when Minetest was compiled without cURL"
 msgstr ""
-"ContentDB není přístupná pokud byl AperosEngine kompilován bez použití cURL"
+"ContentDB není přístupná pokud byl Minetest kompilován bez použití cURL"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid "Downloading..."
@@ -677,28 +677,28 @@ msgstr "Odmítnout"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"For a long time, the AperosEngine engine shipped with a default game called "
-"\"AperosVoxel\". Since AperosEngine 5.8.0, AperosEngine ships without a default "
+"For a long time, the Minetest engine shipped with a default game called "
+"\"Minetest Game\". Since Minetest 5.8.0, Minetest ships without a default "
 "game."
 msgstr ""
-"Po dlouhou dobu, AperosEngine engine byl dodáván s výchozí hrou „AperosEngine hra“. "
-"Od verze 5.8.0 už AperosEngine s touto hrou dodáván není."
+"Po dlouhou dobu, Minetest engine byl dodáván s výchozí hrou „Minetest hra“. "
+"Od verze 5.8.0 už Minetest s touto hrou dodáván není."
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"If you want to continue playing in your AperosVoxel worlds, you need to "
-"reinstall AperosVoxel."
+"If you want to continue playing in your Minetest Game worlds, you need to "
+"reinstall Minetest Game."
 msgstr ""
 "Pokud chceš pokračovat v hraní tvých světů Menetest Hry, tak si ji musíš "
 "přeinstalovat."
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "AperosVoxel is no longer installed by default"
-msgstr "AperosEngine Hra už není instalována jako výchozí"
+msgid "Minetest Game is no longer installed by default"
+msgstr "Minetest Hra už není instalována jako výchozí"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 #, fuzzy
-msgid "Reinstall AperosVoxel"
+msgid "Reinstall Minetest Game"
 msgstr "Nainstalovat jinou hru"
 
 #: builtin/mainmenu/dlg_rename_modpack.lua
@@ -1078,12 +1078,13 @@ msgid "Install games from ContentDB"
 msgstr "Instalovat hry z ContentDB"
 
 #: builtin/mainmenu/tab_local.lua
-msgid "Aperos Engine doesn't come with the AperosVoxel by default."
-msgstr "AperosEngine není dodáván s výchozí hrou."
+msgid "Minetest doesn't come with a game by default."
+msgstr "Minetest není dodáván s výchozí hrou."
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"Aperos Engine is a game creation platform that allows you to create different games."
+"Minetest is a game-creation platform that allows you to play many different "
+"games."
 msgstr ""
 
 #: builtin/mainmenu/tab_local.lua
@@ -2882,7 +2883,7 @@ msgid ""
 "software',\n"
 "as defined by the Free Software Foundation.\n"
 "You can also specify content ratings.\n"
-"These flags are independent from AperosEngine versions,\n"
+"These flags are independent from Minetest versions,\n"
 "so see a full list at https://content.aperosvoxel.domain/help/content_flags/"
 msgstr ""
 "Seznam nastavení ve formátu CSV sloužící k filtrování obsahu repozitáře.\n"
@@ -2890,7 +2891,7 @@ msgstr ""
 "Software Foundation\n"
 "neřadí do \"svobodného softwaru\".\n"
 "Můžete také zadat hodnocení obsahu.\n"
-"Tato nastavení jsou nezávislá na versi AperosEngineu,\n"
+"Tato nastavení jsou nezávislá na versi Minetestu,\n"
 "kompletní seznam na: https://content.aperosvoxel.domain/help/content_flags/"
 
 #: src/settings_translation_file.cpp
@@ -3103,7 +3104,7 @@ msgid ""
 "expecting.\n"
 "This allows for more fine-grained control than "
 "strict_protocol_version_checking.\n"
-"AperosEngine still enforces its own internal minimum, and enabling\n"
+"Minetest still enforces its own internal minimum, and enabling\n"
 "strict_protocol_version_checking will effectively override this."
 msgstr ""
 "Zapněte pro zakázání připojení starých klientů.\n"
@@ -4215,10 +4216,10 @@ msgstr "Instrumentovat příkazy Chatu při registraci."
 #: src/settings_translation_file.cpp
 msgid ""
 "Instrument global callback functions on registration.\n"
-"(anything you pass to a AperosEngine.register_*() function)"
+"(anything you pass to a minetest.register_*() function)"
 msgstr ""
 "Instrumentovat globální callback funkce při registraci.\n"
-"(jakákoliv, kterou můžete předat do funkcí AperosEngine.register_*())"
+"(jakákoliv, kterou můžete předat do funkcí minetest.register_*())"
 
 #: src/settings_translation_file.cpp
 msgid ""
@@ -5196,11 +5197,11 @@ msgstr "Množství zpráv, které může hráč odeslat za 10 vteřin."
 #: src/settings_translation_file.cpp
 msgid ""
 "Number of threads to use for mesh generation.\n"
-"Value of 0 (default) will let AperosEngine autodetect the number of available "
+"Value of 0 (default) will let Minetest autodetect the number of available "
 "threads."
 msgstr ""
 "Počet vláken pro generování sítě. \n"
-"Hodnota 0 (výchozí) umožní AperosEngineu automaticky zjistit počet dostupných "
+"Hodnota 0 (výchozí) umožní Minetestu automaticky zjistit počet dostupných "
 "vláken."
 
 #: src/settings_translation_file.cpp
@@ -5352,12 +5353,12 @@ msgstr "Adresa naslouchače Promethea"
 #: src/settings_translation_file.cpp
 msgid ""
 "Prometheus listener address.\n"
-"If AperosEngine is compiled with ENABLE_PROMETHEUS option enabled,\n"
+"If Minetest is compiled with ENABLE_PROMETHEUS option enabled,\n"
 "enable metrics listener for Prometheus on that address.\n"
 "Metrics can be fetched on http://127.0.0.1:30000/metrics"
 msgstr ""
 "Adresa naslouchače Promethea. \n"
-"Pokud je AperosEngine zkompilován s povolenou možností ENABLE_PROMETHEUS, \n"
+"Pokud je Minetest zkompilován s povolenou možností ENABLE_PROMETHEUS, \n"
 "povolit na této adrese naslouchače metrik pro Promethea. \n"
 "Metriky lze získat na http://127.0.0.1:30000/metrics"
 
@@ -5853,7 +5854,7 @@ msgid "Shader path"
 msgstr "Cesta k shaderům"
 
 #: src/settings_translation_file.cpp
-msgid "Effects"
+msgid "Shaders"
 msgstr "Shadery"
 
 #: src/settings_translation_file.cpp
@@ -6250,7 +6251,7 @@ msgid ""
 "Easy to use and well-known from other games that shall not be named.\n"
 "\n"
 "* long_tap\n"
-"Known from the classic AperosEngine mobile controls.\n"
+"Known from the classic Minetest mobile controls.\n"
 "Combat is more or less impossible."
 msgstr ""
 
@@ -6515,11 +6516,11 @@ msgstr ""
 #: src/settings_translation_file.cpp
 #, fuzzy
 msgid ""
-"URL to JSON file which provides information about the newest AperosEngine "
+"URL to JSON file which provides information about the newest Minetest "
 "release\n"
 "If this is empty the engine will never check for updates."
 msgstr ""
-"URL k souboru JSON, který poskytuje informace o nejnovější verzi AperosEngineu"
+"URL k souboru JSON, který poskytuje informace o nejnovější verzi Minetestu"
 
 #: src/settings_translation_file.cpp
 msgid "URL to the server list displayed in the Multiplayer Tab."
@@ -6933,11 +6934,11 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"Windows systems only: Start AperosEngine with the command line window in the "
+"Windows systems only: Start Minetest with the command line window in the "
 "background.\n"
 "Contains the same information as the file debug.txt (default name)."
 msgstr ""
-"Pouze systémy Windows: Spusťte AperosEngine s oknem příkazového řádku na "
+"Pouze systémy Windows: Spusťte Minetest s oknem příkazového řádku na "
 "pozadí. \n"
 "Obsahuje stejné informace jako soubor debug.txt (výchozí název)."
 
@@ -7338,8 +7339,8 @@ msgstr "cURL limit paralelních stahování"
 #~ msgid "Down"
 #~ msgstr "Dolů"
 
-#~ msgid "Download a game, such as AperosVoxel, from aperosvoxel.domain"
-#~ msgstr "Stáhněte si z aperosvoxel.domain hru, například AperosVoxel"
+#~ msgid "Download a game, such as Minetest Game, from aperosvoxel.domain"
+#~ msgstr "Stáhněte si z aperosvoxel.domain hru, například Minetest Game"
 
 #~ msgid "Download one from aperosvoxel.domain"
 #~ msgstr "Stáhněte si jednu z aperosvoxel.domain"
@@ -8182,10 +8183,10 @@ msgstr "cURL limit paralelních stahování"
 #~ "html#a54da2a0e231901735e3da1b0edf72eb3"
 
 #~ msgid ""
-#~ "Keybindings. (If this menu screws up, remove stuff from aperosengine.conf)"
+#~ "Keybindings. (If this menu screws up, remove stuff from minetest.conf)"
 #~ msgstr ""
 #~ "Nastavení kláves (pokud toto menu je špatně naformátované, upravte "
-#~ "nastavení v aperosengine.conf)"
+#~ "nastavení v minetest.conf)"
 
 #~ msgid "Large chat console key"
 #~ msgstr "Klávesa velkého chatu"

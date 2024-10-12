@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Korean (AperosEngine)\n"
+"Project-Id-Version: Korean (Minetest)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-11 15:14+0200\n"
 "PO-Revision-Date: 2024-01-11 09:06+0000\n"
 "Last-Translator: dog <dog808657@gmail.com>\n"
-"Language-Team: Korean <https://hosted.weblate.org/projects/AperosEngine/AperosEngine/"
+"Language-Team: Korean <https://hosted.weblate.org/projects/aperosengine/aperosengine/"
 "ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -181,8 +181,8 @@ msgid "Back to Main Menu"
 msgstr "주 메뉴로 돌아가기"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
-msgid "ContentDB is not available when AperosEngine was compiled without cURL"
-msgstr "cURL 없이 AperosEngine를 컴파일한 경우 ContentDB를 사용할 수 없습니다"
+msgid "ContentDB is not available when Minetest was compiled without cURL"
+msgstr "cURL 없이 Minetest를 컴파일한 경우 ContentDB를 사용할 수 없습니다"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid "Downloading..."
@@ -688,23 +688,23 @@ msgstr ""
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"For a long time, the AperosEngine engine shipped with a default game called "
-"\"AperosVoxel\". Since AperosEngine 5.8.0, AperosEngine ships without a default "
+"For a long time, the Minetest engine shipped with a default game called "
+"\"Minetest Game\". Since Minetest 5.8.0, Minetest ships without a default "
 "game."
 msgstr ""
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"If you want to continue playing in your AperosVoxel worlds, you need to "
-"reinstall AperosVoxel."
+"If you want to continue playing in your Minetest Game worlds, you need to "
+"reinstall Minetest Game."
 msgstr ""
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "AperosVoxel is no longer installed by default"
+msgid "Minetest Game is no longer installed by default"
 msgstr ""
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Reinstall AperosVoxel"
+msgid "Reinstall Minetest Game"
 msgstr ""
 
 #: builtin/mainmenu/dlg_rename_modpack.lua
@@ -1086,12 +1086,13 @@ msgid "Install games from ContentDB"
 msgstr "ContentDB에서 게임 설치"
 
 #: builtin/mainmenu/tab_local.lua
-msgid "Aperos Engine doesn't come with the AperosVoxel by default."
+msgid "Minetest doesn't come with a game by default."
 msgstr ""
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"Aperos Engine is a game creation platform that allows you to create different games."
+"Minetest is a game-creation platform that allows you to play many different "
+"games."
 msgstr ""
 
 #: builtin/mainmenu/tab_local.lua
@@ -2905,14 +2906,14 @@ msgid ""
 "software',\n"
 "as defined by the Free Software Foundation.\n"
 "You can also specify content ratings.\n"
-"These flags are independent from AperosEngine versions,\n"
+"These flags are independent from Minetest versions,\n"
 "so see a full list at https://content.aperosvoxel.domain/help/content_flags/"
 msgstr ""
 "컨텐츠 저장소에서 쉼표로 구분된 숨겨진 플래그 목록입니다.\n"
 "\"nonfree\"는 Free Software Foundation에서 정의한대로 '자유 소프트웨어'로 분"
 "류되지 않는 패키지를 숨기는 데 사용할 수 있습니다,\n"
 "콘텐츠 등급을 지정할 수도 있습니다.\n"
-"이 플래그는 AperosEngine 버전과 독립적이므로. \n"
+"이 플래그는 Minetest 버전과 독립적이므로. \n"
 "https://content.aperosvoxel.domain/help/content_flags/에서,\n"
 "전체 목록을 참조하십시오."
 
@@ -3107,7 +3108,7 @@ msgid ""
 "expecting.\n"
 "This allows for more fine-grained control than "
 "strict_protocol_version_checking.\n"
-"AperosEngine still enforces its own internal minimum, and enabling\n"
+"Minetest still enforces its own internal minimum, and enabling\n"
 "strict_protocol_version_checking will effectively override this."
 msgstr ""
 "오래된 클라이언트 연결을 허락하지 않는것을 사용.\n"
@@ -4095,7 +4096,7 @@ msgstr ""
 #: src/settings_translation_file.cpp
 msgid ""
 "Instrument global callback functions on registration.\n"
-"(anything you pass to a AperosEngine.register_*() function)"
+"(anything you pass to a minetest.register_*() function)"
 msgstr ""
 
 #: src/settings_translation_file.cpp
@@ -4960,7 +4961,7 @@ msgstr "플레이어가 10 초당 보낼 수있는 메시지의 양."
 #: src/settings_translation_file.cpp
 msgid ""
 "Number of threads to use for mesh generation.\n"
-"Value of 0 (default) will let AperosEngine autodetect the number of available "
+"Value of 0 (default) will let Minetest autodetect the number of available "
 "threads."
 msgstr ""
 
@@ -5094,7 +5095,7 @@ msgstr ""
 #: src/settings_translation_file.cpp
 msgid ""
 "Prometheus listener address.\n"
-"If AperosEngine is compiled with ENABLE_PROMETHEUS option enabled,\n"
+"If Minetest is compiled with ENABLE_PROMETHEUS option enabled,\n"
 "enable metrics listener for Prometheus on that address.\n"
 "Metrics can be fetched on http://127.0.0.1:30000/metrics"
 msgstr ""
@@ -5553,7 +5554,7 @@ msgid "Shader path"
 msgstr "쉐이더 경로"
 
 #: src/settings_translation_file.cpp
-msgid "Effects"
+msgid "Shaders"
 msgstr "쉐이더"
 
 #: src/settings_translation_file.cpp
@@ -5889,7 +5890,7 @@ msgid ""
 "Easy to use and well-known from other games that shall not be named.\n"
 "\n"
 "* long_tap\n"
-"Known from the classic AperosEngine mobile controls.\n"
+"Known from the classic Minetest mobile controls.\n"
 "Combat is more or less impossible."
 msgstr ""
 
@@ -6109,7 +6110,7 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"URL to JSON file which provides information about the newest AperosEngine "
+"URL to JSON file which provides information about the newest Minetest "
 "release\n"
 "If this is empty the engine will never check for updates."
 msgstr ""
@@ -6487,7 +6488,7 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"Windows systems only: Start AperosEngine with the command line window in the "
+"Windows systems only: Start Minetest with the command line window in the "
 "background.\n"
 "Contains the same information as the file debug.txt (default name)."
 msgstr ""
@@ -6845,8 +6846,8 @@ msgstr ""
 #~ msgid "Down"
 #~ msgstr "아래"
 
-#~ msgid "Download a game, such as AperosVoxel, from aperosvoxel.domain"
-#~ msgstr "aperosvoxel.domain에서 AperosVoxel 같은 서브 게임을 다운로드하세요"
+#~ msgid "Download a game, such as Minetest Game, from aperosvoxel.domain"
+#~ msgstr "aperosvoxel.domain에서 Minetest Game 같은 서브 게임을 다운로드하세요"
 
 #~ msgid "Download one from aperosvoxel.domain"
 #~ msgstr "aperosvoxel.domain에서 다운로드 하세요"
@@ -7646,9 +7647,9 @@ msgstr ""
 #~ "html#a54da2a0e231901735e3da1b0edf72eb3 참조"
 
 #~ msgid ""
-#~ "Keybindings. (If this menu screws up, remove stuff from aperosengine.conf)"
+#~ "Keybindings. (If this menu screws up, remove stuff from minetest.conf)"
 #~ msgstr ""
-#~ "Keybindings. (이 메뉴를 고정하려면 AperosEngine.cof에서 stuff를 제거해야합니"
+#~ "Keybindings. (이 메뉴를 고정하려면 minetest.cof에서 stuff를 제거해야합니"
 #~ "다.)"
 
 #~ msgid "Large chat console key"

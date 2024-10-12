@@ -179,6 +179,7 @@ void PlayerControl::setMovementFromKeys()
 		a_down = direction_keys & (1 << 1),
 		a_left = direction_keys & (1 << 2),
 		a_right = direction_keys & (1 << 3);
+
 	if (a_up || a_down || a_left || a_right)  {
 		// if contradictory keys pressed, stay still
 		if (a_up && a_down && a_left && a_right)
@@ -191,6 +192,7 @@ void PlayerControl::setMovementFromKeys()
 			// If there is a keyboard event, assume maximum speed
 			movement_speed = 1.0f;
 	}
+
 	// Check keyboard for input
 	float x = 0, y = 0;
 	if (a_up)
@@ -201,6 +203,7 @@ void PlayerControl::setMovementFromKeys()
 		x -= 1;
 	if (a_right)
 		x += 1;
+
 	if (x != 0 || y != 0)
 		// If there is a keyboard event, it takes priority
 		movement_direction = std::atan2(x, y);

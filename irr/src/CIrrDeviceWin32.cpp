@@ -1003,7 +1003,7 @@ void CIrrDeviceWin32::setWindowCaption(const wchar_t *text)
 bool CIrrDeviceWin32::setWindowIcon(const video::IImage *img)
 {
 	// Ignore the img, instead load the ICON from resource file
-	// (This is minetest-specific!)
+	// (This is aperosengine-specific!)
 	const HICON hicon = LoadIcon(GetModuleHandle(NULL),
 			MAKEINTRESOURCE(130) // The ID of the ICON defined in
 								 // winresource.rc

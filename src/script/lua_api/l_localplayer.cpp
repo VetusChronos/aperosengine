@@ -266,7 +266,7 @@ int LuaLocalPlayer::l_get_control(lua_State *L)
 	lua_setfield(L, -2, "movement_x");
 	lua_pushnumber(L, movement.Y);
 	lua_setfield(L, -2, "movement_y");
-	
+
 	set("up",    c.direction_keys & (1 << 0));
 	set("down",  c.direction_keys & (1 << 1));
 	set("left",  c.direction_keys & (1 << 2));

@@ -114,7 +114,7 @@ void TestSocket::testIPv6Socket()
 		/* Note: Failing to create an IPv6 socket is not technically an
 		   error because the OS may not support IPv6 or it may
 		   have been disabled. IPv6 is not /required/ by
-		   aperosengine and therefore this should not cause the unit
+		   minetest and therefore this should not cause the unit
 		   test to fail
 		*/
 		dstream << "WARNING: IPv6 socket creation failed (unit test)"

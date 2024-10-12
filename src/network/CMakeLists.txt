@@ -1,8 +1,8 @@
 set(common_network_SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/address.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/connection.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/atp/impl.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/atp/threads.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/aprp/impl.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/aprp/threads.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/networkpacket.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/networkprotocol.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/serveropcodes.cpp

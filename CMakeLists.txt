@@ -58,7 +58,7 @@ set(ENABLE_LTO ${DEFAULT_ENABLE_LTO} CACHE BOOL "Use Link Time Optimization")
 
 set(BUILD_WITH_TRACY FALSE CACHE BOOL
 	"Fetch and build with the Tracy profiler client")
-set(FETCH_TRACY_GIT_TAG "main" CACHE STRING
+set(FETCH_TRACY_GIT_TAG "master" CACHE STRING
 	"Git tag for fetching Tracy client. Match with your server (gui) version")
 
 set(DEFAULT_RUN_IN_PLACE FALSE)
@@ -92,7 +92,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 # Load default options for Android
 if(ANDROID)
 	cmake_minimum_required(VERSION 3.20)
-	include(AperosVoxelAndroidLibs)
+	include(AperosEngineAndroidLibs)
 endif()
 
 
@@ -142,7 +142,7 @@ endif()
 if(WIN32)
 	set(SHAREDIR ".")
 	set(BINDIR "bin")
-	set(DOCDIR "doc")
+	set(DOCDIR "docs")
 	set(EXAMPLE_CONF_DIR ".")
 	set(LOCALEDIR "locale")
 elseif(APPLE)
@@ -157,7 +157,7 @@ elseif(UNIX) # Linux, BSD etc
 	if(RUN_IN_PLACE)
 		set(SHAREDIR ".")
 		set(BINDIR "bin")
-		set(DOCDIR "doc")
+		set(DOCDIR "docs")
 		set(EXAMPLE_CONF_DIR ".")
 		set(MANDIR "unix/man")
 		set(XDG_APPS_DIR "unix/applications")
@@ -253,25 +253,25 @@ if(BUILD_CLIENT)
 endif()
 
 install(FILES "README.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
-install(FILES "docs/locales/en/lua_api.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
-install(FILES "docs/locales/en/client_lua_api.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
-install(FILES "docs/locales/en/menu_lua_api.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
-install(FILES "docs/locales/en/texture_packs.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
-install(FILES "docs/locales/en/world_format.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
+install(FILES "docs/en/modding/lua_api.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
+install(FILES "docs/en/modding/client_lua_api.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
+install(FILES "docs/en/modding/menu_lua_api.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
+install(FILES "docs/en/modding/texture_packs.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
+install(FILES "docs/en/modding/world_format.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
 install(FILES "aperosengine.conf.example" DESTINATION "${EXAMPLE_CONF_DIR}")
 
 if(UNIX AND NOT APPLE)
-	install(FILES "docs/locales/en/aperosengine.6" "docs/locales/en/aperosengine.6" DESTINATION "${MANDIR}/man6")
+	install(FILES "docs/en/aperosengine.6" "docs/en/aperosengineserver.6" DESTINATION "${MANDIR}/man6")
 	install(FILES "misc/net.aperosengine.aperosengine.desktop" DESTINATION "${XDG_APPS_DIR}")
 	install(FILES "misc/net.aperosengine.aperosengine.metainfo.xml" DESTINATION "${METAINFODIR}")
-	#install(FILES "misc/aperosengine.svg" DESTINATION "${ICONDIR}/hicolor/scalable/apps")
+	install(FILES "misc/aperosengine.svg" DESTINATION "${ICONDIR}/hicolor/scalable/apps")
 	install(FILES "misc/aperosengine-xorg-icon-128.png"
 		DESTINATION "${ICONDIR}/hicolor/128x128/apps"
 		RENAME "aperosengine.png")
 endif()
 
 if(APPLE)
-	install(FILES "misc/aperosengine-icon.ico" DESTINATION "${SHAREDIR}")
+	install(FILES "misc/aperosengine-icon.icns" DESTINATION "${SHAREDIR}")
 	install(FILES "misc/Info.plist" DESTINATION "${BUNDLE_PATH}/Contents")
 endif()
 
@@ -296,7 +296,7 @@ add_subdirectory(src)
 
 # CPack
 
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A free open source voxel game engine focusing on ease of modding and game creation.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A free open-source voxel game engine with easy modding and game creation.")
 set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
@@ -338,7 +338,7 @@ if(WIN32)
 		set(CPACK_WIX_UI_BANNER "${CMAKE_CURRENT_SOURCE_DIR}/misc/CPACK_WIX_UI_BANNER.BMP")
 		set(CPACK_WIX_UI_DIALOG "${CMAKE_CURRENT_SOURCE_DIR}/misc/CPACK_WIX_UI_DIALOG.BMP")
 
-		set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/docs/locales/en/lgpl-2.1.txt")
+		set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/docs/LGPL-2.1.md")
 
 		# The correct way would be to include both x32 and x64 into one installer
 		# and install the appropriate one.
@@ -366,10 +366,10 @@ include(CPack)
 if(BUILD_DOCUMENTATION)
 	find_package(Doxygen)
 	if(DOXYGEN_FOUND)
-		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/locales/en/Doxyfile.in
-				${CMAKE_CURRENT_BINARY_DIR}/docs/locales/en/Doxyfile @ONLY)
+		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/en/Doxyfile.in
+				${CMAKE_CURRENT_BINARY_DIR}/docs/en/Doxyfile @ONLY)
 		add_custom_target(doc
-			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/docs/locales/en/Doxyfile
+			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/docs/en/Doxyfile
 			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc
 			COMMENT "Generating API documentation with Doxygen" VERBATIM
 		)

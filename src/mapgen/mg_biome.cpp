@@ -1,6 +1,6 @@
 /*
 Minetest
-Copyright (C) 2014-2018 kwolekr, Ryan Kwolek <kwolekr@aperosvoxel.domain>
+Copyright (C) 2014-2018 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
 Copyright (C) 2014-2018 paramat
 
 This program is free software; you can redistribute it and/or modify

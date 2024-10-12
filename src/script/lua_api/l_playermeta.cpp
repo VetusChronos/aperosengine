@@ -38,7 +38,7 @@ void PlayerMetaRef::clearMeta()
 
 void PlayerMetaRef::reportMetadataChange(const std::string *name)
 {
-	// The server saves these on its own
+	// the server saves these on its own
 }
 
 // Creates an PlayerMetaRef and leaves it on top of stack

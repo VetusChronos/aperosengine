@@ -33,7 +33,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <cassert>
 
 /*
- * Redis is not a good fit for AperosEngine and only still supported for legacy as
+ * Redis is not a good fit for Minetest and only still supported for legacy as
  * well as advanced use case reasons, see:
  * <https://github.com/minetest/minetest/issues/14822>
  *

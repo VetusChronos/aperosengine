@@ -109,7 +109,7 @@ void NodeTimerList::deSerialize(std::istream &is, u8 map_format_version)
 			warningstream<<"NodeTimerList::deSerialize(): "
 					<<"invalid data at position"
 					<<"("<<p.X<<","<<p.Y<<","<<p.Z<<"): Ignoring."
-					<<'\n';
+					<< '\n';
 			continue;
 		}
 
@@ -117,7 +117,7 @@ void NodeTimerList::deSerialize(std::istream &is, u8 map_format_version)
 			warningstream<<"NodeTimerList::deSerialize(): "
 					<<"already set data at position"
 					<<"("<<p.X<<","<<p.Y<<","<<p.Z<<"): Ignoring."
-					<<'\n';
+					<< '\n';
 			continue;
 		}
 

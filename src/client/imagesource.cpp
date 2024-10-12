@@ -357,7 +357,7 @@ void upscaleImagesToMatchLargest(video::IImage *& img1,
 
 void blitBaseImage(video::IImage* &src, video::IImage* &dst)
 {
-	//infostream<<"Blitting "<<part_of_name<<" on base"<<'\n';
+	//infostream<<"Blitting "<<part_of_name<<" on base"<< '\n';
 	upscaleImagesToMatchLargest(dst, src);
 
 	// Size of the copied area
@@ -1326,7 +1326,7 @@ bool ImageSource::generateImagePart(std::string_view part_of_name,
 			if (baseimg) {
 				errorstream<<"generateImagePart(): baseimg != NULL "
 						<<"for part_of_name=\""<<part_of_name
-						<<"\", cancelling."<<'\n';
+						<<"\", cancelling."<< '\n';
 				return false;
 			}
 
@@ -1448,7 +1448,7 @@ bool ImageSource::generateImagePart(std::string_view part_of_name,
 			video::IImage *img = generateImage(filename, source_image_names);
 			if (img) {
 				upscaleImagesToMatchLargest(baseimg, img);
-				
+
 				apply_mask(img, baseimg, v2s32(0, 0), v2s32(0, 0),
 						img->getDimension());
 				img->drop();

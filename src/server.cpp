@@ -21,6 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <iostream>
 #include <queue>
 #include <algorithm>
+#include "irr_v2d.h"
 #include "network/connection.h"
 #include "network/networkprotocol.h"
 #include "network/serveropcodes.h"
@@ -85,6 +86,15 @@ public:
 	{}
 };
 
+ModIPCStore::~ModIPCStore()
+{
+	// we don't have to do this, it's pure debugging aid
+	if (!std::unique_lock(mutex, std::try_to_lock).owns_lock()) {
+		errorstream << FUNCTION_NAME << ": lock is still in use!" << '\n';
+		assert(0);
+	}
+}
+
 class ServerThread : public Thread
 {
 public:
@@ -133,9 +143,13 @@ void *ServerThread::run()
 
 		u64 t0 = porting::getTimeUs();
 
-		const Server::StepSettings step_settings = m_server->getStepSettings();
+		const auto step_settings = m_server->getStepSettings();
 
 		try {
+			// see explanation inside
+			if (dtime > step_settings.steplen)
+				m_server->yieldToOtherThreads(dtime);
+
 			m_server->AsyncRunStep(step_settings.pause ? 0.0f : dtime);
 
 			const float remaining_time = step_settings.steplen
@@ -143,9 +157,9 @@ void *ServerThread::run()
 			m_server->Receive(remaining_time);
 
 		} catch (con::PeerNotFoundException &e) {
-			infostream<<"Server: PeerNotFoundException"<<'\n';
+			infostream<<"Server: PeerNotFoundException"<< '\n';
 		} catch (ClientNotFoundException &e) {
-			infostream<<"Server: ClientNotFoundException"<<'\n';
+			infostream<<"Server: ClientNotFoundException"<< '\n';
 		} catch (con::ConnectionBindFailed &e) {
 			m_server->setAsyncFatalError(e.what());
 		} catch (LuaError &e) {
@@ -265,7 +279,7 @@ Server::Server(
 	m_simple_singleplayer_mode(simple_singleplayer_mode),
 	m_dedicated(dedicated),
 	m_async_fatal_error(""),
-	m_con(con::createATP(CONNECTION_TIMEOUT, m_bind_addr.isIPv6(), this)),
+	m_con(con::createAPRP(CONNECTION_TIMEOUT, m_bind_addr.isIPv6(), this)),
 	m_itemdef(createItemDefManager()),
 	m_nodedef(createNodeDefManager()),
 	m_craftdef(createCraftDefManager()),
@@ -290,15 +304,15 @@ Server::Server(
 #endif
 		m_metrics_backend = std::make_unique<MetricsBackend>();
 
-	m_uptime_counter = m_metrics_backend->addCounter("aperosengine_core_server_uptime", "Server uptime (in seconds)");
-	m_player_gauge = m_metrics_backend->addGauge("aperosengine_core_player_number", "Number of connected players");
+	m_uptime_counter = m_metrics_backend->addCounter("minetest_core_server_uptime", "Server uptime (in seconds)");
+	m_player_gauge = m_metrics_backend->addGauge("minetest_core_player_number", "Number of connected players");
 
 	m_timeofday_gauge = m_metrics_backend->addGauge(
-			"aperosengine_core_timeofday",
+			"minetest_core_timeofday",
 			"Time of day value");
 
 	m_lag_gauge = m_metrics_backend->addGauge(
-			"aperosengine_core_latency",
+			"minetest_core_latency",
 			"Latency value (in seconds)");
 
 
@@ -307,20 +321,20 @@ Server::Server(
 		std::string help_str("Number of active object messages generated (");
 		help_str.append(aom_types[i]).append(")");
 		m_aom_buffer_counter[i] = m_metrics_backend->addCounter(
-				"aperosengine_core_aom_generated_count", help_str,
+				"minetest_core_aom_generated_count", help_str,
 				{{"type", aom_types[i]}});
 	}
 
 	m_packet_recv_counter = m_metrics_backend->addCounter(
-			"aperosengine_core_server_packet_recv",
+			"minetest_core_server_packet_recv",
 			"Processable packets received");
 
 	m_packet_recv_processed_counter = m_metrics_backend->addCounter(
-			"aperosengine_core_server_packet_recv_processed",
+			"minetest_core_server_packet_recv_processed",
 			"Valid received packets processed");
 
 	m_map_edit_event_counter = m_metrics_backend->addCounter(
-			"aperosengine_core_map_edit_events",
+			"minetest_core_map_edit_events",
 			"Number of map edit events");
 
 	m_lag_gauge->set(g_settings->getFloat("dedicated_server_step"));
@@ -409,7 +423,7 @@ Server::~Server()
 		}
 	}
 
-	// Emerge may depend on definition managers, so destroy first
+	// emerge may depend on definition managers, so destroy first
 	m_emerge.reset();
 
 	// Delete the rest in the reverse order of creation
@@ -571,38 +585,38 @@ void Server::start()
 	m_thread->start();
 
 	// ASCII art for the win!
-	const std::array<const char *, 6> ascii_art = {
-		"   _____                                    ",
-		"  /  _  \\ ______   ___________  ____  ______",
-		" /  /_\\  \\\\____ \\_/ __ \\_  __ \\/  _ \\/  ___/",
-		"/    |    \\  |_> >  ___/|  | \\(  <_> )___ \\ ",
-		"\\____|__  /   __/ \\___  >__|   \\____/____  >",
-		"        \\/|__|        \\/                 \\/ "
+	const char *art[] = {
+		"         __.               __.                 __.  ",
+		"  _____ |__| ____   _____ /  |_  _____  _____ /  |_ ",
+		" /     \\|  |/    \\ /  __ \\    _\\/  __ \\/   __>    _\\",
+		"|  Y Y  \\  |   |  \\   ___/|  | |   ___/\\___  \\|  |  ",
+		"|__|_|  /  |___|  /\\______>  |  \\______>_____/|  |  ",
+		"      \\/ \\/     \\/         \\/                  \\/   "
 	};
 
 	if (!m_admin_chat) {
-		// We're not printing to rawstream to avoid it showing up in the logs.
+		// we're not printing to rawstream to avoid it showing up in the logs.
 		// however it would then mess up the ncurses terminal (m_admin_chat),
 		// so we skip it in that case.
-		for (const auto &line : ascii_art) {
+		for (auto line : art)
 			std::cerr << line << '\n';
-		}
 	}
 	actionstream << "World at [" << m_path_world << "]" << '\n';
-	actionstream << "Server for gameid=\"" << m_gamespec.id << "\" listening on ";
+	actionstream << "Server for gameid=\"" << m_gamespec.id
+			<< "\" listening on ";
 	m_bind_addr.print(actionstream);
 	actionstream << "." << '\n';
 }
 
 void Server::stop()
 {
-	infostream<<"Server: Stopping and waiting for threads"<<'\n';
+	infostream<<"Server: Stopping and waiting for threads"<< '\n';
 
 	// Stop threads (set run=false first so both start stopping)
 	m_thread->stop();
 	m_thread->wait();
 
-	infostream<<"Server: Threads stopped"<<'\n';
+	infostream<<"Server: Threads stopped"<< '\n';
 }
 
 void Server::step()
@@ -662,7 +676,7 @@ void Server::AsyncRunStep(float dtime, bool initial_step)
 	{
 		EnvAutoLock lock(this);
 		float max_lag = m_env->getMaxLagEstimate();
-		constexpr float lag_warn_threshold = 2.0f;
+		constexpr float lag_warn_threshold = 1.0f;
 
 		// Decrease value gradually, halve it every minute.
 		if (m_max_lag_decrease.step(dtime, 0.5f)) {
@@ -792,7 +806,7 @@ void Server::AsyncRunStep(float dtime, bool initial_step)
 		Check added and deleted active objects
 	*/
 	{
-		//infostream<<"Server: Checking added and deleted active objects"<<'\n';
+		//infostream<<"Server: Checking added and deleted active objects"<< '\n';
 		EnvAutoLock envlock(this);
 
 		// This guarantees that each object recomputes its cache only once per server step,
@@ -1118,6 +1132,52 @@ void Server::Receive(float timeout)
 			infostream << "Server: ClientNotFoundException" << '\n';
 		}
 	}
+}
+
+void Server::yieldToOtherThreads(float dtime)
+{
+	/*
+	 * Problem: the server thread and emerge thread compete for the envlock.
+	 * While the emerge thread needs it just once or twice for every processed item
+	 * the server thread uses it much more generously.
+	 * This is usually not a problem as the server sleeps between steps, which leaves
+	 * enough chance. But if the server is overloaded it's busy all the time and
+	 * - even with a fair envlock - the emerge thread can't get up to speed.
+	 * This generally has a much worse impact on gameplay than server lag itself
+	 * ever would.
+	 *
+	 * Workaround: If we detect that the server is overloaded, introduce some careful
+	 * artificial sleeps to leave the emerge threads enough chance to do their job.
+	 *
+	 * In the future the emerge code should be reworked to exclusively use a result
+	 * queue, thereby avoiding this problem (and terrible workaround).
+	 */
+
+	// don't activate workaround too quickly
+	constexpr size_t MIN_EMERGE_QUEUE_SIZE = 32;
+	const size_t qs_initial = m_emerge->getQueueSize();
+	if (qs_initial < MIN_EMERGE_QUEUE_SIZE)
+		return;
+
+	// give the thread a chance to run for every 28ms (on average)
+	// this was experimentally determined
+	const float QUANTUM = 28.0f / 1000;
+	// put an upper limit to not cause too much lag, also so this doesn't become self-sustaining
+	const int SLEEP_MAX = 10;
+
+	int sleep_count = std::clamp<int>(dtime / QUANTUM, 1, SLEEP_MAX);
+
+	ScopeProfiler sp(g_profiler, "Server::yieldTo...() sleep", SPT_AVG);
+	size_t qs = qs_initial;
+	while (sleep_count-- > 0) {
+		sleep_ms(1);
+		// abort if we don't make progress
+		size_t qs2 = m_emerge->getQueueSize();
+		if (qs2 >= qs || qs2 == 0)
+			break;
+		qs = qs2;
+	}
+	g_profiler->avg("Server::yieldTo...() progress [#]", qs_initial - qs);
 }
 
 PlayerSAO* Server::StageTwoClientInit(session_t peer_id)
@@ -1869,6 +1929,8 @@ void Server::SendSetLighting(session_t peer_id, const Lighting &lighting)
 			<< lighting.exposure.center_weight_power;
 
 	pkt << lighting.volumetric_light_strength << lighting.shadow_tint;
+	pkt << lighting.bloom_intensity << lighting.bloom_strength_factor <<
+			lighting.bloom_radius;
 
 	Send(&pkt);
 }
@@ -1935,14 +1997,20 @@ void Server::SendPlayerFov(session_t peer_id)
 	Send(&pkt);
 }
 
-void Server::SendLocalPlayerAnimations(session_t peer_id, v2s32 animation_frames[4],
+void Server::SendLocalPlayerAnimations(session_t peer_id, v2f animation_frames[4],
 		f32 animation_speed)
 {
 	NetworkPacket pkt(TOCLIENT_LOCAL_PLAYER_ANIMATIONS, 0,
 		peer_id);
 
-	pkt << animation_frames[0] << animation_frames[1] << animation_frames[2]
-			<< animation_frames[3] << animation_speed;
+	for (int i = 0; i < 4; ++i) {
+		if (m_clients.getProtocolVersion(peer_id) >= 46) {
+			pkt << animation_frames[i];
+		} else {
+			pkt << v2s32::from(animation_frames[i]);
+		}
+	}
+	pkt  << animation_speed;
 
 	Send(&pkt);
 }
@@ -2137,7 +2205,7 @@ s32 Server::playSound(ServerPlayingSound &params, bool ephemeral)
 		RemotePlayer *player = m_env->getPlayer(params.to_player.c_str());
 		if(!player){
 			infostream<<"Server::playSound: Player \""<<params.to_player
-					<<"\" not found"<<'\n';
+					<<"\" not found"<< '\n';
 			return -1;
 		}
 		dst_clients.push_back(player->getPeerId());
@@ -2631,7 +2699,7 @@ void Server::sendRequestedMedia(session_t peer_id,
 
 		if (it == m_media.end()) {
 			errorstream<<"Server::sendRequestedMedia(): Client asked for "
-					<<"unknown file \""<<(name)<<"\""<<'\n';
+					<<"unknown file \""<<(name)<<"\""<< '\n';
 			continue;
 		}
 		const auto &m = it->second;
@@ -3372,7 +3440,7 @@ Address Server::getPeerAddress(session_t peer_id)
 }
 
 void Server::setLocalPlayerAnimations(RemotePlayer *player,
-		v2s32 animation_frames[4], f32 frame_speed)
+		v2f animation_frames[4], f32 frame_speed)
 {
 	sanity_check(player);
 	player->setLocalAnimations(animation_frames, frame_speed);
@@ -3696,7 +3764,7 @@ bool Server::dynamicAddMedia(const DynamicMediaArgs &a)
 bool Server::rollbackRevertActions(const std::list<RollbackAction> &actions,
 		std::list<std::string> *log)
 {
-	infostream<<"Server::rollbackRevertActions(len="<<actions.size()<<")"<<'\n';
+	infostream<<"Server::rollbackRevertActions(len="<<actions.size()<<")"<< '\n';
 	auto *map = &m_env->getServerMap();
 
 	// Fail if no actions to handle
@@ -3716,20 +3784,20 @@ bool Server::rollbackRevertActions(const std::list<RollbackAction> &actions,
 			num_failed++;
 			std::ostringstream os;
 			os<<"Revert of step ("<<num_tried<<") "<<action.toString()<<" failed";
-			infostream<<"Map::rollbackRevertActions(): "<<os.str()<<'\n';
+			infostream<<"Map::rollbackRevertActions(): "<<os.str()<< '\n';
 			if (log)
 				log->push_back(os.str());
 		}else{
 			std::ostringstream os;
 			os<<"Successfully reverted step ("<<num_tried<<") "<<action.toString();
-			infostream<<"Map::rollbackRevertActions(): "<<os.str()<<'\n';
+			infostream<<"Map::rollbackRevertActions(): "<<os.str()<< '\n';
 			if (log)
 				log->push_back(os.str());
 		}
 	}
 
 	infostream<<"Map::rollbackRevertActions(): "<<num_failed<<"/"<<num_tried
-			<<" failed"<<'\n';
+			<<" failed"<< '\n';
 
 	// Call it done if less than half failed
 	return num_failed <= num_tried/2;
@@ -3916,7 +3984,7 @@ PlayerSAO* Server::emergePlayer(const char *name, session_t peer_id, u16 proto_v
 
 	// If player is already connected, cancel
 	if (player) {
-		infostream<<"emergePlayer(): Player already connected"<<'\n';
+		infostream<<"emergePlayer(): Player already connected"<< '\n';
 		return NULL;
 	}
 
@@ -3925,7 +3993,7 @@ PlayerSAO* Server::emergePlayer(const char *name, session_t peer_id, u16 proto_v
 	*/
 	if (m_env->getPlayer(peer_id)) {
 		infostream<<"emergePlayer(): Player with wrong name but same"
-				" peer_id already exists"<<'\n';
+				" peer_id already exists"<< '\n';
 		return NULL;
 	}
 
@@ -3969,7 +4037,7 @@ PlayerSAO* Server::emergePlayer(const char *name, session_t peer_id, u16 proto_v
 
 void dedicated_server_loop(Server &server, bool &kill)
 {
-	verbosestream<<"dedicated_server_loop()"<<'\n';
+	verbosestream<<"dedicated_server_loop()"<< '\n';
 
 	IntervalLimiter m_profiler_interval;
 
@@ -4126,24 +4194,24 @@ std::unordered_map<std::string, std::string> Server::getMediaList()
 
 ModStorageDatabase *Server::openModStorageDatabase(const std::string &world_path)
 {
-	std::string world_apr_path = world_path + DIR_DELIM + "world.apr";
-	Settings world_apr;
-	if (!world_apr.readConfigFile(world_apr_path.c_str()))
+	std::string world_mt_path = world_path + DIR_DELIM + "world.apr";
+	Settings world_mt;
+	if (!world_mt.readConfigFile(world_mt_path.c_str()))
 		throw BaseException("Cannot read world.apr!");
 
-	std::string backend = world_apr.exists("mod_storage_backend") ?
-		world_apr.get("mod_storage_backend") : "files";
+	std::string backend = world_mt.exists("mod_storage_backend") ?
+		world_mt.get("mod_storage_backend") : "files";
 	if (backend == "files")
 		warningstream << "/!\\ You are using the old mod storage files backend. "
 			<< "This backend is deprecated and may be removed in a future release /!\\"
 			<< '\n' << "Switching to SQLite3 is advised, "
 			<< "please read http://wiki.aperosvoxel.domain/Database_backends." << '\n';
 
-	return openModStorageDatabase(backend, world_path, world_apr);
+	return openModStorageDatabase(backend, world_path, world_mt);
 }
 
 ModStorageDatabase *Server::openModStorageDatabase(const std::string &backend,
-		const std::string &world_path, const Settings &world_apr)
+		const std::string &world_path, const Settings &world_mt)
 {
 	if (backend == "sqlite3")
 		return new ModStorageDatabaseSQLite3(world_path);
@@ -4151,7 +4219,7 @@ ModStorageDatabase *Server::openModStorageDatabase(const std::string &backend,
 #if USE_POSTGRESQL
 	if (backend == "postgresql") {
 		std::string connect_string;
-		world_apr.getNoEx("pgsql_mod_storage_connection", connect_string);
+		world_mt.getNoEx("pgsql_mod_storage_connection", connect_string);
 		return new ModStorageDatabasePostgreSQL(connect_string);
 	}
 #endif // USE_POSTGRESQL
@@ -4168,15 +4236,15 @@ ModStorageDatabase *Server::openModStorageDatabase(const std::string &backend,
 bool Server::migrateModStorageDatabase(const GameParams &game_params, const Settings &cmd_args)
 {
 	std::string migrate_to = cmd_args.get("migrate-mod-storage");
-	Settings world_apr;
-	std::string world_apr_path = game_params.world_path + DIR_DELIM + "world.apr";
-	if (!world_apr.readConfigFile(world_apr_path.c_str())) {
+	Settings world_mt;
+	std::string world_mt_path = game_params.world_path + DIR_DELIM + "world.apr";
+	if (!world_mt.readConfigFile(world_mt_path.c_str())) {
 		errorstream << "Cannot read world.apr!" << '\n';
 		return false;
 	}
 
-	std::string backend = world_apr.exists("mod_storage_backend") ?
-		world_apr.get("mod_storage_backend") : "files";
+	std::string backend = world_mt.exists("mod_storage_backend") ?
+		world_mt.get("mod_storage_backend") : "files";
 	if (backend == migrate_to) {
 		errorstream << "Cannot migrate: new backend is same"
 			<< " as the old one" << '\n';
@@ -4189,8 +4257,8 @@ bool Server::migrateModStorageDatabase(const GameParams &game_params, const Sett
 	bool succeeded = false;
 
 	try {
-		srcdb = Server::openModStorageDatabase(backend, game_params.world_path, world_apr);
-		dstdb = Server::openModStorageDatabase(migrate_to, game_params.world_path, world_apr);
+		srcdb = Server::openModStorageDatabase(backend, game_params.world_path, world_mt);
+		dstdb = Server::openModStorageDatabase(migrate_to, game_params.world_path, world_mt);
 
 		dstdb->beginSave();
 
@@ -4210,8 +4278,8 @@ bool Server::migrateModStorageDatabase(const GameParams &game_params, const Sett
 
 		actionstream << "Successfully migrated the metadata of "
 			<< mod_list.size() << " mods" << '\n';
-		world_apr.set("mod_storage_backend", migrate_to);
-		if (!world_apr.updateConfigFile(world_apr_path.c_str()))
+		world_mt.set("mod_storage_backend", migrate_to);
+		if (!world_mt.updateConfigFile(world_mt_path.c_str()))
 			errorstream << "Failed to update world.apr!" << '\n';
 		else
 			actionstream << "world.apr updated" << '\n';

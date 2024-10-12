@@ -25,6 +25,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "porting.h"
 #include "mapgen/mapgen.h" // Mapgen::setDefaultSettings
 #include "util/string.h"
+#include "server.h"
+
 
 /*
  * inspired by https://github.com/systemd/systemd/blob/7aed43437175623e0f3ae8b071bbc500c13ce893/src/hostname/hostnamed.c#L406
@@ -96,7 +98,20 @@ void set_default_settings()
 	// Client
 	settings->setDefault("address", "");
 	settings->setDefault("enable_sound", "true");
+#if defined(__unix__) && !defined(__APPLE__) && !defined (__ANDROID__)
+	// On Linux+X11 (not Linux+Wayland or Linux+XWayland), I've encountered a bug
+	// where fake mouse events were generated from touch events if in relative
+	// mouse mode, resulting in the touchscreen controls being instantly disabled
+	// again and thus making them unusable.
+	// => We can't switch based on the last input method used.
+	// => Fall back to hardware detection.
 	settings->setDefault("touch_controls", bool_to_cstr(has_touch));
+#else
+	settings->setDefault("touch_controls", "auto");
+#endif
+	// Since GUI scaling shouldn't suddenly change during a session, we use
+	// hardware detection for "touch_gui" instead of switching based on the last
+	// input method used.
 	settings->setDefault("touch_gui", bool_to_cstr(has_touch));
 	settings->setDefault("sound_volume", "0.8");
 	settings->setDefault("sound_volume_unfocused", "0.3");
@@ -142,7 +157,7 @@ void set_default_settings()
 	settings->setDefault("keymap_drop", "KEY_KEY_Q");
 	settings->setDefault("keymap_zoom", "KEY_KEY_Z");
 	settings->setDefault("keymap_inventory", "KEY_KEY_E");
-	settings->setDefault("keymap_aux1", "KEY_CONTROL");
+	settings->setDefault("keymap_aux1", "KEY_KEY_E");
 	settings->setDefault("keymap_chat", "KEY_KEY_T");
 	settings->setDefault("keymap_cmd", "/");
 	settings->setDefault("keymap_cmd_local", ".");
@@ -257,7 +272,7 @@ void set_default_settings()
 	settings->setDefault("leaves_style", "fancy");
 	settings->setDefault("connected_glass", "true");
 	settings->setDefault("smooth_lighting", "true");
-	settings->setDefault("performance_tradeoffs", "true");
+	settings->setDefault("performance_tradeoffs", "false");
 	settings->setDefault("lighting_alpha", "0.0");
 	settings->setDefault("lighting_beta", "1.5");
 	settings->setDefault("display_gamma", "1.0");
@@ -274,7 +289,7 @@ void set_default_settings()
 	settings->setDefault("view_bobbing_amount", "1.0");
 	settings->setDefault("fall_bobbing_amount", "0.03");
 	settings->setDefault("enable_3d_clouds", "true");
-	settings->setDefault("soft_clouds", "false");
+	settings->setDefault("soft_clouds", "true");
 	settings->setDefault("cloud_radius", "12");
 	settings->setDefault("menu_clouds", "true");
 	settings->setDefault("translucent_liquids", "true");
@@ -331,9 +346,6 @@ void set_default_settings()
 	settings->setDefault("antialiasing", "none");
 	settings->setDefault("enable_bloom", "false");
 	settings->setDefault("enable_bloom_debug", "false");
-	settings->setDefault("bloom_strength_factor", "1.0");
-	settings->setDefault("bloom_intensity", "0.05");
-	settings->setDefault("bloom_radius", "1");
 	settings->setDefault("enable_volumetric_lighting", "false");
 	settings->setDefault("enable_water_reflections", "false");
 	settings->setDefault("enable_translucent_foliage", "false");
@@ -448,7 +460,9 @@ void set_default_settings()
 	settings->setDefault("enable_pvp", "true");
 	settings->setDefault("enable_mod_channels", "false");
 	settings->setDefault("disallow_empty_password", "false");
-	settings->setDefault("disable_anticheat", "false");
+	settings->setDefault("anticheat_flags", flagdesc_anticheat,
+		AC_DIGGING | AC_INTERACTION | AC_MOVEMENT);
+	settings->setDefault("anticheat_movement_tolerance", "1.0");
 	settings->setDefault("enable_rollback_recording", "false");
 	settings->setDefault("deprecated_lua_api_handling", "log");
 
@@ -519,7 +533,7 @@ void set_default_settings()
 	settings->setDefault("liquid_update", "1.0");
 
 	// Mapgen
-	settings->setDefault("mg_name", "v7");
+	settings->setDefault("mg_name", "carpathian");
 	settings->setDefault("water_level", "1");
 	settings->setDefault("mapgen_limit", "31007");
 	settings->setDefault("chunksize", "5");

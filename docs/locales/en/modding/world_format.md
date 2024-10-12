@@ -168,7 +168,7 @@ For `load_mod_<mod>`, the possible values are:
 
 `PostgreSQL` backend specific settings:
 
-    pgsql_connection = host=127.0.0.1 port=5432 user=mt_user password=mt_password dbname=aperosengine
+    pgsql_connection = host=127.0.0.1 port=5432 user=mt_user password=apr_password dbname=aperosengine
     pgsql_player_connection = (same parameters as above)
     pgsql_readonly_connection = (same parameters as above)
     pgsql_auth_connection = (same parameters as above)

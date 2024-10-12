@@ -1,12 +1,12 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Chinese (Traditional) (AperosEngine)\n"
+"Project-Id-Version: Chinese (Traditional) (Minetest)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-11 15:14+0200\n"
 "PO-Revision-Date: 2024-08-10 06:09+0000\n"
 "Last-Translator: hugoalh <hugoalh@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Traditional) <https://hosted.weblate.org/projects/"
-"AperosEngine/AperosEngine/zh_Hant/>\n"
+"minetest/minetest/zh_Hant/>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -171,8 +171,8 @@ msgid "Back to Main Menu"
 msgstr "返回主選單"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
-msgid "ContentDB is not available when AperosEngine was compiled without cURL"
-msgstr "在沒有 cURL 的情況下編譯 AperosEngine 時，ContentDB 不可用"
+msgid "ContentDB is not available when Minetest was compiled without cURL"
+msgstr "在沒有 cURL 的情況下編譯 Minetest 時，ContentDB 不可用"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid "Downloading..."
@@ -664,27 +664,27 @@ msgstr "忽略"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"For a long time, the AperosEngine engine shipped with a default game called "
-"\"AperosVoxel\". Since AperosEngine 5.8.0, AperosEngine ships without a default "
+"For a long time, the Minetest engine shipped with a default game called "
+"\"Minetest Game\". Since Minetest 5.8.0, Minetest ships without a default "
 "game."
 msgstr ""
-"長期以來，AperosEngine 引擎附帶了一個名為「AperosVoxel」的預設遊戲。 自 "
-"AperosEngine 5.8.0 起，AperosEngine 不再提供預設遊戲。"
+"長期以來，Minetest 引擎附帶了一個名為「Minetest Game」的預設遊戲。 自 "
+"Minetest 5.8.0 起，Minetest 不再提供預設遊戲。"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"If you want to continue playing in your AperosVoxel worlds, you need to "
-"reinstall AperosVoxel."
+"If you want to continue playing in your Minetest Game worlds, you need to "
+"reinstall Minetest Game."
 msgstr ""
-"如果您想繼續在 AperosVoxel 世界中玩遊戲，您需要重新安裝 AperosVoxel。"
+"如果您想繼續在 Minetest Game 世界中玩遊戲，您需要重新安裝 Minetest Game。"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "AperosVoxel is no longer installed by default"
-msgstr "預設不再安裝 AperosEngine 遊戲"
+msgid "Minetest Game is no longer installed by default"
+msgstr "預設不再安裝 Minetest 遊戲"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Reinstall AperosVoxel"
-msgstr "重新安裝 AperosEngine 遊戲"
+msgid "Reinstall Minetest Game"
+msgstr "重新安裝 Minetest 遊戲"
 
 #: builtin/mainmenu/dlg_rename_modpack.lua
 msgid "Accept"
@@ -1052,13 +1052,14 @@ msgid "Install games from ContentDB"
 msgstr "從 ContentDB 安裝遊戲"
 
 #: builtin/mainmenu/tab_local.lua
-msgid "Aperos Engine doesn't come with the AperosVoxel by default."
-msgstr "預設不再安裝 AperosEngine 遊戲。"
+msgid "Minetest doesn't come with a game by default."
+msgstr "預設不再安裝 Minetest 遊戲。"
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"Aperos Engine is a game creation platform that allows you to create different games."
-msgstr "AperosEngine 是一個遊戲創建平台，可以讓你遊玩許多不同的遊戲。"
+"Minetest is a game-creation platform that allows you to play many different "
+"games."
+msgstr "Minetest 是一個遊戲創建平台，可以讓你遊玩許多不同的遊戲。"
 
 #: builtin/mainmenu/tab_local.lua
 msgid "New"
@@ -2822,14 +2823,14 @@ msgid ""
 "software',\n"
 "as defined by the Free Software Foundation.\n"
 "You can also specify content ratings.\n"
-"These flags are independent from AperosEngine versions,\n"
+"These flags are independent from Minetest versions,\n"
 "so see a full list at https://content.aperosvoxel.domain/help/content_flags/"
 msgstr ""
 "逗號分隔用於在倉庫中隱藏內容的標籤清單。\n"
 "\"nonfree\"可用於隱藏根據自由軟體基金會\n"
 "不符合「自由軟體」標準的套件。\n"
 "你也可以為倉庫內容指定評分。\n"
-"這些評分獨立於AperosEngine版本，\n"
+"這些評分獨立於Minetest版本，\n"
 "完整清單請見https://content.aperosvoxel.domain/help/content_flags/"
 
 #: src/settings_translation_file.cpp
@@ -3039,14 +3040,14 @@ msgid ""
 "expecting.\n"
 "This allows for more fine-grained control than "
 "strict_protocol_version_checking.\n"
-"AperosEngine still enforces its own internal minimum, and enabling\n"
+"Minetest still enforces its own internal minimum, and enabling\n"
 "strict_protocol_version_checking will effectively override this."
 msgstr ""
 "定義允許連線的最早的客戶端。\n"
 "較舊的客戶端是相容的，因為它們在連接時不會崩潰\n"
 "到新伺服器，但它們可能不支援您期望的所有新功能。\n"
 "這允許比 strict_protocol_version_checking 更細粒度的控制。\n"
-"AperosEngine 仍然強制執行其自己的內部最低限度，並啟用\n"
+"Minetest 仍然強制執行其自己的內部最低限度，並啟用\n"
 "strict_protocol_version_checking 將有效地覆蓋這一點。"
 
 #: src/settings_translation_file.cpp
@@ -4115,10 +4116,10 @@ msgstr "分析登錄的聊天指令。"
 #: src/settings_translation_file.cpp
 msgid ""
 "Instrument global callback functions on registration.\n"
-"(anything you pass to a AperosEngine.register_*() function)"
+"(anything you pass to a minetest.register_*() function)"
 msgstr ""
 "在登錄上分析全域回呼。\n"
-"（任何您想要傳遞給 AperosEngine.register_*() 函數的東西）"
+"（任何您想要傳遞給 minetest.register_*() 函數的東西）"
 
 #: src/settings_translation_file.cpp
 msgid ""
@@ -5084,11 +5085,11 @@ msgstr "玩家每 10 秒能傳送的訊息量。"
 #: src/settings_translation_file.cpp
 msgid ""
 "Number of threads to use for mesh generation.\n"
-"Value of 0 (default) will let AperosEngine autodetect the number of available "
+"Value of 0 (default) will let Minetest autodetect the number of available "
 "threads."
 msgstr ""
 "用於網格產生的線程數。\n"
-"值 0（預設）將讓 AperosEngine 自動偵測可用執行緒的數量。"
+"值 0（預設）將讓 Minetest 自動偵測可用執行緒的數量。"
 
 #: src/settings_translation_file.cpp
 msgid "Occlusion Culler"
@@ -5231,12 +5232,12 @@ msgstr "Prometheus 監聽器位址"
 #: src/settings_translation_file.cpp
 msgid ""
 "Prometheus listener address.\n"
-"If AperosEngine is compiled with ENABLE_PROMETHEUS option enabled,\n"
+"If Minetest is compiled with ENABLE_PROMETHEUS option enabled,\n"
 "enable metrics listener for Prometheus on that address.\n"
 "Metrics can be fetched on http://127.0.0.1:30000/metrics"
 msgstr ""
 "Prometheus 監聽器地址。\n"
-"如果AperosEngine在編輯時啓用了ENABLE_PROMETHEUS選項，\n"
+"如果Minetest在編輯時啓用了ENABLE_PROMETHEUS選項，\n"
 "在該地址上為 Prometheus 啓用指標偵聽器。\n"
 "可以從 http://127.0.0.1:30000/metrics 獲取指標"
 
@@ -5732,7 +5733,7 @@ msgid "Shader path"
 msgstr "著色器路徑"
 
 #: src/settings_translation_file.cpp
-msgid "Effects"
+msgid "Shaders"
 msgstr "著色器"
 
 #: src/settings_translation_file.cpp
@@ -6110,7 +6111,7 @@ msgid ""
 "Easy to use and well-known from other games that shall not be named.\n"
 "\n"
 "* long_tap\n"
-"Known from the classic AperosEngine mobile controls.\n"
+"Known from the classic Minetest mobile controls.\n"
 "Combat is more or less impossible."
 msgstr ""
 
@@ -6366,10 +6367,10 @@ msgstr ""
 #: src/settings_translation_file.cpp
 #, fuzzy
 msgid ""
-"URL to JSON file which provides information about the newest AperosEngine "
+"URL to JSON file which provides information about the newest Minetest "
 "release\n"
 "If this is empty the engine will never check for updates."
-msgstr "JSON 檔案的 URL，提供有關最新 AperosEngine 版本的信息"
+msgstr "JSON 檔案的 URL，提供有關最新 Minetest 版本的信息"
 
 #: src/settings_translation_file.cpp
 msgid "URL to the server list displayed in the Multiplayer Tab."
@@ -6778,11 +6779,11 @@ msgstr "視窗最大化"
 
 #: src/settings_translation_file.cpp
 msgid ""
-"Windows systems only: Start AperosEngine with the command line window in the "
+"Windows systems only: Start Minetest with the command line window in the "
 "background.\n"
 "Contains the same information as the file debug.txt (default name)."
 msgstr ""
-"僅 Windows 系統：以在背景的命令列視窗啟動 AperosEngine。\n"
+"僅 Windows 系統：以在背景的命令列視窗啟動 Minetest。\n"
 "包含與 debug.txt（預設名稱）檔案相同的的資訊。"
 
 #: src/settings_translation_file.cpp
@@ -7155,8 +7156,8 @@ msgstr "cURL 並行限制"
 #~ msgid "Down"
 #~ msgstr "下"
 
-#~ msgid "Download a game, such as AperosVoxel, from aperosvoxel.domain"
-#~ msgstr "從 aperosvoxel.domain 下載遊戲，例如 AperosVoxel"
+#~ msgid "Download a game, such as Minetest Game, from aperosvoxel.domain"
+#~ msgstr "從 aperosvoxel.domain 下載遊戲，例如 Minetest Game"
 
 #~ msgid "Download one from aperosvoxel.domain"
 #~ msgstr "從 aperosvoxel.domain 下載一個"
@@ -8123,8 +8124,8 @@ msgstr "cURL 並行限制"
 #~ "html#a54da2a0e231901735e3da1b0edf72eb3"
 
 #~ msgid ""
-#~ "Keybindings. (If this menu screws up, remove stuff from aperosengine.conf)"
-#~ msgstr "按鍵綁定。（若此選單鎖住了，從 aperosengine.conf 移除相關參數）"
+#~ "Keybindings. (If this menu screws up, remove stuff from minetest.conf)"
+#~ msgstr "按鍵綁定。（若此選單鎖住了，從 minetest.conf 移除相關參數）"
 
 #~ msgid "Large chat console key"
 #~ msgstr "大聊天終端機按鍵"

@@ -149,7 +149,7 @@ static void set_node_in_block(const NodeDefManager *nodedef, MapBlock *block,
 		errorstream<<"Not allowing to place CONTENT_IGNORE"
 				<<" while trying to replace \""
 				<<nodedef->get(block->getNodeNoCheck(relpos)).name
-				<<"\" at "<<p<<" (block "<<blockpos<<")"<<'\n';
+				<<"\" at "<<p<<" (block "<<blockpos<<")"<< '\n';
 		return;
 	}
 	block->setNodeNoCheck(relpos, n);
@@ -421,10 +421,10 @@ void Map::timerUpdate(float dtime, float unload_timeout, s32 max_loaded_blocks,
 		if(save_before_unloading)
 			infostream<<", of which "<<saved_blocks_count<<" were written";
 		infostream<<", "<<block_count_all<<" blocks in memory, " << locked_blocks << " locked";
-		infostream<<"."<<'\n';
+		infostream<<"."<< '\n';
 		if(saved_blocks_count != 0){
 			PrintInfo(infostream); // ServerMap/ClientMap:
-			infostream<<"Blocks modified by: "<<'\n';
+			infostream<<"Blocks modified by: "<< '\n';
 			modprofiler.print(infostream);
 		}
 	}
@@ -501,12 +501,12 @@ NodeMetadata *Map::getNodeMetadata(v3s16 p)
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if(!block){
 		infostream<<"Map::getNodeMetadata(): Need to emerge "
-				<<blockpos<<'\n';
+				<<blockpos<< '\n';
 		block = emergeBlock(blockpos, false);
 	}
 	if(!block){
 		warningstream<<"Map::getNodeMetadata(): Block not found"
-				<<'\n';
+				<< '\n';
 		return NULL;
 	}
 	NodeMetadata *meta = block->m_node_metadata.get(p_rel);
@@ -520,12 +520,12 @@ bool Map::setNodeMetadata(v3s16 p, NodeMetadata *meta)
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if(!block){
 		infostream<<"Map::setNodeMetadata(): Need to emerge "
-				<<blockpos<<'\n';
+				<<blockpos<< '\n';
 		block = emergeBlock(blockpos, false);
 	}
 	if(!block){
 		warningstream<<"Map::setNodeMetadata(): Block not found"
-				<<'\n';
+				<< '\n';
 		return false;
 	}
 	block->m_node_metadata.set(p_rel, meta);
@@ -540,7 +540,7 @@ void Map::removeNodeMetadata(v3s16 p)
 	if(block == NULL)
 	{
 		warningstream<<"Map::removeNodeMetadata(): Block not found"
-				<<'\n';
+				<< '\n';
 		return;
 	}
 	block->m_node_metadata.remove(p_rel);
@@ -553,12 +553,12 @@ NodeTimer Map::getNodeTimer(v3s16 p)
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if(!block){
 		infostream<<"Map::getNodeTimer(): Need to emerge "
-				<<blockpos<<'\n';
+				<<blockpos<< '\n';
 		block = emergeBlock(blockpos, false);
 	}
 	if(!block){
 		warningstream<<"Map::getNodeTimer(): Block not found"
-				<<'\n';
+				<< '\n';
 		return NodeTimer();
 	}
 	NodeTimer t = block->getNodeTimer(p_rel);
@@ -574,12 +574,12 @@ void Map::setNodeTimer(const NodeTimer &t)
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if(!block){
 		infostream<<"Map::setNodeTimer(): Need to emerge "
-				<<blockpos<<'\n';
+				<<blockpos<< '\n';
 		block = emergeBlock(blockpos, false);
 	}
 	if(!block){
 		warningstream<<"Map::setNodeTimer(): Block not found"
-				<<'\n';
+				<< '\n';
 		return;
 	}
 	NodeTimer nt(t.timeout, t.elapsed, p_rel);
@@ -594,7 +594,7 @@ void Map::removeNodeTimer(v3s16 p)
 	if(block == NULL)
 	{
 		warningstream<<"Map::removeNodeTimer(): Block not found"
-				<<'\n';
+				<< '\n';
 		return;
 	}
 	block->removeNodeTimer(p_rel);
@@ -787,7 +787,7 @@ void MMVManip::initialEmerge(v3s16 blockpos_min, v3s16 blockpos_max,
 		infostream<<"initialEmerge: area: ";
 		block_area_nodes.print(infostream);
 		infostream<<" ("<<size_MB<<"MB)";
-		infostream<<'\n';
+		infostream<< '\n';
 	}
 
 	addArea(block_area_nodes);

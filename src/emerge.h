@@ -33,7 +33,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #define EMERGE_DBG_OUT(x) {                            \
 	if (enable_mapgen_debug_info)                      \
-		infostream << "EmergeThread: " x << std::endl; \
+		infostream << "EmergeThread: " x << '\n'; \
 }
 
 class EmergeThread;

@@ -1,6 +1,6 @@
 /*
 Minetest
-Copyright (C) 2014-2018 kwolekr, Ryan Kwolek <kwolekr@aperosvoxel.domain>
+Copyright (C) 2014-2018 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
 Copyright (C) 2015-2018 paramat
 
 This program is free software; you can redistribute it and/or modify
@@ -163,8 +163,8 @@ void Schematic::blitToVManip(MMVManip *vm, v3s16 p, Rotation rot, bool force_pla
 
 	s16 y_map = p.Y;
 	for (s16 y = 0; y != sy; y++) {
-		if ((slice_probs[y] != MTSCHEM_PROB_ALWAYS) &&
-			(slice_probs[y] <= myrand_range(1, MTSCHEM_PROB_ALWAYS)))
+		if ((slice_probs[y] != APRSCHEM_PROB_ALWAYS) &&
+			(slice_probs[y] <= myrand_range(1, APRSCHEM_PROB_ALWAYS)))
 			continue;
 
 		for (s16 z = 0; z != sz; z++) {
@@ -177,10 +177,10 @@ void Schematic::blitToVManip(MMVManip *vm, v3s16 p, Rotation rot, bool force_pla
 				if (schemdata[i].getContent() == CONTENT_IGNORE)
 					continue;
 
-				u8 placement_prob     = schemdata[i].param1 & MTSCHEM_PROB_MASK;
-				bool force_place_node = schemdata[i].param1 & MTSCHEM_FORCE_PLACE;
+				u8 placement_prob     = schemdata[i].param1 & APRSCHEM_PROB_MASK;
+				bool force_place_node = schemdata[i].param1 & APRSCHEM_FORCE_PLACE;
 
-				if (placement_prob == MTSCHEM_PROB_NEVER)
+				if (placement_prob == APRSCHEM_PROB_NEVER)
 					continue;
 
 				u32 vi = vm->m_area.index(pos);
@@ -190,8 +190,8 @@ void Schematic::blitToVManip(MMVManip *vm, v3s16 p, Rotation rot, bool force_pla
 						continue;
 				}
 
-				if ((placement_prob != MTSCHEM_PROB_ALWAYS) &&
-					(placement_prob <= myrand_range(1, MTSCHEM_PROB_ALWAYS)))
+				if ((placement_prob != APRSCHEM_PROB_ALWAYS) &&
+					(placement_prob <= myrand_range(1, APRSCHEM_PROB_ALWAYS)))
 					continue;
 
 				vm->m_data[vi] = schemdata[i];
@@ -289,7 +289,7 @@ bool Schematic::deserializeFromMts(std::istream *is)
 
 	//// Read signature
 	u32 signature = readU32(ss);
-	if (signature != MTSCHEM_FILE_SIGNATURE) {
+	if (signature != APRSCHEM_FILE_SIGNATURE) {
 		errorstream << __FUNCTION__ << ": invalid schematic "
 			"file" << '\n';
 		return false;
@@ -297,7 +297,7 @@ bool Schematic::deserializeFromMts(std::istream *is)
 
 	//// Read version
 	u16 version = readU16(ss);
-	if (version > MTSCHEM_FILE_VER_HIGHEST_READ) {
+	if (version > APRSCHEM_FILE_VER_HIGHEST_READ) {
 		errorstream << __FUNCTION__ << ": unsupported schematic "
 			"file version" << '\n';
 		return false;
@@ -310,7 +310,7 @@ bool Schematic::deserializeFromMts(std::istream *is)
 	delete []slice_probs;
 	slice_probs = new u8[size.Y];
 	for (int y = 0; y != size.Y; y++)
-		slice_probs[y] = (version >= 3) ? readU8(ss) : MTSCHEM_PROB_ALWAYS_OLD;
+		slice_probs[y] = (version >= 3) ? readU8(ss) : APRSCHEM_PROB_ALWAYS_OLD;
 
 	//// Read node names
 	NodeResolver::reset();
@@ -320,7 +320,7 @@ bool Schematic::deserializeFromMts(std::istream *is)
 		std::string name = deSerializeString16(ss);
 
 		// Instances of "ignore" from v1 are converted to air (and instances
-		// are fixed to have MTSCHEM_PROB_NEVER later on).
+		// are fixed to have APRSCHEM_PROB_NEVER later on).
 		if (name == "ignore") {
 			name = "air";
 			cignore = i;
@@ -340,17 +340,17 @@ bool Schematic::deserializeFromMts(std::istream *is)
 	schemdata = new MapNode[nodecount];
 
 	std::stringstream d_ss(std::ios_base::binary | std::ios_base::in | std::ios_base::out);
-	decompress(ss, d_ss, MTSCHEM_MAPNODE_SER_FMT_VER);
-	MapNode::deSerializeBulk(d_ss, MTSCHEM_MAPNODE_SER_FMT_VER, schemdata,
+	decompress(ss, d_ss, APRSCHEM_MAPNODE_SER_FMT_VER);
+	MapNode::deSerializeBulk(d_ss, APRSCHEM_MAPNODE_SER_FMT_VER, schemdata,
 		nodecount, 2, 2);
 
 	// Fix probability values for nodes that were ignore; removed in v2
 	if (version < 2) {
 		for (size_t i = 0; i != nodecount; i++) {
 			if (schemdata[i].param1 == 0)
-				schemdata[i].param1 = MTSCHEM_PROB_ALWAYS_OLD;
+				schemdata[i].param1 = APRSCHEM_PROB_ALWAYS_OLD;
 			if (have_cignore && schemdata[i].getContent() == cignore)
-				schemdata[i].param1 = MTSCHEM_PROB_NEVER;
+				schemdata[i].param1 = APRSCHEM_PROB_NEVER;
 		}
 	}
 
@@ -373,8 +373,8 @@ bool Schematic::serializeToMts(std::ostream *os) const
 
 	std::ostream &ss = *os;
 
-	writeU32(ss, MTSCHEM_FILE_SIGNATURE);         // signature
-	writeU16(ss, MTSCHEM_FILE_VER_HIGHEST_WRITE); // version
+	writeU32(ss, APRSCHEM_FILE_SIGNATURE);         // signature
+	writeU16(ss, APRSCHEM_FILE_VER_HIGHEST_WRITE); // version
 	writeV3S16(ss, size);                         // schematic size
 
 	for (int y = 0; y != size.Y; y++)             // Y slice probabilities
@@ -386,9 +386,9 @@ bool Schematic::serializeToMts(std::ostream *os) const
 	}
 
 	// compressed bulk node data
-	auto buf = MapNode::serializeBulk(MTSCHEM_MAPNODE_SER_FMT_VER,
+	auto buf = MapNode::serializeBulk(APRSCHEM_MAPNODE_SER_FMT_VER,
 		schemdata, size.X * size.Y * size.Z, 2, 2);
-	compress(buf, ss, MTSCHEM_MAPNODE_SER_FMT_VER);
+	compress(buf, ss, APRSCHEM_MAPNODE_SER_FMT_VER);
 
 	return true;
 }
@@ -421,7 +421,7 @@ bool Schematic::serializeToLua(std::ostream *os, bool use_comments,
 		ss << indent << "yslice_prob = {" << '\n';
 
 		for (u16 y = 0; y != size.Y; y++) {
-			u8 probability = slice_probs[y] & MTSCHEM_PROB_MASK;
+			u8 probability = slice_probs[y] & APRSCHEM_PROB_MASK;
 
 			ss << indent << indent << "{"
 				<< "ypos=" << y
@@ -447,8 +447,8 @@ bool Schematic::serializeToLua(std::ostream *os, bool use_comments,
 			}
 
 			for (u16 x = 0; x != size.X; x++, i++) {
-				u8 probability   = schemdata[i].param1 & MTSCHEM_PROB_MASK;
-				bool force_place = schemdata[i].param1 & MTSCHEM_FORCE_PLACE;
+				u8 probability   = schemdata[i].param1 & APRSCHEM_PROB_MASK;
+				bool force_place = schemdata[i].param1 & APRSCHEM_FORCE_PLACE;
 
 				// After node resolving: real content_t, lookup using NodeDefManager
 				// Prior node resolving: condensed ID, lookup using m_nodenames
@@ -557,7 +557,7 @@ bool Schematic::getSchematicFromMap(Map *map, v3s16 p1, v3s16 p2)
 
 	slice_probs = new u8[size.Y];
 	for (s16 y = 0; y != size.Y; y++)
-		slice_probs[y] = MTSCHEM_PROB_ALWAYS;
+		slice_probs[y] = APRSCHEM_PROB_ALWAYS;
 
 	schemdata = new MapNode[size.X * size.Y * size.Z];
 
@@ -567,7 +567,7 @@ bool Schematic::getSchematicFromMap(Map *map, v3s16 p1, v3s16 p2)
 		u32 vi = vm->m_area.index(p1.X, y, z);
 		for (s16 x = p1.X; x <= p2.X; x++, i++, vi++) {
 			schemdata[i] = vm->m_data[vi];
-			schemdata[i].param1 = MTSCHEM_PROB_ALWAYS;
+			schemdata[i].param1 = APRSCHEM_PROB_ALWAYS;
 		}
 	}
 
@@ -592,7 +592,7 @@ void Schematic::applyProbabilities(v3s16 p0,
 			schemdata[index].param1 = prob;
 
 			// trim unnecessary node names from schematic
-			if (prob == MTSCHEM_PROB_NEVER)
+			if (prob == APRSCHEM_PROB_NEVER)
 				schemdata[index].setContent(CONTENT_AIR);
 		}
 	}

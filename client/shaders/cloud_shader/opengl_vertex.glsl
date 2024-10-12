@@ -8,7 +8,7 @@ void main(void)
 {
 	gl_Position = mWorldViewProj * inVertexPosition;
 
-vec4 color = inVertexColor;
+	vec4 color = inVertexColor;
 
 	color *= materialColor;
 	varColor = color;

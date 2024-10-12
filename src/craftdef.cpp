@@ -24,6 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <sstream>
 #include <unordered_set>
 #include <algorithm>
+#include <queue>
 #include "gamedef.h"
 #include "inventory.h"
 #include "util/serialize.h"
@@ -616,7 +617,7 @@ bool CraftDefinitionShapeless::check(const CraftInput &input, IGameDef *gamedef)
 	if (input_filtered.size() != recipe.size()) {
 		/*dstream<<"Number of input items ("<<input_filtered.size()
 				<<") does not match recipe size ("<<recipe.size()<<") "
-				<<"of recipe with output="<<output<<'\n';*/
+				<<"of recipe with output="<<output<< '\n';*/
 		return false;
 	}
 
@@ -863,7 +864,7 @@ bool CraftDefinitionCooking::check(const CraftInput &input, IGameDef *gamedef) c
 	if (input_filtered.size() != 1) {
 		/*dstream<<"Number of input items ("<<input_filtered.size()
 				<<") does not match recipe size (1) "
-				<<"of cooking recipe with output="<<output<<'\n';*/
+				<<"of cooking recipe with output="<<output<< '\n';*/
 		return false;
 	}
 
@@ -966,7 +967,7 @@ bool CraftDefinitionFuel::check(const CraftInput &input, IGameDef *gamedef) cons
 	if (input_filtered.size() != 1) {
 		/*dstream<<"Number of input items ("<<input_filtered.size()
 				<<") does not match recipe size (1) "
-				<<"of fuel recipe with burntime="<<burntime<<'\n';*/
+				<<"of fuel recipe with burntime="<<burntime<< '\n';*/
 		return false;
 	}
 

@@ -267,7 +267,7 @@ void Sky::render()
 			float mid = wicked_time_of_day < 0.5 ? mid1 : (1.0 - mid1);
 			float a_ = 1.0f - std::fabs(wicked_time_of_day - mid) * 35.0f;
 			float a = easeCurve(MYMAX(0, MYMIN(1, a_)));
-			//std::cerr<<"a_="<<a_<<" a="<<a<<'\n';
+			//std::cerr<<"a_="<<a_<<" a="<<a<< '\n';
 			video::SColor c(255, 255, 255, 255);
 			float y = -(1.0 - a) * 0.22;
 			vertices[0] = video::S3DVertex(-1, -0.05 + y, -1, 0, 0, 1, c, t, t);
@@ -341,7 +341,7 @@ void Sky::update(float time_of_day, float time_brightness,
 		/*dstream<<"First update with time_of_day="<<time_of_day
 				<<" time_brightness="<<time_brightness
 				<<" direct_brightness="<<direct_brightness
-				<<" sunlight_seen="<<sunlight_seen<<'\n';*/
+				<<" sunlight_seen="<<sunlight_seen<< '\n';*/
 		m_first_update = false;
 		for (u32 i = 0; i < 100; i++) {
 			update(time_of_day, time_brightness, direct_brightness,
@@ -838,14 +838,10 @@ void Sky::updateStars()
 		);
 		core::CMatrix4<f32> a;
 		a.buildRotateFromTo(v3f(0, 1, 0), r);
-		v3f p = v3f(-d, 1, -d);
-		v3f p1 = v3f(d, 1, -d);
-		v3f p2 = v3f(d, 1, d);
-		v3f p3 = v3f(-d, 1, d);
-		a.rotateVect(p);
-		a.rotateVect(p1);
-		a.rotateVect(p2);
-		a.rotateVect(p3);
+		v3f p = a.rotateAndScaleVect(v3f(-d, 1, -d));
+		v3f p1 = a.rotateAndScaleVect(v3f(d, 1, -d));
+		v3f p2 = a.rotateAndScaleVect(v3f(d, 1, d));
+		v3f p3 = a.rotateAndScaleVect(v3f(-d, 1, d));
 		vertices.push_back(video::S3DVertex(p, {}, {}, {}));
 		vertices.push_back(video::S3DVertex(p1, {}, {}, {}));
 		vertices.push_back(video::S3DVertex(p2, {}, {}, {}));

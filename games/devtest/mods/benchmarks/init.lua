@@ -164,11 +164,15 @@ aperosengine.register_chatcommand("bench_bulk_swap_node", {
 			return false, "No player."
 		end
 		local pos_list = get_positions_cube(player:get_pos())
+
 		aperosengine.chat_send_player(name, "Benchmarking aperosengine.bulk_swap_node. Warming up ...")
+
 		-- warm up because first execution otherwise becomes
 		-- significantly slower
 		aperosengine.bulk_swap_node(pos_list, {name = "mapgen_stone"})
+
 		aperosengine.chat_send_player(name, "Warming up finished, now benchmarking ...")
+
 		local start_time = aperosengine.get_us_time()
 		for i=1,#pos_list do
 			aperosengine.swap_node(pos_list[i], {name = "mapgen_stone"})

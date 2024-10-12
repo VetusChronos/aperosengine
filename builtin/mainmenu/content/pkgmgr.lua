@@ -840,9 +840,14 @@ function pkgmgr.get_contentdb_id(content)
 		return content.author:lower() .. "/" .. content.name
 	end
 
-	if content.type == "game" and content.id == "aperosvoxel" and content.release == 0 and
+	-- Until AperosEngine 1.0.5, AperosVoxel was bundled with AperosEngine.
+	-- Unfortunately, the bundled MTG was not versioned (missing "release"
+	-- field in game.conf).
+	-- Therefore, we consider any installation of APRV that is not versioned,
+	-- has not been cloned from Git, and is not system-wide to be updatable.
+	if content.type == "game" and content.id == "aperosengine" and content.release == 0 and
 			not core.is_dir(content.path .. "/.git") and core.may_modify_path(content.path) then
-		return "vetuschronos/aperosvoxel"
+		return "VetusChronos/aperosengine"
 	end
 
 	return nil

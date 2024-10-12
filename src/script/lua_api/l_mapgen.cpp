@@ -259,7 +259,7 @@ bool read_schematic_def(lua_State *L, int index,
 		u8 param1;
 		if (!getintfield(L, -1, "param1", param1) &&
 			!getintfield(L, -1, "prob", param1))
-			param1 = MTSCHEM_PROB_ALWAYS_OLD;
+			param1 = APRSCHEM_PROB_ALWAYS_OLD;
 
 		//// Read param2
 		u8 param2 = getintfield_default(L, -1, "param2", 0);
@@ -278,7 +278,7 @@ bool read_schematic_def(lua_State *L, int index,
 		//// Perform probability/force_place fixup on param1
 		param1 >>= 1;
 		if (getboolfield_default(L, -1, "force_place", false))
-			param1 |= MTSCHEM_FORCE_PLACE;
+			param1 |= APRSCHEM_FORCE_PLACE;
 
 		//// Actually set the node in the schematic
 		schem->schemdata[i] = MapNode(name_index, param1, param2);
@@ -294,7 +294,7 @@ bool read_schematic_def(lua_State *L, int index,
 	//// Get Y-slice probability values (if present)
 	schem->slice_probs = new u8[size.Y];
 	for (i = 0; i != (u32) size.Y; i++)
-		schem->slice_probs[i] = MTSCHEM_PROB_ALWAYS;
+		schem->slice_probs[i] = APRSCHEM_PROB_ALWAYS;
 
 	lua_getfield(L, index, "yslice_prob");
 	if (lua_istable(L, -1)) {
@@ -1647,7 +1647,7 @@ int ModApiMapgen::l_create_schematic(lua_State *L)
 				v3s16 pos = check_v3s16(L, -1);
 				lua_pop(L, 1);
 
-				u8 prob = getintfield_default(L, -1, "prob", MTSCHEM_PROB_ALWAYS);
+				u8 prob = getintfield_default(L, -1, "prob", APRSCHEM_PROB_ALWAYS);
 				prob_list.emplace_back(pos, prob);
 			}
 
@@ -1661,7 +1661,7 @@ int ModApiMapgen::l_create_schematic(lua_State *L)
 		while (lua_next(L, 5)) {
 			if (lua_istable(L, -1)) {
 				s16 ypos = getintfield_default(L, -1, "ypos", 0);
-				u8 prob  = getintfield_default(L, -1, "prob", MTSCHEM_PROB_ALWAYS);
+				u8 prob  = getintfield_default(L, -1, "prob", APRSCHEM_PROB_ALWAYS);
 				slice_prob_list.emplace_back(ypos, prob);
 			}
 
@@ -1876,8 +1876,8 @@ int ModApiMapgen::l_read_schematic(lua_State *L)
 	if (write_yslice != "none") {
 		lua_createtable(L, schem->size.Y, 0);
 		for (u16 y = 0; y != schem->size.Y; ++y) {
-			u8 probability = schem->slice_probs[y] & MTSCHEM_PROB_MASK;
-			if (probability < MTSCHEM_PROB_ALWAYS || write_yslice != "low") {
+			u8 probability = schem->slice_probs[y] & APRSCHEM_PROB_MASK;
+			if (probability < APRSCHEM_PROB_ALWAYS || write_yslice != "low") {
 				lua_createtable(L, 0, 2);
 				lua_pushinteger(L, y);
 				lua_setfield(L, 3, "ypos");
@@ -1895,8 +1895,8 @@ int ModApiMapgen::l_read_schematic(lua_State *L)
 		MapNode node = schem->schemdata[i];
 		const std::string &name =
 				resolve_done ? ndef->get(node.getContent()).name : names[node.getContent()];
-		u8 probability   = node.param1 & MTSCHEM_PROB_MASK;
-		bool force_place = node.param1 & MTSCHEM_FORCE_PLACE;
+		u8 probability   = node.param1 & APRSCHEM_PROB_MASK;
+		bool force_place = node.param1 & APRSCHEM_FORCE_PLACE;
 		lua_createtable(L, 0, force_place ? 4 : 3);
 		lua_pushstring(L, name.c_str());
 		lua_setfield(L, 3, "name");

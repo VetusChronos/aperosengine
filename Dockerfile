@@ -32,22 +32,22 @@ RUN git clone --recursive https://github.com/jupp0r/prometheus-cpp && \
 
 FROM dev as builder
 
-COPY .git /usr/src/aperosvoxel/.git
-COPY CMakeLists.txt /usr/src/aperosvoxel/CMakeLists.txt
-COPY README.md /usr/src/aperosvoxel/README.md
-COPY aperosengine.conf.example /usr/src/aperosvoxel/aperosengine.conf.example
-COPY builtin /usr/src/aperosvoxel/builtin
-COPY cmake /usr/src/aperosvoxel/cmake
-COPY doc /usr/src/aperosvoxel/doc
-COPY fonts /usr/src/aperosvoxel/fonts
-COPY lib /usr/src/aperosvoxel/lib
-COPY misc /usr/src/aperosvoxel/misc
-COPY po /usr/src/aperosvoxel/po
-COPY src /usr/src/aperosvoxel/src
-COPY irr /usr/src/aperosvoxel/irr
-COPY textures /usr/src/aperosvoxel/textures
+COPY .git /usr/src/aperosengine/.git
+COPY CMakeLists.txt /usr/src/aperosengine/CMakeLists.txt
+COPY README.md /usr/src/aperosengine/README.md
+COPY aperosengine.conf.example /usr/src/aperosengine/aperosengine.conf.example
+COPY builtin /usr/src/aperosengine/builtin
+COPY cmake /usr/src/aperosengine/cmake
+COPY doc /usr/src/aperosengine/docs
+COPY fonts /usr/src/aperosengine/fonts
+COPY lib /usr/src/aperosengine/lib
+COPY misc /usr/src/aperosengine/misc
+COPY po /usr/src/aperosengine/po
+COPY src /usr/src/aperosengine/src
+COPY irr /usr/src/aperosengine/irr
+COPY textures /usr/src/aperosengine/textures
 
-WORKDIR /usr/src/aperosvoxel
+WORKDIR /usr/src/aperosengine
 RUN cmake -B build \
 		-DCMAKE_INSTALL_PREFIX=/usr/local \
 		-DCMAKE_BUILD_TYPE=Release \
@@ -63,20 +63,20 @@ FROM $DOCKER_IMAGE AS runtime
 
 RUN apk add --no-cache curl gmp libstdc++ libgcc libpq jsoncpp zstd-libs \
 				sqlite-libs postgresql hiredis leveldb && \
-	adduser -D aperosvoxel --uid 30000 -h /var/lib/aperosvoxel && \
-	chown -R aperosvoxel:aperosvoxel /var/lib/aperosvoxel
+	adduser -D aperosengine --uid 30000 -h /var/lib/aperosengine && \
+	chown -R aperosengine:aperosengine /var/lib/aperosengine
 
-WORKDIR /var/lib/aperosvoxel
+WORKDIR /var/lib/aperosengine
 
-COPY --from=builder /usr/local/share/aperosvoxel /usr/local/share/aperosvoxel
-COPY --from=builder /usr/local/bin/aperosvoxelserver /usr/local/bin/aperosvoxelserver
-COPY --from=builder /usr/local/share/doc/aperosvoxel/aperosengine.conf.example /etc/aperosvoxel/aperosengine.conf
+COPY --from=builder /usr/local/share/aperosengine /usr/local/share/aperosengine
+COPY --from=builder /usr/local/bin/aperosengineserver /usr/local/bin/aperosengineserver
+COPY --from=builder /usr/local/share/doc/aperosengine/aperosengine.conf.example /etc/aperosengine/aperosengine.conf
 COPY --from=builder /usr/local/lib/libspatialindex* /usr/local/lib/
 COPY --from=builder /usr/local/lib/libluajit* /usr/local/lib/
-USER aperosvoxel:aperosvoxel
+USER aperosengine:aperosengine
 
 EXPOSE 30000/udp 30000/tcp
-VOLUME /var/lib/aperosvoxel/ /etc/aperosvoxel/
+VOLUME /var/lib/aperosengine/ /etc/aperosengine/
 
-ENTRYPOINT ["/usr/local/bin/aperosvoxelserver"]
-CMD ["--config", "/etc/aperosvoxel/aperosengine.conf"]
+ENTRYPOINT ["/usr/local/bin/aperosengineserver"]
+CMD ["--config", "/etc/aperosengine/aperosengine.conf"]

@@ -1,12 +1,12 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Romanian (AperosEngine)\n"
+"Project-Id-Version: Romanian (Minetest)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-11 15:14+0200\n"
 "PO-Revision-Date: 2024-07-27 04:09+0000\n"
 "Last-Translator: AlexTECPlayz <alextec70@outlook.com>\n"
-"Language-Team: Romanian <https://hosted.weblate.org/projects/AperosEngine/"
-"AperosEngine/ro/>\n"
+"Language-Team: Romanian <https://hosted.weblate.org/projects/minetest/"
+"minetest/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -173,8 +173,8 @@ msgid "Back to Main Menu"
 msgstr "Meniul principal"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
-msgid "ContentDB is not available when AperosEngine was compiled without cURL"
-msgstr "ContentDB nu este disponibil când AperosEngine e compilat fără cURL"
+msgid "ContentDB is not available when Minetest was compiled without cURL"
+msgstr "ContentDB nu este disponibil când Minetest e compilat fără cURL"
 
 #: builtin/mainmenu/content/dlg_contentdb.lua
 msgid "Downloading..."
@@ -671,28 +671,28 @@ msgstr "Respinge"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"For a long time, the AperosEngine engine shipped with a default game called "
-"\"AperosVoxel\". Since AperosEngine 5.8.0, AperosEngine ships without a default "
+"For a long time, the Minetest engine shipped with a default game called "
+"\"Minetest Game\". Since Minetest 5.8.0, Minetest ships without a default "
 "game."
 msgstr ""
-"Pentru mult timp, motorul AperosEngine a venit cu un joc implicit pe nume "
-"„AperosVoxel”. Din AperosEngine 5.8.0, AperosEngine nu mai vine cu un joc implicit."
+"Pentru mult timp, motorul Minetest a venit cu un joc implicit pe nume "
+"„Minetest Game”. Din Minetest 5.8.0, Minetest nu mai vine cu un joc implicit."
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
 msgid ""
-"If you want to continue playing in your AperosVoxel worlds, you need to "
-"reinstall AperosVoxel."
+"If you want to continue playing in your Minetest Game worlds, you need to "
+"reinstall Minetest Game."
 msgstr ""
-"Dacă dorești să joci în continuare pe lumile tale AperosVoxel, trebuie să "
-"reinstalezi AperosVoxel."
+"Dacă dorești să joci în continuare pe lumile tale Minetest Game, trebuie să "
+"reinstalezi Minetest Game."
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "AperosVoxel is no longer installed by default"
-msgstr "AperosVoxel nu mai este instalat în mod implicit"
+msgid "Minetest Game is no longer installed by default"
+msgstr "Minetest Game nu mai este instalat în mod implicit"
 
 #: builtin/mainmenu/dlg_reinstall_mtg.lua
-msgid "Reinstall AperosVoxel"
-msgstr "Reinstalați jocul AperosEngine"
+msgid "Reinstall Minetest Game"
+msgstr "Reinstalați jocul Minetest"
 
 #: builtin/mainmenu/dlg_rename_modpack.lua
 msgid "Accept"
@@ -1065,14 +1065,15 @@ msgid "Install games from ContentDB"
 msgstr "Instalarea jocurilor din ContentDB"
 
 #: builtin/mainmenu/tab_local.lua
-msgid "Aperos Engine doesn't come with the AperosVoxel by default."
-msgstr "AperosEngine nu vine cu un joc preinstalat."
+msgid "Minetest doesn't come with a game by default."
+msgstr "Minetest nu vine cu un joc preinstalat."
 
 #: builtin/mainmenu/tab_local.lua
 msgid ""
-"Aperos Engine is a game creation platform that allows you to create different games."
+"Minetest is a game-creation platform that allows you to play many different "
+"games."
 msgstr ""
-"AperosEngine este o platformă de creare de jocuri care vă permite să jucați "
+"Minetest este o platformă de creare de jocuri care vă permite să jucați "
 "multe jocuri diferite."
 
 #: builtin/mainmenu/tab_local.lua
@@ -2869,7 +2870,7 @@ msgid ""
 "software',\n"
 "as defined by the Free Software Foundation.\n"
 "You can also specify content ratings.\n"
-"These flags are independent from AperosEngine versions,\n"
+"These flags are independent from Minetest versions,\n"
 "so see a full list at https://content.aperosvoxel.domain/help/content_flags/"
 msgstr ""
 "Listă separată de virgule cu etichete de ascuns din depozitul de conținut.\n"
@@ -2877,7 +2878,7 @@ msgstr ""
 "'software liber',\n"
 "conform definiției Free Software Foundation.\n"
 "Puteți specifica și clasificarea conținutului.\n"
-"Aceste etichete nu depind de versiunile AperosEngine.\n"
+"Aceste etichete nu depind de versiunile Minetest.\n"
 "Puteți vedea lista completă la https://content.aperosvoxel.domain/help/"
 "content_flags/"
 
@@ -3092,7 +3093,7 @@ msgid ""
 "expecting.\n"
 "This allows for more fine-grained control than "
 "strict_protocol_version_checking.\n"
-"AperosEngine still enforces its own internal minimum, and enabling\n"
+"Minetest still enforces its own internal minimum, and enabling\n"
 "strict_protocol_version_checking will effectively override this."
 msgstr ""
 
@@ -4047,7 +4048,7 @@ msgstr ""
 #: src/settings_translation_file.cpp
 msgid ""
 "Instrument global callback functions on registration.\n"
-"(anything you pass to a AperosEngine.register_*() function)"
+"(anything you pass to a minetest.register_*() function)"
 msgstr ""
 
 #: src/settings_translation_file.cpp
@@ -4886,7 +4887,7 @@ msgstr "Cantitatea de mesaje pe care un jucător poate trimite la 10 secunde."
 #: src/settings_translation_file.cpp
 msgid ""
 "Number of threads to use for mesh generation.\n"
-"Value of 0 (default) will let AperosEngine autodetect the number of available "
+"Value of 0 (default) will let Minetest autodetect the number of available "
 "threads."
 msgstr ""
 
@@ -5015,7 +5016,7 @@ msgstr ""
 #: src/settings_translation_file.cpp
 msgid ""
 "Prometheus listener address.\n"
-"If AperosEngine is compiled with ENABLE_PROMETHEUS option enabled,\n"
+"If Minetest is compiled with ENABLE_PROMETHEUS option enabled,\n"
 "enable metrics listener for Prometheus on that address.\n"
 "Metrics can be fetched on http://127.0.0.1:30000/metrics"
 msgstr ""
@@ -5428,7 +5429,7 @@ msgid "Shader path"
 msgstr "Calea shaderului"
 
 #: src/settings_translation_file.cpp
-msgid "Effects"
+msgid "Shaders"
 msgstr "Shadere"
 
 #: src/settings_translation_file.cpp
@@ -5747,7 +5748,7 @@ msgid ""
 "Easy to use and well-known from other games that shall not be named.\n"
 "\n"
 "* long_tap\n"
-"Known from the classic AperosEngine mobile controls.\n"
+"Known from the classic Minetest mobile controls.\n"
 "Combat is more or less impossible."
 msgstr ""
 
@@ -5952,7 +5953,7 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"URL to JSON file which provides information about the newest AperosEngine "
+"URL to JSON file which provides information about the newest Minetest "
 "release\n"
 "If this is empty the engine will never check for updates."
 msgstr ""
@@ -6306,7 +6307,7 @@ msgstr ""
 
 #: src/settings_translation_file.cpp
 msgid ""
-"Windows systems only: Start AperosEngine with the command line window in the "
+"Windows systems only: Start Minetest with the command line window in the "
 "background.\n"
 "Contains the same information as the file debug.txt (default name)."
 msgstr ""
@@ -6628,8 +6629,8 @@ msgstr ""
 #~ msgid "Down"
 #~ msgstr "Jos"
 
-#~ msgid "Download a game, such as AperosVoxel, from aperosvoxel.domain"
-#~ msgstr "Descărcați un joc, precum AperosVoxel, de pe aperosvoxel.domain"
+#~ msgid "Download a game, such as Minetest Game, from aperosvoxel.domain"
+#~ msgstr "Descărcați un joc, precum Minetest Game, de pe aperosvoxel.domain"
 
 #~ msgid "Download one from aperosvoxel.domain"
 #~ msgstr "Descărcați unul de pe aperosvoxel.domain"
@@ -6701,9 +6702,9 @@ msgstr ""
 #~ msgstr "Tasta de salt"
 
 #~ msgid ""
-#~ "Keybindings. (If this menu screws up, remove stuff from aperosengine.conf)"
+#~ "Keybindings. (If this menu screws up, remove stuff from minetest.conf)"
 #~ msgstr ""
-#~ "Keybindings. (Dacă acest meniu apare, șterge lucrurile din aperosengine.conf)"
+#~ "Keybindings. (Dacă acest meniu apare, șterge lucrurile din minetest.conf)"
 
 #~ msgid "Large chat console key"
 #~ msgstr "Tasta de consolă de chat mare"

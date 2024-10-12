@@ -356,7 +356,7 @@ void GUIFormSpecMenu::parseContainerEnd(parserData* data, const std::string &)
 void GUIFormSpecMenu::parseScrollContainer(parserData *data, const std::string &element)
 {
 	std::vector<std::string> parts;
-	if (!precheckElement("scroll_container start", element, 4, 5, parts))
+	if (!precheckElement("scroll_container start", element, 4, 6, parts))
 		return;
 
 	std::vector<std::string> v_pos  = split(parts[0], ',');
@@ -366,6 +366,12 @@ void GUIFormSpecMenu::parseScrollContainer(parserData *data, const std::string &
 	f32 scroll_factor = 0.1f;
 	if (parts.size() >= 5 && !parts[4].empty())
 		scroll_factor = stof(parts[4]);
+
+	std::optional<s32> content_padding_px;
+	if (parts.size() >= 6 && !parts[5].empty()) {
+		std::vector<std::string> v_size = { parts[5], parts[5] };
+		content_padding_px = getRealCoordinateGeometry(v_size)[orientation == "vertical" ? 1 : 0];
+	}
 
 	MY_CHECKPOS("scroll_container", 0);
 	MY_CHECKGEOM("scroll_container", 1);
@@ -405,6 +411,7 @@ void GUIFormSpecMenu::parseScrollContainer(parserData *data, const std::string &
 
 	GUIScrollContainer *mover = new GUIScrollContainer(Environment,
 			clipper, spec_mover.fid, rect_mover, orientation, scroll_factor);
+	mover->setContentPadding(content_padding_px);
 
 	data->current_parent = mover;
 
@@ -957,7 +964,7 @@ void GUIFormSpecMenu::parseItemImage(parserData* data, const std::string &elemen
 	}
 
 	if(!data->explicit_size)
-		warningstream<<"invalid use of item_image without a size[] element"<<'\n';
+		warningstream<<"invalid use of item_image without a size[] element"<< '\n';
 
 	FieldSpec spec(
 		"",
@@ -1016,7 +1023,7 @@ void GUIFormSpecMenu::parseButton(parserData* data, const std::string &element)
 	}
 
 	if(!data->explicit_size)
-		warningstream<<"invalid use of button without a size[] element"<<'\n';
+		warningstream<<"invalid use of button without a size[] element"<< '\n';
 
 	std::wstring wlabel = translate_string(utf8_to_wide(unescape_string(label)));
 
@@ -1670,7 +1677,7 @@ void GUIFormSpecMenu::parseTextArea(parserData* data, std::vector<std::string>& 
 	core::rect<s32> rect = core::rect<s32>(pos.X, pos.Y, pos.X+geom.X, pos.Y+geom.Y);
 
 	if(!data->explicit_size)
-		warningstream<<"invalid use of positioned "<<type<<" without a size[] element"<<'\n';
+		warningstream<<"invalid use of positioned "<<type<<" without a size[] element"<< '\n';
 
 	if(m_form_src)
 		default_val = m_form_src->resolveText(default_val);
@@ -1774,7 +1781,7 @@ void GUIFormSpecMenu::parseLabel(parserData* data, const std::string &element)
 	MY_CHECKPOS("label",0);
 
 	if(!data->explicit_size)
-		warningstream<<"invalid use of label without a size[] element"<<'\n';
+		warningstream<<"invalid use of label without a size[] element"<< '\n';
 
 	auto style = getDefaultStyleForElement("label", "");
 	gui::IGUIFont *font = style.getFont();
@@ -1900,7 +1907,7 @@ void GUIFormSpecMenu::parseVertLabel(parserData* data, const std::string &elemen
 	}
 
 	if(!data->explicit_size)
-		warningstream<<"invalid use of label without a size[] element"<<'\n';
+		warningstream<<"invalid use of label without a size[] element"<< '\n';
 
 	std::wstring label;
 
@@ -1973,7 +1980,7 @@ void GUIFormSpecMenu::parseImageButton(parserData* data, const std::string &elem
 		pos.Y+geom.Y);
 
 	if (!data->explicit_size)
-		warningstream<<"invalid use of image_button without a size[] element"<<'\n';
+		warningstream<<"invalid use of image_button without a size[] element"<< '\n';
 
 	image_name = unescape_string(image_name);
 	pressed_image_name = unescape_string(pressed_image_name);
@@ -2170,7 +2177,7 @@ void GUIFormSpecMenu::parseItemImageButton(parserData* data, const std::string &
 	core::rect<s32> rect = core::rect<s32>(pos.X, pos.Y, pos.X+geom.X, pos.Y+geom.Y);
 
 	if(!data->explicit_size)
-		warningstream<<"invalid use of item_image_button without a size[] element"<<'\n';
+		warningstream<<"invalid use of item_image_button without a size[] element"<< '\n';
 
 	IItemDefManager *idef = m_client->idef();
 	ItemStack item;
@@ -3608,7 +3615,7 @@ void GUIFormSpecMenu::showTooltip(const std::wstring &text,
 	int tooltip_offset_x = m_btn_height;
 	int tooltip_offset_y = m_btn_height;
 
-	if (m_pointer_type == PointerType::Touch) {
+	if (RenderingEngine::getLastPointerType() == PointerType::Touch) {
 		tooltip_offset_x *= 3;
 		tooltip_offset_y  = 0;
 		if (m_pointer.X > (s32)screenSize.X / 2)
@@ -4784,7 +4791,7 @@ bool GUIFormSpecMenu::OnEvent(const SEvent& event)
 				&& isVisible()) {
 			if (!canTakeFocus(event.GUIEvent.Element)) {
 				infostream<<"GUIFormSpecMenu: Not allowing focus change."
-						<<'\n';
+						<< '\n';
 				// Returning true disables focus change
 				return true;
 			}

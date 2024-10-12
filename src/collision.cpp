@@ -355,7 +355,7 @@ collisionMoveResult collisionMoveSimple(Environment *env, IGameDef *gamedef,
 		if (!time_notification_done) {
 			time_notification_done = true;
 			warningstream << "collisionMoveSimple: maximum step interval exceeded,"
-					" lost movement details!"<<'\n';
+					" lost movement details!"<< '\n';
 		}
 		dtime = DTIME_LIMIT;
 	} else {

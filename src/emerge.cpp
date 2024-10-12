@@ -47,7 +47,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 EmergeParams::~EmergeParams()
 {
-	infostream << "EmergeParams: destroying " << this << std::endl;
+	infostream << "EmergeParams: destroying " << this << '\n';
 	// Delete everything that was cloned on creation of EmergeParams
 	delete biomegen;
 	delete biomemgr;
@@ -128,7 +128,7 @@ EmergeManager::EmergeManager(Server *server, MetricsBackend *mb)
 	for (s16 i = 0; i < nthreads; i++)
 		m_threads.push_back(new EmergeThread(server, i));
 
-	infostream << "EmergeManager: using " << nthreads << " threads" << std::endl;
+	infostream << "EmergeManager: using " << nthreads << " threads" << '\n';
 }
 
 
@@ -212,7 +212,7 @@ void EmergeManager::initMapgens(MapgenParams *params)
 		EmergeParams *p = new EmergeParams(this, biomegen,
 			biomemgr, oremgr, decomgr, schemmgr);
 		infostream << "EmergeManager: Created params " << p
-			<< " for thread " << i << std::endl;
+			<< " for thread " << i << '\n';
 		m_mapgens.push_back(Mapgen::createMapgen(params->mgtype, params, p));
 	}
 }
@@ -349,7 +349,7 @@ int EmergeManager::getSpawnLevelAtPoint(v2s16 p)
 {
 	if (m_mapgens.empty() || !m_mapgens[0]) {
 		errorstream << "EmergeManager: getSpawnLevelAtPoint() called"
-			" before mapgen init" << std::endl;
+			" before mapgen init" << '\n';
 		return 0;
 	}
 
@@ -561,7 +561,7 @@ EmergeAction EmergeThread::getBlockOrStartGen(const v3s16 pos, bool allow_gen,
 			// if we just read it from the db but the block exists that means
 			// someone else was faster. don't touch it to prevent data loss.
 			if (from_db)
-				verbosestream << "getBlockOrStartGen: block loading raced" << std::endl;
+				verbosestream << "getBlockOrStartGen: block loading raced" << '\n';
 			return EMERGE_FROM_MEMORY;
 		}
 	} else {
@@ -602,7 +602,7 @@ MapBlock *EmergeThread::finishGen(v3s16 pos, BlockMakeData *bmdata,
 	MapBlock *block = m_map->getBlockNoCreateNoEx(pos);
 	if (!block) {
 		errorstream << "EmergeThread::finishGen: Couldn't grab block we "
-			"just generated: " << pos << std::endl;
+			"just generated: " << pos << '\n';
 		return NULL;
 	}
 
@@ -653,7 +653,7 @@ bool EmergeThread::initScripting()
 			BUILTIN_MOD_NAME);
 		m_script->checkSetByBuiltin();
 	} catch (const ModError &e) {
-		errorstream << "Execution of mapgen base environment failed." << std::endl;
+		errorstream << "Execution of mapgen base environment failed." << '\n';
 		m_server->setAsyncFatalError(e.what());
 		return false;
 	}
@@ -665,7 +665,7 @@ bool EmergeThread::initScripting()
 
 		m_script->on_mods_loaded();
 	} catch (const ModError &e) {
-		errorstream << "Failed to load mod script inside mapgen environment." << std::endl;
+		errorstream << "Failed to load mod script inside mapgen environment." << '\n';
 		m_server->setAsyncFatalError(e.what());
 		return false;
 	}
@@ -777,21 +777,21 @@ void *EmergeThread::run()
 	}
 	} catch (VersionMismatchException &e) {
 		std::ostringstream err;
-		err << "World data version mismatch in MapBlock " << pos << std::endl
-			<< "----" << std::endl
-			<< "\"" << e.what() << "\"" << std::endl
-			<< "See debug.txt." << std::endl
+		err << "World data version mismatch in MapBlock " << pos << '\n'
+			<< "----" << '\n'
+			<< "\"" << e.what() << "\"" << '\n'
+			<< "See debug.txt." << '\n'
 			<< "World probably saved by a newer version of " PROJECT_NAME_C "."
-			<< std::endl;
+			<< '\n';
 		m_server->setAsyncFatalError(err.str());
 	} catch (SerializationError &e) {
 		std::ostringstream err;
-		err << "Invalid data in MapBlock " << pos << std::endl
-			<< "----" << std::endl
-			<< "\"" << e.what() << "\"" << std::endl
-			<< "See debug.txt." << std::endl
+		err << "Invalid data in MapBlock " << pos << '\n'
+			<< "----" << '\n'
+			<< "\"" << e.what() << "\"" << '\n'
+			<< "See debug.txt." << '\n'
 			<< "You can ignore this using [ignore_world_load_errors = true]."
-			<< std::endl;
+			<< '\n';
 		m_server->setAsyncFatalError(err.str());
 	}
 

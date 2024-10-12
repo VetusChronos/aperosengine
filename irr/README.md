@@ -1,9 +1,9 @@
 IrrlichtMt version 1.9
 ======================
 
-IrrlichtMt is the 3D engine of [Aperos Engine](https://github.com/vetuschronos/aperosengine).
+IrrlichtMt is the 3D engine of [Aperos Engine](https://github.com/VetusChronos/aperosengine).
 It is based on the [Irrlicht Engine](https://irrlicht.sourceforge.io/) but is now developed independently.
-It is intentionally not compatible to upstream and is planned to be eventually absorbed into Aperos Engine.
+It is intentionally not compatible to upstream and is planned to be eventually absorbed into AperosEngine.
 
 Build
 -----
@@ -20,12 +20,11 @@ The following libraries are required to be installed:
 Aside from standard search options (`ZLIB_INCLUDE_DIR`, `ZLIB_LIBRARY`, ...) the following options are available:
 * `ENABLE_OPENGL` - Enable OpenGL driver
 * `ENABLE_OPENGL3` (default: `OFF`) - Enable OpenGL 3+ driver
-* `ENABLE_GLES1` - Enable OpenGL ES driver, legacy
 * `ENABLE_GLES2` - Enable OpenGL ES 2+ driver
 * `USE_SDL2` (default: platform-dependent, usually `ON`) - Use SDL2 instead of older native device code
 
 However, IrrlichtMt cannot be built or installed separately.
-	
+
 Platforms
 ---------
 
@@ -40,4 +39,4 @@ This doesn't mean other platforms don't work or won't be supported, if you find 
 License
 -------
 
-See [LICENSE.md](LICENSE.md)
+See [LICENSE](./LICENSE)

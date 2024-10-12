@@ -1,11 +1,14 @@
 -- test ABMs with neighbor and without_neighbor
+
 local S = aperosengine.get_translator("testnodes")
+
 -- ABM required neighbor
 aperosengine.register_node("testabms:required_neighbor", {
 	description = S("Node for test ABM required_neighbor.") .. "\n"
 		.. S("Sensitive neighbor node is testnodes:normal."),
 	drawtype = "normal",
 	tiles = { "testabms_wait_node.png" },
+
 	groups = { dig_immediate = 3 },
 	
 	on_construct = function (pos)
@@ -15,6 +18,7 @@ aperosengine.register_node("testabms:required_neighbor", {
 			.. "(normal drawtype testnode sensitive)")
 	end,
 })
+
 aperosengine.register_abm({
 	label = "testabms:required_neighbor",
 	nodenames = "testabms:required_neighbor",
@@ -28,12 +32,14 @@ aperosengine.register_abm({
 			"ABM testabsm:required_neighbor changed this node.")
 	end
 })
+
 -- ABM missing neighbor node
 aperosengine.register_node("testabms:missing_neighbor", {
 	description = S("Node for test ABM missing_neighbor.") .. "\n"
 		.. S("Sensitive neighbor node is testnodes:normal."),
 	drawtype = "normal",
 	tiles = { "testabms_wait_node.png" },
+
 	groups = { dig_immediate = 3 },
 	
 	on_construct = function (pos)
@@ -43,6 +49,7 @@ aperosengine.register_node("testabms:missing_neighbor", {
 			.. " (normal drawtype testnode sensitive)")
 	end,
 })
+
 aperosengine.register_abm({
 	label = "testabms:missing_neighbor",
 	nodenames = "testabms:missing_neighbor",
@@ -56,12 +63,14 @@ aperosengine.register_abm({
 			"ABM testabsm:missing_neighbor changed this node.")
 	end
 })
+
 -- ABM required and missing neighbor node
 aperosengine.register_node("testabms:required_missing_neighbor", {
 	description = S("Node for test ABM required_missing_neighbor.") .. "\n"
 		.. S("Sensitive neighbor nodes are testnodes:normal and testnodes:glasslike."),
 	drawtype = "normal",
 	tiles = { "testabms_wait_node.png" },
+
 	groups = { dig_immediate = 3 },
 	
 	on_construct = function (pos)
@@ -72,6 +81,7 @@ aperosengine.register_node("testabms:required_missing_neighbor", {
 			.. " drawtype testnode sensitive)")
 	end,
 })
+
 aperosengine.register_abm({
 	label = "testabms:required_missing_neighbor",
 	nodenames = "testabms:required_missing_neighbor",
@@ -86,3 +96,4 @@ aperosengine.register_abm({
 			"ABM testabsm:required_missing_neighbor changed this node.")
 	end
 })
+

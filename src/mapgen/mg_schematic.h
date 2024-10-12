@@ -1,6 +1,6 @@
 /*
 Minetest
-Copyright (C) 2014-2018 kwolekr, Ryan Kwolek <kwolekr@aperosvoxel.domain>
+Copyright (C) 2014-2018 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
 Copyright (C) 2015-2018 paramat
 
 This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,7 @@ class Server;
 	AperosEngine Schematic File Format
 
 	All values are stored in big-endian byte order.
-	[u32] signature: 'MTSM'
+	[u32] signature: 'APRSM'
 	[u16] version: 4
 	[u16] size X
 	[u16] size Y
@@ -67,18 +67,18 @@ class Server;
 */
 
 //// Schematic constants
-#define MTSCHEM_FILE_SIGNATURE 0x4d54534d // 'MTSM'
-#define MTSCHEM_FILE_VER_HIGHEST_READ  4
-#define MTSCHEM_FILE_VER_HIGHEST_WRITE 4
-#define MTSCHEM_MAPNODE_SER_FMT_VER    28 // Fixed serialization version for schematics since these still need to use Zlib
+#define APRSCHEM_FILE_SIGNATURE 0x4d54534d // 'APRSM'
+#define APRSCHEM_FILE_VER_HIGHEST_READ  4
+#define APRSCHEM_FILE_VER_HIGHEST_WRITE 4
+#define APRSCHEM_MAPNODE_SER_FMT_VER    28 // Fixed serialization version for schematics since these still need to use Zlib
 
-#define MTSCHEM_PROB_MASK       0x7F
+#define APRSCHEM_PROB_MASK       0x7F
 
-#define MTSCHEM_PROB_NEVER      0x00
-#define MTSCHEM_PROB_ALWAYS     0x7F
-#define MTSCHEM_PROB_ALWAYS_OLD 0xFF
+#define APRSCHEM_PROB_NEVER      0x00
+#define APRSCHEM_PROB_ALWAYS     0x7F
+#define APRSCHEM_PROB_ALWAYS_OLD 0xFF
 
-#define MTSCHEM_FORCE_PLACE     0x80
+#define APRSCHEM_FORCE_PLACE     0x80
 
 enum SchematicType
 {

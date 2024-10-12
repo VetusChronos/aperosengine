@@ -1,6 +1,6 @@
 /* 
 * sha256.c modified by Vetus (Chronos)
-* based on libcrypto/sha/sha256.c (see LICENSE.md) 
+* based on libcrypto/sha/sha256.c (see LICENSE) 
 */
 
 #include <stdint.h>

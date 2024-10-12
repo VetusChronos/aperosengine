@@ -30,6 +30,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "defaultsettings.h"
 #include "gettext.h"
 #include "log.h"
+#include "log_internal.h"
 #include "util/quicktune.h"
 #include "httpfetch.h"
 #include "gameparams.h"
@@ -59,7 +60,7 @@ extern "C" {
 }
 
 #if !defined(__cpp_rtti) || !defined(__cpp_exceptions)
-#error AperosEngine cannot be built without exceptions or RTTI
+#error Minetest cannot be built without exceptions or RTTI
 #endif
 
 #if defined(__MINGW32__) && !defined(__clang__)
@@ -67,7 +68,7 @@ extern "C" {
 // https://github.com/minetest/minetest/issues/10137 for one of the various issues we had
 #error ==================================
 #error MinGW gcc has a broken TLS implementation and is not supported for building \
-	AperosEngine. Look at testTLS() in test_threading.cpp and see for yourself. \
+	Minetest. Look at testTLS() in test_threading.cpp and see for yourself. \
 	Please use a clang-based compiler or alternatively MSVC.
 #error ==================================
 #endif
@@ -364,15 +365,15 @@ static void set_allowed_options(OptionList *allowed_options)
 	allowed_options->insert(std::make_pair("gameid", ValueSpec(VALUETYPE_STRING,
 			_("Set gameid (\"--gameid list\" prints available ones)"))));
 	allowed_options->insert(std::make_pair("migrate", ValueSpec(VALUETYPE_STRING,
-			_("Migrate from current map backend to another (Only works when using aperosengineserver or with --server)"))));
+			_("Migrate from current map backend to another (Only works when using minetestserver or with --server)"))));
 	allowed_options->insert(std::make_pair("migrate-players", ValueSpec(VALUETYPE_STRING,
-		_("Migrate from current players backend to another (Only works when using aperosengineserver or with --server)"))));
+		_("Migrate from current players backend to another (Only works when using minetestserver or with --server)"))));
 	allowed_options->insert(std::make_pair("migrate-auth", ValueSpec(VALUETYPE_STRING,
-		_("Migrate from current auth backend to another (Only works when using aperosengineserver or with --server)"))));
+		_("Migrate from current auth backend to another (Only works when using minetestserver or with --server)"))));
 	allowed_options->insert(std::make_pair("migrate-mod-storage", ValueSpec(VALUETYPE_STRING,
-		_("Migrate from current mod storage backend to another (Only works when using aperosengineserver or with --server)"))));
+		_("Migrate from current mod storage backend to another (Only works when using minetestserver or with --server)"))));
 	allowed_options->insert(std::make_pair("terminal", ValueSpec(VALUETYPE_FLAG,
-			_("Feature an interactive terminal (Only works when using aperosengineserver or with --server)"))));
+			_("Feature an interactive terminal (Only works when using minetestserver or with --server)"))));
 	allowed_options->insert(std::make_pair("recompress", ValueSpec(VALUETYPE_FLAG,
 			_("Recompress the blocks of the given map database."))));
 #ifndef SERVER
@@ -449,7 +450,7 @@ static void list_game_ids()
 {
 	std::set<std::string> gameids = getAvailableGameIds();
 	for (const std::string &gameid : gameids)
-		std::cout << gameid <<'\n';
+		std::cout << gameid << '\n';
 }
 
 static void list_worlds(bool print_name, bool print_path)
@@ -1096,7 +1097,7 @@ static bool run_dedicated_server(const GameParams &game_params, const Settings &
 		if (!is_valid_player_name(admin_nick)) {
 			if (admin_nick.empty()) {
 				errorstream << "No name given for admin. "
-					<< "Please check your aperosengine.conf that it "
+					<< "Please check your minetest.conf that it "
 					<< "contains a 'name = ' to your main admin account."
 					<< '\n';
 			} else {
@@ -1171,14 +1172,14 @@ static bool run_dedicated_server(const GameParams &game_params, const Settings &
 static bool migrate_map_database(const GameParams &game_params, const Settings &cmd_args)
 {
 	std::string migrate_to = cmd_args.get("migrate");
-	Settings world_apr;
-	std::string world_apr_path = game_params.world_path + DIR_DELIM + "world.apr";
-	if (!world_apr.readConfigFile(world_apr_path.c_str())) {
+	Settings world_mt;
+	std::string world_mt_path = game_params.world_path + DIR_DELIM + "world.apr";
+	if (!world_mt.readConfigFile(world_mt_path.c_str())) {
 		errorstream << "Cannot read world.apr!" << '\n';
 		return false;
 	}
 
-	if (!world_apr.exists("backend")) {
+	if (!world_mt.exists("backend")) {
 		errorstream << "Please specify your current backend in world.apr:"
 			<< '\n'
 			<< "	backend = {sqlite3|leveldb|redis|dummy|postgresql}"
@@ -1186,15 +1187,15 @@ static bool migrate_map_database(const GameParams &game_params, const Settings &
 		return false;
 	}
 
-	std::string backend = world_apr.get("backend");
+	std::string backend = world_mt.get("backend");
 	if (backend == migrate_to) {
 		errorstream << "Cannot migrate: new backend is same"
 			<< " as the old one" << '\n';
 		return false;
 	}
 
-	MapDatabase *old_db = ServerMap::createDatabase(backend, game_params.world_path, world_apr),
-		*new_db = ServerMap::createDatabase(migrate_to, game_params.world_path, world_apr);
+	MapDatabase *old_db = ServerMap::createDatabase(backend, game_params.world_path, world_mt),
+		*new_db = ServerMap::createDatabase(migrate_to, game_params.world_path, world_mt);
 
 	u32 count = 0;
 	time_t last_update_time = 0;
@@ -1227,8 +1228,8 @@ static bool migrate_map_database(const GameParams &game_params, const Settings &
 	delete new_db;
 
 	actionstream << "Successfully migrated " << count << " blocks" << '\n';
-	world_apr.set("backend", migrate_to);
-	if (!world_apr.updateConfigFile(world_apr_path.c_str()))
+	world_mt.set("backend", migrate_to);
+	if (!world_mt.updateConfigFile(world_mt_path.c_str()))
 		errorstream << "Failed to update world.apr!" << '\n';
 	else
 		actionstream << "world.apr updated" << '\n';
@@ -1238,16 +1239,16 @@ static bool migrate_map_database(const GameParams &game_params, const Settings &
 
 static bool recompress_map_database(const GameParams &game_params, const Settings &cmd_args)
 {
-	Settings world_apr;
-	const std::string world_apr_path = game_params.world_path + DIR_DELIM + "world.apr";
+	Settings world_mt;
+	const std::string world_mt_path = game_params.world_path + DIR_DELIM + "world.apr";
 
-	if (!world_apr.readConfigFile(world_apr_path.c_str())) {
-		errorstream << "Cannot read world.apr at " << world_apr_path << '\n';
+	if (!world_mt.readConfigFile(world_mt_path.c_str())) {
+		errorstream << "Cannot read world.apr at " << world_mt_path << '\n';
 		return false;
 	}
-	const std::string &backend = world_apr.get("backend");
+	const std::string &backend = world_mt.get("backend");
 	Server server(game_params.world_path, game_params.game_spec, false, Address(), false);
-	MapDatabase *db = ServerMap::createDatabase(backend, game_params.world_path, world_apr);
+	MapDatabase *db = ServerMap::createDatabase(backend, game_params.world_path, world_mt);
 
 	u32 count = 0;
 	u64 last_update_time = 0;
