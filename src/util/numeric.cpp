@@ -21,7 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "log.h"
 #include "constants.h" // BS, MAP_BLOCKSIZE
-#include "noise.h" // PseudoRandom, PcgRandom
+#include "noise.h" // PseudoRandom
+#include "pcg_random.h" // PcgRandom
 #include "threading/mutex_auto_lock.h"
 #include <cstring>
 #include <cmath>

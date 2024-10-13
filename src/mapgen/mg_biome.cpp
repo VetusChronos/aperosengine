@@ -27,6 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/numeric.h"
 #include "porting.h"
 #include "settings.h"
+#include "pcg_random.h"
 
 #include <algorithm>
 

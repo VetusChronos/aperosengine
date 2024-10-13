@@ -33,6 +33,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/renderingengine.h"
 #include "settings.h"
 #include "camera.h" // CameraModes
+#include "pcg_random.h"
 
 using namespace irr::core;
 

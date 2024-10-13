@@ -9,9 +9,9 @@ PcgRandom::PcgRandom(uint64_t state, uint64_t seq) {
 void PcgRandom::seed(uint64_t state, uint64_t seq) {
     m_state = 0U;
     m_inc = (seq << 1u) | 1u;
-    next();
+    uint32_t init_val = next();
     m_state += state;
-    next();
+    uint32_t next_val = next();
 }
 
 uint32_t PcgRandom::next() {
@@ -24,48 +24,43 @@ uint32_t PcgRandom::next() {
 }
 
 uint32_t PcgRandom::range(uint32_t bound) {
-    if (bound == 0)
-        return next();
+    if (bound == 0) return next();
 
-    uint32_t threshold = -bound % bound;
+    const uint32_t threshold = RANDOM_RANGE % bound;
     uint32_t r;
-    while ((r = next()) < threshold)
-        ;
+
+    do {
+        r = next();
+    } while (r < threshold);
 
     return r % bound;
 }
 
 int32_t PcgRandom::range(int32_t min, int32_t max) {
-    if (max < min)
-        throw std::invalid_argument("Invalid range (max < min)");
-
-    uint32_t bound = static_cast<int64_t>(max) - static_cast<int64_t>(min) + 1;
-    return range(bound) + min;
+    if (max < min) throw std::invalid_argument("Invalid range (max < min)");
+    return range(static_cast<uint32_t>(max - min + 1)) + min;
 }
 
 void PcgRandom::bytes(void* out, size_t len) {
-    uint8_t* outb = static_cast<uint8_t*>(out);
-    int bytes_left = 0;
-    uint32_t r;
+    auto outb = static_cast<uint8_t*>(out);
+    uint32_t r = next(); // Initialize r before using it
 
     while (len--) {
-        if (bytes_left == 0) {
-            bytes_left = sizeof(uint32_t);
+        // Load a new integer every 4 bytes
+        if (len % sizeof(uint32_t) == 0) {
             r = next();
         }
-
-        *outb = r & 0xFF;
-        outb++;
-        bytes_left--;
-        r >>= CHAR_BIT;
+        *outb++ = static_cast<uint8_t>(r);
+        r >>= CHAR_BIT; // Move to the right
     }
 }
 
 int32_t PcgRandom::randNormalDist(int32_t min, int32_t max, int num_trials) {
     int32_t accum = 0;
-    for (int i = 0; i != num_trials; i++)
+    for (int i = 0; i < num_trials; ++i) {
         accum += range(min, max);
-    return static_cast<int32_t>(std::round(static_cast<float>(accum) / num_trials));
+    }
+    return std::round(static_cast<float>(accum) / num_trials);
 }
 
 void PcgRandom::getState(uint64_t state[2]) const {

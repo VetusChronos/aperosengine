@@ -34,6 +34,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "version.h"
 #include "settings.h"
 #include "noise.h"
+#include "pcg_random.h"
 
 static std::mutex g_httpfetch_mutex;
 static std::unordered_map<u64, std::queue<HTTPFetchResult>>
